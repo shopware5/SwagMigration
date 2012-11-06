@@ -197,7 +197,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
             defaultType: 'textfield',
             items :[{
                 xtype: 'label',
-                text: 'Database settings for the shop you want to migrate'
+                text: '{s name=dbDescription}Database settings for the shop you want to migrate{/s}'
             }, {
 				fieldLabel: '{s name=dbUser}User{/s}',
 				name: 'username',
@@ -267,7 +267,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
             items : [
                 {
                     xtype: 'label',
-                    text: 'Select the shop you want top migrate to shopware'
+                    text: '{s name=profileSelectDescription}Select the shop you want to migrate to Shopware{/s}'
                 },
                 me.profileSelection
             ]

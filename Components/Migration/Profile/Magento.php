@@ -187,11 +187,6 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			ON manufacturer_option.value_id=manufacturer.value
 		";
 
-        echo "<pre>";
-        print_r($sql);
-        echo "</pre>";
-        exit();
-        
         return $sql;
 	}
 

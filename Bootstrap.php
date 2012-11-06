@@ -15,6 +15,11 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 	 		'onGetControllerPath'
 	 	);
 
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PostDispatch',
+            'onPostDispatch',
+            110
+        );
 
 	 	$parent = $this->Menu()->findOneBy('label', 'Inhalte');
 		$item = $this->createMenuItem(array(
@@ -50,12 +55,20 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     protected function registerMyTemplateDir()
     {
-//        $this->Application()->Snippets()->addConfigDir(
-//            $this->Path() . 'Snippets/'
-//        );
+        $this->Application()->Snippets()->addConfigDir(
+            $this->Path() . 'Snippets/'
+        );
         $this->Application()->Template()->addTemplateDir(
             $this->Path() . 'Views/'
         );
+    }
+
+    /**
+     * @param Enlight_Event_EventArgs $args
+     */
+    public function onPostDispatch(Enlight_Event_EventArgs $args)
+    {
+        $this->registerMyTemplateDir();
     }
 
     /**

@@ -183,14 +183,14 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
         me.progressWindow = Ext.MessageBox.show({
             title        : 'Import',
-            msg          : "Depending on the import settings and the amount of data being imported, import might take a while.",
+            msg          : "{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}",
             width        : 300,
             progress     : true,
             closable     : false
         });
 
         // workaround to set the height of the MessageBox
-        me.progressWindow.setSize(300, 123);
+        me.progressWindow.setSize(300, 150);
         me.progressWindow.doLayout();
 
 

@@ -91,6 +91,19 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     createItems: function() {
         var me = this;
 
+        me.basePath = Ext.create('Ext.form.field.Text', {
+            fieldLabel: '{s name=articleImagesPath}Shop path for the article images (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
+            name: 'basepath',
+            value: '',
+            labelWidth: 500,
+            allowBlank: false,
+            listeners: {
+                change: function() {
+                    me.fireEvent('validate');
+                }
+            }
+        });
+
         me.fieldSet = {
             xtype:'fieldset',
             title: '{s name=importSettings}Import settings{/s}',
@@ -118,7 +131,14 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             }, {
                 fieldLabel: '{s name=importArticleImages}Import product images{/s}',
                 name: 'import_images',
-                xtype: 'checkbox'
+                xtype: 'checkbox',
+                listeners: {
+                    change: function(checkBox, newValue, oldValue, eOpts) {
+                        // if the product images are going to be imported, the basePath field is mandatory
+                        me.basePath.allowBlank = !newValue;
+                        me.fireEvent('validate');
+                    }
+                }
             }, {
                 fieldLabel: '{s name=importCategories}Import categories{/s}',
                 name: 'import_categories',
@@ -156,11 +176,9 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                         me.fireEvent('validate');
                     }
                 }
-            }, {
-                fieldLabel: '{s name=articleImagesPath}Shop path for the article images (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
-                name: 'basepath',
-                value: ''
-            }]
+            },
+                me.basePath
+            ]
         };
 
         return me.fieldSet;
