@@ -46,7 +46,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 		';
 		Shopware()->Db()->query($sql);
-		
+
 	 	return true;
 	}
 

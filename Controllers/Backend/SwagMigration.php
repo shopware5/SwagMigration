@@ -25,6 +25,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     protected $target;
 
     /**
+     * Namespace for the snippets
+     */
+    protected $namespace;
+
+    /**
      * This function add the template directory and register the Shopware_Components namespace
      */
     public function init()
@@ -449,7 +454,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Preise wurden importiert.',
+            'message'=>$this->namespace->get('importedPrices', "Prices successfully imported!"),
             'success'=>true,
             'import_prices'=>null,
             'offset'=>0,
@@ -520,7 +525,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Bilder wurden importiert.',
+            'message'=>$this->namespace->get('importedImages', "Images successfully imported!"),
             'success'=>true,
             'import_images'=>null,
             'offset'=>0,
@@ -648,7 +653,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Kategorien wurden importiert.',
+            'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
             'success'=>true,
             'import_categories'=>null,
             'offset'=>0,
@@ -708,7 +713,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Bewertungen wurden importiert.',
+            'message'=>$this->namespace->get('importedRatings', "Ratings successfully imported!"),
             'success'=>true,
             'import_ratings'=>null,
             'offset'=>0,
@@ -776,7 +781,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Übersetzungen wurden importiert.',
+            'message'=>$this->namespace->get('importedTranslations', "Translations successfully imported!"),
             'success'=>true,
             'import_translations'=>null,
             'offset'=>0,
@@ -894,7 +899,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
         echo Zend_Json::encode(array(
-            'message'=>'Alle Artikel wurden importiert.',
+            'message'=>$this->namespace->get('importedProducts', "Products successfully imported!"),
             'success'=>true,
             'import_products'=>null,
             'offset'=>0,
@@ -983,7 +988,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         echo Zend_Json::encode(array(
-            'message'=>'Alle Kunden wurden importiert.',
+            'message'=>$this->namespace->get('importedCustomers', "Customers successfully imported!"),
             'success'=>true,
             'import_customers'=>null,
             'offset'=>0,
@@ -1140,7 +1145,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         echo Zend_Json::encode(array(
-            'message'=>'Alle Bestellungen wurden importiert.',
+            'message'=>$this->namespace->get('importedOrders', "Orders successfully imported!"),
             'success'=>true,
             'import_orders'=>null,
             'import_order_details'=>1,
@@ -1226,7 +1231,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         echo Zend_Json::encode(array(
-            'message'=>'Alle Bestellungen wurden importiert.',
+            'message'=>$this->namespace->get('importedOrders', "Orders successfully imported!"),
             'success'=>true,
             'import_order_details'=>null,
             'offset'=>0,
@@ -1244,7 +1249,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ';
         Shopware()->Db()->query($sql);
         echo Zend_Json::encode(array(
-            'message'=>'Import abgeschlossen.',
+            'message'=>$this->namespace->get('importFinished', "Import finished"),
             'success'=>true,
             'progress'=>1,
             'done'=>true
@@ -1258,53 +1263,54 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function importAction()
     {
 
+        $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
         try {
             $errorMessage = '';
 
             if(!empty($this->Request()->import_products)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Artikel aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingProducts', "An error occurred while importing products");
                 return $this->importProducts();
             }
 
             if(!empty($this->Request()->import_translations)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Übersetzungen aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingTranslations', "An error occurred while importing translations");
 				return $this->importProductTranslations();
             }
 
             if(!empty($this->Request()->import_categories)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Kategorien aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingCategories', "An error occurred while importing categories");
                 return $this->importCategories();
             }
 
             if(!empty($this->Request()->import_prices)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Artikel Preise aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingPrices', "An error occurred while importing prices");
                 return $this->importProductPrices();
             }
 
             if(!empty($this->Request()->import_images)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Artikel Bilder aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingImages', "An error occurred while importing images");
                 return $this->importProductImages();
             }
 
             if(!empty($this->Request()->import_customers)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Kunden aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingCustomers', "An error occurred while importing customers");
                 return $this->importCustomers();
             }
 
             if(!empty($this->Request()->import_ratings)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Bewertungen aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingRatings', "An error occurred while importing ratings");
                 return $this->importProductRatings();
             }
 
             if(!empty($this->Request()->import_orders)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Bestellungen aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingOrders', "An error occurred while importing orders");
                 return $this->importOrders();
             }
 
             if(!empty($this->Request()->import_order_details)) {
-                $errorMessage = 'Es ist ein Fehler beim importieren der Bestellpositionen aufgetreten.';
+                $errorMessage = $this->namespace->get('errorImportingOrderDetails', "An error occurred while importing order details");
                 return $this->importOrderDetails();
             }
 
@@ -1313,7 +1319,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             echo Zend_Json::encode(array(
-                'message'=>utf8_encode('Alle ausgew&auml;hlte Daten wurden importiert.'),
+                'message'=>$this->namespace->get('importedSelectedData', "Selected data successfully imported!"),
                 'success'=>true,
                 'progress'=>1,
                 'done'=>true
