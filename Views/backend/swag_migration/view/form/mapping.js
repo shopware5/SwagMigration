@@ -265,9 +265,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
         this.mappingStoreLeft.each(function(record){
             if(record.data.required) {
                 if(record.data.mapping_name == '' || record.data.mapping_name == 'keine Auswahl' || record.data.mapping == '') {
-                    console.log(record.get('name')+" missing");
-                    console.log("Current name "+record.get('mapping_name'));
-                    console.log("Current value "+record.get('mapping'));
                     allMapped = false;
                 }
             }
@@ -276,9 +273,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
         this.mappingStoreRight.each(function(record){
             if(record.data.required) {
                 if(record.data.mapping_name == '' || record.data.mapping_name == 'keine Auswahl' || record.data.mapping == '') {
-                    console.log(record.get('name')+" missing");
-                    console.log("Current name "+record.get('mapping_name'));
-                    console.log("Current value "+record.get('mapping'));
                     allMapped = false;
                 }
             }

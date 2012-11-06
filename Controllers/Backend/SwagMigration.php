@@ -516,7 +516,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Bilder importiert.',
+                    'message'=>sprintf($this->namespace->get('progressImages', "%s out of %s images imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -644,7 +644,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Kategorien-Zuordnugen importiert.',
+                    'message'=>sprintf($this->namespace->get('progressCategories', "%s out of %s categories imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -772,7 +772,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '. $count . '&Uuml;bersetzungen importiert.',
+                    'message'=>sprintf($this->namespace->get('progressTranslations', "%s out of %s translations imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -890,7 +890,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Artikel importiert.',
+                    'message'=>sprintf($this->namespace->get('progressArticles', "%s out of %s articles imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -978,7 +978,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Kunden importiert.',
+                    'message'=>sprintf($this->namespace->get('progressCustomers', "%s out of %s customers imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -1135,7 +1135,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Bestellungen importiert.',
+                    'message'=>sprintf($this->namespace->get('progressOrders', "%s out of %s orders imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
@@ -1221,7 +1221,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>$offset.' von '.$count.' Bestell-Position importiert.',
+                    'message'=>sprintf($this->namespace->get('progressOrderDetails', "%s out of %s order details imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count
