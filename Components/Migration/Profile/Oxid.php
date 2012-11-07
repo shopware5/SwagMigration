@@ -201,13 +201,14 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	public function getProductSelect()
 	{
 		return "
-			SELECT
+SELECT
 				a.OXID 				as `productID`,
 				a.OXPARENTID 		as `parentID`,
 				a.OXARTNUM 			as ordernumber,
 				a.OXACTIVE 			as active,
 				a.OXTITLE 			as name,
 				a.OXVARSELECT 		as additionaltext,
+			    COALESCE(a2.OXVARNAME, '') as variant_group_names,
 				a.OXSHORTDESC 		as description,
 				a.OXSEARCHKEYS 		as keywords,
 				a.OXWEIGHT 			as weight,
@@ -224,34 +225,37 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				a.OXTPRICE 			as pseudoprice,
 				a.OXBPRICE 			as baseprice,
 				a.OXPRICE 			as price,
-				
+
 				-- a.OXPRICEA 		as price_A,
 				-- a.OXPRICEB 		as price_B,
 				-- a.OXPRICEC 		as price_C,
-				
+
 				s.OXTITLE 			as supplier,
 				e.OXLONGDESC 		as description_long,
 				e.OXTAGS 			as tags,
-				
+
 				a.OXEXTURL 			as link,
 				a.OXURLDESC			as link_description,
 				a.OXLENGTH 			as length,
 				a.OXWIDTH 			as width,
 				a.OXHEIGHT 			as height,
-				
-				OXUNITNAME			as packunit,
-				OXUNITQUANTITY		as purchaseunit
-					
+
+				a.OXUNITNAME			as packunit,
+				a.OXUNITQUANTITY		as purchaseunit
+
 			FROM {$this->quoteTable('articles', 'a')}
-			
+
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.OXID=a.OXMANUFACTURERID
-			
+
+			LEFT JOIN {$this->quoteTable('articles', 'a2')}
+			ON a2.OXID=a.OXPARENTID
+
 			LEFT JOIN {$this->quoteTable('artextends', 'e')}
 			ON e.OXID=a.OXID
-			
+
 			ORDER BY `parentID`, a.OXSORT
-		";
+        ";
 	}
 
     /**
@@ -333,6 +337,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 					a.OXID 					as productID,
 					{$this->Db()->quote($languageID)} as languageID,
 					a.OXTITLE_$key 			as name,
+					-- a.OXVARNAME_$key        as configuratorgroup,
 					a.OXVARSELECT_$key 		as additionaltext,
 					a.OXSHORTDESC_$key 		as description,
 					a.OXSEARCHKEYS_$key 	as keywords,

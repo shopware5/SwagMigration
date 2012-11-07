@@ -142,9 +142,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function databaseListAction() 
     {
-
         $this->Front()->Plugins()->Json()->setRenderer(false);
-
 
         $rows = array();
         try {
@@ -381,7 +379,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function checkFormAction()
     {
-
+        $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
         try {
@@ -394,7 +392,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         } catch (Zend_Db_Statement_Exception $e) {
             switch($e->getCode()) {
                 case 42:
-                    echo Zend_Json::encode(array('success'=>false, 'message'=>utf8_encode("The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
+                    echo Zend_Json::encode(array('success'=>false, 'message'=>$this->namespace->get('databaseProfileDoesNotMatch', "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
                     break;
                 default:
                     echo Zend_Json::encode(array('success'=>false, 'message'=>utf8_encode($e->getMessage())));
@@ -770,7 +768,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= 10)  {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressTranslations', "%s out of %s translations imported"), $offset, $count),
                     'success'=>true,
@@ -823,10 +821,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             //Supplier
             if(empty($product['supplierID']) && empty($product['supplier'])) {
                 $product['supplier'] = utf8_decode($this->Request()->supplier);
-                error_log("nope");
-            }else{
-                error_log($product['supplierID']);
-                error_log($product['supplier']);
             }
             //Parent
             if(!empty($product['parentID'])) {
