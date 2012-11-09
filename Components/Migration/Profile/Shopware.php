@@ -130,6 +130,8 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
 			SELECT `name` as id, `label` as name
 			FROM {$this->quoteTable('core_engine_elements')}
 			WHERE `name` LIKE '%attr%%'
+			UNION ALL
+			SELECT 'ean' as id, 'EAN' as name
 		";
     }
 

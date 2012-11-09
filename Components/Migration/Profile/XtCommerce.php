@@ -148,12 +148,12 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				d.products_meta_description 			as meta_description,
 				d.products_meta_keywords 				as keywords,
 				d.products_url							as link
-				
+
 			FROM {$this->quoteTable('products', 'a')}
 			
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
-			
+
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
 			AND d.language_id={$this->Db()->quote($this->getDefaultLanguage())}

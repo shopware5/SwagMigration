@@ -132,11 +132,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'xt:Commerce 3.04'),
-            array('id'=>'Shopware350', 	'name'=>'Shopware 3.5.0'),
+//            array('id'=>'Shopware350', 	'name'=>'Shopware 3.5.0'),
+            array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.2'),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
+    /**
     /**
      * Returns the database list of the server.
      */
@@ -175,10 +177,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             WHERE `name` LIKE ?
             ORDER BY `name`
         ';
-        $query = empty($this->Request()->query) ? '%' : '%'.trim(utf8_decode($this->Request()->query)).'%';
+        $query = empty($this->Request()->query) ? '%' : '%'.trim($this->Request()->query).'%';
         $rows = Shopware()->Db()->fetchAll($sql, array($query));
         foreach ($rows as $key=>$row) {
-            $rows[$key]['name'] = utf8_encode(htmlspecialchars_decode($row['name']));
+            $rows[$key]['name'] = htmlspecialchars_decode($row['name']);
         }
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
@@ -239,25 +241,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $target = self::setAliases($this->Target()->getShops());
         $shops = self::mapArrays($this->Source()->getShops(), $target);
         foreach ($shops as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'shop', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]), 'required'=>true);
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'shop', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
         }
 
         $target = self::setAliases($this->Target()->getLanguages());
         $languages = self::mapArrays($this->Source()->getLanguages(), $target);
         foreach ($languages as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'language', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]), 'required'=>true);
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'language', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
         }
 
         $target = self::setAliases($this->Target()->getCustomerGroups());
         $customerGroups = self::mapArrays($this->Source()->getCustomerGroups(), $target);
         foreach ($customerGroups as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'customer_group', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'customer_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         $target = self::setAliases($this->Target()->getPriceGroups());
         $priceGroups = self::mapArrays($this->Source()->getPriceGroups(), $target);
         foreach ($priceGroups as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'price_group', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'price_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
@@ -305,25 +307,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $target = self::setAliases($this->Target()->getPaymentMeans());
         $paymentMeans = self::mapArrays($this->Source()->getPaymentMeans(), $target);
         foreach ($paymentMeans as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'payment_mean', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'payment_mean', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         $target = self::setAliases($this->Target()->getOrderStatus());
         $orderStatus = self::mapArrays($this->Source()->getOrderStatus(), $target);
         foreach ($orderStatus as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'order_status', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'order_status', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         $target = self::setAliases($this->Target()->getTaxRates());
         $taxRates = self::mapArrays($this->Source()->getTaxRates(), $target);
         foreach ($taxRates as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>utf8_encode($name["value"]), 'group'=>'tax_rate', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'tax_rate', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         $target = self::setAliases($this->Target()->getAttributes());
         $attributes = self::mapArrays($this->Source()->getAttributes(), $target);
         foreach ($attributes as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'attribute', 'mapping_name'=>utf8_encode($name["mapping"]), 'mapping'=>utf8_encode($name["mapping_value"]));
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'attribute', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
@@ -364,11 +366,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             default:
                 break;
         }
-        $rows = array(array('id'=>0, 'name'=>utf8_encode('keine Auswahl')));
+        $rows = array(array('id'=>0, 'name'=>'keine Auswahl'));
         
         if(!empty($values)) {
             foreach ($values as $key=>$value) {
-                $rows[] = array('id'=>$key, 'name'=>utf8_encode($value));
+                $rows[] = array('id'=>$key, 'name'=>$value);
             }
         }
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
@@ -395,10 +397,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     echo Zend_Json::encode(array('success'=>false, 'message'=>$this->namespace->get('databaseProfileDoesNotMatch', "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
                     break;
                 default:
-                    echo Zend_Json::encode(array('success'=>false, 'message'=>utf8_encode($e->getMessage())));
+                    echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
             }
         } catch (Exception $e) {
-            echo Zend_Json::encode(array('success'=>false, 'message'=>utf8_encode($e->getMessage())));
+            echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
         }
     }
 
@@ -820,7 +822,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             //Supplier
             if(empty($product['supplierID']) && empty($product['supplier'])) {
-                $product['supplier'] = utf8_decode($this->Request()->supplier);
+                $product['supplier'] = $this->Request()->supplier;
             }
             //Parent
             if(!empty($product['parentID'])) {
@@ -1053,12 +1055,14 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
             if(!empty($order['orderID'])) {
+                error_log("update: ".$order['orderID']);
                 Shopware()->Db()->update('s_order', $data, array('id=?'=>$order['orderID']));
                 $sql = 'DELETE FROM `s_order_details` WHERE `orderID`=?';
                 Shopware()->Db()->query($sql , array($order['orderID']));
             } else {
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
+                error_log("create: ".$order['orderID']);
                 Shopware()->Db()->insert('s_plugin_migrations' , array(
                     'typeID'=>4, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
                 ));
@@ -1197,6 +1201,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'orderID' => $order['orderID'],
                 'articleID' => isset($order['articleID']) ? (int) $order['articleID'] : 0,
                 'articleordernumber' => $order['article_ordernumber'],
+                'ordernumber' => !empty($order['ordernumber']) ? $order['ordernumber'] : '',
                 'name' => $order['name'],
                 'price' => $order['price'],
                 'taxID' =>  !empty($order['taxID']) ? $order['taxID'] : 0,
@@ -1321,12 +1326,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         } catch (Exception $e) {
             echo Zend_Json::encode(array(
-                'message'=>utf8_encode($errorMessage),
-                'error'=>utf8_encode($e->getMessage()),
-                'code'=>utf8_encode($e->getCode()),
-                'file'=>utf8_encode($e->getFile()),
-                'line'=>utf8_encode($e->getLine()),
-                'trace'=>utf8_encode($e->getTraceAsString()),
+                'message'=>$errorMessage,
+                'error'=>$e->getMessage(),
+                'code'=>$e->getCode(),
+                'file'=>$e->getFile(),
+                'line'=>$e->getLine(),
+                'trace'=>$e->getTraceAsString(),
                 'success'=>false,
                 'progress'=>1,
                 'done'=>true
