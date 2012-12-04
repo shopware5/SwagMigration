@@ -139,7 +139,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     		'version' => $this->getVersion(),
     		'label' => $this->getLabel(),
             'author' => 'shopware AG',
-    		'description' => 'Import shop data from various third party shops',
+            'description' => file_get_contents($this->Path() . 'info.txt'),
     		'support' => 'http://www.forum.shopware.de',
     		'changes' =>array(
     				'1.3.1'=>array('releasedate'=>'2010-01-18', 'lines' => array(
