@@ -98,7 +98,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
             name: 'deleteArticlesAndCategories',
             text: '{s name=deleteCategoriesAndArticles}Delete categories and articles{/s}',
             cls: 'primary',
-            anchor: '30%',
             scope: this,
             handler  : function() {
                 Ext.Msg.show({
