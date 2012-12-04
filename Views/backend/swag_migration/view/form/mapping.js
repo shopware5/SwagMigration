@@ -56,7 +56,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * Set css class for this component
      * @string
      */
-    cls: Ext.baseCSSPrefix + 'migration-form-mapping',
+    cls: 'shopware-form',
 
     defaults: {
         style: {

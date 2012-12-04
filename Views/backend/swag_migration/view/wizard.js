@@ -99,6 +99,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
 
         me.buttonPrev = Ext.create(Ext.button.Button, {
             text: '{s name=prevBtn}Back{/s}',
+            cls: 'secondary',
             handler: function(btn) {
                 me.fireEvent('navigate', btn.up("panel"), "prev");
             },
@@ -107,6 +108,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
 
         me.buttonNext = Ext.create(Ext.button.Button, {
             text: '{s name=nextBtn}Next{/s}',
+            cls: 'primary',
             handler: function(btn) {
                 me.fireEvent('navigate', btn.up("panel"), "next");
             }

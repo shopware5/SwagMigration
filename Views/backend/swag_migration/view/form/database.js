@@ -56,9 +56,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
      * Set css class for this component
      * @string
      */
-    cls: Ext.baseCSSPrefix + 'migration-form-database',
-
-
+    cls: 'shopware-form',
 
     /**
 	 * The initComponent template method is an important initialization step for a Component.
@@ -96,17 +94,17 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
         var me = this;
 
         me.clearShopForm = Ext.create('Ext.form.FieldSet', {
-            title: '{s name=initShop}Initialize Shop{/s}',
             autoHeight: true,
             defaults: { anchor: '100%' },
             defaultType: 'button',
+            title: '{s name=initShop}Initialize Shop{/s}',
             items: [{
-                xtype: 'label',
-                text: '{s name=clearShop}Clear the local shopware shop in order to have a clean start{/s}'
-            }, {
+                fieldLabel: '{s name=clearShop}Clear the local Shopware shop in order to have a clean start{/s}',
+                anchor: '30%',
+                name: 'deleteArticlesAndCategories',
                 text: '{s name=deleteCategoriesAndArticles}Delete categories and articles{/s}',
+                cls: 'primary',
                 scope: this,
-                height: 35,
                 handler  : function() {
                     Ext.Msg.show({
                         title: '{s name=initShop}Initialize Shop{/s}',
