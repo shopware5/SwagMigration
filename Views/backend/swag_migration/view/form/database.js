@@ -93,41 +93,44 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
     createFormFieldClearShop: function() {
         var me = this;
 
+        var button = Ext.create('Ext.button.Button', {
+            tooltip: '{s name=clearShop}Clear the local Shopware shop in order to have a clean start{/s}',
+            name: 'deleteArticlesAndCategories',
+            text: '{s name=deleteCategoriesAndArticles}Delete categories and articles{/s}',
+            cls: 'primary',
+            anchor: '30%',
+            scope: this,
+            handler  : function() {
+                Ext.Msg.show({
+                    title: '{s name=initShop}Initialize Shop{/s}',
+                    msg: '{s name=initShop/AreYouSure}Are you sure? All categories and articles will be lost permanently.{/s}',
+                    buttons: Ext.Msg.YESNO,
+                    scope: this,
+                    fn: function (btn) {
+                        if (btn === "yes") {
+                            Ext.Ajax.request({
+                                url: '{url action="clearShop"}',
+                                success: function (r, o){
+                                    var res = r.responseText;
+                                    Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
+
+                                },
+                                scope: this
+                            });
+                        }
+                    },
+                    icon: Ext.MessageBox.WARNING
+                });
+            }
+        });
+
+
         me.clearShopForm = Ext.create('Ext.form.FieldSet', {
             autoHeight: true,
-            defaults: { anchor: '100%' },
-            defaultType: 'button',
             title: '{s name=initShop}Initialize Shop{/s}',
-            items: [{
-                fieldLabel: '{s name=clearShop}Clear the local Shopware shop in order to have a clean start{/s}',
-                anchor: '30%',
-                name: 'deleteArticlesAndCategories',
-                text: '{s name=deleteCategoriesAndArticles}Delete categories and articles{/s}',
-                cls: 'primary',
-                scope: this,
-                handler  : function() {
-                    Ext.Msg.show({
-                        title: '{s name=initShop}Initialize Shop{/s}',
-                        msg: '{s name=initShop/AreYouSure}Are you sure? All categories and articles will be lost permanently.{/s}',
-                        buttons: Ext.Msg.YESNO,
-                        scope: this,
-                        fn: function (btn) {
-                            if (btn === "yes") {
-                                Ext.Ajax.request({
-                                    url: '{url action="clearShop"}',
-                                    success: function (r, o){
-                                        var res = r.responseText;
-                                        Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
-
-                                    },
-                                    scope: this
-                                });
-                            }
-                        },
-                        icon: Ext.MessageBox.WARNING
-                    });
-                }
-            }]
+            items: [
+                button
+            ]
         });
 
         return me.clearShopForm;
