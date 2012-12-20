@@ -73,6 +73,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if(isset($query['username'])&&$query['username']!='default') {
             $config['username'] = $query['username'];
         }
+        if(isset($query['prefix'])&&$query['prefix']!='default') {
+            $config['prefix'] = $query['prefix'];
+        }
         if(isset($query['password'])&&$query['password']!='default') {
             $config['password'] = $query['password'];
         }

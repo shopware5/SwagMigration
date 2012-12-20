@@ -132,7 +132,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				d.products_description 					as description_long,
 				d.products_short_description 			as description,
 				d.products_keywords 					as keywords
-				
+
 			FROM {$this->quoteTable('products', 'a')}
 			
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
