@@ -242,7 +242,7 @@ SELECT
 				a.OXHEIGHT 			as height,
 				a.OXEAN 			as ean,
 
-				REPLACE(a.OXUNITNAME, '_UNIT_', '')			as packunit,
+				LOWER(REPLACE(a.OXUNITNAME, '_UNIT_', ''))			as packunit,
 				a.OXUNITQUANTITY		as purchaseunit
 
 			FROM {$this->quoteTable('articles', 'a')}
