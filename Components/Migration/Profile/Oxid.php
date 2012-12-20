@@ -140,14 +140,6 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	public function getAttributeSelect()
 	{
 		return "
-				SELECT 'length' as id, 'Länge' as name
-			UNION
-				SELECT 'width' as id, 'Weite' as name
-			UNION
-				SELECT 'height' as id, 'Höhe' as name
-			UNION
-				SELECT 'tags' as id, 'Stichworte' as name
-			UNION
 				SELECT 'ean' as id, 'EAN' as name
 		";
 	}

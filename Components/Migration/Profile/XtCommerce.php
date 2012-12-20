@@ -119,15 +119,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	public function getAttributeSelect()
 	{
 		return "
-				SELECT 'fsk18' as id, 'FSK 18' as name
-			UNION
 				SELECT 'asin' as id, 'ASIN' as name
-			UNION
-				SELECT 'tags' as id, 'Stichworte' as name
-			UNION
-				SELECT 'meta_title' as id, 'Meta Title' as name
-			UNION
-				SELECT 'meta_description' as id, 'Meta Description' as name
 		";
 	}
 
