@@ -134,17 +134,6 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	}
 
     /**
-   	 * Returns the sql statement to select the shop system article attributes
-   	 * @return string {String} | sql for the article attributes
-   	 */
-	public function getAttributeSelect()
-	{
-		return "
-				SELECT 'ean' as id, 'EAN' as name
-		";
-	}
-
-    /**
    	 * Returns the sql statement to select the shop system customer
    	 * @return string {String} | sql for the customer data
    	 */
@@ -251,6 +240,7 @@ SELECT
 				a.OXLENGTH 			as length,
 				a.OXWIDTH 			as width,
 				a.OXHEIGHT 			as height,
+				a.OXEAN 			as ean,
 
 				a.OXUNITNAME			as packunit,
 				a.OXUNITQUANTITY		as purchaseunit
