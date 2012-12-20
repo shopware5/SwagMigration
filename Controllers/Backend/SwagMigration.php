@@ -385,7 +385,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             default:
                 break;
         }
-        $rows = array(array('id'=>0, 'name'=>'keine Auswahl'));
+        $rows = array(array('id'=>0, 'name'=>'Bitte wählen'));
         
         if(!empty($values)) {
             foreach ($values as $key=>$value) {

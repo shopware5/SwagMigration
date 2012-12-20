@@ -231,18 +231,18 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                 sortable: false,
                 flex: 1,
                 renderer: function(val, p, r){
-                    if(r.data.mapping_name && r.data.mapping_name != 'keine Auswahl') {
+                    if(r.data.mapping_name && r.data.mapping_name != 'Bitte wählen') {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
                                 'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "This property has been mapped");
+                                "{s name=mappedProperty}This property has been mapped{/s}");
                     } else if(r.data.required) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-minus-circle-frame" ' +
                                 'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "Mapping of this property is required");
+                                "{s name=requiredProperty}Mapping of this property is required{/s}");
                     } else {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-exclamation--frame" ' +
                                 'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "Properties not being mapped will be skipped during the migration");
+                                "{s name=missingProperty}Properties not being mapped will be skipped during the migration{/s}");
                     }
                 }
             }, {
@@ -264,7 +264,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
 
         this.mappingStoreLeft.each(function(record){
             if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == 'keine Auswahl' || record.data.mapping == '') {
+                if(record.data.mapping_name == '' || record.data.mapping_name == 'Bitte wählen' || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
@@ -272,7 +272,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
 
         this.mappingStoreRight.each(function(record){
             if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == 'keine Auswahl' || record.data.mapping == '') {
+                if(record.data.mapping_name == '' || record.data.mapping_name == 'Bitte wählen' || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
