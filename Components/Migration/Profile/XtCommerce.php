@@ -123,8 +123,6 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			UNION
 				SELECT 'asin' as id, 'ASIN' as name
 			UNION
-				SELECT 'ean' as id, 'EAN' as name
-			UNION
 				SELECT 'tags' as id, 'Stichworte' as name
 			UNION
 				SELECT 'meta_title' as id, 'Meta Title' as name
@@ -461,6 +459,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				`currency`										as currency,
 				`currency_value`								as currency_factor,
 				-- `language_code`								as languageID,
+				l.`languages_id`									        as languageID,
 				`comments`										as customercomment,
 				`date_purchased`								as date,
 				`orders_status`									as statusID,
@@ -468,9 +467,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				-- IF(o.`allow_tax`=1,0,1)						as tax_free,
 				o.`customers_ip`								as remote_addr,
 				-- `shop_id`									as subshopID,
-				
+
 				(
-					SELECT `value` 
+					SELECT `value`
 					FROM {$this->quoteTable('orders_total')}
 					WHERE `class` = 'ot_shipping'
 					AND `orders_id`=o.`orders_id`
@@ -503,6 +502,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			
 			LEFT JOIN {$this->quoteTable('customers', 'u')}
 			ON u.customers_id=o.customers_id
+
+            LEFT JOIN {$this->quoteTable('languages', 'l')}
+			ON l.directory=o.language
 			
 			LEFT JOIN {$this->quoteTable('address_book', 'a')}
 			ON a.customers_id=u.customers_id

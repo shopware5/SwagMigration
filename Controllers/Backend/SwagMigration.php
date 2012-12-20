@@ -147,7 +147,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = array(
             array('id'=>'Magento', 		'name'=>'Magento 1.4.2 bis 1.7.2'),
-            array('id'=>'Oxid', 		'name'=>'OXID eShop 4.4.5 bis 4.6.5'),
+            array('id'=>'Oxid', 		'name'=>'OXID eShop bis 4.7.1'),
             array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
