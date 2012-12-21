@@ -138,7 +138,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				a.products_shippingtime					as shippingtime,
 				a.products_model						as ordernumber,
 				-- a.products_image						as image,
-				a.products_price						as price,
+
+				a.products_price						as net_price,
+
 				a.products_date_available 				as releasedate,
 				a.products_date_added					as added,
 				-- a.last_modified 						as changed,
@@ -160,7 +162,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				d.products_url							as link
 
 			FROM {$this->quoteTable('products', 'a')}
-			
+
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
 
@@ -446,7 +448,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 								
 				o.`customers_telephone`							as phone,
 				-- `billing_fax`								as fax,
-				`payment_class`									as paymentID,
+				`payment_method`									as paymentID,
 				`shipping_class`								as dispatchID,
 				`currency`										as currency,
 				`currency_value`								as currency_factor,
