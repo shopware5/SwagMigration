@@ -661,7 +661,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             foreach ($categories as $category) {
-                Shopware()->Api()->Import()->sArticleCategory($article, $category);
+                Shopware()->Api()->Import()->sArticleCategory($article, $category, false);
             }
 
             if(time()-$requestTime >= 10) {
@@ -1077,14 +1077,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
             if(!empty($order['orderID'])) {
-                error_log("update: ".$order['orderID']);
                 Shopware()->Db()->update('s_order', $data, array('id=?'=>$order['orderID']));
                 $sql = 'DELETE FROM `s_order_details` WHERE `orderID`=?';
                 Shopware()->Db()->query($sql , array($order['orderID']));
             } else {
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
-                error_log("create: ".$order['orderID']);
                 Shopware()->Db()->insert('s_plugin_migrations' , array(
                     'typeID'=>4, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
                 ));
