@@ -608,10 +608,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $category['parent'] = Shopware()->Db()->fetchOne($sql , array($this->Request()->language[$category['languageID']]));
             }
 
-            if(!empty($category['cmstext']) && strlen($category['cmstext'])>1000) {
-                unset($category['cmstext']);
-            }
-
             try {
                 $targets[$category['categoryID']] = $category['targetID'] = Shopware()->Api()->Import()->sCategory($category);
             }
