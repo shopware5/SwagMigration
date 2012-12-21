@@ -1063,7 +1063,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'invoice_shipping_net' => !empty($order['invoice_shipping_net']) ? $order['invoice_shipping_net'] : 0,
                 'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
                 'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
-                'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 0,
+                'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
                 'paymentID' => !empty($order['paymentID']) ? (int) $order['paymentID'] : 0,
                 'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
                 'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
