@@ -589,6 +589,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 }
             }
 
+            // Do not create empty categories
+            if(empty($category['description'])) {
+                continue;
+            }
             if(!empty($category['parentID'])) {
 
                 if (!empty($targets[$category['parentID']])) {
