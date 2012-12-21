@@ -954,6 +954,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($customer['shipping_countryiso']));
             }
 
+            if(!isset($customer['paymentID'])) {
+                $customer['paymentID'] = Shopware()->Config()->Paymentdefault;
+            }
+
+
             if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
                 $customer_shipping = array(
                     'company' => !empty($customer['shipping_company']) ? $customer['shipping_company'] : '',

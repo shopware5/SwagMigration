@@ -222,7 +222,7 @@ SELECT
 					IF(a.OXDELTIMEUNIT='WEEK', a.OXMINDELTIME*7, a.OXMINDELTIME),
 					IF(a.OXMAXDELTIME!=0, CONCAT('-', IF(a.OXDELTIMEUNIT='WEEK', a.OXMAXDELTIME*7, a.OXMAXDELTIME)), '')
 				)					as shippingtime,
-				a.OXVAT				as tax,
+			    COALESCE(ap.OXVAT, a.OXVAT) as tax,
 				a.OXTPRICE 			as pseudoprice,
 				a.OXBPRICE 			as baseprice,
 				a.OXPRICE 			as price,
@@ -246,6 +246,9 @@ SELECT
 				a.OXUNITQUANTITY		as purchaseunit
 
 			FROM {$this->quoteTable('articles', 'a')}
+
+			LEFT JOIN {$this->quoteTable('articles', 'ap')}
+			ON a.OXID=ap.OXPARENTID
 
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.OXID=a.OXMANUFACTURERID
