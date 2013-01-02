@@ -259,6 +259,7 @@ SELECT
 			LEFT JOIN {$this->quoteTable('artextends', 'e')}
 			ON e.OXID=a.OXID
 
+            GROUP BY a.OXID
 			ORDER BY `parentID`, a.OXSORT
         ";
 	}

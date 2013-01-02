@@ -595,11 +595,14 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             if(!empty($category['parentID'])) {
 
+                // Map the category IDs
                 if (!empty($targets[$category['parentID']])) {
                     $category['parent'] = $targets[$category['parentID']];
+                // Push the category to the end of the list, if the parentID is not available, yet
                 } elseif(isset($targets[$category['parentID']]) && $targets[$category['parentID']] != false) {
                     array_push($categories, $category);
                     continue;
+                // Drop any other category
                 } else {
 					unset($targets[$category['categoryID']]);
                     continue;
