@@ -1086,6 +1086,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'remote_addr' => isset($order['remote_addr']) ? $order['remote_addr'] : '',
             );
 
+            if($data['cleareddate'] === '0000-00-00 00:00:00') {
+                $data['cleareddate'] = NULL;
+            }
 
             if(!empty($order['orderID'])) {
                 Shopware()->Db()->update('s_order', $data, array('id=?'=>$order['orderID']));
