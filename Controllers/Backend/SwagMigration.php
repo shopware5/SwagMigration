@@ -275,7 +275,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $target = self::setAliases($this->Target()->getCustomerGroups());
         $customerGroups = self::mapArrays($this->Source()->getCustomerGroups(), $target);
         foreach ($customerGroups as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'customer_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'customer_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
         }
 
         $target = self::setAliases($this->Target()->getPriceGroups());
