@@ -135,7 +135,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 
 				a.products_quantity						as instock,
 				-- a.products_average_quantity			as stockmin,
-				a.products_shippingtime					as shippingtime,
+				-- a.products_shippingtime					as shippingtime,
 				a.products_model						as ordernumber,
 				-- a.products_image						as image,
 
