@@ -96,13 +96,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
         var button = Ext.create('Ext.button.Button', {
             tooltip: '{s name=clearShop}Clear the local Shopware shop in order to have a clean start{/s}',
             name: 'deleteArticlesAndCategories',
-            text: '{s name=deleteCategoriesAndArticles}Delete categories and articles{/s}',
+            text: '{s name=deleteCategoriesAndArticles}Delete orders, categories and articles{/s}',
             cls: 'primary',
             scope: this,
             handler  : function() {
                 Ext.Msg.show({
                     title: '{s name=initShop}Initialize Shop{/s}',
-                    msg: '{s name=initShop/AreYouSure}Are you sure? All categories and articles will be lost permanently.{/s}',
+                    msg: '{s name=initShop/AreYouSure}Are you sure? All orders, categories and articles will be lost permanently.{/s}',
                     buttons: Ext.Msg.YESNO,
                     scope: this,
                     fn: function (btn) {

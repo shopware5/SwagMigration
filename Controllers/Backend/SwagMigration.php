@@ -136,6 +136,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         Shopware()->Api()->Import()->sDeleteAllCategories();
         Shopware()->Api()->Import()->sDeleteAllArticles();
+        Shopware()->Api()->Import()->sDeleteAllOrders();
+
+
 
 		echo Zend_Json::encode(array('success'=>true));
 	}
