@@ -384,20 +384,24 @@ SELECT
 		$keys = $this->getLanguageKeys();
 		$sql = array("
 			SELECT 
-				OXID as categoryID,
-				(CASE WHEN OXPARENTID = 'oxrootid' THEN '' ELSE OXPARENTID END) as parentID,
+				c.OXID as categoryID,
+				(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
 				{$this->Db()->quote($keys[0])} as languageID,
 				-- OXSHOPID as shopID,
-				OXTITLE as description,
-				OXDESC as cmsheadline,
-				OXLONGDESC as cmstext,
-				OXACTIVE as active,
-				OXHIDDEN as hidetop,
-				OXSORT as position,
-				OXEXTLINK as external,
-				OXRIGHT-OXLEFT as diff
-			FROM {$this->quoteTable('categories')}
-			WHERE OXSHOPID='oxbaseshop'
+				c.OXTITLE as description,
+				c.OXDESC as cmsheadline,
+				c.OXLONGDESC as cmstext,
+				c.OXACTIVE as active,
+				c.OXHIDDEN as hidetop,
+				c.OXSORT as position,
+				c.OXEXTLINK as external,
+				c.OXRIGHT-OXLEFT as diff,
+                s.OXKEYWORDS as metakeywords,
+                s.OXDESCRIPTION as metadescription
+			FROM {$this->quoteTable('categories', 'c')}
+            LEFT JOIN {$this->quoteTable('object2seodata', 's')}
+            ON s.OXOBJECTID = c.OXID
+			WHERE c.OXSHOPID='oxbaseshop'
 		");
 		foreach ($keys as $key=>$languageID) {
 			if(empty($key)) {
@@ -405,20 +409,24 @@ SELECT
 			}
 			$sql[] = "
 				SELECT 
-					OXID as categoryID,
-					(CASE WHEN OXPARENTID = 'oxrootid' THEN '' ELSE OXPARENTID END) as parentID,
+					c.OXID as categoryID,
+					(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
 					{$this->Db()->quote($languageID)} as languageID,
 					-- OXSHOPID as shopID,
-					IF(OXTITLE_$key='', OXTITLE, OXTITLE_$key) as description,
-					IF(OXDESC_$key='', OXDESC, OXDESC_$key) as cmsheadline,
-					IF(OXLONGDESC_$key='', OXLONGDESC, OXLONGDESC_$key) as cmstext,
-					IF(OXACTIVE_$key='', OXACTIVE, OXACTIVE_$key) as active,
-					OXHIDDEN as hidetop,
-					OXSORT as position,
-				    OXEXTLINK as external,
-					OXRIGHT-OXLEFT as diff
-				FROM {$this->quoteTable('categories')}
-				WHERE OXSHOPID='oxbaseshop'
+					IF(c.OXTITLE_$key='', c.OXTITLE, c.OXTITLE_$key) as description,
+					IF(c.OXDESC_$key='', c.OXDESC, c.OXDESC_$key) as cmsheadline,
+					IF(c.OXLONGDESC_$key='', c.OXLONGDESC, c.OXLONGDESC_$key) as cmstext,
+					IF(c.OXACTIVE_$key='', c.OXACTIVE, c.OXACTIVE_$key) as active,
+					c.OXHIDDEN as hidetop,
+					c.OXSORT as position,
+				    c.OXEXTLINK as external,
+					c.OXRIGHT-OXLEFT as diff,
+                    s.OXKEYWORDS as metakeywords,
+                    s.OXDESCRIPTION as metadescription
+				FROM {$this->quoteTable('categories', 'c')}
+                LEFT JOIN {$this->quoteTable('object2seodata', 's')}
+                ON s.OXOBJECTID = OXID
+				WHERE c.OXSHOPID='oxbaseshop'
 			";
 		}
 		return '('.implode(') UNION ALL (', $sql).') ORDER BY languageID, diff DESC';
