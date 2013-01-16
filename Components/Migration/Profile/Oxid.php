@@ -394,6 +394,7 @@ SELECT
 				OXACTIVE as active,
 				OXHIDDEN as hidetop,
 				OXSORT as position,
+				OXEXTLINK as external,
 				OXRIGHT-OXLEFT as diff
 			FROM {$this->quoteTable('categories')}
 			WHERE OXSHOPID='oxbaseshop'
@@ -414,6 +415,7 @@ SELECT
 					IF(OXACTIVE_$key='', OXACTIVE, OXACTIVE_$key) as active,
 					OXHIDDEN as hidetop,
 					OXSORT as position,
+				    OXEXTLINK as external,
 					OXRIGHT-OXLEFT as diff
 				FROM {$this->quoteTable('categories')}
 				WHERE OXSHOPID='oxbaseshop'
