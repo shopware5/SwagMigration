@@ -316,6 +316,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     }
                 }
             }
+
+            if ($source['mapping'] === '' && $source['mapping_value'] === '') {
+                $source["mapping"] = 'Bitte wählen';
+                $source["mapping_value"] = 0;
+            }
+
         }
         return $sourceArray;
     }
