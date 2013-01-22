@@ -172,7 +172,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
 //            array('id'=>'Shopware350', 	'name'=>'Shopware 3.5.0'),
-            array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.2'),
+            array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.3'),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
