@@ -394,7 +394,9 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				c.position as position,
 				cl.meta_keywords as metaKeywords,
 				cl.meta_description as metaDescription,
-				c.active as active
+				c.active as active,
+				cl.meta_title as cmsheadline,
+				cl.description as cmstext
 
 			FROM  {$this->quoteTable('category', 'c')}
 
