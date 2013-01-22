@@ -158,10 +158,16 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				if(a.reference='', CONCAT('sw', a.id_product), a.reference)						as ordernumber,
 				-- a.products_image						as image,
 				a.price         						as net_price,
+				a.wholesale_price                       as baseprice,
+
 				a.available_date         				as releasedate,
 				a.date_add          					as added,
 				a.date_upd 						        as changed,
 				a.weight        						as weight,
+				a.depth 			                    as length,
+				a.width 			                    as width,
+				a.height 			                    as height,
+
 				tr.id_tax           					as taxID,
 				s.name              					as supplier,
 				a.active        						as active,
@@ -212,6 +218,7 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 			foreach ($price_groups as $price_group) {
 				$sql[] = "
 					SELECT
+                        a.wholesale_price                       as baseprice,
 						pr.id_product as productID,
 						pr.from_quantity as `from`,
 						IF(reduction_type='percentage', a.price*(1-reduction),a.price-reduction) as `net_price`,
