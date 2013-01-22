@@ -392,8 +392,8 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				cl.id_lang as languageID,
 				cl.name as description,
 				c.position as position,
-				cl.meta_keywords as metakeywords,
-				cl.meta_description as metadescription,
+				cl.meta_keywords as metaKeywords,
+				cl.meta_description as metaDescription,
 				c.active as active
 
 			FROM  {$this->quoteTable('category', 'c')}

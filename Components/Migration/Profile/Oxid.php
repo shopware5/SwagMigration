@@ -396,8 +396,8 @@ SELECT
 				c.OXSORT as position,
 				c.OXEXTLINK as external,
 				c.OXRIGHT-OXLEFT as diff,
-                s.OXKEYWORDS as metakeywords,
-                s.OXDESCRIPTION as metadescription
+                s.OXKEYWORDS as metaKeywords,
+                s.OXDESCRIPTION as metaDescription
 			FROM {$this->quoteTable('categories', 'c')}
             LEFT JOIN {$this->quoteTable('object2seodata', 's')}
             ON s.OXOBJECTID = c.OXID
@@ -421,8 +421,8 @@ SELECT
 					c.OXSORT as position,
 				    c.OXEXTLINK as external,
 					c.OXRIGHT-OXLEFT as diff,
-                    s.OXKEYWORDS as metakeywords,
-                    s.OXDESCRIPTION as metadescription
+                    s.OXKEYWORDS as metaKeywords,
+                    s.OXDESCRIPTION as metaDescription
 				FROM {$this->quoteTable('categories', 'c')}
                 LEFT JOIN {$this->quoteTable('object2seodata', 's')}
                 ON s.OXOBJECTID = OXID

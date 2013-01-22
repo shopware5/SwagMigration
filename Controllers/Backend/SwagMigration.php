@@ -125,6 +125,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
+    public function sDeleteAllOrders()
+    {
+        $sql = "
+        TRUNCATE s_order;
+        TRUNCATE s_order_details;
+        TRUNCATE s_order_billingaddress;
+        TRUNCATE s_order_billingaddress_attributes;
+        TRUNCATE s_order_shippingaddress;
+        TRUNCATE s_order_shippingaddress_attributes;
+        ";
+
+        Shopware()->Db()->query($sql);
+    }
 
     /**
      * This function initial shopware data. Categories and articles will be deleted.
@@ -136,7 +149,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         Shopware()->Api()->Import()->sDeleteAllCategories();
         Shopware()->Api()->Import()->sDeleteAllArticles();
-        Shopware()->Api()->Import()->sDeleteAllOrders();
+
+        $this->sDeleteAllOrders();
 
 
 
@@ -686,6 +700,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 return;
             }
         }
+
+        // Fallback for SW versions prior 4.0.6
+        Shopware()->Db()->exec('
+            DELETE ac FROM s_articles_categories ac
+            INNER JOIN s_categories c ON ac.categoryID =c.id WHERE c.`right`-c.`left` > 1
+        ');
+
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
             'success'=>true,

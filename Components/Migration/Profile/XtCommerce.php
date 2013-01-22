@@ -370,8 +370,8 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				language_id as languageID,
 				categories_name as description,
 				sort_order as position,
-				categories_meta_keywords as metakeywords,
-				categories_meta_description as metadescription,
+				categories_meta_keywords as metaKeywords,
+				categories_meta_description as metaDescription,
 				categories_heading_title as cmsheadline,
 				categories_description as cmstext,
 				categories_status as active		
