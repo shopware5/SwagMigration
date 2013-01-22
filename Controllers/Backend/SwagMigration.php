@@ -871,6 +871,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $product_description = null;
             }
 
+            if(isset($product['description'])) {
+                $product['description'] = strip_tags($product['description']);
+            }
+
             //Article
             $product_result = $import->sArticle($product);
             if(!empty($product_result)) {
