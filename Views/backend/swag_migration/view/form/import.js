@@ -92,7 +92,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         var me = this;
 
         me.basePath = Ext.create('Ext.form.field.Text', {
-            fieldLabel: '{s name=articleImagesPath}Shop path for the article images (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
+            fieldLabel: '{s name=articleImagesPath}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
             name: 'basepath',
             value: '',
             labelWidth: 500,
