@@ -139,7 +139,13 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
    	 */
 	public function getCustomerSelect()
 	{
-		return "
+
+        /**
+         * Intentionally do not join last orders shipping address in order to get customers shipping address
+         * as this data is not essential at this point and will run over a join without index => slow
+         */
+
+        return "
 			SELECT
 				u.OXID										as customerID,
 				u.OXCUSTNR 									as customernumber,
@@ -161,37 +167,21 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				u.OXUSERNAME 								as email,
 				u.OXBIRTHDATE 								as birthday,
 				u.OXUSTID 									as ustid,
-				
-				IF(OXDELSAL IN ('m','Herr','MR'), 'mr', 'ms')	as shipping_salutation,
-				OXDELFNAME									as shipping_firstname,
-				OXDELLNAME 									as shipping_lastname,
-				OXDELCOMPANY 								as shipping_company,
-				'' 											as shipping_department,
-				OXDELSTREET 								as shipping_street,
-				OXDELSTREETNR 								as shipping_streetnumber,
-				OXDELZIP									as shipping_zipcode,
-				OXDELCITY									as shipping_city,
-				sc.OXISOALPHA2								as shipping_countryiso,
-				OXDELADDINFO								as shipping_text1,
-				
+
 				u.OXPASSWORD								as password,
 				u.OXCREATE									as firstlogin,
-				IFNULL(o.OXORDERDATE, u.OXCREATE)			as lastlogin,
 				u.OXSHOPID									as subshopID,
 				
 				IF(gb.OXID, 0, IF(u.OXACTIVE,1,0))			as active,
 				IF(n.OXID, IF(gb.OXID, 0, IF(u.OXACTIVE,1,0)), 0)	as newsletter
 				
 			FROM {$this->quoteTable('user', 'u')}
-			LEFT JOIN {$this->quoteTable('order', 'o')} ON o.OXID=(SELECT OXID FROM {$this->quoteTable('order')} WHERE OXUSERID=u.OXID ORDER BY OXORDERDATE DESC LIMIT 1)
 
 			LEFT JOIN {$this->quoteTable('object2group', 'n')} ON n.OXOBJECTID=u.OXID AND n.OXGROUPSID='oxidnewsletter'
-			-- LEFT JOIN oxobject2group gd ON gd.OXOBJECTID=u.OXID AND gd.OXGROUPSID='oxiddealer'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb')} ON gb.OXOBJECTID=u.OXID AND gb.OXGROUPSID='oxidblacklist'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb2')} ON gb2.OXOBJECTID=u.OXID AND gb2.OXGROUPSID='oxidblocked'
 			
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
-			LEFT JOIN {$this->quoteTable('country', 'sc')} ON sc.OXID=o.OXDELCOUNTRYID
 		";
 	}
 
@@ -202,7 +192,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	public function getProductSelect()
 	{
 		return "
-SELECT
+                SELECT
 				a.OXID 				as `productID`,
 				a.OXPARENTID 		as `parentID`,
 				a.OXARTNUM 			as ordernumber,
@@ -440,7 +430,7 @@ SELECT
 	{
 		return "
 			SELECT
-				r.`OXOBJECTID` as `productID`,
+			    COALESCE(a.OXPARENTID, r.OXOBJECTID)  as `productID`,
 				r.`OXUSERID` as `customerID`,
 				u.`OXFNAME` as `name`,
 				u.`OXUSERNAME` as `email`,
@@ -449,9 +439,16 @@ SELECT
 				r.`OXACTIVE` as `active`,
 				r.`OXTEXT` as `comment`,
 				'' as `title`
-			FROM {$this->quoteTable('reviews', 'r')}, {$this->quoteTable('user', 'u')}
-			WHERE r.OXUSERID=u.OXID
-			AND `OXTYPE`='oxarticle'
+			FROM {$this->quoteTable('reviews', 'r')}
+
+			LEFT JOIN {$this->quoteTable('user', 'u')}
+			ON r.OXUSERID=u.OXID
+
+			LEFT JOIN {$this->quoteTable('articles', 'a')}
+			ON a.`OXID` = r.`OXOBJECTID`
+			AND a.OXPARENTID <> ''
+
+			WHERE `OXTYPE`='oxarticle'
 		";
 	}
 
