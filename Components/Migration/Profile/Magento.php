@@ -156,7 +156,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 	{
 		$attributes = array(
 			'description', 'name', 'short_description', 
-			'status', 'weight', 'manufacturer',
+			'status', 'manufacturer',
 			'price', 'cost', 'tax_class_id', 
 			'meta_keyword', 'special_price'
 		);
@@ -181,8 +181,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				short_description.value							as description,
 				meta_keyword.value								as keywords,
 				manufacturer_option.value						as supplier,
-				weight.value									as weight,
-				
+
 				cs.qty											as instock,
 				cs.min_qty										as stockmin,
 				cs.min_sale_qty									as minpurchase,
