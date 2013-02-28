@@ -173,8 +173,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
             Ext.create('Ext.form.field.Checkbox', {
                 boxLabel: '{s name=clearCustomersAndOrders}Delete customers and orders{/s}',
                 name: 'clear_orders'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearSupplier}Delete supplier{/s}',
+                name: 'clear_supplier'
             })
-
         ];
     },
 

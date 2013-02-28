@@ -195,6 +195,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     case 'clear_categories':
                         Shopware()->Api()->Import()->sDeleteAllCategories();
                         break;
+                    case 'clear_supplier':
+                        Shopware()->Db()->exec("
+                            TRUNCATE s_articles_supplier;
+                            TRUNCATE s_articles_supplier_attributes;
+                            INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
+                            INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
+                            UPDATE s_articles SET supplierID=1 WHERE 1;
+                        ");
+                        break;
                     default:
                         break;
                 }
