@@ -277,13 +277,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
         });
 
 
-        var container = Ext.create('Ext.container.Container', {
+        var buttonContainer = Ext.create('Ext.container.Container', {
             border: false,
             layout: 'anchor',
             items: [ deleteButton,  inverseButton ]
         });
 
-        return container;
+        return buttonContainer;
     },
 
     /**
