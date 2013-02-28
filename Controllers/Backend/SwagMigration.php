@@ -898,12 +898,36 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $disableNumberValidation = $this->Request()->getParam('no_number_validation', false);
         $import = Shopware()->Api()->Import();
 
         $result = $this->Source()->queryProducts($offset);
         $count = $result->rowCount()+$offset;
 
+        $numberSnippet = $this->namespace->get('numberNotValid',
+            "The product number %s is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            ");
+
         while ($product = $result->fetch()) {
+            $number = $product['ordernumber'];
+            if (!$disableNumberValidation && isset($number) &&
+                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($numberSnippet, $number),
+                    'success'=>false,
+                    'import_products'=>null,
+                    'offset'=>0,
+                    'progress'=>-1
+                ));
+                return;
+            }
             //Attribute
             if(!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source=>$target) {
@@ -1115,8 +1139,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $count = $result->rowCount()+$offset;
 
         while ($order = $result->fetch()) {
-
-
             if(isset($order['languageID']) && isset($this->Request()->language[$order['languageID']])) {
                 $order['languageID'] = $this->Request()->language[$order['languageID']];
             }

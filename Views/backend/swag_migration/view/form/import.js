@@ -181,7 +181,23 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             ]
         };
 
-        return me.fieldSet;
+        me.advancedOptionsFieldset = {
+                    xtype:'fieldset',
+                    title: '{s name=importSettingsAdvanced}Advanced import settings{/s}',
+                    autoHeight: true,
+                    buttonAlign: 'right',
+                    defaults: {
+                        anchor: '100%',
+                        labelWidth: 500
+                    },
+                    items :[{
+                        fieldLabel: '{s name=noProductNumberValidation}Ignore invalid product numbers (not recommended){/s}',
+                        name: 'no_number_validation',
+                        xtype: 'checkbox'
+                    }]
+                };
+
+        return  [ me.fieldSet, me.advancedOptionsFieldset ];
     }
 
 });
