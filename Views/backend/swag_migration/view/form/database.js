@@ -93,24 +93,112 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
     createFormFieldClearShop: function() {
         var me = this;
 
-        var button = Ext.create('Ext.button.Button', {
-            tooltip: '{s name=clearShop}Clear the local Shopware shop in order to have a clean start{/s}',
+        me.clearShopForm = Ext.create('Ext.form.FieldSet', {
+            autoHeight: true,
+            layout: 'anchor',
+            title: '{s name=initShop}Initialize Shop{/s}',
+            items: me.getClearShopElements()
+        });
+
+        return me.clearShopForm;
+    },
+
+
+    getClearShopElements: function() {
+        var me = this;
+
+        var leftContainer = Ext.create('Ext.container.Container', {
+            columnWidth:.5,
+            border:false,
+            cls: Ext.baseCSSPrefix + 'field-set-container',
+            layout:'anchor',
+            defaults:{
+                anchor:'100%',
+                labelWidth:150,
+                minWidth:250,
+                xtype:'textfield'
+            },
+            items:me.getLeftElements()
+        });
+
+        var rightContainer = Ext.create('Ext.container.Container', {
+            columnWidth:.5,
+            border:false,
+            cls: Ext.baseCSSPrefix + 'field-set-container',
+            layout:'anchor',
+            defaults:{
+                anchor:'100%',
+                labelWidth:100,
+                xtype:'textfield'
+            },
+            items:me.getRightElements()
+        });
+
+        var checkBoxes = Ext.create('Ext.container.Container', {
+            border:false,
+            layout:'column',
+            items:[ leftContainer, rightContainer]
+        });
+
+        return [checkBoxes, me.getClearShopButton()];
+    },
+
+    getLeftElements: function() {
+        var me = this;
+
+        return [
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearArticles}Delete articles{/s}',
+                name: 'clear_articles'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearCategories}Delete categories{/s}',
+                name: 'clear_categories'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearVotes}Delete votes{/s}',
+                name: 'clear_votes'
+            })
+        ];
+    },
+
+    getRightElements: function() {
+        var me = this;
+
+        return [
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearCustomers}Delete customer{/s}',
+                name: 'clear_customers'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearCustomersAndOrders}Delete customers and orders{/s}',
+                name: 'clear_orders'
+            })
+
+        ];
+    },
+
+    getClearShopButton: function() {
+        var me = this;
+
+        return Ext.create('Ext.button.Button', {
+            tooltip: '{s name=clearShop}Delete selected {/s}',
             name: 'deleteArticlesAndCategories',
-            text: '{s name=deleteCategoriesAndArticles}Delete orders, categories and articles{/s}',
+            text: '{s name=deleteCategoriesAndArticles}Delete selected data{/s}',
             cls: 'primary',
             scope: this,
             handler  : function() {
                 Ext.Msg.show({
                     title: '{s name=initShop}Initialize Shop{/s}',
-                    msg: '{s name=initShop/AreYouSure}Are you sure? All orders, categories and articles will be lost permanently.{/s}',
+                    msg: '{s name=initShop/AreYouSure}Are you sure? All selected elements will be deleted permanently.{/s}',
                     buttons: Ext.Msg.YESNO,
                     scope: this,
                     fn: function (btn) {
                         if (btn === "yes") {
                             Ext.Ajax.request({
                                 url: '{url action="clearShop"}',
+                                params: me.getForm().getValues(),
                                 success: function (r, o){
-                                    var res = r.responseText;
                                     Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
 
                                 },
@@ -123,21 +211,10 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Database', {
             }
         });
 
-
-        me.clearShopForm = Ext.create('Ext.form.FieldSet', {
-            autoHeight: true,
-            title: '{s name=initShop}Initialize Shop{/s}',
-            items: [
-                button
-            ]
-        });
-
-        return me.clearShopForm;
-
     },
 
     /**
-     * Creates the database seleciton combobox
+     * Creates the database selection combobox
      * @return Ext.form.ComboBox
      */
     createDatabaseSelection: function() {

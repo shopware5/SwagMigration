@@ -129,14 +129,42 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $sql = "
         TRUNCATE s_order;
-        TRUNCATE s_order_details;
+        TRUNCATE s_order_attributes;
+        TRUNCATE s_order_basket;
+        TRUNCATE s_order_basket_attributes;
         TRUNCATE s_order_billingaddress;
         TRUNCATE s_order_billingaddress_attributes;
+        TRUNCATE s_order_comparisons;
+        TRUNCATE s_order_details;
+        TRUNCATE s_order_details_attributes;
         TRUNCATE s_order_shippingaddress;
         TRUNCATE s_order_shippingaddress_attributes;
+        TRUNCATE s_order_documents;
+        TRUNCATE s_order_documents_attributes;
+        TRUNCATE s_order_esd;
+        TRUNCATE s_order_history;
+        TRUNCATE s_order_notes;
+        TRUNCATE s_order_number;
         ";
 
         Shopware()->Db()->query($sql);
+    }
+
+    public function sDeleteAllCustomers()
+    {
+        $sql = "
+            TRUNCATE s_user;
+            TRUNCATE s_user_attributes;
+            TRUNCATE s_user_billingaddress;
+            TRUNCATE s_user_billingaddress_asssttributes;
+            TRUNCATE s_user_shippingaddress;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_debit;
+        ";
+
+        Shopware()->Db()->query($sql);
+
     }
 
     /**
@@ -146,13 +174,31 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	{
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
+        Shopware()->Db()->exec("SET foreign_key_checks = 0;");
 
-        Shopware()->Api()->Import()->sDeleteAllCategories();
-        Shopware()->Api()->Import()->sDeleteAllArticles();
-
-        $this->sDeleteAllOrders();
-
-
+        $data = $this->Request()->getParams();
+        foreach ($data as $key => $value) {
+                switch ($key) {
+                    case 'clear_customers':
+                        $this->sDeleteAllCustomers();
+                        break;
+                    case 'clear_orders':
+                        $this->sDeleteAllCustomers();
+                        $this->sDeleteAllOrders();
+                        break;
+                    case 'clear_votes':
+                        Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
+                        break;
+                    case 'clear_articles':
+                        Shopware()->Api()->Import()->sDeleteAllArticles();
+                        break;
+                    case 'clear_categories':
+                        Shopware()->Api()->Import()->sDeleteAllCategories();
+                        break;
+                    default:
+                        break;
+                }
+        }
 
 		echo Zend_Json::encode(array('success'=>true));
 	}
