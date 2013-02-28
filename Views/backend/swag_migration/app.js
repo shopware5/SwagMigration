@@ -70,7 +70,10 @@ Ext.define('Shopware.apps.SwagMigration', {
         'form.Mapping',
         'form.Import',
         'main.Window',
-        'Progress'
+        'Progress',
+        'form.fieldsets.ClearShop',
+        'form.fieldsets.DatabaseSelection',
+        'form.fieldsets.ProfileSelection'
     ],
 
 
