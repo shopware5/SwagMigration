@@ -125,6 +125,43 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
+    public function sDeleteAllArticles()
+    {
+        $sql = "
+			TRUNCATE s_articles;
+			TRUNCATE s_articles_attributes;
+			TRUNCATE s_articles_avoid_customergroups;
+			TRUNCATE s_articles_categories;
+			TRUNCATE s_articles_details;
+			TRUNCATE s_articles_downloads;
+			TRUNCATE s_articles_downloads_attributes;
+			TRUNCATE s_articles_esd;
+			TRUNCATE s_articles_esd_attributes;
+			TRUNCATE s_articles_esd_serials;
+			TRUNCATE s_articles_img;
+			TRUNCATE s_articles_img_attributes;
+			TRUNCATE s_articles_information;
+			TRUNCATE s_articles_information_attributes;
+			TRUNCATE s_articles_notification;
+			TRUNCATE s_articles_prices;
+			TRUNCATE s_articles_prices_attributes;
+			TRUNCATE s_articles_relationships;
+			TRUNCATE s_articles_similar;
+			TRUNCATE s_articles_translations;
+			TRUNCATE s_article_configurator_dependencies;
+			TRUNCATE s_article_configurator_groups;
+			TRUNCATE s_article_configurator_options;
+			TRUNCATE s_article_configurator_option_relations;
+			TRUNCATE s_article_configurator_price_surcharges;
+			TRUNCATE s_article_configurator_sets;
+			TRUNCATE s_article_configurator_set_group_relations;
+			TRUNCATE s_article_configurator_set_option_relations;
+			TRUNCATE s_article_img_mappings;
+			TRUNCATE s_article_img_mapping_rulesTRUNCATE 
+        ";
+        Shopware()->Db()->query($sql);
+    }
+
     public function sDeleteAllOrders()
     {
         $sql = "
@@ -190,7 +227,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
                         break;
                     case 'clear_articles':
-                        Shopware()->Api()->Import()->sDeleteAllArticles();
+                        $this->sDeleteAllArticles();
                         break;
                     case 'clear_categories':
                         Shopware()->Api()->Import()->sDeleteAllCategories();
