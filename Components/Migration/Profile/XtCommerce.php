@@ -62,6 +62,17 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	}
 
     /**
+   	 * Returns a dummy SQL statement with a default shop
+   	 * @return string {String} | sql for sub shops
+   	 */
+	public function getShopSelect()
+	{
+		return "
+			SELECT 1 as id, 'Default' as name
+		";
+	}
+
+    /**
    	 * Returns the sql statement to select the shop system customer groups
    	 * @return string {String} | sql for customer groups
    	 */
@@ -322,7 +333,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				
 				u.customers_date_added 								as firstlogin,
 				IFNULL(o.date_purchased, u.customers_date_added)	as lastlogin,
-				IF(u.delete_user=1, 0, 1)							as active
+				IF(u.delete_user=1, 0, 1)							as active,
+				1               									as subshopID
+
 				
 			FROM {$this->quoteTable('customers', 'u')}
 			
@@ -460,7 +473,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				-- `orders_date_finished`,
 				-- IF(o.`allow_tax`=1,0,1)						as tax_free,
 				o.`customers_ip`								as remote_addr,
-				-- `shop_id`									as subshopID,
+				1           									as subshopID,
 
 				(
 					SELECT `value`
