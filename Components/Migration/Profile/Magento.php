@@ -167,13 +167,17 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				$attributeID.value									as $attributeID";
 			$attributes[] = $attributeID;
 		}
-		
+
 		$sql = "
 			SELECT 
 				
 				catalog_product.entity_id						as productID,
 				catalog_product.sku								as ordernumber,
 				catalog_product.created_at						as added,
+                relation.parent_id	                            as `parentID`,
+
+				a.OXVARSELECT 		                            as additionaltext,
+			    COALESCE(a2.OXVARNAME, '')                      as variant_group_names,
 				
 				name.value										as name,	
 				NULL											as additionaltext,
@@ -202,6 +206,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			LEFT JOIN {$this->quoteTable('cataloginventory_stock_item', 'cs')}
 			ON cs.`product_id`=catalog_product.`entity_id`
 			AND cs.`stock_id`=1
+
+			LEFT JOIN {$this->quoteTable('eav_product_relation', 'relation')}
+			ON catalog_product.entity_id=relation.child_id
 			
 			LEFT JOIN {$this->quoteTable('eav_attribute_option_value', 'manufacturer_option')}
 			ON manufacturer_option.value_id=manufacturer.value

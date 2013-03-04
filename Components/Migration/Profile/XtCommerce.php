@@ -123,6 +123,56 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 		";
 	}
 
+    public function getAttributedProductsSelect()
+    {
+        return "
+            SELECT
+            DISTINCT p.products_id as productID
+
+            FROM products p
+
+            LEFT JOIN products_attributes a
+            ON p.products_id=a.products_id
+
+            WHERE a.products_id IS NOT NULL
+        ";
+    }
+
+    public function getProductAttributesSelect($id)
+    {
+        return "
+            SELECT
+                p.products_id                           as attribute_productID,
+                po.products_options_name                as attribute_group,
+                GROUP_CONCAT(pv.products_options_values_name SEPARATOR '|')         as attribute_groupoption,
+                GROUP_CONCAT(a.options_values_price SEPARATOR '|')                  as attribute_price,
+                GROUP_CONCAT(a.options_values_weight SEPARATOR '|')                 as attribute_weight,
+                GROUP_CONCAT(a.price_prefix SEPARATOR '|')                          as attribute_priceMode,
+                GROUP_CONCAT(a.weight_prefix SEPARATOR '|')                         as attribute_weightMode,
+                GROUP_CONCAT(a.attributes_stock SEPARATOR '|')                      as attribute_inStock
+
+
+            FROM `products` p
+
+            LEFT JOIN products_attributes a
+            ON p.products_id=a.products_id
+
+            LEFT JOIN products_options po
+            ON po.products_options_id = a.options_id
+
+            LEFT JOIN products_options_values pv
+            ON pv.products_options_values_id = a.options_values_id
+            AND pv.language_id = po.language_id
+
+            WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
+            AND a.products_id = {$id}
+
+            GROUP BY po.products_options_name
+
+
+        ";
+    }
+
     /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
@@ -166,9 +216,14 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
 
+--			LEFT JOIN {$this->quoteTable('products_attributes', 'pa')}
+--			ON pa.products_id=a.products_id
+
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
 			AND d.language_id={$this->Db()->quote($this->getDefaultLanguage())}
+
+--			WHERE pa.products_id IS NULL
 		";
 	}
 

@@ -962,6 +962,92 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
+    public function generateVariantsFromAttributes()
+    {
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offset = 1;//empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        $done = Zend_Json::encode(array(
+            'message'=>$this->namespace->get('generatedVariants', "Variants succesfully generated!"),
+            'success'=>true,
+            'generate_variants'=>null,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+
+        $products_result = $this->Source()->queryAttributedProducts($offset);
+        if (empty($products_result)) {
+            echo $done;
+            return;
+        }
+        $count = $products_result->rowCount()+$offset;
+
+        while ($product = $products_result->fetch()) {
+            $id = $product['productID'];
+            
+            $result = $this->Source()->queryProductAttributes($id);
+
+            $this->createVariantsFromAttributes($result->fetchAll());
+            echo $done;
+            return;
+
+
+
+            $offset++;
+        }
+        echo $done;
+
+
+
+
+    }
+
+    /**
+     * Helper function which creates a cartesian product
+     * @param $arrays
+     * @return array
+     */
+    private function createCartesianProduct($arrays)
+    {
+        $cartesian = array();
+        $dims = array_reverse($arrays);
+
+        foreach ($dims as $dim_name => $dim) {
+            $buf = array();
+
+            foreach ($dim as $val) {
+                $buf[] = array($dim_name => $val);
+            }
+
+            if (!count($cartesian)) {
+                $cartesian = $buf;
+            } else {
+                $tmp = array();
+                foreach ($buf as $el_buf)
+                    foreach ($cartesian as $el_ap)
+                        $tmp[] = array_merge($el_buf, $el_ap);
+                $cartesian = $tmp;
+            }
+
+        }
+        return $cartesian;
+    }
+
+    public function createVariantsFromAttributes($attributes)
+    {
+        $groups = array();
+
+        $fields = array('groupoption', 'price', 'weight', 'priceMode', 'weightMode', 'inStock');
+        foreach ($attributes as $row) {
+            foreach ($fields as $field) {
+//                $row['attribute_' . $field] = explode('|', $row['attribute_' . $field]);
+                $groups[$row['attribute_group']] = explode('|', $row['attribute_groupoption']);
+            }
+        }
+        error_log(print_r($groups, true));
+        
+//        error_log(print_r(count($this->createCartesianProduct($attribute)), true));
+    }
 
     /**
      * This function imports the customers, selected by the source profile.
@@ -1101,7 +1187,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
                 'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
                 'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
-                'paymentID' => !empty($order['paymentID']) ? (int) $order['paymentID'] : 0,
+                'paymentID' => !empty($order['paymentID']) ? (int) $order['paymentID'] : NULL,
                 'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
                 'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
                 'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
@@ -1351,6 +1437,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(!empty($this->Request()->import_prices)) {
                 $errorMessage = $this->namespace->get('errorImportingPrices', "An error occurred while importing prices");
                 return $this->importProductPrices();
+            }
+
+            if(!empty($this->Request()->generate_variants)) {
+                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while importing prices");
+                return $this->generateVariantsFromAttributes();
             }
 
             if(!empty($this->Request()->import_images)) {

@@ -315,6 +315,35 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->fetchAll($this->getCategorySelect());
 	}
 
+    public function queryAttributedProducts($offset=0)
+    {
+        if (!method_exists($this, 'getAttributedProductsSelect')) {
+            return;
+        }
+		$sql = $this->getAttributedProductsSelect();
+        if(!empty($offset)) {
+            $sql = $this->limit($sql, null, $offset);
+        }
+		return $this->db->query($sql);
+    }
+
+    /**
+     * Executes the profile attributprofile select statement with the given offset
+     * @param int $offset
+     * @return Zend_Db_Statement_Interface
+     */
+	public function queryProductAttributes($id, $offset=0)
+	{
+        if (!method_exists($this, 'getProductAttributesSelect')) {
+            return;
+        }
+		$sql = $this->getProductAttributesSelect($id);
+		if(!empty($offset)) {
+			$sql = $this->limit($sql, null, $offset);
+		}
+		return $this->db->query($sql);
+	}
+
     /**
      * Executes the profile category select statement with the given offset
      * @param int $offset
