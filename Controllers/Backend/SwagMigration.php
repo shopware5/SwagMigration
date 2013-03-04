@@ -125,18 +125,83 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
+    public function sDeleteAllArticles()
+    {
+        $sql = "
+			TRUNCATE s_articles;
+			TRUNCATE s_articles_attributes;
+			TRUNCATE s_articles_avoid_customergroups;
+			TRUNCATE s_articles_categories;
+			TRUNCATE s_articles_details;
+			TRUNCATE s_articles_downloads;
+			TRUNCATE s_articles_downloads_attributes;
+			TRUNCATE s_articles_esd;
+			TRUNCATE s_articles_esd_attributes;
+			TRUNCATE s_articles_esd_serials;
+			TRUNCATE s_articles_img;
+			TRUNCATE s_articles_img_attributes;
+			TRUNCATE s_articles_information;
+			TRUNCATE s_articles_information_attributes;
+			TRUNCATE s_articles_notification;
+			TRUNCATE s_articles_prices;
+			TRUNCATE s_articles_prices_attributes;
+			TRUNCATE s_articles_relationships;
+			TRUNCATE s_articles_similar;
+			TRUNCATE s_articles_translations;
+			TRUNCATE s_article_configurator_dependencies;
+			TRUNCATE s_article_configurator_groups;
+			TRUNCATE s_article_configurator_options;
+			TRUNCATE s_article_configurator_option_relations;
+			TRUNCATE s_article_configurator_price_surcharges;
+			TRUNCATE s_article_configurator_sets;
+			TRUNCATE s_article_configurator_set_group_relations;
+			TRUNCATE s_article_configurator_set_option_relations;
+			TRUNCATE s_article_img_mappings;
+			TRUNCATE s_article_img_mapping_rulesTRUNCATE 
+        ";
+        Shopware()->Db()->query($sql);
+    }
+
     public function sDeleteAllOrders()
     {
         $sql = "
         TRUNCATE s_order;
-        TRUNCATE s_order_details;
+        TRUNCATE s_order_attributes;
+        TRUNCATE s_order_basket;
+        TRUNCATE s_order_basket_attributes;
         TRUNCATE s_order_billingaddress;
         TRUNCATE s_order_billingaddress_attributes;
+        TRUNCATE s_order_comparisons;
+        TRUNCATE s_order_details;
+        TRUNCATE s_order_details_attributes;
         TRUNCATE s_order_shippingaddress;
         TRUNCATE s_order_shippingaddress_attributes;
+        TRUNCATE s_order_documents;
+        TRUNCATE s_order_documents_attributes;
+        TRUNCATE s_order_esd;
+        TRUNCATE s_order_history;
+        TRUNCATE s_order_notes;
+        TRUNCATE s_order_number;
         ";
 
         Shopware()->Db()->query($sql);
+    }
+
+    public function sDeleteAllCustomers()
+    {
+        $sql = "
+            TRUNCATE s_user;
+            TRUNCATE s_user_attributes;
+            TRUNCATE s_user_billingaddress;
+            TRUNCATE s_user_billingaddress_asssttributes;
+            TRUNCATE s_user_shippingaddress;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_debit;
+        ";
+
+        Shopware()->Db()->query($sql);
+
     }
 
     /**
@@ -146,13 +211,40 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	{
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
+        Shopware()->Db()->exec("SET foreign_key_checks = 0;");
 
-        Shopware()->Api()->Import()->sDeleteAllCategories();
-        Shopware()->Api()->Import()->sDeleteAllArticles();
-
-        $this->sDeleteAllOrders();
-
-
+        $data = $this->Request()->getParams();
+        foreach ($data as $key => $value) {
+                switch ($key) {
+                    case 'clear_customers':
+                        $this->sDeleteAllCustomers();
+                        break;
+                    case 'clear_orders':
+                        $this->sDeleteAllCustomers();
+                        $this->sDeleteAllOrders();
+                        break;
+                    case 'clear_votes':
+                        Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
+                        break;
+                    case 'clear_articles':
+                        $this->sDeleteAllArticles();
+                        break;
+                    case 'clear_categories':
+                        Shopware()->Api()->Import()->sDeleteAllCategories();
+                        break;
+                    case 'clear_supplier':
+                        Shopware()->Db()->exec("
+                            TRUNCATE s_articles_supplier;
+                            TRUNCATE s_articles_supplier_attributes;
+                            INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
+                            INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
+                            UPDATE s_articles SET supplierID=1 WHERE 1;
+                        ");
+                        break;
+                    default:
+                        break;
+                }
+        }
 
 		echo Zend_Json::encode(array('success'=>true));
 	}
@@ -852,12 +944,36 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $disableNumberValidation = $this->Request()->getParam('no_number_validation', false);
         $import = Shopware()->Api()->Import();
 
         $result = $this->Source()->queryProducts($offset);
         $count = $result->rowCount()+$offset;
 
+        $numberSnippet = $this->namespace->get('numberNotValid',
+            "The product number %s is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            ");
+
         while ($product = $result->fetch()) {
+            $number = $product['ordernumber'];
+            if (!$disableNumberValidation && isset($number) &&
+                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($numberSnippet, $number),
+                    'success'=>false,
+                    'import_products'=>null,
+                    'offset'=>0,
+                    'progress'=>-1
+                ));
+                return;
+            }
             //Attribute
             if(!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source=>$target) {
@@ -1168,6 +1284,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             if(isset($order['paymentID']) && isset($this->Request()->payment_mean[$order['paymentID']])) {
                 $order['paymentID'] = $this->Request()->payment_mean[$order['paymentID']];
+            }else {
+                $order['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=3 AND `sourceID`=?';
@@ -1187,7 +1305,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
                 'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
                 'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
-                'paymentID' => !empty($order['paymentID']) ? (int) $order['paymentID'] : NULL,
+                'paymentID' => (int) $order['paymentID'],
                 'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
                 'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
                 'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
