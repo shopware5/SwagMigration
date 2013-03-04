@@ -1196,6 +1196,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             if(isset($order['paymentID']) && isset($this->Request()->payment_mean[$order['paymentID']])) {
                 $order['paymentID'] = $this->Request()->payment_mean[$order['paymentID']];
+            }else {
+                $order['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=3 AND `sourceID`=?';
@@ -1215,7 +1217,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
                 'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
                 'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
-                'paymentID' => !empty($order['paymentID']) ? (int) $order['paymentID'] : 0,
+                'paymentID' => (int) $order['paymentID'],
                 'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
                 'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
                 'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
