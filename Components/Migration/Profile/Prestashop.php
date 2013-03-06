@@ -143,6 +143,70 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 	}
 
     /**
+     * Get productIds for all products with attributes
+     * @return string
+     */
+    public function getAttributedProductsSelect()
+    {
+        return "
+            SELECT
+            DISTINCT p.id_product as productID
+
+            FROM ps_product p
+
+            LEFT JOIN ps_product_attribute a
+            ON p.id_product =a.id_product
+
+            WHERE a.id_product IS NOT NULL
+        ";
+    }
+
+    /**
+     * Select attributes for a given article
+     * @param $id
+     * @return string
+     */
+    public function getProductAttributesSelect($id)
+    {
+
+        return "
+            SELECT
+            agl.public_name as attribute_group,
+            GROUP_CONCAT(al.name SEPARATOR '|') as attribute_groupoption,
+            GROUP_CONCAT(pa.price SEPARATOR '|') as attribute_price,
+            GROUP_CONCAT(pa.weight SEPARATOR '|') as attribute_weight
+
+            FROM ps_product p
+
+            -- join products attributes
+            LEFT JOIN ps_product_attribute pa
+            ON pa.id_product = p.id_product
+
+            -- maps products attributes and attributes
+            INNER JOIN ps_product_attribute_combination c
+            ON c.id_product_attribute = pa.id_product_attribute
+
+            -- join actual attributes
+            INNER JOIN ps_attribute a
+            ON a.id_attribute = c.id_attribute
+
+            -- attribute names
+            LEFT JOIN ps_attribute_lang al
+            ON al.id_attribute = a.id_attribute
+            AND al.id_lang = {$this->Db()->quote($this->getDefaultLanguage())}
+
+            -- attribute group names
+            LEFT JOIN ps_attribute_group_lang agl
+            ON agl.id_attribute_group = a.id_attribute_group
+            AND agl.id_lang = al.id_lang
+
+            WHERE p.id_product = {$id}
+
+            GROUP BY agl.public_name
+        ";
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
    	 */

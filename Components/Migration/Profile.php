@@ -341,7 +341,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		if(!empty($offset)) {
 			$sql = $this->limit($sql, null, $offset);
 		}
-		return $this->db->query($sql);
+		return $this->db->fetchAssoc($sql);
 	}
 
     /**

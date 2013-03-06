@@ -130,7 +130,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 xtype: 'checkbox'
             }, {
                 fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
-                name: 'generate_variants',
+                name: 'import_generate_variants',
                 xtype: 'checkbox'
             }, {
                 fieldLabel: '{s name=importArticleImages}Import product images{/s}',

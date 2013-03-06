@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 /**
  * Shopware 4.0
  * Copyright © 2012 shopware AG
@@ -36,6 +36,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * @var Shopware_Components_Migration_Profile
      */
     protected $source;
+
+    /**
+     * Attribute helper of the source system
+     */
+    protected $attributeHelper;
 
     /**
      * Target shop system profile
@@ -89,6 +94,22 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $config['dbname'] = $query['database'];
         }
         return Shopware_Components_Migration::factory($query['profile'], $config);
+    }
+
+    public function initAttributeHelper()
+    {
+        $query = $this->Request()->getPost()+$this->Request()->getQuery();
+
+        return Shopware_Components_Migration::attributeHelperFactory($query['profile'], $this->Source());
+
+    }
+
+    public function AttributeHelper()
+    {
+        if (!isset($this->attributeHelper)) {
+            $this->attributeHelper = $this->initAttributeHelper();
+        }
+        return $this->attributeHelper;
     }
 
     /**
@@ -1081,88 +1102,39 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function generateVariantsFromAttributes()
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
-        $offset = 1;//empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
         $done = Zend_Json::encode(array(
-            'message'=>$this->namespace->get('generatedVariants', "Variants succesfully generated!"),
+            'message'=>$this->namespace->get('generatedVariants', "Variants successfully generated!"),
             'success'=>true,
-            'generate_variants'=>null,
+            'import_generate_variants'=>null,
             'offset'=>0,
             'progress'=>-1
         ));
 
-        $products_result = $this->Source()->queryAttributedProducts($offset);
-        if (empty($products_result)) {
-            echo $done;
+        if (method_exists($this->AttributeHelper(), 'generateVariants')) {
+            $ret = $this->AttributeHelper()->generateVariants($offset);
+
+            if ($ret === true) {
+                echo $done;
+                return;
+            }
+
+            echo Zend_Json::encode(array(
+                'message'=>sprintf($this->namespace->get('generatedVariants', "Generated variants for %s out of %s articles"), $ret['offset'], $ret['count']),
+                'success'=>true,
+                'offset'=>$ret['offset'],
+                'progress'=>$ret['offset']/$ret['count']
+            ));
             return;
         }
-        $count = $products_result->rowCount()+$offset;
-
-        while ($product = $products_result->fetch()) {
-            $id = $product['productID'];
-            
-            $result = $this->Source()->queryProductAttributes($id);
-
-            $this->createVariantsFromAttributes($result->fetchAll());
-            echo $done;
-            return;
 
 
-
-            $offset++;
-        }
         echo $done;
 
 
 
 
-    }
-
-    /**
-     * Helper function which creates a cartesian product
-     * @param $arrays
-     * @return array
-     */
-    private function createCartesianProduct($arrays)
-    {
-        $cartesian = array();
-        $dims = array_reverse($arrays);
-
-        foreach ($dims as $dim_name => $dim) {
-            $buf = array();
-
-            foreach ($dim as $val) {
-                $buf[] = array($dim_name => $val);
-            }
-
-            if (!count($cartesian)) {
-                $cartesian = $buf;
-            } else {
-                $tmp = array();
-                foreach ($buf as $el_buf)
-                    foreach ($cartesian as $el_ap)
-                        $tmp[] = array_merge($el_buf, $el_ap);
-                $cartesian = $tmp;
-            }
-
-        }
-        return $cartesian;
-    }
-
-    public function createVariantsFromAttributes($attributes)
-    {
-        $groups = array();
-
-        $fields = array('groupoption', 'price', 'weight', 'priceMode', 'weightMode', 'inStock');
-        foreach ($attributes as $row) {
-            foreach ($fields as $field) {
-//                $row['attribute_' . $field] = explode('|', $row['attribute_' . $field]);
-                $groups[$row['attribute_group']] = explode('|', $row['attribute_groupoption']);
-            }
-        }
-        error_log(print_r($groups, true));
-        
-//        error_log(print_r(count($this->createCartesianProduct($attribute)), true));
     }
 
     /**
@@ -1557,7 +1529,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 return $this->importProductPrices();
             }
 
-            if(!empty($this->Request()->generate_variants)) {
+            if(!empty($this->Request()->import_generate_variants)) {
                 $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while importing prices");
                 return $this->generateVariantsFromAttributes();
             }
