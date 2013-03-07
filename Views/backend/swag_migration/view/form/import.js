@@ -125,6 +125,10 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 name: 'import_translations',
                 xtype: 'checkbox'
             }, {
+                fieldLabel: '{s name=importCategories}Import categories{/s}',
+                name: 'import_categories',
+                xtype: 'checkbox'
+            }, {
                 fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
                 name: 'import_prices',
                 xtype: 'checkbox'
@@ -132,6 +136,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
                 name: 'import_generate_variants',
                 xtype: 'checkbox'
+            }, {
+                fieldLabel: '',
+                name: 'import_create_configurator_variants',
+                xtype: 'checkbox',
+                checked: false,
+                hidden: true
             }, {
                 fieldLabel: '{s name=importArticleImages}Import product images{/s}',
                 name: 'import_images',
@@ -143,10 +153,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                         me.fireEvent('validate');
                     }
                 }
-            }, {
-                fieldLabel: '{s name=importCategories}Import categories{/s}',
-                name: 'import_categories',
-                xtype: 'checkbox'
             }, {
                 fieldLabel: '{s name=importCustomers}Import customers{/s}',
                 name: 'import_customers',

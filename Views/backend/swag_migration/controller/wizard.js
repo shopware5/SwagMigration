@@ -50,6 +50,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         { ref: 'wizardPanel', selector: 'migration-wizard' }
     ],
 
+    snippets: {
+        variantProgress: '{s name=variantGenerationProgress}Generated [0] out of [1] variants for product [2]/[3]{/s}',
+    },
+
     /**
      * A template method that is called when your application boots.
      * It is called before the Application's launch function is executed
@@ -179,18 +183,16 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
         config.action = 'import';
 
-//            me.progressWindow = me.getView('Shopware.apps.SwagMigration.view.Progress').create();
-
         me.progressWindow = Ext.MessageBox.show({
             title        : 'Import',
             msg          : "{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}",
-            width        : 300,
+            width        : 500,
             progress     : true,
             closable     : false
         });
 
         // workaround to set the height of the MessageBox
-        me.progressWindow.setSize(300, 150);
+        me.progressWindow.setSize(500, 150);
         me.progressWindow.doLayout();
 
 
@@ -241,6 +243,14 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     Ext.iterate(result, function(key, value) {
                         config[key] = value;
                     });
+
+                    // Special treatment for variant creation:
+                    // If all variants have been created, 'runImportRequest' will be called again
+                    if(result.create_variants) {
+                        me.createVariants(result.params, result.offset, result.count, config);
+                        return;
+                    }
+
                     me.runImportRequest(config);
                 } else {
                     me.progressWindow.close();
@@ -252,6 +262,122 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 if(response.responseText) {
                     Ext.Msg.alert('{s name=importFailes}Import failed{/s}', response.responseText);
                 }
+            }
+        });
+    },
+
+    /**
+     * Prepares models for variant generation and triggers the startVariantGenerator method
+     * @param params
+     * @param currentProduct
+     * @param totalProducts
+     * @param importConfig
+     */
+    createVariants: function(params, currentProduct, totalProducts, importConfig) {
+        var me = this,
+            totalCount = 1,
+            articleId = params.articleId,
+            generatorConfig;
+
+
+        var configurator = Ext.create('Shopware.apps.SwagMigration.model.Configurator', {
+            articleId:articleId
+        });
+
+        var configuratorGroups = Ext.create('Ext.data.Store', { model: 'Shopware.apps.SwagMigration.model.ConfiguratorGroup' });
+
+        // Create group/option models and set all of them active
+        Ext.each(params.groups, function (group) {
+
+            // Create groupModel and the corresponding options store
+            var groupModel = Ext.create('Shopware.apps.SwagMigration.model.ConfiguratorGroup', {
+                active: true,
+                id: group.id
+            });
+            var groupOptions = Ext.create('Ext.data.Store', { model: 'Shopware.apps.SwagMigration.model.ConfiguratorOption' });
+
+            // Fill options store
+            Ext.each(group.options, function (option) {
+                var optionModel = Ext.create('Shopware.apps.SwagMigration.model.ConfiguratorOption', {
+                    id: option.id,
+                    active: true,
+                    groupId: group.id
+                });
+                groupOptions.add(optionModel);
+            });
+
+            // Variant calculation
+            if(groupOptions.count() >  0) {
+                totalCount = totalCount * groupOptions.count();
+            }
+
+            // Set the groups options store
+            groupModel.getConfiguratorOptionsStore = groupOptions;
+            // Add the group to the configurator group store
+            configuratorGroups.add(groupModel);
+        });
+
+        // set the configurator group store
+        configurator.getConfiguratorGroupsStore = configuratorGroups;
+        configurator.setDirty();
+        configurator.set('totalCount', totalCount);
+
+        // encapsulate the generator config into a distinct object
+        generatorConfig = {
+            offset: 0,
+            limit: 50,
+            articleId: articleId
+        };
+
+        me.startVariantGenerator(configurator, generatorConfig, currentProduct, totalProducts, importConfig);
+    },
+
+    /**
+     * Triggers the article controllers' variant generation method until all variants
+     * have been created. If creation was successfull, migration will be continued.
+     *
+     * @param model
+     * @param generatorConfig
+     * @param currentProduct
+     * @param totalProducts
+     * @param importConfig
+     */
+    startVariantGenerator: function(model,  generatorConfig, currentProduct, totalProducts, importConfig) {
+        var me = this;
+
+        model.set('offset', generatorConfig.offset);
+        model.set('limit', generatorConfig.limit);
+        // Force creation of all variants
+        model.set('mergeType', 1);
+        model.setDirty();
+
+        model.save({
+            success: function(record, operation) {
+                // Calculate and show progress
+                var doneVariants = Ext.Array.min([generatorConfig.offset + generatorConfig.limit, model.get('totalCount')]);
+                var progress = doneVariants / model.get('totalCount');
+                me.progressWindow.progressBar.updateProgress(
+                        progress,
+                        Ext.String.format(
+                            me.snippets.variantProgress,
+                            doneVariants, model.get('totalCount'), currentProduct, totalProducts
+                        )
+                );
+
+
+                //if the last variant was created, continue migration
+                if (generatorConfig.offset + generatorConfig.limit >= model.get('totalCount')) {
+                    me.runImportRequest(importConfig);
+                } else {
+                    generatorConfig.offset = generatorConfig.offset + generatorConfig.limit;
+                    me.startVariantGenerator(model, generatorConfig, currentProduct, totalProducts, importConfig);
+                }
+            },
+            failure: function(record, operation) {
+                var rawData = record.getProxy().getReader().rawData,
+                    message = '<br>' + rawData.message;
+                me.progressWindow.close();
+                Ext.Msg.alert('{s name=importFailes}Import failed{/s}', message);
             }
         });
     },

@@ -32,7 +32,6 @@
 class Shopware_Components_Migration extends Enlight_Class
 {
 	static protected $profileNamespace = 'Shopware_Components_Migration_Profile';
-	static protected $attributeProfileNamespace = 'Shopware_Components_Migration_AttributeHelper';
 
     /**
      * For the generation of the profile is a factory used, because of the profile type is not known until runtime.
@@ -51,16 +50,4 @@ class Shopware_Components_Migration extends Enlight_Class
 		
 		return $migrationAdapter;
 	}
-
-    public static function attributeHelperFactory($selectedProfile, $sourceProfile)
-    {
-        $attributeProfileNamespace =  self::$attributeProfileNamespace;
-        $profileName = $attributeProfileNamespace . '_';
-        $profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($selectedProfile))));
-
-        $attributeHelper = Enlight_Class::Instance($profileName, array($sourceProfile));
-
-        return $attributeHelper;
-    }
-
 }

@@ -171,38 +171,36 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 
         return "
             SELECT
-            agl.public_name as attribute_group,
-            GROUP_CONCAT(al.name SEPARATOR '|') as attribute_groupoption,
-            GROUP_CONCAT(pa.price SEPARATOR '|') as attribute_price,
-            GROUP_CONCAT(pa.weight SEPARATOR '|') as attribute_weight
+            agl.public_name             as group_name,
+            p.id_product                as productId,
+            al.name                     as option_name,
+            pa.price                    as price
 
             FROM ps_product p
 
             -- join products attributes
-            LEFT JOIN ps_product_attribute pa
+            LEFT JOIN  {$this->quoteTable('product_attribute', 'pa')}
             ON pa.id_product = p.id_product
 
             -- maps products attributes and attributes
-            INNER JOIN ps_product_attribute_combination c
+            INNER JOIN {$this->quoteTable('product_attribute_combination', 'c')}
             ON c.id_product_attribute = pa.id_product_attribute
 
             -- join actual attributes
-            INNER JOIN ps_attribute a
+            INNER JOIN {$this->quoteTable('attribute', 'a')}
             ON a.id_attribute = c.id_attribute
 
             -- attribute names
-            LEFT JOIN ps_attribute_lang al
+            LEFT JOIN {$this->quoteTable('attribute_lang', 'al')}
             ON al.id_attribute = a.id_attribute
             AND al.id_lang = {$this->Db()->quote($this->getDefaultLanguage())}
 
             -- attribute group names
-            LEFT JOIN ps_attribute_group_lang agl
+            LEFT JOIN {$this->quoteTable('attribute_group_lang', 'agl')}
             ON agl.id_attribute_group = a.id_attribute_group
             AND agl.id_lang = al.id_lang
 
             WHERE p.id_product = {$id}
-
-            GROUP BY agl.public_name
         ";
     }
 

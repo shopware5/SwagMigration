@@ -162,14 +162,10 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
     {
         return "
             SELECT
-                po.products_options_name                as attribute_group,
-                p.products_id                           as attribute_productID,
-                GROUP_CONCAT(pv.products_options_values_name SEPARATOR '|')         as attribute_groupoption,
-                GROUP_CONCAT(a.options_values_price SEPARATOR '|')                  as attribute_price,
-                GROUP_CONCAT(a.options_values_weight SEPARATOR '|')                 as attribute_weight,
-                GROUP_CONCAT(a.price_prefix SEPARATOR '|')                          as attribute_priceMode,
-                GROUP_CONCAT(a.weight_prefix SEPARATOR '|')                         as attribute_weightMode
-
+                po.products_options_name                as group_name,
+                p.products_id                           as productId,
+                pv.products_options_values_name          as option_name,
+                IF(a.price_prefix='+', a.options_values_price, CONCAT('-', a.options_values_price)) as price
 
             FROM `products` p
 
@@ -186,7 +182,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
             WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
             AND a.products_id = {$id}
 
-            GROUP BY po.products_options_name
+--            GROUP BY po.products_options_name
         ";
     }
 

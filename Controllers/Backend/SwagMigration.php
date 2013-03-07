@@ -38,11 +38,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     protected $source;
 
     /**
-     * Attribute helper of the source system
-     */
-    protected $attributeHelper;
-
-    /**
      * Target shop system profile
      * @var Shopware_Components_Migration_Profile
      */
@@ -96,22 +91,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return Shopware_Components_Migration::factory($query['profile'], $config);
     }
 
-    public function initAttributeHelper()
-    {
-        $query = $this->Request()->getPost()+$this->Request()->getQuery();
-
-        return Shopware_Components_Migration::attributeHelperFactory($query['profile'], $this->Source());
-
-    }
-
-    public function AttributeHelper()
-    {
-        if (!isset($this->attributeHelper)) {
-            $this->attributeHelper = $this->initAttributeHelper();
-        }
-        return $this->attributeHelper;
-    }
-
     /**
      * Getter function of the source profile
      * @return Shopware_Components_Migration_Profile
@@ -144,6 +123,65 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $this->target = $this->initTarget();
         }
         return $this->target;
+    }
+
+    /**
+     * Helper function which gets the configurator groups for
+     * a given product
+     * @param $productId
+     * @return Array
+     */
+    public function getConfiguratorGroups($productId)
+    {
+        // get configurator groups for the given product
+        $builder = Shopware()->Models()->createQueryBuilder();
+        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
+                ->from('Shopware\Models\Article\Article', 'article')
+                ->innerJoin('article.configuratorSet', 'configuratorSet')
+                ->leftJoin('configuratorSet.groups', 'groups')
+                ->where('article.id = ?1')
+                ->setParameter(1, $productId);
+
+        $result = array_pop($builder->getQuery()->getArrayResult());
+
+        $configuratorArray = $result['configuratorSet'];
+        $groups = $configuratorArray['groups'];
+
+        // Additionally get the options for the given configurator set
+        // this relations seems not to be available in the configurator models
+        // (the configuratorSet-Model returns all group's options, even those
+        // not related to the given set)
+        $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
+
+        LEFT JOIN s_article_configurator_set_option_relations relations
+        ON relations.set_id = sets.id
+
+        LEFT JOIN s_article_configurator_options options
+        ON options.id = relations.option_id
+
+        WHERE sets.id = ?";
+        $results = Shopware()->Db()->fetchAll($sql, array($configuratorArray['id']));
+
+        // Sort the options by group
+        $optionsByGroups = array();
+        foreach($results as $option) {
+            $groupId = $option['group_id'];
+            if (!isset($optionsByGroups[$groupId])) {
+                $optionsByGroups[$groupId] = array();
+            }
+            $optionsByGroups[$groupId][] = $option;
+        }
+
+        // merge the options into the group
+        $totalCount = 1;
+        foreach ($groups as &$group) {
+            $group['options'] = $optionsByGroups[$group['id']];
+            if (count($group['options']) > 0 ) {
+                $totalCount = $totalCount * count($group['options']);
+            }
+        }
+
+        return $groups;
     }
 
     public function sDeleteAllArticles()
@@ -1099,42 +1137,215 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
-    public function generateVariantsFromAttributes()
+    /**
+     * Returns a SW-productID for a given source-productId
+     * @param $productId
+     * @return string
+     */
+    public function getBaseArticleInfo($productId)
     {
+        $sql = '
+            SELECT
+                ad.articleID as productId
+            FROM s_plugin_migrations pm
+            LEFT JOIN s_articles_details ad
+                ON ad.id = pm.targetID
+            WHERE pm.`sourceID`=?
+            AND `typeID`=1
+        ';
+
+        return Shopware()->Db()->fetchOne($sql, array($productId));
+    }
+
+    /**
+     * Generates configuratorSets, configuratorOptions and configuratorGroups
+     * for a given article depending on its attributes
+     */
+    public function generateConfiguratorSetsFromAttributes()
+    {
+
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
-        $done = Zend_Json::encode(array(
-            'message'=>$this->namespace->get('generatedVariants', "Variants successfully generated!"),
-            'success'=>true,
-            'import_generate_variants'=>null,
-            'offset'=>0,
-            'progress'=>-1
-        ));
-
-        if (method_exists($this->AttributeHelper(), 'generateVariants')) {
-            $ret = $this->AttributeHelper()->generateVariants($offset);
-
-            if ($ret === true) {
-                echo $done;
-                return;
-            }
-
+        $products_result = $this->Source()->queryAttributedProducts($offset);
+        if (empty($products_result)) {
             echo Zend_Json::encode(array(
-                'message'=>sprintf($this->namespace->get('generatedVariants', "Generated variants for %s out of %s articles"), $ret['offset'], $ret['count']),
+                'message'=>$this->namespace->get('generatedConfigurators', "Configurators successfully generated!"),
                 'success'=>true,
-                'offset'=>$ret['offset'],
-                'progress'=>$ret['offset']/$ret['count']
+                'import_generate_variants'=>null,
+                'import_create_configurator_variants' => null,
+                'offset'=>0,
+                'progress'=>-1
             ));
             return;
         }
 
+        $count = $products_result->rowCount()+$offset;
+
+        // iterate all products with attributes
+        while ($product = $products_result->fetch()) {
+            $id = $product['productID'];
+
+            // Skip products which have not been imported before
+            $productId = $this->getBaseArticleInfo($id);
+            if (false === $productId) {
+                continue;
+            }
+
+            // Create configurator set for product
+            $configuratorSetName = "Generated Set - ".$id;
+            $configuratorSetId = Shopware()->Db()->fetchOne("SELECT `id` FROM `s_article_configurator_sets` WHERE `name`='{$configuratorSetName}' LIMIT 1");
+            if(false === $configuratorSetId) {
+                $sql = "INSERT INTO s_article_configurator_sets SET `name`='{$configuratorSetName}'";
+                Shopware()->Db()->query($sql);
+                $configuratorSetId = Shopware()->Db()->lastInsertId();
+            }
+
+            // Get all attributes of the current product
+            $result = $this->Source()->queryProductAttributes($id);
+
+            $options = array();
+            $groups = array();
+            // iterate all attributes
+            while ($attribute = $result->fetch()) {
+                $group = $attribute['group_name'];
+                $option = $attribute['option_name'];
+                $price = $attribute['price'];
+
+
+                // Create / load group
+                if (!isset($groups[$group])) {
+                    $groupId = Shopware()->Db()->fetchOne("SELECT `id` FROM `s_article_configurator_groups` WHERE `name`='{$group}' LIMIT 1");
+                    if ($groupId === false) {
+                        $sql = "INSERT INTO `s_article_configurator_groups` SET `name`='{$group}'";
+                        Shopware()->Db()->query($sql);
+                        $groupId = Shopware()->Db()->lastInsertId();
+                    }
+                    $groups[$group] = $groupId;
+                } else {
+                    $groupId = $groups[$group];
+                }
+
+                // Set group relations
+                $sql = "INSERT IGNORE INTO s_article_configurator_set_group_relations (`set_id`, `group_id`) VALUES ({$configuratorSetId}, {$groupId})";
+                Shopware()->Db()->query($sql);
+
+                // Create / load option
+                if (!isset($options[$option])) {
+                    $optionId = Shopware()->Db()->fetchOne("SELECT `id` FROM `s_article_configurator_options` WHERE `name`='{$option}' AND `group_id`={$groupId}");
+                    if ($optionId === false) {
+                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`) VALUES ({$groupId}, '{$option}')";
+                        Shopware()->Db()->query($sql);
+                        $optionId = Shopware()->Db()->lastInsertId();
+                    }
+                    $options[$option] = $optionId;
+                } else {
+                    $optionId = $options[$option];
+                }
+
+                // Set option relations
+                $sql = "INSERT IGNORE INTO s_article_configurator_set_option_relations (`set_id`, `option_id`) VALUES ({$configuratorSetId}, {$optionId})";
+                Shopware()->Db()->query($sql);
+
+
+                $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
+                Shopware()->Db()->query($sql);
+
+            }
+
+            // Set product's configurator set
+            $sql = "UPDATE s_articles SET configurator_set_id = {$configuratorSetId} WHERE `id`={$productId}";
+            Shopware()->Db()->query($sql);
+
+
+            $offset++;
+            if(time()-$requestTime >= 10) {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($this->namespace->get('configuratorProgress', "%s out of %s configurators imported"), $offset, $count),
+                    'success'=>true,
+                    'offset'=>$offset,
+                    'progress'=>$offset/$count
+                ));
+                return;
+            }
+
+        }
+        echo Zend_Json::encode(array(
+            'message'=>$this->namespace->get('generatedConfigurators', "Configurators successfully created!"),
+            'success'=>true,
+            'import_generate_variants'=>null,
+            // Set variant generation to be the next step
+            'import_create_configurator_variants' => 1,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+
+    }
+
+    /**
+     * Generate variants from configuratorSets
+     */
+    public function generateVariants()
+    {
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offsetProduct = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+
+        $done = Zend_Json::encode(array(
+            'message'=>$this->namespace->get('generatedVariants', "Variants successfully generated"),
+            'success'=>true,
+            'count' => 0,
+            'import_generate_variants'=>null,
+            'import_create_configurator_variants' => null,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+
+        // Get products with attributes
+        $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
+        if (empty($products_result)) {
+            echo $done;
+            return;
+        }
+
+        $count = $products_result->rowCount()+$offsetProduct;
+
+        // iter products
+        while ($product = $products_result->fetch()) {
+            $id = $product['productID'];
+
+            // continue if product was not imported before
+            $productId = $this->getBaseArticleInfo($id);
+            if (false === $productId) {
+                continue;
+            }
+
+            $groups = $this->getConfiguratorGroups($productId);
+
+            $params = array(
+                'articleId' => $productId,
+                'groups' => $groups
+
+            );
+
+            $offsetProduct++;
+
+            // Return the groups
+            // The ExtJS frontend will care of the generation by triggering
+            // the default article controller
+            echo Zend_Json::encode(array(
+                'message'=>sprintf($this->namespace->get('variantsArticleProgress', "Generating variants for product %s out of %s"), $offsetProduct, $count),
+                'success'=>true,
+                'offset'=>$offsetProduct,
+                'count'=>$count,
+                'create_variants' => true,
+                'params' => $params,
+                'progress'=>$offsetProduct/$count
+            ));
+            return;
+        }
 
         echo $done;
-
-
-
-
     }
 
     /**
@@ -1530,8 +1741,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             if(!empty($this->Request()->import_generate_variants)) {
-                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while importing prices");
-                return $this->generateVariantsFromAttributes();
+                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configuratos");
+                return $this->generateConfiguratorSetsFromAttributes();
+            }
+
+            if(!empty($this->Request()->import_create_configurator_variants)) {
+                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configurator variants");
+                return $this->generateVariants();
             }
 
             if(!empty($this->Request()->import_images)) {
@@ -1571,7 +1787,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ));
 
         } catch (Exception $e) {
-            echo Zend_Json::encode(array(
+            $error = array(
                 'message'=>$errorMessage,
                 'error'=>$e->getMessage(),
                 'code'=>$e->getCode(),
@@ -1581,7 +1797,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'success'=>false,
                 'progress'=>1,
                 'done'=>true
-            ));
+            );
+            if (!$this->Front()->Plugins()->Json()->getRenderer()) {
+                echo Zend_Json::encode($error);
+            } else {
+                $this->view->assign($error);
+            }
+
         }
     }
 
