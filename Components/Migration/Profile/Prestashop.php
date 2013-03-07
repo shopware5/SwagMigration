@@ -210,6 +210,13 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
    	 */
 	public function getProductSelect()
 	{
+        $taxSelect = "
+            IFNULL (
+                (SELECT tr.id_tax FROM {$this->quoteTable('tax_rule', 'tr')}  WHERE id_tax_rule=1 LIMIT 1),
+                1
+            ) as taxID,
+        ";
+
 		return "
 			SELECT
 				a.id_product							as productID,
@@ -230,7 +237,8 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				a.width 			                    as width,
 				a.height 			                    as height,
 
-				tr.id_tax           					as taxID,
+				{$taxSelect}
+
 				s.name              					as supplier,
 				a.active        						as active,
 
@@ -245,20 +253,16 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 
 			FROM {$this->quoteTable('product', 'a')}
 
-			LEFT JOIN {$this->quoteTable('tax_rule', 'tr')}
-			ON tr.id_tax_rules_group=a.id_tax_rules_group
-
 			LEFT JOIN {$this->quoteTable('manufacturer', 's')}
 			ON s.id_manufacturer=a.id_manufacturer
 
             LEFT JOIN {$this->quoteTable('stock_available', 'st')}
             ON st.id_product=a.id_product
+            AND st.id_product_attribute=0
 
 			LEFT JOIN {$this->quoteTable('product_lang', 'd')}
 			ON d.id_product=a.id_product
-
-			WHERE d.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
-			AND st.id_product_attribute=0
+            AND d.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
 		";
 	}
 

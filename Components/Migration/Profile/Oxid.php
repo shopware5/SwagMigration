@@ -212,7 +212,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 					IF(a.OXDELTIMEUNIT='WEEK', a.OXMINDELTIME*7, a.OXMINDELTIME),
 					IF(a.OXMAXDELTIME!=0, CONCAT('-', IF(a.OXDELTIMEUNIT='WEEK', a.OXMAXDELTIME*7, a.OXMAXDELTIME)), '')
 				)					as shippingtime,
-			    COALESCE(ap.OXVAT, a.OXVAT) as tax,
+			    COALESCE(a2.OXVAT, a.OXVAT) as tax,
 				a.OXTPRICE 			as pseudoprice,
 				a.OXBPRICE 			as baseprice,
 				a.OXPRICE 			as price,
@@ -237,9 +237,6 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			FROM {$this->quoteTable('articles', 'a')}
 
-			LEFT JOIN {$this->quoteTable('articles', 'ap')}
-			ON a.OXID=ap.OXPARENTID
-
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.OXID=a.OXMANUFACTURERID
 
@@ -248,9 +245,6 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			LEFT JOIN {$this->quoteTable('artextends', 'e')}
 			ON e.OXID=a.OXID
-
-            GROUP BY a.OXID
-			ORDER BY `parentID`, a.OXSORT
         ";
 	}
 
