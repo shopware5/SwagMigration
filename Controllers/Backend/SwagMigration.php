@@ -215,8 +215,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			TRUNCATE s_article_configurator_sets;
 			TRUNCATE s_article_configurator_set_group_relations;
 			TRUNCATE s_article_configurator_set_option_relations;
+			TRUNCATE s_article_configurator_templates;
+			TRUNCATE s_article_configurator_templates_attributes;
+			TRUNCATE s_article_configurator_template_prices;
+			TRUNCATE s_article_configurator_template_prices_attributes;
 			TRUNCATE s_article_img_mappings;
-			TRUNCATE s_article_img_mapping_rulesTRUNCATE 
+			TRUNCATE s_article_img_mapping_rules;
         ";
         Shopware()->Db()->query($sql);
     }
@@ -1300,7 +1304,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'offset'=>0,
             'progress'=>-1
         ));
-
+//echo $done;return;
         // Get products with attributes
         $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
         if (empty($products_result)) {
