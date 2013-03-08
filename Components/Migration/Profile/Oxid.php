@@ -379,7 +379,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				c.OXHIDDEN as hidetop,
 				c.OXSORT as position,
 				c.OXEXTLINK as external,
-				c.OXRIGHT-OXLEFT as diff,
+                c.OXLEFT as catLeft,
                 s.OXKEYWORDS as metaKeywords,
                 s.OXDESCRIPTION as metaDescription
 			FROM {$this->quoteTable('categories', 'c')}
@@ -404,7 +404,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 					c.OXHIDDEN as hidetop,
 					c.OXSORT as position,
 				    c.OXEXTLINK as external,
-					c.OXRIGHT-OXLEFT as diff,
+					c.OXLEFT as catLeft,
                     s.OXKEYWORDS as metaKeywords,
                     s.OXDESCRIPTION as metaDescription
 				FROM {$this->quoteTable('categories', 'c')}
@@ -413,7 +413,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				WHERE c.OXSHOPID='oxbaseshop'
 			";
 		}
-		return '('.implode(') UNION ALL (', $sql).') ORDER BY languageID, diff DESC';
+		return '('.implode(') UNION ALL (', $sql).') ORDER BY catLeft';
 	}
 
     /**

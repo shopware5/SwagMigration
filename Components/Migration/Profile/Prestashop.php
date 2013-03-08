@@ -471,6 +471,8 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 
             WHERE c.id_category>1
 
+            ORDER BY c.id_parent ASC
+
 		";
 	}
 

@@ -346,6 +346,8 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				{$this->quoteTable('languages', 'lg')}
 			WHERE co.categories_id=cd.categories_id
 			AND lg.code = cd.language_code
+
+			ORDER BY co.parent_id
 		";
 
 	}

@@ -55,6 +55,11 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
     },
 
     /**
+     * If set to true, the import will be canceled
+     */
+    cancel: false,
+
+    /**
      * A template method that is called when your application boots.
      * It is called before the Application's launch function is executed
      * so gives a hook point to run any code before your Viewport is created.
@@ -165,6 +170,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             config = databaseValues,
             total = 0;
 
+        me.cancel = false;
+
         Ext.iterate(importCardValues, function(key, value) {
             config[key] = value;
             if(key.substring(0, 7) === "import_") {
@@ -188,11 +195,26 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             msg          : "{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}",
             width        : 500,
             progress     : true,
-            closable     : false
+            closable     : false,
+            buttons      : Ext.MessageBox.CANCEL,
+            fn           : function(buttonId, text, opt) {
+
+                if (buttonId != 'cancel') {
+                    return;
+                }
+
+                // Set the cancel property to true in order to cancel the migration
+                // after the next request
+                me.cancel = true;
+                Ext.Msg.alert(
+                    '{s name=importCanceled}Import canceled by user{/s}',
+                    '{s name=importCanceled}Import canceled by user{/s}'
+                );
+            }
         });
 
         // workaround to set the height of the MessageBox
-        me.progressWindow.setSize(500, 150);
+        me.progressWindow.setSize(500, 160);
         me.progressWindow.doLayout();
 
 
@@ -209,7 +231,15 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      */
     runImportRequest: function(config) {
         var me = this;
-        console.log("Config", config);
+        if (config.offset > 0) {
+            config.messageShown = 0;
+        }
+
+        // If import was canceled, return and set the cancel flag bag to false
+        if (me.cancel) {
+            me.cancel = false;
+            return;
+        }
 
         Ext.Ajax.request({
             url: '{url controller="SwagMigration"}/'+config.action,
@@ -217,6 +247,11 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             method: 'POST',
             success: function (response, request) {
                 if(!response.responseText) {
+                    Ext.Msg.alert(
+                        '{s name=importFailedWithoutErrors}Import failed{/s}',
+                        'The server aborted the import without any error message.' +
+                        ' Usually this is caused by low max-execution limits or SQL-server timeouts.'
+                    );
                     return;
                 }
                 result = Ext.JSON.decode(response.responseText);
@@ -261,6 +296,12 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 me.progressWindow.close();
                 if(response.responseText) {
                     Ext.Msg.alert('{s name=importFailes}Import failed{/s}', response.responseText);
+                } else {
+                    Ext.Msg.alert(
+                        '{s name=importFailedWithoutErrors}Import failed{/s}',
+                        'The server aborted the import without any error message.' +
+                        'Usually this is caused by low max-execution limits or SQL-server timeouts.'
+                    );
                 }
             }
         });

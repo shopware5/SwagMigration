@@ -610,7 +610,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function importProductPrices()
     {
-        $result = $this->Source()->queryProductPrices();
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        if ($this->printCurrentImportMessage('Product prices')) {
+            return;
+        }
+
+        $result = $this->Source()->queryProductPrices($offset);
+        $count = $result->rowCount()+$offset;
+
         while ($price = $result->fetch()) {
             if(!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
                 if(isset($this->Request()->price_group[$price['pricegroup']])) {
@@ -652,6 +661,18 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 }
                 $price['articlepricesID'] = Shopware()->Api()->Import()->sArticlePrice($price);
             }
+
+
+            $offset++;
+            if(time()-$requestTime >= 10) {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($this->namespace->get('progressPrices', "%s out of %s prices imported"), $offset, $count),
+                    'success'=>true,
+                    'offset'=>$offset,
+                    'progress'=>$offset/$count
+                ));
+                return;
+            }
         }
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importedPrices', "Prices successfully imported!"),
@@ -670,6 +691,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+
+        if ($this->printCurrentImportMessage('Product images')) {
+            return;
+        }
 
         $result = $this->Source()->queryProductImages($offset);
 
@@ -734,6 +760,74 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
+     * Set a category target id
+     * @param $id
+     * @param $target
+     */
+    public function setCategoryTarget($id, $target)
+    {
+        $this->deleteCategoryTarget($id);
+
+        $sql = '
+            INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
+        ';
+
+        Shopware()->Db()->query($sql, array(99, $id, $target));
+    }
+
+    /**
+     * Get a category target id
+     * @param $id
+     * @return bool|string
+     */
+    public function getCategoryTarget($id)
+    {
+        if (!isset($id) || empty($id)) {
+            return false;
+        }
+        return Shopware()->Db()->fetchOne("SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?", array(99, $id));
+    }
+
+    /**
+     * Delete category target
+     * @param $id
+     */
+    public function deleteCategoryTarget($id)
+    {
+        $sql = "DELETE FROM s_plugin_migrations WHERE typeID = 99 AND sourceID = '{$id}'";
+        Shopware()->Db()->query($sql);
+    }
+
+    /**
+     * Helper method to print "currently importing" messages
+     * @param $type
+     * @return bool
+     */
+    public function printCurrentImportMessage($type)
+    {
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        if ($offset > 0) {
+            return false;
+        }
+        $messageShown = empty($this->Request()->messageShown) ? false : (bool) $this->Request()->messageShown;
+        if ($messageShown) {
+            return false;
+        }
+        $import = $this->namespace->get("currentImport".$type, $type);
+
+        echo Zend_Json::encode(array(
+            'message'=>sprintf($this->namespace->get('currentlyImporting', "Current import step: %s"), $import),
+            'success'=>true,
+            'offset'=>0,
+            'progress'=>0,
+            'messageShown'=>1
+        ));
+        return true;
+    }
+
+    /**
      * Imports the categories of the target database into the shopware database
      * Some shop system have only one main shop. For this shops the categories translations will split into new categories.
      *
@@ -744,18 +838,26 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
-        $categories = $this->Source()->getCategories();
+        if ($this->printCurrentImportMessage('Categories')) {
+            return;
+        }
 
-		$targets = array();
+        $categories = $this->Source()->getCategories($offset);
 
-		//some shop systems have only one main shop with different translations for the same category
-        foreach ($categories as $category) {
-            if(!empty($category['languageID'])) {
-                $targets[$category['categoryID'].'_'.$category['languageID']] = null;
-            } else {
-                $targets[$category['categoryID']] = null;
+		// On the first request delete all previous category ids
+        // Also set temporary IDs to 0 in order to tell apart non-existing from not yet imported categories later
+        if ($offset === 0) {
+            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (99,2);");
+            foreach ($categories as $category) {
+                if(!empty($category['languageID'])) {
+                    $this->setCategoryTarget($category['categoryID'].'_'.$category['languageID'], 0);
+                } else {
+                    $this->setCategoryTarget($category['categoryID'], 0);
+                }
             }
         }
+
+        $count = count($categories)+$offset;
 
         while ($category = array_shift($categories)) {
 			//check if the category split into the different translations
@@ -767,22 +869,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 }
             }
 
+            $target_parent = $this->getCategoryTarget($category['parentID']);
+
             // Do not create empty categories
             if(empty($category['description'])) {
+                $offset++;
                 continue;
             }
             if(!empty($category['parentID'])) {
-
                 // Map the category IDs
-                if (!empty($targets[$category['parentID']])) {
-                    $category['parent'] = $targets[$category['parentID']];
+                if (false !== $target_parent && 0 !== $target_parent) {
+                    $category['parent'] = $target_parent;
                 // Push the category to the end of the list, if the parentID is not available, yet
-                } elseif(isset($targets[$category['parentID']]) && $targets[$category['parentID']] != false) {
-                    array_push($categories, $category);
+                } elseif(0 !== $target_parent) {
+                    $offset++;
                     continue;
                 // Drop any other category
                 } else {
-					unset($targets[$category['categoryID']]);
+                    $this->deleteCategoryTarget($category['categoryID']);
+                    $offset++;
                     continue;
                 }
             } elseif( !empty($category['languageID'])
@@ -794,7 +899,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             try {
-                $targets[$category['categoryID']] = $category['targetID'] = Shopware()->Api()->Import()->sCategory($category);
+                $category['targetID'] = Shopware()->Api()->Import()->sCategory($category);
+                $this->setCategoryTarget($category['categoryID'], $category['targetID']);
             }
             catch(Exception $e) {
                 echo "<pre>";
@@ -810,12 +916,56 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ';
 
             Shopware()->Db()->query($sql , array(2, $category['categoryID'], $category['targetID']));
+
+            $offset++;
+            if(time()-$requestTime >= 10) {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($this->namespace->get('progressCategories', "%s out of %s categories imported"), $offset, $count),
+                    'success'=>true,
+                    'offset'=>$offset,
+                    'progress'=>$offset/$count
+                ));
+                return;
+            }
+
+        }
+
+        echo Zend_Json::encode(array(
+            'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
+            'success'=>true,
+            'import_categories'=>null,
+            'import_article_categories'=>1,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+
+    }
+
+    public function importArticleCategories()
+    {
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        if ($this->printCurrentImportMessage('Article-Category assignment')) {
+            return;
         }
 
         $result = $this->Source()->queryProductCategories($offset);
+
         $count = $result->rowCount()+$offset;
+
         while ($productCategory = $result->fetch()) {
+            if(time()-$requestTime >= 10) {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($this->namespace->get('progressArticleCategories', "%s out of %s articles assigned to categories"), $offset, $count),
+                    'success'=>true,
+                    'offset'=>$offset,
+                    'progress'=>$offset/$count
+                ));
+                return;
+            }
             $offset++;
+
             $sql = '
                 SELECT ad.articleID
                 FROM s_plugin_migrations pm
@@ -844,16 +994,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             foreach ($categories as $category) {
                 Shopware()->Api()->Import()->sArticleCategory($article, $category, false);
             }
-
-            if(time()-$requestTime >= 10) {
-                echo Zend_Json::encode(array(
-                    'message'=>sprintf($this->namespace->get('progressCategories', "%s out of %s categories imported"), $offset, $count),
-                    'success'=>true,
-                    'offset'=>$offset,
-                    'progress'=>$offset/$count
-                ));
-                return;
-            }
         }
 
         // Fallback for SW versions prior 4.0.6
@@ -866,6 +1006,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
             'success'=>true,
             'import_categories'=>null,
+            'import_article_categories'=>null,
             'offset'=>0,
             'progress'=>-1
         ));
@@ -873,9 +1014,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * This function import the product ratings, selected by the source profile
+     * todo@dn: make this multi request capable
      */
     public function importProductRatings()
     {
+
+        if ($this->printCurrentImportMessage('Product ratings')) {
+            return;
+        }
+
         $result = $this->Source()->queryProductRatings();
         while ($rating = $result->fetch()) {
             $sql = '
@@ -939,6 +1086,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        if ($this->printCurrentImportMessage('Product translations')) {
+            return;
+        }
 
         $result = $this->Source()->queryProductTranslations($offset);
         $count = $result->rowCount()+$offset;
@@ -1009,6 +1160,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
         $disableNumberValidation = $this->Request()->getParam('no_number_validation', false);
         $import = Shopware()->Api()->Import();
+
+        if ($this->printCurrentImportMessage('Products')) {
+            return;
+        }
 
         $result = $this->Source()->queryProducts($offset);
         $count = $result->rowCount()+$offset;
@@ -1361,11 +1516,14 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
+        if ($this->printCurrentImportMessage('Customers')) {
+            return;
+        }
+
         $result = $this->Source()->queryCustomers($offset);
         $count = $result->rowCount()+$offset;
 
         while ($customer = $result->fetch()) {
-
             if(isset($customer['customergroupID']) && isset($this->Request()->customer_group[$customer['customergroupID']])) {
                 $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
             }
@@ -1453,6 +1611,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        if ($this->printCurrentImportMessage('Orders')) {
+            return;
+        }
 
         $result = $this->Source()->queryOrders($offset);
         $count = $result->rowCount()+$offset;
@@ -1617,6 +1779,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
+        if ($this->printCurrentImportMessage('Order details')) {
+            return;
+        }
+
         $result = $this->Source()->queryOrderDetails($offset);
         $count = $result->rowCount()+$offset;
 
@@ -1737,6 +1903,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(!empty($this->Request()->import_categories)) {
                 $errorMessage = $this->namespace->get('errorImportingCategories', "An error occurred while importing categories");
                 return $this->importCategories();
+            }
+
+            if(!empty($this->Request()->import_article_categories)) {
+                $errorMessage = $this->namespace->get('errorImportingArticleCategories', "An error assigning articles to categories");
+                return $this->importArticleCategories();
             }
 
             if(!empty($this->Request()->import_prices)) {
