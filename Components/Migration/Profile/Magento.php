@@ -330,6 +330,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				WHERE g.`group_id`=s.`group_id`
 				AND c.`path` LIKE CONCAT('1/', g.`root_category_id`, '/%')
 				AND s.`store_id`={$this->Db()->quote($shopID)}
+
+                ORDER BY parentID ASC
 			";
 		}
 		return '('.implode(') UNION ALL (', $sql).')'.' ORDER BY languageID ASC, parentID ASC';

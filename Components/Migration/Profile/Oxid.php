@@ -162,36 +162,20 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				u.OXBIRTHDATE 								as birthday,
 				u.OXUSTID 									as ustid,
 				
-				IF(OXDELSAL IN ('m','Herr','MR'), 'mr', 'ms')	as shipping_salutation,
-				OXDELFNAME									as shipping_firstname,
-				OXDELLNAME 									as shipping_lastname,
-				OXDELCOMPANY 								as shipping_company,
-				'' 											as shipping_department,
-				OXDELSTREET 								as shipping_street,
-				OXDELSTREETNR 								as shipping_streetnumber,
-				OXDELZIP									as shipping_zipcode,
-				OXDELCITY									as shipping_city,
-				sc.OXISOALPHA2								as shipping_countryiso,
-				OXDELADDINFO								as shipping_text1,
-				
 				u.OXPASSWORD								as password,
 				u.OXCREATE									as firstlogin,
-				IFNULL(o.OXORDERDATE, u.OXCREATE)			as lastlogin,
 				u.OXSHOPID									as subshopID,
 				
 				IF(gb.OXID, 0, IF(u.OXACTIVE,1,0))			as active,
 				IF(n.OXID, IF(gb.OXID, 0, IF(u.OXACTIVE,1,0)), 0)	as newsletter
 				
 			FROM {$this->quoteTable('user', 'u')}
-			LEFT JOIN {$this->quoteTable('order', 'o')} ON o.OXID=(SELECT OXID FROM {$this->quoteTable('order')} WHERE OXUSERID=u.OXID ORDER BY OXORDERDATE DESC LIMIT 1)
 
 			LEFT JOIN {$this->quoteTable('object2group', 'n')} ON n.OXOBJECTID=u.OXID AND n.OXGROUPSID='oxidnewsletter'
-			-- LEFT JOIN oxobject2group gd ON gd.OXOBJECTID=u.OXID AND gd.OXGROUPSID='oxiddealer'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb')} ON gb.OXOBJECTID=u.OXID AND gb.OXGROUPSID='oxidblacklist'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb2')} ON gb2.OXOBJECTID=u.OXID AND gb2.OXGROUPSID='oxidblocked'
 			
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
-			LEFT JOIN {$this->quoteTable('country', 'sc')} ON sc.OXID=o.OXDELCOUNTRYID
 		";
 	}
 
@@ -391,7 +375,7 @@ SELECT
 				c.OXHIDDEN as hidetop,
 				c.OXSORT as position,
 				c.OXEXTLINK as external,
-				c.OXRIGHT-OXLEFT as diff,
+                c.OXLEFT as catLeft,
                 s.OXKEYWORDS as metaKeywords,
                 s.OXDESCRIPTION as metaDescription
 			FROM {$this->quoteTable('categories', 'c')}
@@ -416,7 +400,7 @@ SELECT
 					c.OXHIDDEN as hidetop,
 					c.OXSORT as position,
 				    c.OXEXTLINK as external,
-					c.OXRIGHT-OXLEFT as diff,
+					c.OXLEFT as catLeft,
                     s.OXKEYWORDS as metaKeywords,
                     s.OXDESCRIPTION as metaDescription
 				FROM {$this->quoteTable('categories', 'c')}
@@ -425,7 +409,7 @@ SELECT
 				WHERE c.OXSHOPID='oxbaseshop'
 			";
 		}
-		return '('.implode(') UNION ALL (', $sql).') ORDER BY languageID, diff DESC';
+		return '('.implode(') UNION ALL (', $sql).') ORDER BY catLeft';
 	}
 
     /**

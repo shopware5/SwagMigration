@@ -144,6 +144,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 name: 'import_categories',
                 xtype: 'checkbox'
             }, {
+                fieldLabel: '',
+                name: 'import_article_categories',
+                xtype: 'checkbox',
+                checked: false,
+                hidden: true
+            }, {
                 fieldLabel: '{s name=importCustomers}Import customers{/s}',
                 name: 'import_customers',
                 xtype: 'checkbox'
