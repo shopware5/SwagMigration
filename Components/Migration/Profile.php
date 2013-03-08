@@ -307,12 +307,11 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Returns the categories, selected by the profile sql
      * @return array
      */
-	public function getCategories()
+	public function getCategories($offset)
 	{
-		if(!method_exists($this, 'getCategorySelect')) {
-			return;
-		}
-		return $this->db->fetchAll($this->getCategorySelect());
+        $query = $this->queryCategories($offset);
+
+		return $query->fetchAll();
 	}
 
     /**
