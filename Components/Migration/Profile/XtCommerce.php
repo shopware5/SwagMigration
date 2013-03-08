@@ -446,7 +446,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				{$this->quoteTable('categories_description', 'cd')}
 			WHERE co.categories_id=cd.categories_id
 
-			ORER BY parent_id
+			ORDER BY parent_id
 		";
 	}
 

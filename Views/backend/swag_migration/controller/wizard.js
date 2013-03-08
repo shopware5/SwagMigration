@@ -386,6 +386,12 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
     startVariantGenerator: function(model,  generatorConfig, currentProduct, totalProducts, importConfig) {
         var me = this;
 
+       // If import was canceled, return and set the cancel flag bag to false
+        if (me.cancel) {
+            me.cancel = false;
+            return;
+        }
+
         model.set('offset', generatorConfig.offset);
         model.set('limit', generatorConfig.limit);
         // Force creation of all variants
