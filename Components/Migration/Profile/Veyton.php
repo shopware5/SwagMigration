@@ -213,7 +213,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			LEFT JOIN {$this->quoteTable('media_description', 'md')}
 			ON md.id=m.id
 			AND md.`language_code`='de'
-			
+
 			WHERE m.`type`='images'
 			AND m.`class`='product'
 			AND m.`status`='true'

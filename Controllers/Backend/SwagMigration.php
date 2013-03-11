@@ -31,6 +31,14 @@
  */
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
+
+    const MAPPING_ARTICLE = 1;
+    const MAPPING_CATEGORY = 2;
+    const MAPPING_CUSTOMER = 3;
+    const MAPPING_ORDER = 4;
+    const MAPPING_CATEGORY_TARGET = 99;
+
+
     /**
      * Source shop system profile
      * @var Shopware_Components_Migration_Profile
@@ -258,22 +266,22 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Truncate customer related tables
-     */
-    public function sDeleteAllCustomers()
-    {
-        $sql = "
-            TRUNCATE s_user;
-            TRUNCATE s_user_attributes;
-            TRUNCATE s_user_billingaddress;
-            TRUNCATE s_user_billingaddress_asssttributes;
-            TRUNCATE s_user_shippingaddress;
-            TRUNCATE s_user_shippingaddress_attributes;
-            TRUNCATE s_user_shippingaddress_attributes;
-            TRUNCATE s_user_debit;
-        ";
 
-        Shopware()->Db()->query($sql);
+        */
+       public function sDeleteAllCustomers()
+       {
+           $sql = "
+               TRUNCATE s_user;
+               TRUNCATE s_user_attributes;
+               TRUNCATE s_user_billingaddress;
+               TRUNCATE s_user_billingaddress_attributes;
+               TRUNCATE s_user_shippingaddress;
+               TRUNCATE s_user_shippingaddress_attributes;
+               TRUNCATE s_user_shippingaddress_attributes;
+               TRUNCATE s_user_debit;
+           ";
 
+           Shopware()->Db()->query($sql);
     }
 
     /**
@@ -621,7 +629,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $price['pricegroup'] = 'EK';
             }
 
-            $sql = '
+            $sql = "
                 SELECT ad.id as articledetailsID, IF(cg.taxinput=1, t.tax, 0) as tax
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
@@ -634,9 +642,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ON cg.mode=0
                 AND cg.groupkey=?
                 WHERE pm.sourceID=?
-                AND pm.typeID=1
-            ';
-            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID']));
+                AND pm.typeID=?
+            ";
+            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], self::MAPPING_ARTICLE));
             if(!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if(isset($price['net_price'])) {
@@ -702,9 +710,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID']));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], self::MAPPING_ARTICLE));
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -712,9 +720,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID']));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], self::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 if(!empty($image['main']) && $product_data['kind']==1) {
@@ -763,7 +771,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        Shopware()->Db()->query($sql, array(99, $id, $target));
+        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET, $id, $target));
     }
 
     /**
@@ -776,7 +784,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if (!isset($id) || empty($id)) {
             return false;
         }
-        return Shopware()->Db()->fetchOne("SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?", array(99, $id));
+        return Shopware()->Db()->fetchOne(
+            "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
+            array(self::MAPPING_CATEGORY_TARGET, $id)
+        );
     }
 
     /**
@@ -785,8 +796,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function deleteCategoryTarget($id)
     {
-        $sql = "DELETE FROM s_plugin_migrations WHERE typeID = 99 AND sourceID = '{$id}'";
-        Shopware()->Db()->query($sql);
+        $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
+        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET));
     }
 
     /**
@@ -806,7 +817,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 		// Cleanup previous category imports
         if ($offset === 0) {
-            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (99,2);");
+            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);", array(self::MAPPING_CATEGORY_TARGET,2));
         }
 
         $categories = $this->Source()->queryCategories($offset);
@@ -864,7 +875,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            Shopware()->Db()->query($sql , array(2, $category['categoryID'], $category['targetID']));
+            Shopware()->Db()->query($sql , array(self::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -924,9 +935,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE `sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID']));
+            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], self::MAPPING_ARTICLE));
 
             if(empty($article)) {
                 continue;
@@ -935,9 +946,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $sql = '
                 SELECT `targetID`
                 FROM `s_plugin_migrations`
-                WHERE `typeID`=2 AND (`sourceID`=? OR `sourceID` LIKE ?)
+                WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
-            $categories = Shopware()->Db()->fetchCol($sql , array($productCategory['categoryID'], $productCategory['categoryID'].'_%'));
+            $categories = Shopware()->Db()->fetchCol($sql , array(self::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
 
             if(empty($categories)) {
                 continue;
@@ -983,9 +994,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID']));
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], self::MAPPING_ARTICLE));
 
             if(empty($rating['articleID'])) {
                 continue;
@@ -1069,9 +1080,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID']));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], self::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(
@@ -1192,8 +1203,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             //Parent
             if(!empty($product['parentID'])) {
-                $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=1 AND `sourceID`=?';
-                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array($product['parentID']));
+                $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ARTICLE, $product['parentID']));
             }
 
             if(isset($product['description_long'])) {
@@ -1250,7 +1261,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(1, $product['productID'], $product['articledetailsID']));
+                Shopware()->Db()->query($sql , array(self::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
             }
 
             $offset++;
@@ -1287,10 +1298,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             LEFT JOIN s_articles_details ad
                 ON ad.id = pm.targetID
             WHERE pm.`sourceID`=?
-            AND `typeID`=1
+            AND `typeID`=?
         ';
 
-        return Shopware()->Db()->fetchOne($sql, array($productId));
+        return Shopware()->Db()->fetchOne($sql, array($productId, self::MAPPING_ARTICLE));
     }
 
     /**
@@ -1572,7 +1583,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(3, $customer['customerID'], $customer['userID']));
+                Shopware()->Db()->query($sql , array(self::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
             }
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -1629,12 +1640,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=3 AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql , array($order['customerID']));
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['customerID']));
 
             $order['sourceID'] = $order['orderID'];
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=4 AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array($order['orderID']));
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -1674,7 +1685,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
                 Shopware()->Db()->insert('s_plugin_migrations' , array(
-                    'typeID'=>4, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
+                    'typeID'=>self::MAPPING_ORDER, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
                 ));
             }
 
@@ -1814,8 +1825,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
 
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=4 AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array($order['orderID']));
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ORDER, $order['orderID']));
 
             $sql = '
                 SELECT ad.articleID
@@ -1823,9 +1834,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID']));
+            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], self::MAPPING_ARTICLE));
 
             //TaxRate
             if(!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
