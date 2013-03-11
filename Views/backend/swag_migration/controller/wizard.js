@@ -250,7 +250,14 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     Ext.Msg.alert(
                         '{s name=importFailedWithoutErrors}Import failed{/s}',
                         'The server aborted the import without any error message.' +
-                        ' Usually this is caused by low max-execution limits or SQL-server timeouts.'
+                        ' Usually this is caused by low max-execution limits or SQL-server timeouts.' +
+                        '' +
+                        'What can you do about this?' +
+                        '' +
+                        '* Check your max-execution timeout' +
+                        '* Check your mysql server configuration' +
+                        '* Add additional indizes to your source database in order to speed up the queries.' +
+                        '  Please refer to our documentation regarding the last option.'
                     );
                     return;
                 }
@@ -300,7 +307,14 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     Ext.Msg.alert(
                         '{s name=importFailedWithoutErrors}Import failed{/s}',
                         'The server aborted the import without any error message.' +
-                        'Usually this is caused by low max-execution limits or SQL-server timeouts.'
+                        ' Usually this is caused by low max-execution limits or SQL-server timeouts.' +
+                        '' +
+                        'What can you do about this?' +
+                        '' +
+                        '* Check your max-execution timeout' +
+                        '* Check your mysql server configuration' +
+                        '* Add additional indizes to your source database in order to speed up the queries.' +
+                        '  Please refer to our documentation regarding the last option.'
                     );
                 }
             }

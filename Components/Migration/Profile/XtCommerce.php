@@ -581,15 +581,29 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	public function getOrderDetailSelect()
 	{
 		return "
-			SELECT
-				`orders_id` as orderID,
-				`products_id` as productID,
-				`products_model` as article_ordernumber,
-				`products_name` as name,
-				`products_price` as price,
-				`products_quantity` as quantity
-				
-			FROM {$this->quoteTable('orders_products')}
+            SELECT
+                products.`orders_id` as orderID,
+                `products_id` as productID,
+                `products_model` as article_ordernumber,
+
+                IFNULL (CONCAT(
+                    products.products_name,
+                    ' ',
+                    GROUP_CONCAT(attributes.products_options_values SEPARATOR ', '),
+                    ' (',
+                    GROUP_CONCAT(attributes.products_options SEPARATOR ', '),
+                    ')'
+                ), products.products_name) as name,
+                `products_price` as price,
+                `products_quantity` as quantity
+
+            FROM orders_products products
+
+            -- Join attributes in order to name the article by its attribute
+            LEFT JOIN orders_products_attributes attributes
+            ON attributes.orders_products_id=products.orders_products_id
+
+            GROUP BY (products.orders_products_id)
 		";
 	}
 
