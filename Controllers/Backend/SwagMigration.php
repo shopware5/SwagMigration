@@ -1151,6 +1151,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
+     * Takes an invalid product number and creates a valid one from it
+     * by returning its md5 hash
+     */
+    public function makeInvalidNumberValid($number)
+    {
+        return "sw-".md5($number);
+    }
+
+    /**
      * This function imports the products, selected by the source profile. For the import the shopware api import used.
      * @return mixed
      */
@@ -1158,7 +1167,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
-        $disableNumberValidation = $this->Request()->getParam('no_number_validation', false);
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
         $import = Shopware()->Api()->Import();
 
         if ($this->printCurrentImportMessage('Products')) {
@@ -1179,26 +1188,33 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ");
 
         while ($product = $result->fetch()) {
-            // Select additional article data if needed
+            // Select additional data for the article if needed
             $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
             if (!empty($additionalProductInfo)) {
-
+                // Merge the results with the pre-existing product array
                 $product = array_merge($product, $additionalProductInfo);
             }
 
-
+            // Check the ordernumber
             $number = $product['ordernumber'];
-            if (!$disableNumberValidation && isset($number) &&
+            if ($numberValidationMode !== 'ignore' && isset($number) &&
                 (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
-                echo Zend_Json::encode(array(
-                    'message'=>sprintf($numberSnippet, $number),
-                    'success'=>false,
-                    'import_products'=>null,
-                    'offset'=>0,
-                    'progress'=>-1
-                ));
-                return;
+                switch ($numberValidationMode) {
+                    case 'complain':
+                        echo Zend_Json::encode(array(
+                            'message'=>sprintf($numberSnippet, $number),
+                            'success'=>false,
+                            'import_products'=>null,
+                            'offset'=>0,
+                            'progress'=>-1
+                        ));
+                        return;
+                        break;
+                    case 'make_valid':
+                        $product['ordernumber'] = $this->makeInvalidNumberValid($number);
+                        break;
+                }
             }
 
             //Attribute
@@ -1787,15 +1803,49 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
         if ($this->printCurrentImportMessage('Order details')) {
             return;
         }
 
+        $numberSnippet = $this->namespace->get('numberNotValid',
+            "The product number %s is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            ");
+
         $result = $this->Source()->queryOrderDetails($offset);
         $count = $result->rowCount()+$offset;
 
         while ($order = $result->fetch()) {
+
+            // Check the ordernumber
+            $number = $order['article_ordernumber'];
+            if ($numberValidationMode !== 'ignore' && isset($number) &&
+                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            {
+                switch ($numberValidationMode) {
+                    case 'complain':
+                        echo Zend_Json::encode(array(
+                            'message'=>sprintf($numberSnippet, $number),
+                            'success'=>false,
+                            'import_products'=>null,
+                            'offset'=>0,
+                            'progress'=>-1
+                        ));
+                        return;
+                        break;
+                    case 'make_valid':
+                        $order['article_ordernumber'] = $this->makeInvalidNumberValid($number);
+                        break;
+                }
+            }
+
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=4 AND `sourceID`=?';
             $order['orderID'] = Shopware()->Db()->fetchOne($sql , array($order['orderID']));

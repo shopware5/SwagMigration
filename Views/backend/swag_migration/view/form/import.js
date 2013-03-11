@@ -206,15 +206,46 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 anchor: '100%',
                 labelWidth: 500
             },
-            items :[{
-                fieldLabel: '{s name=noProductNumberValidation}Ignore invalid product numbers (not recommended){/s}',
-                name: 'no_number_validation',
-                xtype: 'checkbox'
-            }]
+            items : me.getAdvancedInputItems()
         };
 
         return  [ me.fieldSet, me.advancedOptionsFieldset ];
+    },
+
+    getAdvancedInputItems: function() {
+        var me = this;
+
+        var item = Ext.create('Ext.form.RadioGroup', {
+                fieldLabel: '{s name=handleInvalidProductNumbers}How to handle invalid product numbers{/s}',
+                labelWidth: 500,
+                columns: 1,
+                items: [
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/complain}Complain about invalid product numbers{/s}',
+                        name: 'number_validation_mode',
+                        checked: true,
+                        inputValue: 'complain'
+                    },
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/convert}Generate new valid numbers{/s}',
+                        name: 'number_validation_mode',
+                        inputValue: 'make_valid'
+                    },
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/ignore}Ignore invalid product numbers (not recommended){/s}',
+                        name: 'number_validation_mode',
+                        inputValue: 'ignore'
+                    }
+                ]
+            });
+
+        return [item];
+
     }
+
 
 });
 //{/block}
