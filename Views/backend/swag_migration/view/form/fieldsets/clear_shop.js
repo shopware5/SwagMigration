@@ -199,7 +199,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
             scope: this,
             handler  : function() {
                 Ext.Msg.show({
-                    title: '{s name=initShop}Initialize Shop{/s}',
+                    title: '{s name=initShop}Reset this Shop{/s}',
                     msg: '{s name=initShop/AreYouSure}Are you sure? All selected elements will be deleted permanently.{/s}',
                     buttons: Ext.Msg.YESNO,
                     scope: this,
@@ -207,7 +207,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
                         if (btn === "yes") {
                             Ext.Ajax.request({
                                 url: '{url action="clearShop"}',
-                                params: me.up().getForm().getValues(),
+                                params: me.up('form').getForm().getValues(),
                                 success: function (r, o){
                                     Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
 

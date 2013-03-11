@@ -209,13 +209,19 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             items : me.getAdvancedInputItems()
         };
 
-        return  [ me.fieldSet, me.advancedOptionsFieldset ];
+        var clearShopFieldSet = {
+            xtype:'migration-fieldset-clearshop',
+            collapsible: true,
+            collapsed: true
+        };
+
+        return  [ me.fieldSet, me.advancedOptionsFieldset, clearShopFieldSet ];
     },
 
     getAdvancedInputItems: function() {
         var me = this;
 
-        var item = Ext.create('Ext.form.RadioGroup', {
+        var radioGroup = Ext.create('Ext.form.RadioGroup', {
                 fieldLabel: '{s name=handleInvalidProductNumbers}How to handle invalid product numbers{/s}',
                 labelWidth: 500,
                 columns: 1,
@@ -242,7 +248,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 ]
             });
 
-        return [item];
+
+        return [radioGroup];
 
     }
 
