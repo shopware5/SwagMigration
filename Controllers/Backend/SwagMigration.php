@@ -1179,6 +1179,14 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ");
 
         while ($product = $result->fetch()) {
+            // Select additional article data if needed
+            $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
+            if (!empty($additionalProductInfo)) {
+
+                $product = array_merge($product, $additionalProductInfo);
+            }
+
+
             $number = $product['ordernumber'];
             if (!$disableNumberValidation && isset($number) &&
                 (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
@@ -1192,6 +1200,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ));
                 return;
             }
+
             //Attribute
             if(!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source=>$target) {

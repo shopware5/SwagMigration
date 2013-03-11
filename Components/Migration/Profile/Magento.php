@@ -125,6 +125,21 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	}
 
+    /**
+     * Returns the entity type id for a given type
+     * @param $type
+     * @return string
+     */
+    public function getEntityTypeId($type)
+    {
+        return $this->Db()->fetchOne("
+            SELECT entity_type_id
+            FROM `eav_entity_type`
+            WHERE entity_type_code = '{$type}'
+        ");
+    }
+
+
 	/**
 	 * Returns the sql statement to select the shop system article attributes
 	 * @return string {String} | sql for the article attributes
@@ -147,6 +162,52 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			ORDER BY `name`
 		";
 	}
+
+    /**
+     * Returns a sql statement which selects additional info for a given productID
+     */
+    public function getAdditionalProductSelect($productId)
+    {
+        return "
+            SELECT
+
+            p.entity_id                                    as productID,
+            IFNULL(r.parent_id, p.entity_id)               as parentID,
+            GROUP_CONCAT(eav.attribute_code SEPARATOR '|') as variant_group_names,
+            GROUP_CONCAT(option_value.value SEPARATOR '|') as additionaltext
+
+            -- The actual product
+            FROM catalog_product_entity p
+
+            -- Relation to parent article
+            LEFT JOIN catalog_product_relation r
+            ON r.child_id=p.entity_id
+
+            -- Join parent article if available
+            LEFT JOIN {$this->quoteTable('catalog_product_entity', 'parent')}
+            ON parent.entity_id = r.parent_id
+
+            -- Maps Articles to attributes
+            INNER JOIN {$this->quoteTable('catalog_product_entity_int', 'entity_int')}
+            ON entity_int.entity_id=p.entity_id
+
+            -- Actual attributes (groups) with names
+            INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+            ON eav.attribute_id=entity_int.attribute_id
+            AND eav.is_user_defined=1
+            AND eav.is_required=1
+
+            -- Joins article option relation
+            INNER  JOIN {$this->quoteTable('eav_attribute_option_value', 'option_value')}
+            ON option_value.option_id=entity_int.value
+            AND option_value.store_id=0
+
+            WHERE p.entity_type_id = {$this->getEntityTypeId('catalog_product')}
+            AND p.entity_id = {$productId}
+            AND (parent.type_id = 'configurable' OR p.type_id = 'configurable')
+            GROUP BY productID
+        ";
+    }
 
 	/**
 	 * Returns the sql statement to select the shop system articles
@@ -174,12 +235,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				catalog_product.entity_id						as productID,
 				catalog_product.sku								as ordernumber,
 				catalog_product.created_at						as added,
-                relation.parent_id	                            as `parentID`,
 
-				a.OXVARSELECT 		                            as additionaltext,
-			    COALESCE(a2.OXVARNAME, '')                      as variant_group_names,
-				
-				name.value										as name,	
+				name.value										as name,
 				NULL											as additionaltext,
 				description.value								as description_long,
 				short_description.value							as description,
@@ -195,22 +252,29 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				cost.value										as baseprice,
 				IFNULL(special_price.value, price.value)		as price,
 				IF(special_price.value IS NULL, 0, price.value) as pseudoprice
-				
+
 				$custom_select
 			
 			FROM {$this->quoteTable('catalog_product_entity', 'catalog_product')}
-			
+
+			-- Joins the attribute tables
 			{$this->createTableSelect('catalog_product', $attributes, 0)}
-			
+
+			-- Join for instock
 			LEFT JOIN {$this->quoteTable('cataloginventory_stock_item', 'cs')}
 			ON cs.`product_id`=catalog_product.`entity_id`
 			AND cs.`stock_id`=1
 
-			LEFT JOIN {$this->quoteTable('eav_product_relation', 'relation')}
+            -- maps child articles to parents
+			LEFT JOIN {$this->quoteTable('catalog_product_relation', 'relation')}
 			ON catalog_product.entity_id=relation.child_id
-			
+
+			-- Joins the attribute values for the manufacturer
 			LEFT JOIN {$this->quoteTable('eav_attribute_option_value', 'manufacturer_option')}
 			ON manufacturer_option.value_id=manufacturer.value
+
+            -- Need to order by parent id in order to correctly assign children later
+			ORDER BY relation.parent_id ASC
 		";
 
         return $sql;

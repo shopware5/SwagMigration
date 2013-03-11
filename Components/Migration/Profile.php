@@ -304,6 +304,19 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 	}
 
     /**
+     * Returns the additional data for the article which will
+     * be merged with the actual product
+     * @return array
+     */
+	public function getAdditionalProductInfo($productId)
+	{
+		if(!method_exists($this, 'getAdditionalProductSelect')) {
+			return;
+		}
+		return $this->db->fetchRow($this->getAdditionalProductSelect($productId));
+	}
+
+    /**
      * Returns the categories, selected by the profile sql
      * @return array
      */
