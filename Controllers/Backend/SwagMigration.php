@@ -148,7 +148,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $groups = $configuratorArray['groups'];
 
         // Additionally get the options for the given configurator set
-        // this relations seems not to be available in the configurator models
+        // this relation seems not to be available in the configurator models
         // (the configuratorSet-Model returns all group's options, even those
         // not related to the given set)
         $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
@@ -184,6 +184,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $groups;
     }
 
+    /**
+     * Truncate all article related tables
+     */
     public function sDeleteAllArticles()
     {
         $sql = "
@@ -225,6 +228,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         Shopware()->Db()->query($sql);
     }
 
+    /**
+     * Truncate order related tables.
+     */
     public function sDeleteAllOrders()
     {
         $sql = "
@@ -250,6 +256,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         Shopware()->Db()->query($sql);
     }
 
+    /**
+     * Truncate customer related tables
+     */
     public function sDeleteAllCustomers()
     {
         $sql = "
@@ -268,14 +277,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
-     * This function initial shopware data. Categories and articles will be deleted.
+     * This function is used to reset the shop. It will truncated all tables related to a given source
      */
 	public function clearShopAction()
 	{
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
+        // Disable foreign key checks
         Shopware()->Db()->exec("SET foreign_key_checks = 0;");
 
+        // Iterate fields and delete all data
         $data = $this->Request()->getParams();
         foreach ($data as $key => $value) {
                 switch ($key) {
@@ -296,6 +307,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         Shopware()->Api()->Import()->sDeleteAllCategories();
                         break;
                     case 'clear_supplier':
+                        // As one might want to clear the suppliers without leaving all related articles
+                        // invalid, we create a new 'Default'-Supplier and set it for all articles
                         Shopware()->Db()->exec("
                             TRUNCATE s_articles_supplier;
                             TRUNCATE s_articles_supplier_attributes;
@@ -314,7 +327,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Returns the possible migration profiles
-     * [Magento, Oxid, Veyton, Gambio, Xt Commerce]
      */
     public function profileListAction()
     {
@@ -332,7 +344,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
-    /**
     /**
      * Returns the database list of the server.
      */
@@ -355,32 +366,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
-     * Deprecated: Not needed any more as one of the base stores is used instead
-     *
-     * Returns all shopware suppliers for the mapping select box
-     */
-    public function supplierListAction()
-    {
-        
-        throw new \Exception("Deprecated");
-        
-        
-        $sql = '
-            SELECT `id`, `name`
-            FROM `s_articles_supplier`
-            WHERE `name` LIKE ?
-            ORDER BY `name`
-        ';
-        $query = empty($this->Request()->query) ? '%' : '%'.trim($this->Request()->query).'%';
-        $rows = Shopware()->Db()->fetchAll($sql, array($query));
-        foreach ($rows as $key=>$row) {
-            $rows[$key]['name'] = htmlspecialchars_decode($row['name']);
-        }
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
-    }
-
-
-    /**
      * Helper function to set an automatic mapping when the user open the mapping panel.
      * @param $array
      * @return mixed
@@ -388,8 +373,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     private function setAliases($array) {
         $aliasList = array(
             //Languages - Shops
-            array("deutsch", "german", "main store", "main", "mainstore"),
-            array("englisch", "english"),
+            array("deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"),
+            array("englisch", "english", "default english"),
             array("französisch", "french"),
 
             //Payments
