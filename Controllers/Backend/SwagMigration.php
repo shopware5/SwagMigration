@@ -31,13 +31,14 @@
  */
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
-
+    /**
+     * Default constants for the mappings from the foreign IDs to Shopware IDs
+     */
     const MAPPING_ARTICLE = 1;
     const MAPPING_CATEGORY = 2;
     const MAPPING_CUSTOMER = 3;
     const MAPPING_ORDER = 4;
     const MAPPING_CATEGORY_TARGET = 99;
-
 
     /**
      * Source shop system profile

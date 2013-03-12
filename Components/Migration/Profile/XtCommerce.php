@@ -144,9 +144,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
             SELECT
             DISTINCT p.products_id as productID
 
-            FROM products p
+            FROM  {$this->quoteTable('products', 'p')}
 
-            LEFT JOIN products_attributes a
+            LEFT JOIN {$this->quoteTable('products_attributes', 'a')}
             ON p.products_id=a.products_id
 
             WHERE a.products_id IS NOT NULL
@@ -167,15 +167,15 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
                 pv.products_options_values_name          as option_name,
                 IF(a.price_prefix='+', a.options_values_price, CONCAT('-', a.options_values_price)) as price
 
-            FROM `products` p
+            FROM {$this->quoteTable('products', 'p')}
 
-            LEFT JOIN products_attributes a
+            LEFT JOIN {$this->quoteTable('products_attributes', 'a')}
             ON p.products_id=a.products_id
 
-            LEFT JOIN products_options po
+            LEFT JOIN {$this->quoteTable('products_options', 'po')}
             ON po.products_options_id = a.options_id
 
-            LEFT JOIN products_options_values pv
+            LEFT JOIN {$this->quoteTable('products_options_values', 'pv')}
             ON pv.products_options_values_id = a.options_values_id
             AND pv.language_id = po.language_id
 

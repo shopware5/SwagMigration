@@ -177,10 +177,10 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             GROUP_CONCAT(option_value.value SEPARATOR '|') as additionaltext
 
             -- The actual product
-            FROM catalog_product_entity p
+            FROM {$this->quoteTable('catalog_product_entity', 'p')}
 
             -- Relation to parent article
-            LEFT JOIN catalog_product_relation r
+            LEFT JOIN {$this->quoteTable('catalog_product_relation', 'r')}
             ON r.child_id=p.entity_id
 
             -- Join parent article if available
