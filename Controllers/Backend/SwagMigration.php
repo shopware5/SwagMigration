@@ -1410,9 +1410,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $sql = "INSERT IGNORE INTO s_article_configurator_set_option_relations (`set_id`, `option_id`) VALUES ({$configuratorSetId}, {$optionId})";
                 Shopware()->Db()->query($sql);
 
-
-                $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
-                Shopware()->Db()->query($sql);
+                if ($price) {
+                    $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
+                    Shopware()->Db()->query($sql);
+                }
 
             }
 
@@ -1463,7 +1464,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'offset'=>0,
             'progress'=>-1
         ));
-//echo $done;return;
+
         // Get products with attributes
         $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
         if (empty($products_result)) {
