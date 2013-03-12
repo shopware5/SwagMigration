@@ -135,6 +135,58 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	}
 
     /**
+     * Get productIds for all products with attributes
+     * @return string
+     */
+    public function getAttributedProductsSelect()
+    {
+        return "
+            SELECT
+            DISTINCT p.products_id as productID
+
+            FROM products p
+
+            LEFT JOIN products_attributes a
+            ON p.products_id=a.products_id
+
+            WHERE a.products_id IS NOT NULL
+        ";
+    }
+
+    /**
+     * Select attributes for a given article
+     * @param $id
+     * @return string
+     */
+    public function getProductAttributesSelect($id)
+    {
+        return "
+            SELECT
+                po.products_options_name                as group_name,
+                p.products_id                           as productId,
+                pv.products_options_values_name          as option_name,
+                IF(a.price_prefix='+', a.options_values_price, CONCAT('-', a.options_values_price)) as price
+
+            FROM `products` p
+
+            LEFT JOIN products_attributes a
+            ON p.products_id=a.products_id
+
+            LEFT JOIN products_options po
+            ON po.products_options_id = a.options_id
+
+            LEFT JOIN products_options_values pv
+            ON pv.products_options_values_id = a.options_values_id
+            AND pv.language_id = po.language_id
+
+            WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
+            AND a.products_id = {$id}
+
+--            GROUP BY po.products_options_name
+        ";
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
    	 */
@@ -180,6 +232,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
 			AND d.language_id={$this->Db()->quote($this->getDefaultLanguage())}
+
 		";
 	}
 
@@ -393,7 +446,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				{$this->quoteTable('categories_description', 'cd')}
 			WHERE co.categories_id=cd.categories_id
 
-			ORER BY parent_id
+			ORDER BY parent_id
 		";
 	}
 
@@ -528,15 +581,32 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	public function getOrderDetailSelect()
 	{
 		return "
-			SELECT
-				`orders_id` as orderID,
-				`products_id` as productID,
-				`products_model` as article_ordernumber,
-				`products_name` as name,
-				`products_price` as price,
-				`products_quantity` as quantity
-				
-			FROM {$this->quoteTable('orders_products')}
+            SELECT
+                products.`orders_id` as orderID,
+                `products_id` as productID,
+                `products_model` as article_ordernumber,
+
+                IFNULL (CONCAT(
+                    products.products_name,
+                    ' ',
+                    GROUP_CONCAT(attributes.products_options_values SEPARATOR ', '),
+                    ' (',
+                    GROUP_CONCAT(attributes.products_options SEPARATOR ', '),
+                    ')'
+                ), products.products_name) as name,
+                `products_price` as price,
+                `products_quantity` as quantity
+
+            FROM orders_products products
+
+            -- Join attributes in order to name the article by its attribute
+            LEFT JOIN orders_products_attributes attributes
+            ON attributes.orders_products_id=products.orders_products_id
+
+            GROUP BY (products.orders_products_id)
 		";
 	}
+
+
+
 }

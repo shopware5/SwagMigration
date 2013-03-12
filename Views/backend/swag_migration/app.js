@@ -85,7 +85,10 @@ Ext.define('Shopware.apps.SwagMigration', {
         'Profile',
         'Database',
         'Mapping',
-        'MappingValue'
+        'MappingValue',
+        'Configurator',
+        'ConfiguratorGroup',
+        'ConfiguratorOption'
     ],
 
     /**

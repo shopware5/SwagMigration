@@ -143,11 +143,80 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 	}
 
     /**
+     * Get productIds for all products with attributes
+     * @return string
+     */
+    public function getAttributedProductsSelect()
+    {
+        return "
+            SELECT
+            DISTINCT p.id_product as productID
+
+            FROM ps_product p
+
+            LEFT JOIN ps_product_attribute a
+            ON p.id_product =a.id_product
+
+            WHERE a.id_product IS NOT NULL
+        ";
+    }
+
+    /**
+     * Select attributes for a given article
+     * @param $id
+     * @return string
+     */
+    public function getProductAttributesSelect($id)
+    {
+
+        return "
+            SELECT
+            agl.public_name             as group_name,
+            p.id_product                as productId,
+            al.name                     as option_name,
+            pa.price                    as price
+
+            FROM ps_product p
+
+            -- join products attributes
+            LEFT JOIN  {$this->quoteTable('product_attribute', 'pa')}
+            ON pa.id_product = p.id_product
+
+            -- maps products attributes and attributes
+            INNER JOIN {$this->quoteTable('product_attribute_combination', 'c')}
+            ON c.id_product_attribute = pa.id_product_attribute
+
+            -- join actual attributes
+            INNER JOIN {$this->quoteTable('attribute', 'a')}
+            ON a.id_attribute = c.id_attribute
+
+            -- attribute names
+            LEFT JOIN {$this->quoteTable('attribute_lang', 'al')}
+            ON al.id_attribute = a.id_attribute
+            AND al.id_lang = {$this->Db()->quote($this->getDefaultLanguage())}
+
+            -- attribute group names
+            LEFT JOIN {$this->quoteTable('attribute_group_lang', 'agl')}
+            ON agl.id_attribute_group = a.id_attribute_group
+            AND agl.id_lang = al.id_lang
+
+            WHERE p.id_product = {$id}
+        ";
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
    	 */
 	public function getProductSelect()
 	{
+        $taxSelect = "
+            IFNULL (
+                (SELECT tr.id_tax FROM {$this->quoteTable('tax_rule', 'tr')}  WHERE id_tax_rule=1 LIMIT 1),
+                1
+            ) as taxID,
+        ";
+
 		return "
 			SELECT
 				a.id_product							as productID,
@@ -168,7 +237,8 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				a.width 			                    as width,
 				a.height 			                    as height,
 
-				tr.id_tax           					as taxID,
+				{$taxSelect}
+
 				s.name              					as supplier,
 				a.active        						as active,
 
@@ -183,20 +253,16 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 
 			FROM {$this->quoteTable('product', 'a')}
 
-			LEFT JOIN {$this->quoteTable('tax_rule', 'tr')}
-			ON tr.id_tax_rules_group=a.id_tax_rules_group
-
 			LEFT JOIN {$this->quoteTable('manufacturer', 's')}
 			ON s.id_manufacturer=a.id_manufacturer
 
             LEFT JOIN {$this->quoteTable('stock_available', 'st')}
             ON st.id_product=a.id_product
+            AND st.id_product_attribute=0
 
 			LEFT JOIN {$this->quoteTable('product_lang', 'd')}
 			ON d.id_product=a.id_product
-
-			WHERE d.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
-			AND st.id_product_attribute=0
+            AND d.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
 		";
 	}
 

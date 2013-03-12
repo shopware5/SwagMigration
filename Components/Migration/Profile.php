@@ -304,6 +304,19 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 	}
 
     /**
+     * Returns the additional data for the article which will
+     * be merged with the actual product
+     * @return array
+     */
+	public function getAdditionalProductInfo($productId)
+	{
+		if(!method_exists($this, 'getAdditionalProductSelect')) {
+			return;
+		}
+		return $this->db->fetchRow($this->getAdditionalProductSelect($productId));
+	}
+
+    /**
      * Returns the categories, selected by the profile sql
      * @return array
      */
@@ -312,6 +325,35 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
         $query = $this->queryCategories($offset);
 
 		return $query->fetchAll();
+	}
+
+    public function queryAttributedProducts($offset=0)
+    {
+        if (!method_exists($this, 'getAttributedProductsSelect')) {
+            return;
+        }
+		$sql = $this->getAttributedProductsSelect();
+        if(!empty($offset)) {
+            $sql = $this->limit($sql, null, $offset);
+        }
+		return $this->db->query($sql);
+    }
+
+    /**
+     * Executes the profile attributprofile select statement with the given offset
+     * @param int $offset
+     * @return Zend_Db_Statement_Interface
+     */
+	public function queryProductAttributes($id, $offset=0)
+	{
+        if (!method_exists($this, 'getProductAttributesSelect')) {
+            return;
+        }
+		$sql = $this->getProductAttributesSelect($id);
+		if(!empty($offset)) {
+			$sql = $this->limit($sql, null, $offset);
+		}
+		return $this->db->query($sql);
 	}
 
     /**

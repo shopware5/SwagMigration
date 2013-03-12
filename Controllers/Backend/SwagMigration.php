@@ -1,4 +1,4 @@
-﻿<?php
+﻿﻿<?php
 /**
  * Shopware 4.0
  * Copyright © 2012 shopware AG
@@ -31,6 +31,14 @@
  */
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
+
+    const MAPPING_ARTICLE = 1;
+    const MAPPING_CATEGORY = 2;
+    const MAPPING_CUSTOMER = 3;
+    const MAPPING_ORDER = 4;
+    const MAPPING_CATEGORY_TARGET = 99;
+
+
     /**
      * Source shop system profile
      * @var Shopware_Components_Migration_Profile
@@ -125,6 +133,68 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
+    /**
+     * Helper function which gets the configurator groups for
+     * a given product
+     * @param $productId
+     * @return Array
+     */
+    public function getConfiguratorGroups($productId)
+    {
+        // get configurator groups for the given product
+        $builder = Shopware()->Models()->createQueryBuilder();
+        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
+                ->from('Shopware\Models\Article\Article', 'article')
+                ->innerJoin('article.configuratorSet', 'configuratorSet')
+                ->leftJoin('configuratorSet.groups', 'groups')
+                ->where('article.id = ?1')
+                ->setParameter(1, $productId);
+
+        $result = array_pop($builder->getQuery()->getArrayResult());
+
+        $configuratorArray = $result['configuratorSet'];
+        $groups = $configuratorArray['groups'];
+
+        // Additionally get the options for the given configurator set
+        // this relation seems not to be available in the configurator models
+        // (the configuratorSet-Model returns all group's options, even those
+        // not related to the given set)
+        $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
+
+        LEFT JOIN s_article_configurator_set_option_relations relations
+        ON relations.set_id = sets.id
+
+        LEFT JOIN s_article_configurator_options options
+        ON options.id = relations.option_id
+
+        WHERE sets.id = ?";
+        $results = Shopware()->Db()->fetchAll($sql, array($configuratorArray['id']));
+
+        // Sort the options by group
+        $optionsByGroups = array();
+        foreach($results as $option) {
+            $groupId = $option['group_id'];
+            if (!isset($optionsByGroups[$groupId])) {
+                $optionsByGroups[$groupId] = array();
+            }
+            $optionsByGroups[$groupId][] = $option;
+        }
+
+        // merge the options into the group
+        $totalCount = 1;
+        foreach ($groups as &$group) {
+            $group['options'] = $optionsByGroups[$group['id']];
+            if (count($group['options']) > 0 ) {
+                $totalCount = $totalCount * count($group['options']);
+            }
+        }
+
+        return $groups;
+    }
+
+    /**
+     * Truncate all article related tables
+     */
     public function sDeleteAllArticles()
     {
         $sql = "
@@ -156,12 +226,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			TRUNCATE s_article_configurator_sets;
 			TRUNCATE s_article_configurator_set_group_relations;
 			TRUNCATE s_article_configurator_set_option_relations;
+			TRUNCATE s_article_configurator_templates;
+			TRUNCATE s_article_configurator_templates_attributes;
+			TRUNCATE s_article_configurator_template_prices;
+			TRUNCATE s_article_configurator_template_prices_attributes;
 			TRUNCATE s_article_img_mappings;
-			TRUNCATE s_article_img_mapping_rulesTRUNCATE 
+			TRUNCATE s_article_img_mapping_rules;
         ";
         Shopware()->Db()->query($sql);
     }
 
+    /**
+     * Truncate order related tables.
+     */
     public function sDeleteAllOrders()
     {
         $sql = "
@@ -187,32 +264,37 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         Shopware()->Db()->query($sql);
     }
 
-    public function sDeleteAllCustomers()
-    {
-        $sql = "
-            TRUNCATE s_user;
-            TRUNCATE s_user_attributes;
-            TRUNCATE s_user_billingaddress;
-            TRUNCATE s_user_billingaddress_asssttributes;
-            TRUNCATE s_user_shippingaddress;
-            TRUNCATE s_user_shippingaddress_attributes;
-            TRUNCATE s_user_shippingaddress_attributes;
-            TRUNCATE s_user_debit;
-        ";
+    /**
+     * Truncate customer related tables
 
-        Shopware()->Db()->query($sql);
+        */
+       public function sDeleteAllCustomers()
+       {
+           $sql = "
+               TRUNCATE s_user;
+               TRUNCATE s_user_attributes;
+               TRUNCATE s_user_billingaddress;
+               TRUNCATE s_user_billingaddress_attributes;
+               TRUNCATE s_user_shippingaddress;
+               TRUNCATE s_user_shippingaddress_attributes;
+               TRUNCATE s_user_shippingaddress_attributes;
+               TRUNCATE s_user_debit;
+           ";
 
+           Shopware()->Db()->query($sql);
     }
 
     /**
-     * This function initial shopware data. Categories and articles will be deleted.
+     * This function is used to reset the shop. It will truncated all tables related to a given source
      */
 	public function clearShopAction()
 	{
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
+        // Disable foreign key checks
         Shopware()->Db()->exec("SET foreign_key_checks = 0;");
 
+        // Iterate fields and delete all data
         $data = $this->Request()->getParams();
         foreach ($data as $key => $value) {
                 switch ($key) {
@@ -233,6 +315,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         Shopware()->Api()->Import()->sDeleteAllCategories();
                         break;
                     case 'clear_supplier':
+                        // As one might want to clear the suppliers without leaving all related articles
+                        // invalid, we create a new 'Default'-Supplier and set it for all articles
                         Shopware()->Db()->exec("
                             TRUNCATE s_articles_supplier;
                             TRUNCATE s_articles_supplier_attributes;
@@ -251,7 +335,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Returns the possible migration profiles
-     * [Magento, Oxid, Veyton, Gambio, Xt Commerce]
      */
     public function profileListAction()
     {
@@ -269,7 +352,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
-    /**
     /**
      * Returns the database list of the server.
      */
@@ -292,32 +374,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
-     * Deprecated: Not needed any more as one of the base stores is used instead
-     *
-     * Returns all shopware suppliers for the mapping select box
-     */
-    public function supplierListAction()
-    {
-        
-        throw new \Exception("Deprecated");
-        
-        
-        $sql = '
-            SELECT `id`, `name`
-            FROM `s_articles_supplier`
-            WHERE `name` LIKE ?
-            ORDER BY `name`
-        ';
-        $query = empty($this->Request()->query) ? '%' : '%'.trim($this->Request()->query).'%';
-        $rows = Shopware()->Db()->fetchAll($sql, array($query));
-        foreach ($rows as $key=>$row) {
-            $rows[$key]['name'] = htmlspecialchars_decode($row['name']);
-        }
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
-    }
-
-
-    /**
      * Helper function to set an automatic mapping when the user open the mapping panel.
      * @param $array
      * @return mixed
@@ -325,8 +381,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     private function setAliases($array) {
         $aliasList = array(
             //Languages - Shops
-            array("deutsch", "german", "main store", "main", "mainstore"),
-            array("englisch", "english"),
+            array("deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"),
+            array("englisch", "english", "default english"),
             array("französisch", "french"),
 
             //Payments
@@ -408,14 +464,18 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             foreach($targetArray as $key => $target) {
                 if(is_array($target)){
                     foreach($target as $alias) {
-                        if(strtolower($source["value"]) == strtolower($alias) || (strtolower(substr($source["value"],0,6)) == strtolower(substr($alias,0,6)))) {
+                        if(strtolower($source["value"]) == strtolower($alias)
+                            || (strtolower(substr($source["value"],0,6)) == strtolower(substr($alias,0,6))))
+                        {
                             $source["mapping"] = $target[0];
                             $source["mapping_value"] = $key;
                             break;
                         }
                     }
                 } else {
-                    if(strtolower($source["value"])==strtolower($target) || (strtolower(substr($source["value"],0,6)) == strtolower(substr($target,0,6)))) {
+                    if(strtolower($source["value"])==strtolower($target)
+                        || (strtolower(substr($source["value"],0,6)) == strtolower(substr($target,0,6))))
+                    {
                         $source["mapping"] = $target;
                         $source["mapping_value"] = $key;
                         break;
@@ -569,7 +629,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $price['pricegroup'] = 'EK';
             }
 
-            $sql = '
+            $sql = "
                 SELECT ad.id as articledetailsID, IF(cg.taxinput=1, t.tax, 0) as tax
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
@@ -582,9 +642,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ON cg.mode=0
                 AND cg.groupkey=?
                 WHERE pm.sourceID=?
-                AND pm.typeID=1
-            ';
-            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID']));
+                AND pm.typeID=?
+            ";
+            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], self::MAPPING_ARTICLE));
             if(!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if(isset($price['net_price'])) {
@@ -650,9 +710,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID']));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], self::MAPPING_ARTICLE));
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -660,9 +720,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID']));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], self::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 if(!empty($image['main']) && $product_data['kind']==1) {
@@ -711,7 +771,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        Shopware()->Db()->query($sql, array(99, $id, $target));
+        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET, $id, $target));
     }
 
     /**
@@ -724,7 +784,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if (!isset($id) || empty($id)) {
             return false;
         }
-        return Shopware()->Db()->fetchOne("SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?", array(99, $id));
+        return Shopware()->Db()->fetchOne(
+            "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
+            array(self::MAPPING_CATEGORY_TARGET, $id)
+        );
     }
 
     /**
@@ -733,35 +796,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function deleteCategoryTarget($id)
     {
-        $sql = "DELETE FROM s_plugin_migrations WHERE typeID = 99 AND sourceID = '{$id}'";
-        Shopware()->Db()->query($sql);
-    }
-
-    /**
-     * Helper method to print "currently importing" messages
-     * @param $type
-     * @return bool
-     */
-    public function printCurrentImportMessage($type)
-    {
-        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
-        if ($offset > 0) {
-            return false;
-        }
-        $messageShown = empty($this->Request()->messageShown) ? false : (bool) $this->Request()->messageShown;
-        if ($messageShown) {
-            return false;
-        }
-        $import = $this->namespace->get("currentImport".$type, $type);
-
-        echo Zend_Json::encode(array(
-            'message'=>sprintf($this->namespace->get('currentlyImporting', "Current import step: %s"), $import),
-            'success'=>true,
-            'offset'=>0,
-            'progress'=>0,
-            'messageShown'=>1
-        ));
-        return true;
+        $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
+        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET));
     }
 
     /**
@@ -779,24 +815,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             return;
         }
 
-        $categories = $this->Source()->getCategories($offset);
-
-		// On the first request delete all previous category ids
-        // Also set temporary IDs to 0 in order to tell apart non-existing from not yet imported categories later
+		// Cleanup previous category imports
         if ($offset === 0) {
-            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (99,2);");
-            foreach ($categories as $category) {
-                if(!empty($category['languageID'])) {
-                    $this->setCategoryTarget($category['categoryID'].'_'.$category['languageID'], 0);
-                } else {
-                    $this->setCategoryTarget($category['categoryID'], 0);
-                }
-            }
+            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);", array(self::MAPPING_CATEGORY_TARGET,2));
         }
 
-        $count = count($categories)+$offset;
+        $categories = $this->Source()->queryCategories($offset);
+        $count = $categories->rowCount()+$offset;
 
-        while ($category = array_shift($categories)) {
+        while ($category = $categories->fetch()) {
 			//check if the category split into the different translations
             if(!empty($category['languageID'])&& strpos($category['categoryID'], '_')===false) {
                 $category['categoryID'] = $category['categoryID'].'_'.$category['languageID'];
@@ -813,17 +840,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $offset++;
                 continue;
             }
+
             if(!empty($category['parentID'])) {
                 // Map the category IDs
-                if (false !== $target_parent && 0 !== $target_parent) {
+                if (false !== $target_parent) {
                     $category['parent'] = $target_parent;
-                // Push the category to the end of the list, if the parentID is not available, yet
-                } elseif(0 !== $target_parent) {
-                    $offset++;
-                    continue;
-                // Drop any other category
                 } else {
-                    $this->deleteCategoryTarget($category['categoryID']);
+                    error_log("Parent category not found");
                     $offset++;
                     continue;
                 }
@@ -852,7 +875,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            Shopware()->Db()->query($sql , array(2, $category['categoryID'], $category['targetID']));
+            Shopware()->Db()->query($sql , array(self::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -878,6 +901,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     }
 
+    /**
+     * Import Article-Category assignments
+     */
     public function importArticleCategories()
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
@@ -909,9 +935,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE `sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID']));
+            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], self::MAPPING_ARTICLE));
 
             if(empty($article)) {
                 continue;
@@ -920,9 +946,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $sql = '
                 SELECT `targetID`
                 FROM `s_plugin_migrations`
-                WHERE `typeID`=2 AND (`sourceID`=? OR `sourceID` LIKE ?)
+                WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
-            $categories = Shopware()->Db()->fetchCol($sql , array($productCategory['categoryID'], $productCategory['categoryID'].'_%'));
+            $categories = Shopware()->Db()->fetchCol($sql , array(self::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
 
             if(empty($categories)) {
                 continue;
@@ -968,9 +994,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID']));
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], self::MAPPING_ARTICLE));
 
             if(empty($rating['articleID'])) {
                 continue;
@@ -1054,9 +1080,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID']));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], self::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(
@@ -1088,6 +1114,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
+     * Takes an invalid product number and creates a valid one from it
+     * by returning its md5 hash
+     */
+    public function makeInvalidNumberValid($number)
+    {
+        return "sw-".md5($number);
+    }
+
+    /**
      * This function imports the products, selected by the source profile. For the import the shopware api import used.
      * @return mixed
      */
@@ -1095,7 +1130,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
-        $disableNumberValidation = $this->Request()->getParam('no_number_validation', false);
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
         $import = Shopware()->Api()->Import();
 
         if ($this->printCurrentImportMessage('Products')) {
@@ -1116,19 +1151,35 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ");
 
         while ($product = $result->fetch()) {
+            // Select additional data for the article if needed
+            $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
+            if (!empty($additionalProductInfo)) {
+                // Merge the results with the pre-existing product array
+                $product = array_merge($product, $additionalProductInfo);
+            }
+
+            // Check the ordernumber
             $number = $product['ordernumber'];
-            if (!$disableNumberValidation && isset($number) &&
+            if ($numberValidationMode !== 'ignore' && isset($number) &&
                 (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
-                echo Zend_Json::encode(array(
-                    'message'=>sprintf($numberSnippet, $number),
-                    'success'=>false,
-                    'import_products'=>null,
-                    'offset'=>0,
-                    'progress'=>-1
-                ));
-                return;
+                switch ($numberValidationMode) {
+                    case 'complain':
+                        echo Zend_Json::encode(array(
+                            'message'=>sprintf($numberSnippet, $number),
+                            'success'=>false,
+                            'import_products'=>null,
+                            'offset'=>0,
+                            'progress'=>-1
+                        ));
+                        return;
+                        break;
+                    case 'make_valid':
+                        $product['ordernumber'] = $this->makeInvalidNumberValid($number);
+                        break;
+                }
             }
+
             //Attribute
             if(!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source=>$target) {
@@ -1152,8 +1203,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
             //Parent
             if(!empty($product['parentID'])) {
-                $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=1 AND `sourceID`=?';
-                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array($product['parentID']));
+                $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ARTICLE, $product['parentID']));
             }
 
             if(isset($product['description_long'])) {
@@ -1210,7 +1261,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(1, $product['productID'], $product['articledetailsID']));
+                Shopware()->Db()->query($sql , array(self::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
             }
 
             $offset++;
@@ -1233,6 +1284,231 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
+    /**
+     * Returns a SW-productID for a given source-productId
+     * @param $productId
+     * @return string
+     */
+    public function getBaseArticleInfo($productId)
+    {
+        $sql = '
+            SELECT
+                ad.articleID as productId
+            FROM s_plugin_migrations pm
+            LEFT JOIN s_articles_details ad
+                ON ad.id = pm.targetID
+            WHERE pm.`sourceID`=?
+            AND `typeID`=?
+        ';
+
+        return Shopware()->Db()->fetchOne($sql, array($productId, self::MAPPING_ARTICLE));
+    }
+
+    /**
+     * Generates configuratorSets, configuratorOptions and configuratorGroups
+     * for a given article depending on its attributes
+     */
+    public function generateConfiguratorSetsFromAttributes()
+    {
+
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+        $products_result = $this->Source()->queryAttributedProducts($offset);
+        if (empty($products_result)) {
+            echo Zend_Json::encode(array(
+                'message'=>$this->namespace->get('generatedConfigurators', "Configurators successfully generated!"),
+                'success'=>true,
+                'import_generate_variants'=>null,
+                'import_create_configurator_variants' => null,
+                'offset'=>0,
+                'progress'=>-1
+            ));
+            return;
+        }
+
+        $count = $products_result->rowCount()+$offset;
+
+        // iterate all products with attributes
+        while ($product = $products_result->fetch()) {
+            $id = $product['productID'];
+
+            // Skip products which have not been imported before
+            $productId = $this->getBaseArticleInfo($id);
+            if (false === $productId) {
+                continue;
+            }
+
+            // Create configurator set for product
+            $configuratorSetName = "Generated Set - ".$id;
+            $configuratorSetId = Shopware()->Db()->fetchOne("
+                SELECT `id`
+                FROM `s_article_configurator_sets`
+                WHERE `name`='{$configuratorSetName}' LIMIT 1
+            ");
+            if(false === $configuratorSetId) {
+                $sql = "INSERT INTO s_article_configurator_sets SET `name`='{$configuratorSetName}'";
+                Shopware()->Db()->query($sql);
+                $configuratorSetId = Shopware()->Db()->lastInsertId();
+            }
+
+            // Get all attributes of the current product
+            $result = $this->Source()->queryProductAttributes($id);
+
+            $options = array();
+            $groups = array();
+            // iterate all attributes
+            while ($attribute = $result->fetch()) {
+                $group = $attribute['group_name'];
+                $option = $attribute['option_name'];
+                $price = $attribute['price'];
+
+
+                // Create / load group
+                if (!isset($groups[$group])) {
+                    $groupId = Shopware()->Db()->fetchOne("
+                        SELECT `id`
+                        FROM `s_article_configurator_groups`
+                        WHERE `name`='{$group}' LIMIT 1
+                    ");
+                    if ($groupId === false) {
+                        $sql = "INSERT INTO `s_article_configurator_groups` SET `name`='{$group}'";
+                        Shopware()->Db()->query($sql);
+                        $groupId = Shopware()->Db()->lastInsertId();
+                    }
+                    $groups[$group] = $groupId;
+                } else {
+                    $groupId = $groups[$group];
+                }
+
+                // Set group relations
+                $sql = "INSERT IGNORE INTO s_article_configurator_set_group_relations
+                    (`set_id`, `group_id`)
+                    VALUES ({$configuratorSetId}, {$groupId})
+                ";
+                Shopware()->Db()->query($sql);
+
+                // Create / load option
+                if (!isset($options[$option])) {
+                    $optionId = Shopware()->Db()->fetchOne("
+                        SELECT `id`
+                        FROM `s_article_configurator_options`
+                        WHERE `name`='{$option}' AND `group_id`={$groupId}
+                    ");
+                    if ($optionId === false) {
+                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`) VALUES ({$groupId}, '{$option}')";
+                        Shopware()->Db()->query($sql);
+                        $optionId = Shopware()->Db()->lastInsertId();
+                    }
+                    $options[$option] = $optionId;
+                } else {
+                    $optionId = $options[$option];
+                }
+
+                // Set option relations
+                $sql = "INSERT IGNORE INTO s_article_configurator_set_option_relations (`set_id`, `option_id`) VALUES ({$configuratorSetId}, {$optionId})";
+                Shopware()->Db()->query($sql);
+
+
+                $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
+                Shopware()->Db()->query($sql);
+
+            }
+
+            // Set product's configurator set
+            $sql = "UPDATE s_articles SET configurator_set_id = {$configuratorSetId} WHERE `id`={$productId}";
+            Shopware()->Db()->query($sql);
+
+
+            $offset++;
+            if(time()-$requestTime >= 10) {
+                echo Zend_Json::encode(array(
+                    'message'=>sprintf($this->namespace->get('configuratorProgress', "%s out of %s configurators imported"), $offset, $count),
+                    'success'=>true,
+                    'offset'=>$offset,
+                    'progress'=>$offset/$count
+                ));
+                return;
+            }
+
+        }
+        echo Zend_Json::encode(array(
+            'message'=>$this->namespace->get('generatedConfigurators', "Configurators successfully created!"),
+            'success'=>true,
+            'import_generate_variants'=>null,
+            // Set variant generation to be the next step
+            'import_create_configurator_variants' => 1,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+
+    }
+
+    /**
+     * Generate variants from configuratorSets
+     */
+    public function generateVariants()
+    {
+        $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offsetProduct = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+
+        $done = Zend_Json::encode(array(
+            'message'=>$this->namespace->get('generatedVariants', "Variants successfully generated"),
+            'success'=>true,
+            'count' => 0,
+            'import_generate_variants'=>null,
+            'import_create_configurator_variants' => null,
+            'offset'=>0,
+            'progress'=>-1
+        ));
+//echo $done;return;
+        // Get products with attributes
+        $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
+        if (empty($products_result)) {
+            echo $done;
+            return;
+        }
+
+        $count = $products_result->rowCount()+$offsetProduct;
+
+        // iter products
+        while ($product = $products_result->fetch()) {
+            $id = $product['productID'];
+
+            // continue if product was not imported before
+            $productId = $this->getBaseArticleInfo($id);
+            if (false === $productId) {
+                continue;
+            }
+
+            $groups = $this->getConfiguratorGroups($productId);
+
+            $params = array(
+                'articleId' => $productId,
+                'groups' => $groups
+
+            );
+
+            $offsetProduct++;
+
+            // Return the groups
+            // The ExtJS frontend will care of the generation by triggering
+            // the default article controller
+            echo Zend_Json::encode(array(
+                'message'=>sprintf($this->namespace->get('variantsArticleProgress', "Generating variants for product %s out of %s"), $offsetProduct, $count),
+                'success'=>true,
+                'offset'=>$offsetProduct,
+                'count'=>$count,
+                'create_variants' => true,
+                'params' => $params,
+                'progress'=>$offsetProduct/$count
+            ));
+            return;
+        }
+
+        echo $done;
+    }
 
     /**
      * This function imports the customers, selected by the source profile.
@@ -1307,7 +1583,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(3, $customer['customerID'], $customer['userID']));
+                Shopware()->Db()->query($sql , array(self::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
             }
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -1347,6 +1623,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $count = $result->rowCount()+$offset;
 
         while ($order = $result->fetch()) {
+
+
             if(isset($order['languageID']) && isset($this->Request()->language[$order['languageID']])) {
                 $order['languageID'] = $this->Request()->language[$order['languageID']];
             }
@@ -1362,12 +1640,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=3 AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql , array($order['customerID']));
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['customerID']));
 
             $order['sourceID'] = $order['orderID'];
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=4 AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array($order['orderID']));
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -1407,7 +1685,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
                 Shopware()->Db()->insert('s_plugin_migrations' , array(
-                    'typeID'=>4, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
+                    'typeID'=>self::MAPPING_ORDER, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
                 ));
             }
 
@@ -1503,18 +1781,52 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
         if ($this->printCurrentImportMessage('Order details')) {
             return;
         }
+
+        $numberSnippet = $this->namespace->get('numberNotValid',
+            "The product number %s is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            ");
 
         $result = $this->Source()->queryOrderDetails($offset);
         $count = $result->rowCount()+$offset;
 
         while ($order = $result->fetch()) {
 
-            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=4 AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array($order['orderID']));
+            // Check the ordernumber
+            $number = $order['article_ordernumber'];
+            if ($numberValidationMode !== 'ignore' && isset($number) &&
+                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            {
+                switch ($numberValidationMode) {
+                    case 'complain':
+                        echo Zend_Json::encode(array(
+                            'message'=>sprintf($numberSnippet, $number),
+                            'success'=>false,
+                            'import_products'=>null,
+                            'offset'=>0,
+                            'progress'=>-1
+                        ));
+                        return;
+                        break;
+                    case 'make_valid':
+                        $order['article_ordernumber'] = $this->makeInvalidNumberValid($number);
+                        break;
+                }
+            }
+
+
+            $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ORDER, $order['orderID']));
 
             $sql = '
                 SELECT ad.articleID
@@ -1522,9 +1834,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=1
+                AND `typeID`=?
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID']));
+            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], self::MAPPING_ARTICLE));
 
             //TaxRate
             if(!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
@@ -1640,6 +1952,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 return $this->importProductPrices();
             }
 
+            if(!empty($this->Request()->import_generate_variants)) {
+                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configuratos");
+                return $this->generateConfiguratorSetsFromAttributes();
+            }
+
+            if(!empty($this->Request()->import_create_configurator_variants)) {
+                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configurator variants");
+                return $this->generateVariants();
+            }
+
             if(!empty($this->Request()->import_images)) {
                 $errorMessage = $this->namespace->get('errorImportingImages', "An error occurred while importing images");
                 return $this->importProductImages();
@@ -1677,7 +1999,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ));
 
         } catch (Exception $e) {
-            echo Zend_Json::encode(array(
+            $error = array(
                 'message'=>$errorMessage,
                 'error'=>$e->getMessage(),
                 'code'=>$e->getCode(),
@@ -1687,8 +2009,41 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'success'=>false,
                 'progress'=>1,
                 'done'=>true
-            ));
+            );
+            if (!$this->Front()->Plugins()->Json()->getRenderer()) {
+                echo Zend_Json::encode($error);
+            } else {
+                $this->view->assign($error);
+            }
+
         }
+    }
+
+    /**
+     * Helper method to print "currently importing" messages
+     * @param $type
+     * @return bool
+     */
+    public function printCurrentImportMessage($type)
+    {
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        if ($offset > 0) {
+            return false;
+        }
+        $messageShown = empty($this->Request()->messageShown) ? false : (bool) $this->Request()->messageShown;
+        if ($messageShown) {
+            return false;
+        }
+        $import = $this->namespace->get("currentImport".$type, $type);
+
+        echo Zend_Json::encode(array(
+            'message'=>sprintf($this->namespace->get('currentlyImporting', "Current import step: %s"), $import),
+            'success'=>true,
+            'offset'=>0,
+            'progress'=>0,
+            'messageShown'=>1
+        ));
+        return true;
     }
 
 }

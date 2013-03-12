@@ -125,9 +125,29 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 name: 'import_translations',
                 xtype: 'checkbox'
             }, {
+                fieldLabel: '{s name=importCategories}Import categories{/s}',
+                name: 'import_categories',
+                xtype: 'checkbox'
+            }, {
+                fieldLabel: '',
+                name: 'import_article_categories',
+                xtype: 'checkbox',
+                checked: false,
+                hidden: true
+            }, {                
                 fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
                 name: 'import_prices',
                 xtype: 'checkbox'
+            }, {
+                fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
+                name: 'import_generate_variants',
+                xtype: 'checkbox'
+            }, {
+                fieldLabel: '',
+                name: 'import_create_configurator_variants',
+                xtype: 'checkbox',
+                checked: false,
+                hidden: true
             }, {
                 fieldLabel: '{s name=importArticleImages}Import product images{/s}',
                 name: 'import_images',
@@ -139,16 +159,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                         me.fireEvent('validate');
                     }
                 }
-            }, {
-                fieldLabel: '{s name=importCategories}Import categories{/s}',
-                name: 'import_categories',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '',
-                name: 'import_article_categories',
-                xtype: 'checkbox',
-                checked: false,
-                hidden: true
             }, {
                 fieldLabel: '{s name=importCustomers}Import customers{/s}',
                 name: 'import_customers',
@@ -196,15 +206,53 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 anchor: '100%',
                 labelWidth: 500
             },
-            items :[{
-                fieldLabel: '{s name=noProductNumberValidation}Ignore invalid product numbers (not recommended){/s}',
-                name: 'no_number_validation',
-                xtype: 'checkbox'
-            }]
+            items : me.getAdvancedInputItems()
         };
 
-        return  [ me.fieldSet, me.advancedOptionsFieldset ];
+        var clearShopFieldSet = {
+            xtype:'migration-fieldset-clearshop',
+            collapsible: true,
+            collapsed: true
+        };
+
+        return  [ me.fieldSet, me.advancedOptionsFieldset, clearShopFieldSet ];
+    },
+
+    getAdvancedInputItems: function() {
+        var me = this;
+
+        var radioGroup = Ext.create('Ext.form.RadioGroup', {
+                fieldLabel: '{s name=handleInvalidProductNumbers}How to handle invalid product numbers{/s}',
+                labelWidth: 500,
+                columns: 1,
+                items: [
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/complain}Complain about invalid product numbers{/s}',
+                        name: 'number_validation_mode',
+                        checked: true,
+                        inputValue: 'complain'
+                    },
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/convert}Generate new valid numbers{/s}',
+                        name: 'number_validation_mode',
+                        inputValue: 'make_valid'
+                    },
+                    {
+                        xtype: 'radiofield',
+                        boxLabel: '{s name=handleProductNumber/ignore}Ignore invalid product numbers (not recommended){/s}',
+                        name: 'number_validation_mode',
+                        inputValue: 'ignore'
+                    }
+                ]
+            });
+
+
+        return [radioGroup];
+
     }
+
 
 });
 //{/block}
