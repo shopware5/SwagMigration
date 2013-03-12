@@ -101,6 +101,71 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 		";
 	}
 
+
+    /**
+     * At this point the Veyton import differs from the Xtc import:
+     * Attributes are not imported as Configurators and then generated,
+     * but as master/slave articles.
+     *
+     * This will keep existing references on prices, votes...
+     *
+     * @return string
+     */
+    public function getAttributedProductsSelect()
+    {
+        return "SELECT 0;";
+    }
+
+
+
+    /**
+     * Returns a sql statement which selects additional info for a given productID
+     */
+    public function getAdditionalProductSelect($productId)
+    {
+        return "
+            SELECT
+                master.products_id                                          as parentID,
+                GROUP_CONCAT(group_description.attributes_name SEPARATOR '|') as variant_group_names,
+                GROUP_CONCAT(option_description.attributes_name  SEPARATOR '|') as additionaltext
+
+            -- Mapping between articles and attributes
+            FROM {$this->quoteTable('plg_products_to_attributes', 'relation')}
+
+            -- Get the actual product
+			INNER JOIN {$this->quoteTable('products', 'product')}
+			ON product.products_id = relation.products_id
+
+			-- Get the products master - no index for that
+			INNER JOIN {$this->quoteTable('products', 'master')}
+			ON master.products_model = product.products_master_model
+
+            -- Join options for the attributes
+            LEFT JOIN {$this->quoteTable('plg_products_attributes', 'options')}
+            ON options.attributes_id = relation.attributes_id
+            AND attributes_parent > 0
+
+            -- Join option name
+            INNER JOIN {$this->quoteTable('plg_products_attributes_description', 'option_description')}
+            ON options.attributes_id = option_description.attributes_id
+
+
+            -- Join groups for the options
+            LEFT JOIN {$this->quoteTable('plg_products_attributes', 'groups')}
+            ON groups.attributes_id = options.attributes_parent
+
+            -- Join group description
+            INNER JOIN {$this->quoteTable('plg_products_attributes_description', 'group_description')}
+            ON groups.attributes_id = group_description.attributes_id
+
+            WHERE relation.products_id = {$productId}
+            AND option_description.language_code = 'de'
+            AND group_description.language_code = option_description.language_code
+
+            GROUP BY relation.products_id
+        ";
+    }
+
     /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
@@ -114,7 +179,10 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				a.products_quantity						as instock,
 				a.products_average_quantity				as stockmin,
 				a.products_shippingtime					as shippingtime,
-				a.products_model						as ordernumber,
+				IF(a.products_model <> '',
+				    a.products_model,
+				    a.products_id
+                )                                       as ordernumber,
 				-- a.products_image						as image,
 				a.products_price						as price,
 				a.date_available						as releasedate,
@@ -124,10 +192,10 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				a.products_tax_class_id					as taxID,
 				s.manufacturers_name					as supplier,
 				a.products_status						as active,
-				
+
 				a.products_fsk18						as fsk18,
 				a.products_ean							as ean,
-				
+
 				d.products_name 						as name,
 				d.products_description 					as description_long,
 				d.products_short_description 			as description,
@@ -137,6 +205,8 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
+
+
 			
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
@@ -253,6 +323,10 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 
     /**
    	 * Returns the sql statement to select the shop system customer
+     *
+     * Selection of SHIPPING-data was removed on purpose: The is no index
+     * for the corresponding join
+     *
    	 * @return string {String} | sql for the customer data
    	 */
 	public function getCustomerSelect()
@@ -272,17 +346,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				a.customers_postcode 								as billing_zipcode,
 				a.customers_city 									as billing_city,
 				a.customers_country_code 							as billing_countryiso,
-				
-				IF(a.customers_gender IN ('m', 'Herr'), 'mr', 'ms') as shipping_salutation,
-				o.delivery_firstname 								as shipping_firstname,
-				o.delivery_lastname 								as shipping_lastname,
-				o.delivery_company 									as shipping_company,
-				'' 													as shipping_department,
-				o.delivery_street_address  							as shipping_street,
-				'' 													as shipping_streetnumber,
-				o.delivery_postcode  								as shipping_zipcode,
-				o.delivery_city  									as shipping_city,
-				o.delivery_country_code 							as shipping_countryiso,
+
 				
 				a.customers_phone 									as phone,
 				a.customers_fax 									as fax,
@@ -295,23 +359,13 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				u.shop_id											as subshopID,
 				u.customers_status									as customergroupID,
 				
-				u.date_added 										as firstlogin,
-				IFNULL(o.date_purchased, u.date_added)				as lastlogin
-				
+				u.date_added 										as firstlogin
+
 			FROM {$this->quoteTable('customers', 'u')}
 			
 			JOIN {$this->quoteTable('customers_addresses', 'a')}
 			ON a.customers_id=u.customers_id
 			AND a.address_class='default'
-
-			LEFT JOIN {$this->quoteTable('orders', 'o')}
-			ON o.orders_id = (
-				SELECT orders_id
-				FROM {$this->quoteTable('orders')}
-				WHERE customers_id=u.customers_id
-				ORDER BY orders_id DESC
-				LIMIT 1
-			)
 		";
 	}
 
@@ -472,7 +526,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				orders_id as orderID,
 				products_id  as productID,
 				
-				products_model as article_ordernumber,
+				IF(products_model <> '', products_model, products_id) as article_ordernumber,
 				products_name as name,
 				ROUND(`products_price`*(IF(`allow_tax`=1,`products_tax`,0)+100)/100,2) as price,
 				products_quantity as quantity,
