@@ -57,7 +57,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     protected $namespace;
 
-    /**
+	/**
      * This function add the template directory and register the Shopware_Components namespace
      */
     public function init()
@@ -615,8 +615,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             return;
         }
 
+	    // Reset block-prices on the first request. (SW-5471)
+	    if ($offset === 0) {
+		    $sql = '
+			DELETE FROM s_articles_prices WHERE `from` > 1;
+		    UPDATE s_articles_prices SET `to` = "beliebig"
+		    ';
+		    Shopware()->Db()->query($sql);
+	    }
+
         $result = $this->Source()->queryProductPrices($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         while ($price = $result->fetch()) {
             if(!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
@@ -667,7 +678,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressPrices', "%s out of %s prices imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -690,14 +703,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
-
         if ($this->printCurrentImportMessage('Product images')) {
             return;
         }
 
         $result = $this->Source()->queryProductImages($offset);
 
-        
+	    $taskStartTime  = $this->initTaskTimer();
         $count = $result->rowCount()+$offset;
         $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
 
@@ -743,7 +755,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressImages', "%s out of %s images imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -816,15 +830,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             return;
         }
 
+        $skip = false;
+
 		// Cleanup previous category imports
-        if ($offset === 0) {
+        if (!$skip && $offset === 0) {
             Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);", array(self::MAPPING_CATEGORY_TARGET,2));
         }
 
         $categories = $this->Source()->queryCategories($offset);
         $count = $categories->rowCount()+$offset;
 
-        while ($category = $categories->fetch()) {
+	    $taskStartTime  = $this->initTaskTimer();
+
+        while (!$skip && $category = $categories->fetch()) {
 			//check if the category split into the different translations
             if(!empty($category['languageID'])&& strpos($category['categoryID'], '_')===false) {
                 $category['categoryID'] = $category['categoryID'].'_'.$category['languageID'];
@@ -884,7 +902,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressCategories', "%s out of %s categories imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -918,13 +938,17 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $count = $result->rowCount()+$offset;
 
+	    $taskStartTime  = $this->initTaskTimer();
+
         while ($productCategory = $result->fetch()) {
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressArticleCategories', "%s out of %s articles assigned to categories"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -949,6 +973,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 FROM `s_plugin_migrations`
                 WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
+            // Also take language categories into account
             $categories = Shopware()->Db()->fetchCol($sql , array(self::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
 
             if(empty($categories)) {
@@ -957,14 +982,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             foreach ($categories as $category) {
                 Shopware()->Api()->Import()->sArticleCategory($article, $category, false);
-            }
-        }
+			}
+		}
 
         // Fallback for SW versions prior 4.0.6
         Shopware()->Db()->exec('
             DELETE ac FROM s_articles_categories ac
             INNER JOIN s_categories c ON ac.categoryID =c.id WHERE c.`right`-c.`left` > 1
         ');
+
 
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
@@ -1057,6 +1083,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $result = $this->Source()->queryProductTranslations($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
+
         while ($translation = $result->fetch()) {
 
             //Attribute
@@ -1100,7 +1129,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressTranslations', "%s out of %s translations imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1132,6 +1163,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
+
         $import = Shopware()->Api()->Import();
 
         if ($this->printCurrentImportMessage('Products')) {
@@ -1140,6 +1172,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $result = $this->Source()->queryProducts($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         $numberSnippet = $this->namespace->get('numberNotValid',
             "The product number %s is not valid. A valid product number must:<br>
@@ -1271,7 +1305,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressArticles', "%s out of %s articles imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+                    'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1329,6 +1365,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         $count = $products_result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         // iterate all products with attributes
         while ($product = $products_result->fetch()) {
@@ -1428,7 +1466,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('configuratorProgress', "%s out of %s configurators imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1454,7 +1494,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offsetProduct = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
-
         $done = Zend_Json::encode(array(
             'message'=>$this->namespace->get('generatedVariants', "Variants successfully generated"),
             'success'=>true,
@@ -1473,6 +1512,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         $count = $products_result->rowCount()+$offsetProduct;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         // iter products
         while ($product = $products_result->fetch()) {
@@ -1504,7 +1545,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'count'=>$count,
                 'create_variants' => true,
                 'params' => $params,
-                'progress'=>$offsetProduct/$count
+                'progress'=>$offsetProduct/$count,
+	            'estimated' => (time()-$taskStartTime)/$offsetProduct * ($count-$offsetProduct),
+                'task_start_time' => $taskStartTime
             ));
             return;
         }
@@ -1527,6 +1570,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $result = $this->Source()->queryCustomers($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         while ($customer = $result->fetch()) {
             if(isset($customer['customergroupID']) && isset($this->Request()->customer_group[$customer['customergroupID']])) {
@@ -1593,7 +1638,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressCustomers', "%s out of %s customers imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1623,6 +1670,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $result = $this->Source()->queryOrders($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
 
@@ -1686,9 +1735,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             } else {
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
-                Shopware()->Db()->insert('s_plugin_migrations' , array(
-                    'typeID'=>self::MAPPING_ORDER, 'sourceID'=>$order['sourceID'], 'targetID'=>$order['orderID']
-                ));
+
+	            $sql = 'INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
+	            VALUES (?, ?, ?)
+	            ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
+	            ';
+	            Shopware()->Db()->query($sql, array(self::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
             }
 
             if(!empty($order['billing_countryiso'])) {
@@ -1759,7 +1811,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressOrders', "%s out of %s orders imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1801,6 +1855,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $result = $this->Source()->queryOrderDetails($offset);
         $count = $result->rowCount()+$offset;
+
+	    $taskStartTime  = $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
 
@@ -1884,7 +1940,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     'message'=>sprintf($this->namespace->get('progressOrderDetails', "%s out of %s order details imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
-                    'progress'=>$offset/$count
+                    'progress'=>$offset/$count,
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+                    'task_start_time' => $taskStartTime
                 ));
                 return;
             }
@@ -1922,7 +1980,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function importAction()
     {
-
         $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
@@ -2047,5 +2104,27 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
         return true;
     }
+
+	/**
+	 * Helper function which sets the start time for a given task
+	 *
+	 * Timer should be inited after the inital DB-Query of each task, as this
+	 * query will usually take longer on the first run and therefore distort the results
+	 *
+	 * @return int
+	 */
+	public function initTaskTimer()
+	{
+		$startTime = (int) $this->Request()->getParam('task_start_time', 0);
+		$offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+		if ($startTime == 0 || $offset == 0) {
+			error_log("reset1");
+			$startTime = time();
+		}
+
+		$this->Request()->setParam('task_start_time', $startTime);
+		return $startTime;
+	}
 
 }
