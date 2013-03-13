@@ -74,7 +74,10 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		';
 		Shopware()->Db()->query($sql);
 
-	 	return true;
+		return array(
+			'success' => true,
+			'invalidateCache' => array('backend')
+		);
 	}
 
 	public function update()
@@ -119,7 +122,10 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 				);
 		}
 
-		return true;
+		return array(
+			'success' => true,
+			'invalidateCache' => array('backend')
+		);
 
 	}
 
