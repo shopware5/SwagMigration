@@ -69,12 +69,64 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 			  `sourceID` varchar(255) NOT NULL,
 			  `targetID` int(11) unsigned NOT NULL,
 			  PRIMARY KEY (`id`),
-			  UNIQUE KEY `typeID` (`typeID`,`sourceID`,`targetID`)
+			  UNIQUE KEY `typeID` (`typeID`,`sourceID`)
 			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 		';
 		Shopware()->Db()->query($sql);
 
-	 	return true;
+		return array(
+			'success' => true,
+			'invalidateCache' => array('backend')
+		);
+	}
+
+	public function update()
+	{
+		// Clean up the migration table in order to not have duplicate entries
+		$sql = '
+		-- Remove non existing article references
+		DELETE m FROM `s_plugin_migrations` m
+		LEFT JOIN s_articles_details ad
+			ON ad.id = m.targetID
+		WHERE ad.id IS NULL AND typeID = 1;
+
+		-- Remove non existing category references
+		DELETE m FROM `s_plugin_migrations` m
+		LEFT JOIN s_categories c
+			ON c.id = m.targetID
+		WHERE c.id IS NULL AND typeID IN (2,99);
+
+		-- Remove non-existing customer references
+		DELETE m FROM `s_plugin_migrations` m
+		LEFT JOIN s_user u
+			ON u.id = m.targetID
+		WHERE u.id IS NULL AND typeID = 3;
+
+		-- Remove non-existing order references
+		DELETE m FROM `s_plugin_migrations` m
+		LEFT JOIN s_order o
+			ON o.id = m.targetID
+		WHERE o.id IS NULL AND typeID = 4;
+
+		-- Replace the old index
+		ALTER TABLE  `s_plugin_migrations` DROP INDEX  `typeID` ,
+		ADD UNIQUE  `typeID` (  `typeID` ,  `sourceID` );
+		';
+
+		try {
+			Shopware()->Db()->query($sql);
+		} catch(\Exception $e) {
+			return array(
+				'success' => false,
+				'message' => "Update failed. Please clear the content of the table s_plugin_migration. After that run the update again."
+				);
+		}
+
+		return array(
+			'success' => true,
+			'invalidateCache' => array('backend')
+		);
+
 	}
 
     /**
@@ -173,7 +225,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * @return string
      */
     public function getVersion() {
-        return '2.0.2';
+        return '2.1.0';
     }
 
     /**

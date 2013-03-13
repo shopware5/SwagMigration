@@ -254,8 +254,36 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
    	 */
 	public function getProductPriceSelect()
 	{
-		return " (
+		return "
+
+			SELECT
+				`OXID` as productID,
+				1 as `from`,
+				`OXPRICEA` as `price`,
+				0 as `percent`,
+				'oxidpricea' as pricegroup
+			FROM {$this->quoteTable('articles')}
+			WHERE `OXPRICEA`!=0
+		 UNION ALL
 			SELECT 
+				`OXID` as productID,
+				1 as `from`,
+				`OXPRICEB` as `price`,
+				0 as `percent`,
+				'oxidpriceb' as pricegroup
+			FROM {$this->quoteTable('articles')}
+			WHERE `OXPRICEB`!=0
+		UNION ALL
+			SELECT 
+				`OXID` as productID,
+				1 as `from`,
+				`OXPRICEC` as `price`,
+				0 as `percent`,
+				'oxidpricec' as pricegroup
+			FROM {$this->quoteTable('articles')}
+			WHERE `OXPRICEC`!=0
+		UNION ALL
+ 			SELECT
 				`OXARTID` as productID,
 				`OXAMOUNT` as `from`,
 				`OXADDABS` as `price`,
@@ -263,34 +291,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				'' as pricegroup
 			FROM {$this->quoteTable('price2article')}
 			ORDER BY productID, `from`
-		) UNION ALL (
-			SELECT 
-				`OXID` as productID,
-				0 as `from`,
-				`OXPRICEA` as `price`,
-				0 as `percent`,
-				'oxidpricea' as pricegroup
-			FROM {$this->quoteTable('articles')}
-			WHERE `OXPRICEA`!=0
-		) UNION ALL (
-			SELECT 
-				`OXID` as productID,
-				0 as `from`,
-				`OXPRICEB` as `price`,
-				0 as `percent`,
-				'oxidpriceb' as pricegroup
-			FROM {$this->quoteTable('articles')}
-			WHERE `OXPRICEB`!=0
-		) UNION ALL (
-			SELECT 
-				`OXID` as productID,
-				0 as `from`,
-				`OXPRICEC` as `price`,
-				0 as `percent`,
-				'oxidpricec' as pricegroup
-			FROM {$this->quoteTable('articles')}
-			WHERE `OXPRICEC`!=0
-		)";		
+		";
 	}
 
     /**
@@ -350,11 +351,21 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	public function getProductCategorySelect()
 	{
 		return "
-			SELECT DISTINCT a.OXOBJECTID AS productID, a.OXCATNID AS categoryID
+			SELECT
+			    a.OXOBJECTID AS productID,
+			    a.OXCATNID AS categoryID
+
+            -- Mapping
 			FROM {$this->quoteTable('object2category', 'a')}
+
+			-- Restrict to existing articles
+			INNER JOIN {$this->quoteTable('articles', 'p')} ON p.OXID = a.OXOBJECTID
+
+			-- Restrict to existing categories *without* children categories
 			INNER JOIN {$this->quoteTable('categories', 'c')} ON c.OXID = a.OXCATNID
 			AND OXRIGHT-OXLEFT=1
-			ORDER BY OXPOS
+
+			ORDER BY a.OXID
 		";
 	}
 
