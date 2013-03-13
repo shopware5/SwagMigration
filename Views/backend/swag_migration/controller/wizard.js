@@ -52,6 +52,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
     snippets: {
         variantProgress: '{s name=variantGenerationProgress}Generated [0] out of [1] variants for product [2]/[3]{/s}',
+        estimated: '{s name=timeRemaining} (~[0] Minutes remaining){/s}'
     },
 
     /**
@@ -230,7 +231,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      * @param config The config object with the database credentials, the mapping information and the import settings
      */
     runImportRequest: function(config) {
-        var me = this;
+        var me = this,
+            progressText = '';
         if (config.offset > 0) {
             config.messageShown = 0;
         }
@@ -281,7 +283,12 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     if(result.progress === -1) {
                         result.progress = me.getDoneTasks(config);
                     }
-                    me.progressWindow.progressBar.updateProgress(result.progress, result.message);
+
+                    progressText = result.message;
+                    if (result.estimated > 0 && result.offset > 0) {
+                        progressText =  result.message + Ext.String.format(me.snippets.estimated, Math.round(result.estimated/60));
+                    }
+                    me.progressWindow.progressBar.updateProgress(result.progress, progressText);
                     Ext.iterate(result, function(key, value) {
                         config[key] = value;
                     });
