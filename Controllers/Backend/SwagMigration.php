@@ -1070,7 +1070,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 	/**
 	 * Imports the product translation from the source database into the shopware database
-	 * @return
 	 */
     public function importProductTranslations()
     {

@@ -52,7 +52,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
     snippets: {
         variantProgress: '{s name=variantGenerationProgress}Generated [0] out of [1] variants for product [2]/[3]{/s}',
-        estimated: '{s name=timeRemaining} (~[0] Minutes remaining){/s}'
+        estimated: '{s name=timeRemaining} (~[0] Minute(s) remaining){/s}'
     },
 
     /**
@@ -286,7 +286,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
                     progressText = result.message;
                     if (result.estimated > 0 && result.offset > 0) {
-                        progressText =  result.message + Ext.String.format(me.snippets.estimated, Math.round(result.estimated/60));
+                        progressText =  result.message + Ext.String.format(me.snippets.estimated, Math.ceil(result.estimated/60));
                     }
                     me.progressWindow.progressBar.updateProgress(result.progress, progressText);
                     Ext.iterate(result, function(key, value) {
