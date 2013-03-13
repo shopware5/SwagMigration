@@ -363,7 +363,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			-- Restrict to existing categories *without* children categories
 			INNER JOIN {$this->quoteTable('categories', 'c')} ON c.OXID = a.OXCATNID
-			-- AND OXRIGHT-OXLEFT=1
+			AND OXRIGHT-OXLEFT=1
 
 			ORDER BY a.OXID
 		";
