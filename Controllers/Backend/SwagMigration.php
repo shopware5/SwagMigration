@@ -1301,7 +1301,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>sprintf($this->namespace->get('progressArticles', "%s out of %s articles imported"), $offset, $count),
+                    'message'=>sprintf($this->namespace->get('progressProducts', "%s out of %s products imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count,
