@@ -776,6 +776,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         while ($image = $result->fetch()) {
 
             $image['link'] = $image_path.$image['image'];
+			if (!isset($image['name'])) {
+				$image['name'] = basename($image['image']);
+			}
 
             $sql = '
                 SELECT ad.articleID
