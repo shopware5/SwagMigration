@@ -245,6 +245,8 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			LEFT JOIN {$this->quoteTable('artextends', 'e')}
 			ON e.OXID=a.OXID
+
+			ORDER BY `parentID`
         ";
 	}
 
