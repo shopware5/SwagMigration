@@ -201,6 +201,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         Shopware()->Db()->query($sql);
 	}
 
+	public function removeMigrationMappingsByType($type)
+	{
+		$sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
+		Shopware()->Db()->query($sql, array($type));
+	}
+
     /**
      * Truncate all article related tables
      */
@@ -309,19 +315,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 switch ($key) {
                     case 'clear_customers':
                         $this->sDeleteAllCustomers();
+	                    $this->removeMigrationMappingsByType(self::MAPPING_CUSTOMER);
                         break;
                     case 'clear_orders':
                         $this->sDeleteAllCustomers();
                         $this->sDeleteAllOrders();
+	                    $this->removeMigrationMappingsByType(self::MAPPING_CUSTOMER);
+	                    $this->removeMigrationMappingsByType(self::MAPPING_ORDER);
                         break;
                     case 'clear_votes':
                         Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
                         break;
                     case 'clear_articles':
                         $this->sDeleteAllArticles();
+	                    $this->removeMigrationMappingsByType(self::MAPPING_ARTICLE);
                         break;
                     case 'clear_categories':
                         Shopware()->Api()->Import()->sDeleteAllCategories();
+	                    $this->removeMigrationMappingsByType(self::MAPPING_CATEGORY);
+	                    $this->removeMigrationMappingsByType(self::MAPPING_CATEGORY_TARGET);
                         break;
                     case 'clear_supplier':
                         // As one might want to clear the suppliers without leaving all related articles

@@ -178,11 +178,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
             Ext.create('Ext.form.field.Checkbox', {
                 boxLabel: '{s name=clearSupplier}Delete supplier{/s}',
                 name: 'clear_supplier'
-            }),
-            Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearMappings}Clear temporary mappings{/s}',
-                name: 'clear_mappings'
             })
+//            Ext.create('Ext.form.field.Checkbox', {
+//                boxLabel: '{s name=clearMappings}Clear temporary mappings{/s}',
+//                name: 'clear_mappings'
+//            })
         ];
 
         return me.rightCheckBoxes
