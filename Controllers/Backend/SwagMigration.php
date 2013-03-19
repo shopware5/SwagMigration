@@ -281,23 +281,54 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Truncate customer related tables
+	 */
+	public function sDeleteAllCustomers()
+	{
+	   $sql = "
+	       TRUNCATE s_user;
+	       TRUNCATE s_user_attributes;
+	       TRUNCATE s_user_billingaddress;
+	       TRUNCATE s_user_billingaddress_attributes;
+	       TRUNCATE s_user_shippingaddress;
+	       TRUNCATE s_user_shippingaddress_attributes;
+	       TRUNCATE s_user_shippingaddress_attributes;
+	       TRUNCATE s_user_debit;
+	   ";
 
-        */
-       public function sDeleteAllCustomers()
-       {
-           $sql = "
-               TRUNCATE s_user;
-               TRUNCATE s_user_attributes;
-               TRUNCATE s_user_billingaddress;
-               TRUNCATE s_user_billingaddress_attributes;
-               TRUNCATE s_user_shippingaddress;
-               TRUNCATE s_user_shippingaddress_attributes;
-               TRUNCATE s_user_shippingaddress_attributes;
-               TRUNCATE s_user_debit;
-           ";
+	   Shopware()->Db()->query($sql);
+	}
 
-           Shopware()->Db()->query($sql);
-    }
+	/**
+	 * Helper method which deletes images/media tables
+	 * Also physically deletes corresponding files
+	 */
+	public function clearImages()
+	{
+		$sql = '
+			TRUNCATE s_articles_img;
+			TRUNCATE s_articles_img_attributes;
+			TRUNCATE s_article_img_mappings;
+			TRUNCATE s_article_img_mapping_rules;
+			TRUNCATE s_media;
+		';
+		Shopware()->Db()->query($sql);
+
+		$foldersToClean = array(
+			Shopware()->DocPath('media/image'),
+			Shopware()->DocPath('media/image/thumbnail')
+		);
+
+		foreach($foldersToClean as $path) {
+			if ($handle = opendir($path)) {
+				while (false !== ($file = readdir($handle))) {
+					// only delete .jpg, .jpeg, .png and .gif; ignore case
+					if (preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
+						unlink($path.$file);
+					}
+				}
+			}
+		}
+	}
 
     /**
      * This function is used to reset the shop. It will truncated all tables related to a given source
@@ -348,6 +379,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         break;
 	                case 'clear_mappings':
 		                $this->clearMigrationMappings();
+		                break;
+	                case 'clear_images':
+		                $this->clearImages();
 		                break;
                     default:
                         break;

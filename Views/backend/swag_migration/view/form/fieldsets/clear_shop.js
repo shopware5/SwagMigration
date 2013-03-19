@@ -135,6 +135,10 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
             Ext.create('Ext.form.field.Checkbox', {
                 boxLabel: '{s name=clearCategories}Delete categories{/s}',
                 name: 'clear_categories'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearImages}Delete images{/s}',
+                name: 'clear_images'
             })
 
         ];
