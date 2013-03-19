@@ -1174,9 +1174,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * Takes an invalid product number and creates a valid one from it
      * by returning its md5 hash
      */
-    public function makeInvalidNumberValid($number)
+    public function makeInvalidNumberValid($number, $id)
     {
-        return "sw-".md5($number);
+        return "sw-".md5($id);
     }
 
     /**
@@ -1235,7 +1235,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         return;
                         break;
                     case 'make_valid':
-                        $product['ordernumber'] = $this->makeInvalidNumberValid($number);
+                        $product['ordernumber'] = $this->makeInvalidNumberValid($number, $product['productID']);
                         break;
                 }
             }
@@ -1903,7 +1903,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         return;
                         break;
                     case 'make_valid':
-                        $order['article_ordernumber'] = $this->makeInvalidNumberValid($number);
+                        $order['article_ordernumber'] = $this->makeInvalidNumberValid($number, $order['productID']);
                         break;
                 }
             }
