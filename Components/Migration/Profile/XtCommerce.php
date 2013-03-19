@@ -375,7 +375,6 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				
 				u.customers_date_added 								as firstlogin,
 				u.customers_date_added								as lastlogin,
-				IF(u.delete_user=1, 0, 1)							as active,
 				1               									as subshopID
 
 				
