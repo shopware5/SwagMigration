@@ -486,7 +486,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             if ($source['mapping'] === '' && $source['mapping_value'] === '') {
                 $source["mapping"] = 'Bitte wählen';
-                $source["mapping_value"] = 0;
+                $source["mapping_value"] = 'Bitte wählen';
             }
 
         }
@@ -564,7 +564,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             default:
                 break;
         }
-        $rows = array(array('id'=>0, 'name'=>'Bitte wählen'));
+
+	    // The id is not needed later - it just may not collide with any other id
+	    $rows = array(array('id'=>'Bitte wählen', 'name'=>'Bitte wählen'));
+
         
         if(!empty($values)) {
             foreach ($values as $key=>$value) {
@@ -1301,7 +1304,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $offset++;
             if(time()-$requestTime >= 10) {
                 echo Zend_Json::encode(array(
-                    'message'=>sprintf($this->namespace->get('progressArticles', "%s out of %s articles imported"), $offset, $count),
+                    'message'=>sprintf($this->namespace->get('progressProducts', "%s out of %s products imported"), $offset, $count),
                     'success'=>true,
                     'offset'=>$offset,
                     'progress'=>$offset/$count,

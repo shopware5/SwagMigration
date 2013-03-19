@@ -122,10 +122,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 				);
 		}
 
-		return array(
-			'success' => true,
-			'invalidateCache' => array('backend')
-		);
+		return true;
 
 	}
 

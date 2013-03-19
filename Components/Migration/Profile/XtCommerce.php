@@ -362,17 +362,6 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				a.entry_city	 									as billing_city,
 				c.countries_iso_code_2 								as billing_countryiso,
 				
-				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms') 	as shipping_salutation,
-				o.delivery_firstname 								as shipping_firstname,
-				o.delivery_lastname 								as shipping_lastname,
-				o.delivery_company 									as shipping_company,
-				'' 													as shipping_department,
-				o.delivery_street_address  							as shipping_street,
-				'' 													as shipping_streetnumber,
-				o.delivery_postcode  								as shipping_zipcode,
-				o.delivery_city  									as shipping_city,
-				o.delivery_country_iso_code_2 						as shipping_countryiso,
-				
 				u.customers_telephone 								as phone,
 				u.customers_fax 									as fax,
 				u.customers_email_address 							as email,
@@ -385,8 +374,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				u.customers_status									as customergroupID,
 				
 				u.customers_date_added 								as firstlogin,
-				IFNULL(o.date_purchased, u.customers_date_added)	as lastlogin,
-				IF(u.delete_user=1, 0, 1)							as active,
+				u.customers_date_added								as lastlogin,
 				1               									as subshopID
 
 				
@@ -395,15 +383,6 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			JOIN {$this->quoteTable('address_book', 'a')}
 			ON a.customers_id=u.customers_id
 			AND a.address_book_id=u.customers_default_address_id
-
-			LEFT JOIN {$this->quoteTable('orders', 'o')}
-			ON o.orders_id = (
-				SELECT orders_id
-				FROM {$this->quoteTable('orders')}
-				WHERE customers_id=u.customers_id
-				ORDER BY orders_id DESC
-				LIMIT 1
-			)
 			
 			LEFT JOIN {$this->quoteTable('countries', 'c')}
 			ON c.countries_id=a.entry_country_id
