@@ -1283,6 +1283,40 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(!empty($product_result)) {
                 $product = array_merge($product, $product_result);
 
+
+	            // Check if the parent article's detail has configurator options associated
+	            // if this is not the case, it was a dummy master article in the source system and
+	            // needs to be replaced
+				if ($product['maindetailsID']) {
+					// Check if there are configurator options associated
+					$sql = 'SELECT id FROM s_article_configurator_option_relations WHERE article_id = ?';
+					$hasOptions = Shopware()->Db()->fetchOne($sql, array($product['maindetailsID']));
+
+					// If this is not the case..
+					if (!$hasOptions) {
+						$oldMainDetail = $product['maindetailsID'];
+
+						// Delete old main detail
+						$sql = 'DELETE FROM s_articles_details WHERE id = ?';
+						Shopware()->Db()->query($sql, array($oldMainDetail));
+
+						// Set this article as the new main detail
+						$sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
+						Shopware()->Db()->query($sql, array($product_result['articledetailsID'], $product_result['articleID']));
+
+						// Update kind
+						$sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
+						Shopware()->Db()->query($sql, array($product_result['articledetailsID']));
+
+						// Update mapping so that references to the old dummy article point to this article
+						$sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND sourceID = ?';
+						Shopware()->Db()->query($sql, array($product['articledetailsID'], self::MAPPING_ARTICLE, $product['parentID']));
+					}
+				}
+
+
+
+
                 if($product['kind']==1 && $product_description!==null) {
                     Shopware()->Db()->update(
                         's_articles',
@@ -1290,6 +1324,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         array('id=?'=>$product_result['articleID'])
                     );
                 }
+
+
+
 
                 //Price
                 if(isset($product['net_price'])) {
@@ -1315,6 +1352,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         ));
                     }
                 }
+
+
+
 
                 $sql = '
                     INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
