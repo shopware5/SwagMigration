@@ -416,8 +416,11 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 			FROM {$this->quoteTable('customer', 'u')}
 
 			LEFT JOIN {$this->quoteTable('address', 'a')}
-			ON a.id_customer=u.id_customer
-			AND a.id_customer=u.id_customer
+            ON a.id_address = (
+            	SELECT id_address
+            	FROM  {$this->quoteTable('address', 'a2')}
+            	WHERE a2.id_customer=u.id_customer LIMIT 1
+            )
 
 			LEFT JOIN {$this->quoteTable('gender', 'g')}
 			ON g.id_gender=u.id_gender
