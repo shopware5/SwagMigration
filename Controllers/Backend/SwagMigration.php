@@ -193,6 +193,14 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $groups;
     }
 
+	public function clearMigrationMappings()
+	{
+		$sql = '
+            TRUNCATE TABLE `s_plugin_migrations`;
+        ';
+        Shopware()->Db()->query($sql);
+	}
+
     /**
      * Truncate all article related tables
      */
@@ -326,6 +334,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                             UPDATE s_articles SET supplierID=1 WHERE 1;
                         ");
                         break;
+	                case 'clear_mappings':
+		                $this->clearMigrationMappings();
+		                break;
                     default:
                         break;
                 }
@@ -1576,6 +1587,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	    $taskStartTime  = $this->initTaskTimer();
 
         while ($customer = $result->fetch()) {
+
             if(isset($customer['customergroupID']) && isset($this->Request()->customer_group[$customer['customergroupID']])) {
                 $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
             }
@@ -1698,7 +1710,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             $order['sourceID'] = $order['orderID'];
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ORDER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -1964,10 +1976,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function finishImport()
     {
-        $sql = '
-            TRUNCATE TABLE `s_plugin_migrations`;
-        ';
-        Shopware()->Db()->query($sql);
+        $this->clearMigrationMappings();
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importFinished', "Import finished"),
             'success'=>true,
@@ -2121,7 +2130,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 		$offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
 		if ($startTime == 0 || $offset == 0) {
-			error_log("reset1");
 			$startTime = time();
 		}
 
