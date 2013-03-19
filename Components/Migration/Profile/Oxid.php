@@ -246,6 +246,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			LEFT JOIN {$this->quoteTable('artextends', 'e')}
 			ON e.OXID=a.OXID
 
+			-- Make sure to no import children products before the parent was imported
 			ORDER BY `parentID`
         ";
 	}

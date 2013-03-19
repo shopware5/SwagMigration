@@ -1284,38 +1284,26 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $product = array_merge($product, $product_result);
 
 
-	            // Check if the parent article's detail has configurator options associated
-	            // if this is not the case, it was a dummy master article in the source system and
-	            // needs to be replaced
-				if ($product['maindetailsID']) {
-					// Check if there are configurator options associated
+	            /**
+	             * Check if the parent article's detail has configurator options associated
+	             *
+	             * If this is not the case, it was a dummy master article in the source system and
+	             * needs to be replaced by another variant
+	             */
+	            if ($product['maindetailsID']) {
+					// Get options of the old main detail
 					$sql = 'SELECT id FROM s_article_configurator_option_relations WHERE article_id = ?';
 					$hasOptions = Shopware()->Db()->fetchOne($sql, array($product['maindetailsID']));
 
-					// If this is not the case..
+					// If non is available remove the odl detail and set the new one as main detail
 					if (!$hasOptions) {
-						$oldMainDetail = $product['maindetailsID'];
-
-						// Delete old main detail
-						$sql = 'DELETE FROM s_articles_details WHERE id = ?';
-						Shopware()->Db()->query($sql, array($oldMainDetail));
-
-						// Set this article as the new main detail
-						$sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
-						Shopware()->Db()->query($sql, array($product_result['articledetailsID'], $product_result['articleID']));
-
-						// Update kind
-						$sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
-						Shopware()->Db()->query($sql, array($product_result['articledetailsID']));
-
-						// Update mapping so that references to the old dummy article point to this article
-						$sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND sourceID = ?';
-						Shopware()->Db()->query($sql, array($product['articledetailsID'], self::MAPPING_ARTICLE, $product['parentID']));
+						$this->replaceProductDetail(
+							$product['maindetailsID'],
+							$product['articledetailsID'],
+							$product['articleID']
+						);
 					}
 				}
-
-
-
 
                 if($product['kind']==1 && $product_description!==null) {
                     Shopware()->Db()->update(
@@ -1385,6 +1373,45 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'progress'=>-1
         ));
     }
+
+	/**
+	 * Helper function to remove an old article detail ans set another detail instead of it. Will also update
+	 * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
+	 *
+	 * @param $oldMainDetail
+	 * @param $newMainDetail
+	 * @param $articleId
+	 */
+	public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
+	{
+		// Delete old main detail
+		$sql = 'DELETE FROM s_articles_details WHERE id = ?';
+		Shopware()->Db()->query(
+			$sql,
+			array($oldMainDetail)
+		);
+
+		// Set the new mainDetail for the article
+		$sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
+		Shopware()->Db()->query(
+			$sql,
+			array($newMainDetail, $articleId)
+		);
+
+		// Update kind of the new main detail
+		$sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
+		Shopware()->Db()->query(
+			$sql,
+			array($newMainDetail)
+		);
+
+		// Update mapping so that references to the old dummy article point to this article
+		$sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
+		Shopware()->Db()->query(
+			$sql,
+			array($newMainDetail,self::MAPPING_ARTICLE, $oldMainDetail)
+		);
+	}
 
     /**
      * Returns a SW-productID for a given source-productId
