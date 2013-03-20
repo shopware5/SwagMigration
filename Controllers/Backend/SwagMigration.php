@@ -801,6 +801,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], self::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
+	            if ($this->Source()->checkForDuplicateImages()) {
+		            if ($this->imageAlreadyImported($product_data['articleID'], $image['link'])) {
+						$offset++;
+			            continue;
+		            }
+	            }
+
                 if(!empty($image['main']) && $product_data['kind']==1) {
                     Shopware()->Api()->Import()->sDeleteArticleImages(array('articleID'=>$product_data['articleID']));
                 }
@@ -833,6 +840,39 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'progress'=>-1
         ));
     }
+
+	/**
+	 * Helper function which tells, if a given image was already assigned to a given product
+	 *
+	 * @param $articleId
+	 * @param $image
+	 * @return boolean
+	 */
+	public function imageAlreadyImported($articleId, $image)
+	{
+		// Get a proper image name (without path and extension)
+		$info = pathinfo($image);
+		$extension = $info['extension'];
+		$name = basename($image, '.'.$extension);
+
+		// Find images with the same articleId and image name
+		$sql = '
+			SELECT COUNT(*)
+			FROM `s_articles_img`
+			WHERE articleID = ?
+			AND img = ?
+		';
+		$numOfImages = Shopware()->Db()->fetchOne(
+			$sql,
+			array($articleId, $name)
+		);
+
+		if ((int) $numOfImages > 0) {
+			return true;
+		}
+
+		return false;
+	}
 
     /**
      * Set a category target id

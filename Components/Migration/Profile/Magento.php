@@ -41,6 +41,15 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 	}
 
 	/**
+	 * As all variants have assigned the product's image, only allow each image one time for a product
+	 * @return bool
+	 */
+	public function checkForDuplicateImages()
+	{
+		return true;
+	}
+
+	/**
 	 * Returns the sql statement to select the config base path
 	 * @return string {String} | sql for the config base path
 	 */

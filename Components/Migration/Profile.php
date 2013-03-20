@@ -74,6 +74,15 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     	}    	
 	}
 
+	/**
+	 * In some shops, any single variant of an product has assigned all the product's images
+	 * In order to sort this out, return 'true' in the shop's profile
+	 */
+	public function checkForDuplicateImages()
+	{
+		return false;
+	}
+
     /**
      * This function add the profile database prefix to the given table
      * @param $table
