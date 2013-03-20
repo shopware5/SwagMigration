@@ -125,7 +125,13 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
     {
         return "
             SELECT
-                master.products_id                                          as parentID,
+                master.products_id	               						as parentID,
+
+               IF(
+               		product.products_master_flag=1,
+                  	1,
+                  	0
+            )   															as masterWithAttributes,
                 GROUP_CONCAT(group_description.attributes_name SEPARATOR '|') as variant_group_names,
                 GROUP_CONCAT(option_description.attributes_name  SEPARATOR '|') as additionaltext
 
@@ -137,8 +143,10 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			ON product.products_id = relation.products_id
 
 			-- Get the products master - no index for that
-			INNER JOIN {$this->quoteTable('products', 'master')}
+			LEFT JOIN {$this->quoteTable('products', 'master')}
 			ON master.products_model = product.products_master_model
+            AND product.products_master_model IS NOT NULL
+            AND product.products_master_model != ''
 
             -- Join options for the attributes
             LEFT JOIN {$this->quoteTable('plg_products_attributes', 'options')}
@@ -148,7 +156,6 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
             -- Join option name
             INNER JOIN {$this->quoteTable('plg_products_attributes_description', 'option_description')}
             ON options.attributes_id = option_description.attributes_id
-
 
             -- Join groups for the options
             LEFT JOIN {$this->quoteTable('plg_products_attributes', 'groups')}
@@ -206,11 +213,12 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
 
-
 			
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
 			AND d.language_code='de'
+
+			ORDER BY a.date_added ASC
 		";
 	}
 

@@ -1277,6 +1277,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 }
             }
 
+
             //Attribute
             if(!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source=>$target) {
@@ -1320,7 +1321,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(!empty($product_result)) {
                 $product = array_merge($product, $product_result);
 
-
 	            /**
 	             * Check if the parent article's detail has configurator options associated
 	             *
@@ -1341,6 +1341,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 						);
 					}
 				}
+
+	            // In some cases we need to make sure, that the article configurator is
+	            // generated for the master article of master/child article architectures
+	            if (isset($product['masterWithAttributes']) && $product['masterWithAttributes'] == 1) {
+		            $product['maindetailsID'] = $product['articledetailsID'];
+		            $import->sArticleLegacyVariant($product);
+	            }
 
                 if($product['kind']==1 && $product_description!==null) {
                     Shopware()->Db()->update(
@@ -1377,8 +1384,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         ));
                     }
                 }
-
-
 
 
                 $sql = '
