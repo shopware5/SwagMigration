@@ -33,6 +33,23 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 {
 	protected $db_prefix = 'ox';
 
+	/**
+	 * Returns a select for a rough estimation for the total number of entities
+	 *
+	 * @param $for
+	 * @return string
+	 */
+	public function getEstimationSelect($for)
+	{
+		switch ($for) {
+			case 'properties':
+				return "SELECT COUNT(*) FROM {$this->quoteTable('object2attribute')}";
+				break;
+			default:
+				return 'SELECT 0;';
+		}
+	}
+
     /**
    	 * Returns the directory of the article images.
    	 * @return string {String} | image path
@@ -182,6 +199,32 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			LEFT JOIN {$this->quoteTable('object2group', 'gb2')} ON gb2.OXOBJECTID=u.OXID AND gb2.OXGROUPSID='oxidblocked'
 			
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
+		";
+	}
+
+	/**
+	 * Returns the sql statement to select articles with
+	 * @return string
+	 */
+	public function getProductPropertySelect()
+	{
+		return "
+			SELECT
+				p.OXID				as productID,
+				'Properties'		as 'group',
+				a.OXTITLE			as 'option',
+				o2a.OXVALUE			as 'value'
+
+			FROM {$this->quoteTable('articles', 'p')}
+
+			INNER JOIN {$this->quoteTable('object2attribute', 'o2a')}
+			ON o2a.OXOBJECTID = p.OXID
+
+			INNER JOIN {$this->quoteTable('attribute', 'a')}
+			ON a.OXID = o2a.OXATTRID
+
+			WHERE a.OXTITLE != ''
+			AND o2a.OXVALUE != ''
 		";
 	}
 

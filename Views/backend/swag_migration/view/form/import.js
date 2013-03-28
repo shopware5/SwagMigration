@@ -91,117 +91,24 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     createItems: function() {
         var me = this;
 
-        me.basePath = Ext.create('Ext.form.field.Text', {
-            fieldLabel: '{s name=articleImagesPath}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
-            name: 'basepath',
-            value: '',
-            labelWidth: 500,
-            allowBlank: false,
-            listeners: {
-                change: function() {
-                    me.fireEvent('validate');
-                }
-            }
-        });
-
         me.fieldSet = {
             xtype:'fieldset',
+            layout: 'column',
             title: '{s name=importSettings}Import settings{/s}',
             autoHeight: true,
-            buttonAlign: 'right',
-            //defaults: { width: 250 },
             defaults: {
                 anchor: '100%',
                 labelWidth: 500,
-                checked: true
+                buttonAlign: 'left'
             },
             defaultType: 'textfield',
-            items :[{
-                fieldLabel: '{s name=importProducts}Import products{/s}',
-                name: 'import_products',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=importTranslations}Import translations{/s}',
-                name: 'import_translations',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=importCategories}Import categories{/s}',
-                name: 'import_categories',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '',
-                name: 'import_article_categories',
-                xtype: 'checkbox',
-                checked: false,
-                hidden: true
-            }, {                
-                fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
-                name: 'import_prices',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
-                name: 'import_generate_variants',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '',
-                name: 'import_create_configurator_variants',
-                xtype: 'checkbox',
-                checked: false,
-                hidden: true
-            }, {
-                fieldLabel: '{s name=importArticleImages}Import product images{/s}',
-                name: 'import_images',
-                xtype: 'checkbox',
-                listeners: {
-                    change: function(checkBox, newValue, oldValue, eOpts) {
-                        // if the product images are going to be imported, the basePath field is mandatory
-                        me.basePath.allowBlank = !newValue;
-                        me.fireEvent('validate');
-                    }
-                }
-            }, {
-                fieldLabel: '{s name=importCustomers}Import customers{/s}',
-                name: 'import_customers',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=importRatings}Import ratings{/s}',
-                name: 'import_ratings',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=importOrders}Import orders{/s}',
-                name: 'import_orders',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=finish}Finish import{/s}',
-                name: 'finish_import',
-                xtype: 'checkbox'
-            }, {
-                fieldLabel: '{s name=defaultSupplier}Default supplier{/s}',
-                name: 'supplier',
-                hiddenName: 'supplier',
-                valueField: 'name',
-                displayField: 'name',
-                triggerAction: 'all',
-                xtype: 'combo',
-                allowBlank: false,
-                mode: 'remote',
-                selectOnFocus: true,
-                store: Ext.create('Shopware.apps.Base.store.Supplier'),
-                listeners: {
-                    change: function() {
-                        me.fireEvent('validate');
-                    }
-                }
-            },
-                me.basePath
-            ]
+            items : me.getContainers()
         };
 
         me.advancedOptionsFieldset = {
             xtype:'fieldset',
             title: '{s name=importSettingsAdvanced}Advanced import settings{/s}',
             autoHeight: true,
-            buttonAlign: 'right',
             defaults: {
                 anchor: '100%',
                 labelWidth: 500
@@ -216,6 +123,150 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         };
 
         return  [ me.fieldSet, me.advancedOptionsFieldset, clearShopFieldSet ];
+    },
+
+    getContainers:function () {
+        var leftContainer, rightContainer, me = this;
+
+        leftContainer = Ext.create('Ext.container.Container', {
+            columnWidth:0.3,
+            defaults: {
+                labelWidth: 250,
+                anchor: '100%',
+                buttonAlign: 'left',
+                checked: true
+            },
+            padding: '0 20 0 0',
+            layout: 'anchor',
+            border:false,
+            items:me.getLeftItems()
+        });
+
+        rightContainer = Ext.create('Ext.container.Container', {
+            columnWidth:0.7,
+            layout: 'anchor',
+            defaults: {
+                labelWidth: 250,
+                anchor: '100%',
+                buttonAlign: 'left',
+                checked: true
+            },
+            padding: '0 0 0 80',
+            border:false,
+            items:me.getRightItems()
+        });
+
+        return [ leftContainer, rightContainer ] ;
+    },
+
+    getLeftItems: function() {
+        var me = this;
+
+        return [{
+            fieldLabel: '{s name=importProducts}Import products{/s}',
+            name: 'import_products',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=importTranslations}Import translations{/s}',
+            name: 'import_translations',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=importProperties}Import product properties{/s}',
+            name: 'import_properties',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=importCategories}Import categories{/s}',
+            name: 'import_categories',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '',
+            name: 'import_article_categories',
+            xtype: 'checkbox',
+            checked: false,
+            hidden: true
+        }, {
+            fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
+            name: 'import_prices',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
+            name: 'import_generate_variants',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '',
+            name: 'import_create_configurator_variants',
+            xtype: 'checkbox',
+            checked: false,
+            hidden: true
+        }];
+    },
+
+    getRightItems: function() {
+        var me = this;
+
+        me.basePath = Ext.create('Ext.form.field.Text', {
+            fieldLabel: '{s name=articleImagesPath}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
+            name: 'basepath',
+            value: '',
+            labelWidth: 250,
+            allowBlank: false,
+            listeners: {
+                change: function() {
+                    me.fireEvent('validate');
+                }
+            }
+        });
+
+
+        return [{
+            fieldLabel: '{s name=importArticleImages}Import product images{/s}',
+            name: 'import_images',
+            xtype: 'checkbox',
+            listeners: {
+                change: function(checkBox, newValue, oldValue, eOpts) {
+                    // if the product images are going to be imported, the basePath field is mandatory
+                    me.basePath.allowBlank = !newValue;
+                    me.fireEvent('validate');
+                }
+            }
+        }, {
+            fieldLabel: '{s name=importCustomers}Import customers{/s}',
+            name: 'import_customers',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=importRatings}Import ratings{/s}',
+            name: 'import_ratings',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=importOrders}Import orders{/s}',
+            name: 'import_orders',
+            xtype: 'checkbox'
+        }, {
+            fieldLabel: '{s name=finish}Finish import{/s}',
+            name: 'finish_import',
+            xtype: 'checkbox',
+            checked: false
+        }, {
+            fieldLabel: '{s name=defaultSupplier}Default supplier{/s}',
+            name: 'supplier',
+            hiddenName: 'supplier',
+            valueField: 'name',
+            displayField: 'name',
+            triggerAction: 'all',
+            xtype: 'combo',
+            allowBlank: false,
+            mode: 'remote',
+            selectOnFocus: true,
+            store: Ext.create('Shopware.apps.Base.store.Supplier'),
+            listeners: {
+                change: function() {
+                    me.fireEvent('validate');
+                }
+            }
+        },
+            me.basePath
+        ];
+
     },
 
     getAdvancedInputItems: function() {

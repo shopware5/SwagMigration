@@ -504,4 +504,42 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		}
 		return $this->db->query($sql);
 	}
+
+	/**
+	 * Execute the product property select statement with the given offset
+	 * @param int $offset
+	 * @return Zend_Db_Statement_Interface
+	 */
+	public function queryProductProperties($offset=0, $limit=1000)
+	{
+		if (!method_exists($this, 'getProductPropertySelect')) {
+           return;
+        }
+
+		$sql = $this->getProductPropertySelect();
+
+		$sql = $this->limit($sql, $limit, $offset);
+
+		return $this->db->query($sql);
+	}
+
+	/**
+	 * Returns a rough estimation of number of entities to import
+	 *
+	 * No need for correctness, only the estimated time depends on this
+	 *
+	 * @param $for
+	 * @return bool|string
+	 */
+	public function getEstimation($for)
+	{
+		if (!method_exists($this, 'getEstimationSelect')) {
+           return false;
+        }
+		$sql = $this->getEstimationSelect($for);
+
+		return $this->db->fetchOne($sql);
+
+
+	}
 }

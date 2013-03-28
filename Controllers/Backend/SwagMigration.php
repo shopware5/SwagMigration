@@ -31,14 +31,11 @@
  */
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
-    /**
-     * Default constants for the mappings from the foreign IDs to Shopware IDs
-     */
-    const MAPPING_ARTICLE = 1;
-    const MAPPING_CATEGORY = 2;
-    const MAPPING_CUSTOMER = 3;
-    const MAPPING_ORDER = 4;
-    const MAPPING_CATEGORY_TARGET = 99;
+	/**
+	 * Some helpers
+	 * @var Shopware_Components_Migration_Helpers
+	 */
+	protected $helpers;
 
     /**
      * Source shop system profile
@@ -122,6 +119,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return Shopware_Components_Migration::factory('Shopware', $config);
     }
 
+
+	public function Helpers()
+	{
+		if (!isset($this->helpers)) {
+			$this->helpers = new Shopware_Components_Migration_Helpers();
+		}
+		return $this->helpers;
+	}
+
     /**
      * Getter method of the target profile. If the profile is not set, the controller initial the profile first.
      * @return Shopware_Components_Migration_Profile
@@ -134,64 +140,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
-    /**
-     * Helper function which gets the configurator groups for
-     * a given product
-     * @param $productId
-     * @return Array
-     */
-    public function getConfiguratorGroups($productId)
-    {
-        // get configurator groups for the given product
-        $builder = Shopware()->Models()->createQueryBuilder();
-        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
-                ->from('Shopware\Models\Article\Article', 'article')
-                ->innerJoin('article.configuratorSet', 'configuratorSet')
-                ->leftJoin('configuratorSet.groups', 'groups')
-                ->where('article.id = ?1')
-                ->setParameter(1, $productId);
-
-        $result = array_pop($builder->getQuery()->getArrayResult());
-
-        $configuratorArray = $result['configuratorSet'];
-        $groups = $configuratorArray['groups'];
-
-        // Additionally get the options for the given configurator set
-        // this relation seems not to be available in the configurator models
-        // (the configuratorSet-Model returns all group's options, even those
-        // not related to the given set)
-        $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
-
-        LEFT JOIN s_article_configurator_set_option_relations relations
-        ON relations.set_id = sets.id
-
-        LEFT JOIN s_article_configurator_options options
-        ON options.id = relations.option_id
-
-        WHERE sets.id = ?";
-        $results = Shopware()->Db()->fetchAll($sql, array($configuratorArray['id']));
-
-        // Sort the options by group
-        $optionsByGroups = array();
-        foreach($results as $option) {
-            $groupId = $option['group_id'];
-            if (!isset($optionsByGroups[$groupId])) {
-                $optionsByGroups[$groupId] = array();
-            }
-            $optionsByGroups[$groupId][] = $option;
-        }
-
-        // merge the options into the group
-        $totalCount = 1;
-        foreach ($groups as &$group) {
-            $group['options'] = $optionsByGroups[$group['id']];
-            if (count($group['options']) > 0 ) {
-                $totalCount = $totalCount * count($group['options']);
-            }
-        }
-
-        return $groups;
-    }
 
 	public function clearMigrationMappings()
 	{
@@ -214,6 +162,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $sql = "
 			TRUNCATE s_articles;
+			TRUNCATE s_filter_articles;
 			TRUNCATE s_articles_attributes;
 			TRUNCATE s_articles_avoid_customergroups;
 			TRUNCATE s_articles_categories;
@@ -299,6 +248,23 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	}
 
 	/**
+	 * Helper method to delete all filter properties
+	 */
+	public function sDeleteAllFilters()
+	{
+		$sql = '
+			TRUNCATE s_filter;
+			TRUNCATE s_filter_articles;
+			TRUNCATE s_filter_attributes;
+			TRUNCATE s_filter_options;
+			TRUNCATE s_filter_relations;
+			TRUNCATE s_filter_values;
+		';
+
+		Shopware()->Db()->query($sql);
+	}
+
+	/**
 	 * Helper method which deletes images/media tables
 	 * Also physically deletes corresponding files
 	 */
@@ -346,25 +312,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 switch ($key) {
                     case 'clear_customers':
                         $this->sDeleteAllCustomers();
-	                    $this->removeMigrationMappingsByType(self::MAPPING_CUSTOMER);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
                         break;
                     case 'clear_orders':
                         $this->sDeleteAllCustomers();
                         $this->sDeleteAllOrders();
-	                    $this->removeMigrationMappingsByType(self::MAPPING_CUSTOMER);
-	                    $this->removeMigrationMappingsByType(self::MAPPING_ORDER);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ORDER);
                         break;
                     case 'clear_votes':
                         Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
                         break;
                     case 'clear_articles':
                         $this->sDeleteAllArticles();
-	                    $this->removeMigrationMappingsByType(self::MAPPING_ARTICLE);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE);
                         break;
                     case 'clear_categories':
                         Shopware()->Api()->Import()->sDeleteAllCategories();
-	                    $this->removeMigrationMappingsByType(self::MAPPING_CATEGORY);
-	                    $this->removeMigrationMappingsByType(self::MAPPING_CATEGORY_TARGET);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY);
+	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET);
                         break;
                     case 'clear_supplier':
                         // As one might want to clear the suppliers without leaving all related articles
@@ -377,6 +343,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                             UPDATE s_articles SET supplierID=1 WHERE 1;
                         ");
                         break;
+	                case 'clear_properties':
+		                $this->sDeleteAllFilters();
+		                break;
 	                case 'clear_mappings':
 		                $this->clearMigrationMappings();
 		                break;
@@ -716,7 +685,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.sourceID=?
                 AND pm.typeID=?
             ";
-            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], self::MAPPING_ARTICLE));
+            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
             if(!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if(isset($price['net_price'])) {
@@ -788,7 +757,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], self::MAPPING_ARTICLE));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -798,11 +767,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], self::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
 	            if ($this->Source()->checkForDuplicateImages()) {
-		            if ($this->imageAlreadyImported($product_data['articleID'], $image['link'])) {
+		            if ($this->Helpers()->imageAlreadyImported($product_data['articleID'], $image['link'])) {
 						$offset++;
 			            continue;
 		            }
@@ -841,39 +810,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
-	/**
-	 * Helper function which tells, if a given image was already assigned to a given product
-	 *
-	 * @param $articleId
-	 * @param $image
-	 * @return boolean
-	 */
-	public function imageAlreadyImported($articleId, $image)
-	{
-		// Get a proper image name (without path and extension)
-		$info = pathinfo($image);
-		$extension = $info['extension'];
-		$name = basename($image, '.'.$extension);
-
-		// Find images with the same articleId and image name
-		$sql = '
-			SELECT COUNT(*)
-			FROM `s_articles_img`
-			WHERE articleID = ?
-			AND img = ?
-		';
-		$numOfImages = Shopware()->Db()->fetchOne(
-			$sql,
-			array($articleId, $name)
-		);
-
-		if ((int) $numOfImages > 0) {
-			return true;
-		}
-
-		return false;
-	}
-
     /**
      * Set a category target id
      * @param $id
@@ -889,7 +825,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET, $id, $target));
+        Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET, $id, $target));
     }
 
     /**
@@ -904,7 +840,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
         return Shopware()->Db()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
-            array(self::MAPPING_CATEGORY_TARGET, $id)
+            array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET, $id)
         );
     }
 
@@ -915,7 +851,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function deleteCategoryTarget($id)
     {
         $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
-        Shopware()->Db()->query($sql, array(self::MAPPING_CATEGORY_TARGET));
+        Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET));
     }
 
     /**
@@ -937,7 +873,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 		// Cleanup previous category imports
         if (!$skip && $offset === 0) {
-            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);", array(self::MAPPING_CATEGORY_TARGET,2));
+            Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
+	            array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,2)
+            );
         }
 
         $categories = $this->Source()->queryCategories($offset);
@@ -997,7 +935,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            Shopware()->Db()->query($sql , array(self::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
+            Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -1065,7 +1003,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE `sourceID`=?
                 AND `typeID`=?
             ';
-            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], self::MAPPING_ARTICLE));
+            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             if(empty($article)) {
                 continue;
@@ -1077,7 +1015,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
             // Also take language categories into account
-            $categories = Shopware()->Db()->fetchCol($sql , array(self::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
+            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
 
             if(empty($categories)) {
                 continue;
@@ -1126,7 +1064,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], self::MAPPING_ARTICLE));
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             if(empty($rating['articleID'])) {
                 continue;
@@ -1214,7 +1152,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], self::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(
@@ -1342,7 +1280,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             //Parent
             if(!empty($product['parentID'])) {
                 $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ARTICLE, $product['parentID']));
+                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $product['parentID']));
             }
 
             if(isset($product['description_long'])) {
@@ -1374,7 +1312,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 					// If non is available remove the odl detail and set the new one as main detail
 					if (!$hasOptions) {
-						$this->replaceProductDetail(
+						$this->Helpers()->replaceProductDetail(
 							$product['maindetailsID'],
 							$product['articledetailsID'],
 							$product['articleID']
@@ -1431,7 +1369,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(self::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
+                Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
             }
 
             $offset++;
@@ -1456,45 +1394,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
-	/**
-	 * Helper function to remove an old article detail ans set another detail instead of it. Will also update
-	 * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
-	 *
-	 * @param $oldMainDetail
-	 * @param $newMainDetail
-	 * @param $articleId
-	 */
-	public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
-	{
-		// Delete old main detail
-		$sql = 'DELETE FROM s_articles_details WHERE id = ?';
-		Shopware()->Db()->query(
-			$sql,
-			array($oldMainDetail)
-		);
-
-		// Set the new mainDetail for the article
-		$sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
-		Shopware()->Db()->query(
-			$sql,
-			array($newMainDetail, $articleId)
-		);
-
-		// Update kind of the new main detail
-		$sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
-		Shopware()->Db()->query(
-			$sql,
-			array($newMainDetail)
-		);
-
-		// Update mapping so that references to the old dummy article point to this article
-		$sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
-		Shopware()->Db()->query(
-			$sql,
-			array($newMainDetail,self::MAPPING_ARTICLE, $oldMainDetail)
-		);
-	}
-
     /**
      * Returns a SW-productID for a given source-productId
      * @param $productId
@@ -1512,7 +1411,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             AND `typeID`=?
         ';
 
-        return Shopware()->Db()->fetchOne($sql, array($productId, self::MAPPING_ARTICLE));
+        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
     }
 
     /**
@@ -1699,7 +1598,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 continue;
             }
 
-            $groups = $this->getConfiguratorGroups($productId);
+            $groups = $this->Helpers()->getConfiguratorGroups($productId);
 
             $params = array(
                 'articleId' => $productId,
@@ -1728,6 +1627,89 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         echo $done;
     }
+
+
+	public function importProductProperties()
+	{
+		$requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+
+		if ($this->printCurrentImportMessage('Product Properties')) {
+		    return;
+		}
+
+		$done = Zend_Json::encode(array(
+			'message'=>$this->namespace->get('importProductProperties', "Properties imported"),
+			'success'=>true,
+			'count' => 0,
+			'import_properties'=>null,
+			'offset'=>0,
+			'progress'=>-1
+		));
+
+		// Get products with attributes
+		$result = $this->Source()->queryProductProperties($offset);
+		if (empty($result)) {
+			echo $done;
+			return;
+		}
+
+        $count = $result->rowCount()+$offset;
+		$count = $this->Source()->getEstimation('properties');
+		error_log($count);
+		$taskStartTime  = $this->initTaskTimer();
+
+        while ($property = $result->fetch()) {
+            // Skip products which have not been imported before
+            $productId = $this->getBaseArticleInfo($property['productID']);
+            if (false === $productId) {
+                continue;
+            }
+	        $data = array(
+		        'productID' => $productId,
+		        'group' => array(
+			        'name' => $property['group'],
+					'options' => array(
+						array(
+							'name' => $property['option'],
+							'values' => array(
+								array('value' => $property['value'])
+							)
+						)
+					)
+		        )
+	        );
+
+			$this->Helpers()->importProductProperty($data);
+
+		    $offset++;
+	        if(time()-$requestTime >= 10) {
+	            echo Zend_Json::encode(array(
+	                'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
+	                'success'=>true,
+	                'offset'=>$offset,
+	                'progress'=>$offset/$count,
+	             'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+	                'task_start_time' => $taskStartTime
+	            ));
+	            return;
+	        }
+		}
+
+		  echo Zend_Json::encode(array(
+		      'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
+		      'success'=>true,
+		      'offset'=>$offset,
+		      'progress'=>$offset/$count,
+		   'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+		      'task_start_time' => $taskStartTime
+		  ));
+      return;
+
+
+//		echo $done;
+
+	}
 
     /**
      * This function imports the customers, selected by the source profile.
@@ -1805,7 +1787,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(self::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
+                Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
             }
             $offset++;
             if(time()-$requestTime >= 10) {
@@ -1867,11 +1849,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_CUSTOMER, $order['customerID']));
+            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER, $order['customerID']));
 
             $order['sourceID'] = $order['orderID'];
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -1915,7 +1897,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	            VALUES (?, ?, ?)
 	            ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
 	            ';
-	            Shopware()->Db()->query($sql, array(self::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
+	            Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
             }
 
             if(!empty($order['billing_countryiso'])) {
@@ -2059,7 +2041,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(self::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['orderID']));
 
             $sql = '
                 SELECT ad.articleID
@@ -2069,7 +2051,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], self::MAPPING_ARTICLE));
+            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
 
             //TaxRate
             if(!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
@@ -2166,6 +2148,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(!empty($this->Request()->import_translations)) {
                 $errorMessage = $this->namespace->get('errorImportingTranslations', "An error occurred while importing translations");
 				return $this->importProductTranslations();
+            }
+
+	        if(!empty($this->Request()->import_properties)) {
+                $errorMessage = $this->namespace->get('errorImportingProductProperties', "An error occurred while importing product properties");
+				return $this->importProductProperties();
             }
 
             if(!empty($this->Request()->import_categories)) {
