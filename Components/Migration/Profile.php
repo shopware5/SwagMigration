@@ -61,6 +61,14 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      */
     protected $default_language;
 
+	/**
+	 * Default query limit for some specific operations
+	 * The system does not need to be able to import $default_limit entities per query
+	 * but it must be able to *select* that much entities within a reasonable time.
+	 * @var
+	 */
+	protected $default_limit = 1000;
+
     /**
      * Class constructor to open the database connection
      * @param $config
@@ -73,6 +81,24 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     		$this->db_prefix = $config['prefix'];
     	}    	
 	}
+
+	/**
+	 * @param  $default_limit
+	 */
+	public function setDefaultLimit($default_limit)
+	{
+		$this->default_limit = $default_limit;
+	}
+
+	/**
+	 * @return
+	 */
+	public function getDefaultLimit()
+	{
+		return $this->default_limit;
+	}
+
+
 
 	/**
 	 * In some shops, any single variant of an product has assigned all the product's images
@@ -510,8 +536,12 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 	 * @param int $offset
 	 * @return Zend_Db_Statement_Interface
 	 */
-	public function queryProductProperties($offset=0, $limit=1000)
+	public function queryProductProperties($offset=0, $limit=null)
 	{
+		if ((int) $limit === 0) {
+			$limit = $this->getDefaultLimit();
+		}
+
 		if (!method_exists($this, 'getProductPropertySelect')) {
            return;
         }

@@ -1649,20 +1649,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 		// Get products with attributes
 		$result = $this->Source()->queryProductProperties($offset);
-		if (empty($result)) {
+		error_log($result->rowCount());
+		if ($result->rowCount() === 0) {
 			echo $done;
 			return;
 		}
 
         $count = $result->rowCount()+$offset;
 		$count = $this->Source()->getEstimation('properties');
-		error_log($count);
 		$taskStartTime  = $this->initTaskTimer();
 
         while ($property = $result->fetch()) {
             // Skip products which have not been imported before
             $productId = $this->getBaseArticleInfo($property['productID']);
-            if (false === $productId) {
+            if (false === $productId || empty($property['option']) || empty($property['value'])) {
+	            $offset++;
                 continue;
             }
 	        $data = array(

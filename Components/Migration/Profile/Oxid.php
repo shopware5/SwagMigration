@@ -43,7 +43,12 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	{
 		switch ($for) {
 			case 'properties':
-				return "SELECT COUNT(*) FROM {$this->quoteTable('object2attribute')}";
+				return "
+					SELECT COUNT(*)
+					FROM {$this->quoteTable('object2attribute', o2a)}
+					INNER JOIN {$this->quoteTable('articles', a)}
+					ON a.OXID = o2a.OXOBJECTID
+				";
 				break;
 			default:
 				return 'SELECT 0;';
@@ -222,9 +227,6 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			INNER JOIN {$this->quoteTable('attribute', 'a')}
 			ON a.OXID = o2a.OXATTRID
-
-			WHERE a.OXTITLE != ''
-			AND o2a.OXVALUE != ''
 		";
 	}
 
