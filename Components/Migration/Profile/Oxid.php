@@ -211,7 +211,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	 * Returns the sql statement to select articles with
 	 * @return string
 	 */
-	public function getProductPropertySelect()
+	public function getProductPropertiesSelect($id)
 	{
 		return "
 			SELECT
@@ -227,6 +227,19 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			INNER JOIN {$this->quoteTable('attribute', 'a')}
 			ON a.OXID = o2a.OXATTRID
+
+			WHERE p.OXID = '{$id}'
+		";
+	}
+
+
+	public function getProductsWithPropertiesSelect()
+	{
+		return "
+			SELECT a.OXID as productID
+			FROM {$this->quoteTable('articles', a)}
+			INNER JOIN {$this->quoteTable('object2attribute', o2a)}
+			ON a.OXID = o2a.OXOBJECTID
 		";
 	}
 

@@ -391,6 +391,28 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->query($sql);
 	}
 
+
+	public function queryProductsWithProperties($offset)
+	{
+		if (!method_exists($this, 'getProductsWithPropertiesSelect')) {
+            return;
+        }
+		$sql = $this->getProductsWithPropertiesSelect();
+        if(!empty($offset)) {
+            $sql = $this->limit($sql, null, $offset);
+        }
+		return $this->db->query($sql);
+	}
+
+	public function queryProductProperties($id)
+	{
+		$sql = $this->getProductPropertiesSelect($id);
+        if(!empty($offset)) {
+            $sql = $this->limit($sql, null, $offset);
+        }
+		return $this->db->query($sql);
+	}
+
     /**
      * Executes the profile category select statement with the given offset
      * @param int $offset
@@ -531,27 +553,6 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->query($sql);
 	}
 
-	/**
-	 * Execute the product property select statement with the given offset
-	 * @param int $offset
-	 * @return Zend_Db_Statement_Interface
-	 */
-	public function queryProductProperties($offset=0, $limit=null)
-	{
-		if ((int) $limit === 0) {
-			$limit = $this->getDefaultLimit();
-		}
-
-		if (!method_exists($this, 'getProductPropertySelect')) {
-           return;
-        }
-
-		$sql = $this->getProductPropertySelect();
-
-		$sql = $this->limit($sql, $limit, $offset);
-
-		return $this->db->query($sql);
-	}
 
 	/**
 	 * Returns a rough estimation of number of entities to import

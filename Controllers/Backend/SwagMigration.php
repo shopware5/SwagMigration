@@ -54,6 +54,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     protected $namespace;
 
+	protected $max_execution = 10;
+
 	/**
      * This function add the template directory and register the Shopware_Components namespace
      */
@@ -309,52 +311,52 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         // Iterate fields and delete all data
         $data = $this->Request()->getParams();
         foreach ($data as $key => $value) {
-                switch ($key) {
-                    case 'clear_customers':
-                        $this->sDeleteAllCustomers();
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
-                        break;
-                    case 'clear_orders':
-                        $this->sDeleteAllCustomers();
-                        $this->sDeleteAllOrders();
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ORDER);
-                        break;
-                    case 'clear_votes':
-                        Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
-                        break;
-                    case 'clear_articles':
-                        $this->sDeleteAllArticles();
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE);
-                        break;
-                    case 'clear_categories':
-                        Shopware()->Api()->Import()->sDeleteAllCategories();
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY);
-	                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET);
-                        break;
-                    case 'clear_supplier':
-                        // As one might want to clear the suppliers without leaving all related articles
-                        // invalid, we create a new 'Default'-Supplier and set it for all articles
-                        Shopware()->Db()->exec("
-                            TRUNCATE s_articles_supplier;
-                            TRUNCATE s_articles_supplier_attributes;
-                            INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
-                            INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
-                            UPDATE s_articles SET supplierID=1 WHERE 1;
-                        ");
-                        break;
-	                case 'clear_properties':
-		                $this->sDeleteAllFilters();
-		                break;
-	                case 'clear_mappings':
-		                $this->clearMigrationMappings();
-		                break;
-	                case 'clear_images':
-		                $this->clearImages();
-		                break;
-                    default:
-                        break;
-                }
+            switch ($key) {
+                case 'clear_customers':
+                    $this->sDeleteAllCustomers();
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
+                    break;
+                case 'clear_orders':
+                    $this->sDeleteAllCustomers();
+                    $this->sDeleteAllOrders();
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ORDER);
+                    break;
+                case 'clear_votes':
+                    Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
+                    break;
+                case 'clear_articles':
+                    $this->sDeleteAllArticles();
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE);
+                    break;
+                case 'clear_categories':
+                    Shopware()->Api()->Import()->sDeleteAllCategories();
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET);
+                    break;
+                case 'clear_supplier':
+                    // As one might want to clear the suppliers without leaving all related articles
+                    // invalid, we create a new 'Default'-Supplier and set it for all articles
+                    Shopware()->Db()->exec("
+                        TRUNCATE s_articles_supplier;
+                        TRUNCATE s_articles_supplier_attributes;
+                        INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
+                        INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
+                        UPDATE s_articles SET supplierID=1 WHERE 1;
+                    ");
+                    break;
+                case 'clear_properties':
+	                $this->sDeleteAllFilters();
+	                break;
+                case 'clear_mappings':
+	                $this->clearMigrationMappings();
+	                break;
+                case 'clear_images':
+	                $this->clearImages();
+	                break;
+                default:
+                    break;
+            }
         }
 
 		echo Zend_Json::encode(array('success'=>true));
@@ -702,7 +704,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressPrices', "%s out of %s prices imported"), $offset, $count),
                     'success'=>true,
@@ -789,7 +791,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             $offset++;
 
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressImages', "%s out of %s images imported"), $offset, $count),
                     'success'=>true,
@@ -938,7 +940,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressCategories', "%s out of %s categories imported"), $offset, $count),
                     'success'=>true,
@@ -982,7 +984,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	    $taskStartTime  = $this->initTaskTimer();
 
         while ($productCategory = $result->fetch()) {
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressArticleCategories', "%s out of %s articles assigned to categories"), $offset, $count),
                     'success'=>true,
@@ -1164,7 +1166,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $offset++;
-            if(time()-$requestTime >= 10)  {
+            if(time()-$requestTime >= $this->max_execution)  {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressTranslations', "%s out of %s translations imported"), $offset, $count),
                     'success'=>true,
@@ -1373,7 +1375,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressProducts', "%s out of %s products imported"), $offset, $count),
                     'success'=>true,
@@ -1534,7 +1536,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('configuratorProgress', "%s out of %s configurators imported"), $offset, $count),
                     'success'=>true,
@@ -1647,68 +1649,84 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			'progress'=>-1
 		));
 
-		// Get products with attributes
-		$result = $this->Source()->queryProductProperties($offset);
-		error_log($result->rowCount());
+		// Get ids of products with properties
+		$result = $this->Source()->queryProductsWithProperties($offset);
 		if ($result->rowCount() === 0) {
 			echo $done;
 			return;
 		}
 
         $count = $result->rowCount()+$offset;
-		$count = $this->Source()->getEstimation('properties');
 		$taskStartTime  = $this->initTaskTimer();
 
-        while ($property = $result->fetch()) {
+		// Iterate those products, get properties, import them
+        while ($product = $result->fetch()) {
             // Skip products which have not been imported before
-            $productId = $this->getBaseArticleInfo($property['productID']);
-            if (false === $productId || empty($property['option']) || empty($property['value'])) {
+            $productId = $this->getBaseArticleInfo($product['productID']);
+            if (false === $productId) {
 	            $offset++;
                 continue;
             }
+
+	        // Get product's properties
+	        $property_result = $this->Source()->queryProductProperties($product['productID']);
+	        $options = array();
+	        $groupName = '';
+
+	        // Build nested array of properties
+	        while ($property = $property_result->fetch()) {
+		        // Skip empty properties
+				if (empty($property['option']) || empty($property['value'])) {
+	                continue;
+	            }
+
+		        // Create new element or extend existing
+		        if (!array_key_exists($property['option'], $options)) {
+					$options[$property['option']] = array('name' => $property['option'], values => array(array('value' => $property['value'])));
+		        } else {
+			        array_push($options[$property['option']]['values'], array('value' => $property['value']) );
+		        }
+
+		        // In SW a product can only have *ONE* property group associated
+		        $groupName = $property['group'];
+	        }
+
 	        $data = array(
 		        'productID' => $productId,
 		        'group' => array(
-			        'name' => $property['group'],
-					'options' => array(
-						array(
-							'name' => $property['option'],
-							'values' => array(
-								array('value' => $property['value'])
-							)
-						)
-					)
+			        'name' => $groupName,
+					'options' => $options
 		        )
 	        );
 
+	        // Actually import the properties
 			$this->Helpers()->importProductProperty($data);
 
 		    $offset++;
-	        if(time()-$requestTime >= 10) {
+	        if(time()-$requestTime >= $this->max_execution) {
 	            echo Zend_Json::encode(array(
 	                'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
 	                'success'=>true,
 	                'offset'=>$offset,
 	                'progress'=>$offset/$count,
-	             'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+	                'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
 	                'task_start_time' => $taskStartTime
 	            ));
 	            return;
 	        }
 		}
 
-		  echo Zend_Json::encode(array(
-		      'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
-		      'success'=>true,
-		      'offset'=>$offset,
-		      'progress'=>$offset/$count,
-		   'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
-		      'task_start_time' => $taskStartTime
-		  ));
-      return;
+//		  echo Zend_Json::encode(array(
+//		      'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
+//		      'success'=>true,
+//		      'offset'=>$offset,
+//		      'progress'=>$offset/$count,
+//		   'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
+//		      'task_start_time' => $taskStartTime
+//		  ));
+//      return;
 
-
-//		echo $done;
+		echo $done;
 
 	}
 
@@ -1791,7 +1809,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
             }
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressCustomers', "%s out of %s customers imported"), $offset, $count),
                     'success'=>true,
@@ -1964,7 +1982,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressOrders', "%s out of %s orders imported"), $offset, $count),
                     'success'=>true,
@@ -2093,7 +2111,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             Shopware()->Db()->insert('s_order_details', $data);
 
             $offset++;
-            if(time()-$requestTime >= 10) {
+            if(time()-$requestTime >= $this->max_execution) {
                 echo Zend_Json::encode(array(
                     'message'=>sprintf($this->namespace->get('progressOrderDetails', "%s out of %s order details imported"), $offset, $count),
                     'success'=>true,
