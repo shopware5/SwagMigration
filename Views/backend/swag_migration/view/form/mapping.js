@@ -77,6 +77,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
             order_status: '{s name=group/orderStatus}Order status{/s}',
             tax_rate: '{s name=group/taxRate}Tax rate{/s}',
             attribute: '{s name=group/attribute}Attribute{/s}',
+            property_options: '{s name=group/propertyOptions}Property options{/s}',
             other: '{s name=group/other}Other{/s}'
         }
     },

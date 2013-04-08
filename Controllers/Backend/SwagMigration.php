@@ -1661,7 +1661,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 		// Get ids of products with properties
 		$result = $this->Source()->queryProductsWithProperties($offset);
-		if ($result->rowCount() === 0) {
+		if (!$result || $result->rowCount() === 0) {
 			echo $done;
 			return;
 		}
