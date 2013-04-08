@@ -182,7 +182,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         config.tasks = total;
 
         mappingStore.each(function(record){
-            if(record.get('mapping') == 0) {
+            if(record.get('mapping') == 0 || record.get('mapping') == 'Bitte wählen') {
                 config[record.get('group')+'['+record.get('internalId')+']'] = "";
             } else {
                 config[record.get('group')+'['+record.get('internalId')+']'] = record.get('mapping');

@@ -37,6 +37,16 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
      */
     protected $db_prefix = 's_';
 
+	/**
+	 * Returns the property options of the shop
+	 */
+	public function getPropertyOptionSelect()
+	{
+		return "
+			SELECT name as name, name as id FROM {$this->quoteTable('filter')}
+		";
+	}
+
     /**
    	 * Returns the sql statement to select default shopware language
    	 * @return string {String} | sql for default language

@@ -99,6 +99,16 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 		return $keys;
 	}
 
+	/**
+	 * Returns the property options of the shop
+	 */
+	public function getPropertyOptionSelect()
+	{
+		return "
+			SELECT OXTITLE as name, OXTITLE as id FROM {$this->quoteTable('attribute')}
+		";
+	}
+
     /**
    	 * Returns the sql statement to select the shop system sub shops
    	 * @return string {String} | sql for sub shops
@@ -216,7 +226,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 		return "
 			SELECT
 				p.OXID				as productID,
-				'Properties'		as 'group',
+				''					as 'group',
 				a.OXTITLE			as 'option',
 				o2a.OXVALUE			as 'value'
 

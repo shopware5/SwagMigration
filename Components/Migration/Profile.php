@@ -278,6 +278,18 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->fetchPairs($this->getPriceGroupSelect());
 	}
 
+	/**
+    * Returns the payment, selected by the profile  sql
+    * @return array
+    */
+	public function getProperties()
+	{
+		if(!method_exists($this, 'getPropertyOptionSelect')) {
+			return;
+		}
+		return $this->db->fetchPairs($this->getPropertyOptionSelect());
+	}
+
     /**
      * Returns the payment, selected by the profile  sql
      * @return array

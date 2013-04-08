@@ -554,6 +554,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'attribute', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
 
+		$target = self::setAliases($this->Target()->getProperties());
+		$attributes = self::mapArrays($this->Source()->getProperties(), $target);
+		foreach ($attributes as $id=>$name) {
+			$rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'property_options', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
+		}
+
+
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
@@ -589,6 +596,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             case 'attribute':
                 $values = $this->Target()->getAttributes();
                 break;
+	        case 'property_options':
+		        $values = $this->Target()->getProperties();
+		        break;
             default:
                 break;
         }
@@ -1680,27 +1690,37 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	                continue;
 	            }
 
+		        // In SW a product can only have *ONE* property group associated
+		        if(empty($property['group'])
+			        && isset($this->Request()->property_options[$property['option']])
+			        && !empty($this->Request()->property_options[$property['option']])
+		        ) {
+			        $property['group'] = $this->Request()->property_options[$property['option']];
+                } else {
+			        $property['group'] = 'Properties';
+		        }
+		        $groupName = $property['group'];
+
 		        // Create new element or extend existing
 		        if (!array_key_exists($property['option'], $options)) {
 					$options[$property['option']] = array('name' => $property['option'], values => array(array('value' => $property['value'])));
 		        } else {
-			        array_push($options[$property['option']]['values'], array('value' => $property['value']) );
+			        array_push($options[$property['option']]['values'], array('value' => $property['value']));
 		        }
-
-		        // In SW a product can only have *ONE* property group associated
-		        $groupName = $property['group'];
 	        }
 
-	        $data = array(
-		        'productID' => $productId,
-		        'group' => array(
-			        'name' => $groupName,
-					'options' => $options
-		        )
-	        );
+	        if (!empty($groupName)) {
+		        $data = array(
+			        'productID' => $productId,
+			        'group' => array(
+				        'name' => $groupName,
+						'options' => $options
+			        )
+		        );
 
-	        // Actually import the properties
-			$this->Helpers()->importProductProperty($data);
+		        // Actually import the properties
+				$this->Helpers()->importProductProperty($data);
+	        }
 
 		    $offset++;
 	        if(time()-$requestTime >= $this->max_execution) {
@@ -1715,16 +1735,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	            return;
 	        }
 		}
-
-//		  echo Zend_Json::encode(array(
-//		      'message'=>sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $offset, $count),
-//		      'success'=>true,
-//		      'offset'=>$offset,
-//		      'progress'=>$offset/$count,
-//		   'estimated' => (time()-$taskStartTime)/$offset * ($count-$offset),
-//		      'task_start_time' => $taskStartTime
-//		  ));
-//      return;
 
 		echo $done;
 
