@@ -918,7 +918,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 if (false !== $target_parent) {
                     $category['parent'] = $target_parent;
                 } else {
-                    error_log("Parent category not found");
+                    error_log("Parent category not found: {$category['parentID']}");
                     $offset++;
                     continue;
                 }

@@ -70,6 +70,26 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		return $this->getShopSelect();
 	}
 
+	public function getPropertyOptionSelect()
+	{
+		return "
+			SELECT
+
+				eav.attribute_code as 'name',
+				eav.attribute_code as 'id'
+
+			-- Attribute configuration
+			FROM {$this->quoteTable('catalog_eav_attribute', 'eav_settings')}
+
+			-- Actual attributes
+            INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+            ON eav.attribute_id=eav_settings.attribute_id
+            AND eav.is_user_defined=1
+
+			WHERE  eav_settings.is_filterable = 1
+		";
+	}
+
 	/**
 	 * Returns the sql statement to select the shop system sub shops
 	 * @return string {String} | sql for sub shops
@@ -134,6 +154,46 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	}
 
+	/**
+	 * Returns the sql statement to select articles with
+	 * @return string
+	 */
+	public function getProductPropertiesSelect($id)
+	{
+		return "
+            SELECT
+
+				p.entity_id                             as productID,
+                eav.attribute_code                      as 'option',
+                option_value.value                      as 'value'
+
+            -- The actual product
+            FROM catalog_product_entity p
+
+            -- Maps Articles to attributes
+            INNER JOIN catalog_product_entity_int entity_int
+            ON entity_int.entity_id=p.entity_id
+
+            -- Actual attributes (groups) with names
+            INNER JOIN eav_attribute eav
+            ON eav.attribute_id=entity_int.attribute_id
+            AND eav.is_user_defined=1
+
+			-- Only get filterable attributes
+			INNER JOIN catalog_eav_attribute eav_settings
+			ON eav_settings.attribute_id = eav.attribute_id
+			AND eav_settings.is_filterable = 1
+
+            -- Joins article option relation
+            INNER  JOIN eav_attribute_option_value option_value
+            ON option_value.option_id=entity_int.value
+            AND option_value.store_id=0
+
+            WHERE p.entity_type_id =  {$this->getEntityTypeId('catalog_product')}
+            AND p.entity_id = {$id}
+		";
+	}
+
     /**
      * Returns the entity type id for a given type
      * @param $type
@@ -148,6 +208,26 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
         ");
     }
 
+	public function getProductsWithPropertiesSelect()
+	{
+		return "
+			SELECT DISTINCT
+
+	      		entity_int.entity_id                                    as productID
+
+			FROM {$this->quoteTable('catalog_product_entity_int', 'entity_int')}
+
+			-- Inner Join product attributes
+			INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+			ON entity_int.attribute_id = eav.attribute_id
+			AND eav.entity_type_id =  {$this->getEntityTypeId('catalog_product')}
+
+			-- Inner Join settings with is_filterable=1
+			INNER JOIN {$this->quoteTable('catalog_eav_attribute', 'eav_settings')}
+			ON eav.attribute_id = eav_settings.attribute_id
+			AND eav_settings.is_filterable=1
+		";
+	}
 
 	/**
 	 * Returns the sql statement to select the shop system article attributes
@@ -177,7 +257,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getAdditionalProductSelect($productId)
     {
-        return "
+        return  "
             SELECT
 
             p.entity_id                                    as productID,
@@ -396,6 +476,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 					IF(entity_id=g.`root_category_id`, 0, entity_id) as categoryID,
 					IF(parent_id=g.`root_category_id`, 0, parent_id) as parentID,
 					s.`store_id` as languageID,
+					c.level,
 					c.name as description,
 					c.position as position,
 					c.meta_keywords as metaKeywords,
@@ -414,7 +495,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
                 ORDER BY parentID ASC
 			";
 		}
-		return '('.implode(') UNION ALL (', $sql).')'.' ORDER BY languageID ASC, parentID ASC';
+		return  '('.implode(') UNION ALL (', $sql).')'.' ORDER BY languageID ASC, level, parentID ASC';
 	}
 
 	/**
