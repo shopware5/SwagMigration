@@ -257,7 +257,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getAdditionalProductSelect($productId)
     {
-        return "
+        return  "
             SELECT
 
             p.entity_id                                    as productID,
