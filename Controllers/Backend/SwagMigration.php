@@ -1785,7 +1785,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
 	        if(!empty($customer['md5_password']) && !empty($salt)) {
-		        $customer['md5_password'] = $customer['md5_password'] . "__" . $salt;
+		        $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
 	        }
 
             if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
