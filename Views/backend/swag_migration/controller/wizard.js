@@ -114,6 +114,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
     onNavigate: function(panel, direction) {
         var me = this,
             layout = panel.getLayout(),
+            items = layout.getLayoutItems(),
+            databaseCard = items[0],
+            databaseValues = databaseCard.getForm().getValues(),
+            profile = databaseValues.profile,
             activeCard = layout.getActiveItem();
         
         switch(direction) {
@@ -139,6 +143,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     case 1:
                         layout.next();
                         me.checkLayoutButtons(panel);
+                        if ("PrestaShop" == profile) {
+                            activeCard = layout.getActiveItem();
+                            activeCard.setSaltInputNeeded(true);
+                        }
                         break;
                     case 2:
                         me.startImport();

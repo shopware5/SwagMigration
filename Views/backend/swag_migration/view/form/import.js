@@ -58,7 +58,10 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
      */
     cls: 'shopware-form',
 
-
+    /**
+     * will be set to true if the current profile needs an additional salt to be entered by the user
+     */
+    saltInputNeeded: false,
 
     /**
 	 * The initComponent template method is an important initialization step for a Component.
@@ -217,6 +220,20 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             }
         });
 
+        me.saltInput = Ext.create('Ext.form.field.Text', {
+            fieldLabel: '{s name=saltInput}Password Salt{/s}',
+            name: 'salt',
+            value: '',
+            labelWidth: 250,
+            allowBlank: true,
+            helpText: "{s name=saltInputHelp}The destination shop uses a salt to make its password more secure. In this special case the salt cannot be read automatically. Please copy the salt from /destination_shop/config/settings.inc.php to this field. It is defined as 'COOKIE KEY' there.{/s}",
+            hidden: !me.saltInputNeeded,
+            listeners: {
+                change: function() {
+                    me.fireEvent('validate');
+                }
+            }
+        });
 
         return [{
             fieldLabel: '{s name=importArticleImages}Import product images{/s}',
@@ -226,13 +243,30 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 change: function(checkBox, newValue, oldValue, eOpts) {
                     // if the product images are going to be imported, the basePath field is mandatory
                     me.basePath.allowBlank = !newValue;
+                    if(newValue) {
+                        me.basePath.show();
+                    }else{
+                        me.basePath.hide();
+                    }
                     me.fireEvent('validate');
                 }
             }
         }, {
             fieldLabel: '{s name=importCustomers}Import customers{/s}',
             name: 'import_customers',
-            xtype: 'checkbox'
+            xtype: 'checkbox',
+            listeners: {
+                change: function(checkBox, newValue, oldValue, eOpts) {
+                    if(newValue && me.saltInputNeeded) {
+                        me.saltInput.show();
+                        me.saltInput.allowBlank = false;
+                    }else{
+                        me.saltInput.hide();
+                        me.saltInput.allowBlank = true;
+                    }
+                    me.fireEvent('validate');
+                }
+            }
         }, {
             fieldLabel: '{s name=importRatings}Import ratings{/s}',
             name: 'import_ratings',
@@ -264,7 +298,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 }
             }
         },
-            me.basePath
+            me.basePath,
+            me.saltInput
         ];
 
     },
@@ -302,6 +337,20 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         return [radioGroup];
 
+    },
+
+    setSaltInputNeeded: function(value) {
+        var me = this;
+
+        me.saltInputNeeded = value;
+
+        if(value) {
+            me.saltInput.show();
+            me.saltInput.allowBlank = false;
+        }else{
+            me.saltInput.hide();
+            me.saltInput.allowBlank = true;
+        }
     }
 
 

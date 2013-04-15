@@ -572,7 +572,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				telephone.value							as phone,
 				fax.value								as fax,
 				dob.value 								as birthday,
-				-- password_hash.value 					as password,
+				password_hash.value 					as md5_password,
+				'magento'								as hashType,
 				taxvat.value 							as ustid,
 				IF(newsletter.subscriber_id, 1, 0)		as newsletter
 			
@@ -622,7 +623,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				o.`customer_taxvat`							as ustid,
 				ba.`telephone`								as phone,
 				ba.`fax`									as fax,
-				
+
 				ba.`company`								as billing_company,
 				ba.`firstname`								as billing_firstname,
 				ba.`lastname`								as billing_lastname,

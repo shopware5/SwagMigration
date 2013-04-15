@@ -1749,6 +1749,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
+	    $salt = $this->Request()->salt;
+
         if ($this->printCurrentImportMessage('Customers')) {
             return;
         }
@@ -1782,6 +1784,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $customer['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
+	        if(!empty($customer['md5_password']) && !empty($salt)) {
+		        $customer['md5_password'] = $customer['md5_password'] . "__" . $salt;
+	        }
 
             if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
                 $customer_shipping = array(

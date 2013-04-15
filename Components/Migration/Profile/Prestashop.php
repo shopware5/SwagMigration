@@ -406,6 +406,7 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				u.newsletter        								as newsletter,
 
 				u.passwd 								            as md5_password,
+				'prestashop'										as hashType,
 
 				u.id_default_group									as customergroupID,
 
