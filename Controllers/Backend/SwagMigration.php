@@ -37,6 +37,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	 */
 	protected $helpers;
 
+    protected $categoryLanguageSeparator = '_LANG_';
+
     /**
      * Source shop system profile
      * @var Shopware_Components_Migration_Profile
@@ -881,6 +883,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             return;
         }
 
+
         $skip = false;
 
 		// Cleanup previous category imports
@@ -897,11 +900,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         while (!$skip && $category = $categories->fetch()) {
 			//check if the category split into the different translations
-            if(!empty($category['languageID'])&& strpos($category['categoryID'], '_')===false) {
-                $category['categoryID'] = $category['categoryID'].'_'.$category['languageID'];
+            if(!empty($category['languageID'])&& strpos($category['categoryID'], $this->categoryLanguageSeparator)===false) {
+                $category['categoryID'] = $category['categoryID'] . $this->categoryLanguageSeparator . $category['languageID'];
 
 				if(!empty($category['parentID'])) {
-                    $category['parentID'] = $category['parentID'].'_'.$category['languageID'];
+                    $category['parentID'] = $category['parentID'] . $this->categoryLanguageSeparator . $category['languageID'];
                 }
             }
 
@@ -918,7 +921,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 if (false !== $target_parent) {
                     $category['parent'] = $target_parent;
                 } else {
-                    error_log("Parent category not found: {$category['parentID']}");
+                    error_log("Parent category not found: {$category['parentID']}. Will not create '{$category['description']}'");
                     $offset++;
                     continue;
                 }
@@ -1027,7 +1030,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
             // Also take language categories into account
-            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'].'_%'));
+            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'] . $this->categoryLanguageSeparator.'%'));
 
             if(empty($categories)) {
                 continue;
