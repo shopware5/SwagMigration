@@ -226,7 +226,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         TRUNCATE s_order_esd;
         TRUNCATE s_order_history;
         TRUNCATE s_order_notes;
-        TRUNCATE s_order_number;
         ";
 
         Shopware()->Db()->query($sql);
