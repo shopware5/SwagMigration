@@ -80,7 +80,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		);
 	}
 
-	public function update()
+	public function update($version)
 	{
 		// Clean up the migration table in order to not have duplicate entries
 		$sql = '
@@ -121,6 +121,21 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 				'message' => "Update failed. Please clear the content of the table s_plugin_migration. After that run the update again."
 				);
 		}
+
+        // Make sure that s_order_number is valid
+        $sql = "
+            INSERT IGNORE INTO `s_order_number` (`number`, `name`, `desc`) VALUES
+            (30004, 'user', 'Kunden'),
+            (30002, 'invoice', 'Bestellungen'),
+            (30000, 'doc_1', 'Lieferscheine'),
+            (30000, 'doc_2', 'Gutschriften'),
+            (30000, 'doc_0', 'Rechnungen'),
+            (20001, 'articleordernumber', 'Artikelbestellnummer  '),
+            (20000, 'sSERVICE1', 'Service - 1'),
+            (20000, 'sSERVICE2', 'Service - 2'),
+            (210, 'blogordernumber', 'Blog - ID');
+        ";
+        Shopware()->Db()->query($sql);
 
 		return true;
 
@@ -222,7 +237,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * @return string
      */
     public function getVersion() {
-        return '2.1.1';
+        return '2.1.2';
     }
 
     /**
