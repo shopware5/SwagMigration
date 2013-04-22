@@ -736,6 +736,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
+    /**
+     * Helper function to format image names the way the media resource expects it
+     * @param $name
+     * @return string
+     */
+    private function removeSpecialCharacters($name)
+    {
+        $name = iconv('utf-8', 'ascii//translit', $name);
+        $name = strtolower($name);
+        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
+        $name = preg_replace('#-{2,}#', '-', $name);
+        $name = trim($name, '-');
+        return mb_substr($name, 0, 180);
+    }
+
 	/**
 	 * Copy the article images from the source shop system into the shopware image path
 	 * @return
@@ -761,6 +776,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			if (!isset($image['name'])) {
 				$image['name'] = basename($image['image']);
 			}
+            $image['name'] = $this->removeSpecialCharacters($image['name']);
 
             $sql = '
                 SELECT ad.articleID
@@ -1907,7 +1923,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
                 'taxfree' => !empty($order['tax_free']) ? 1 : 0,
                 'referer' => isset($order['referer']) ? $order['referer'] : '',
-                'cleareddate' => isset($order['cleared_date']) ? $order['cleared_date'] : NULL,
+                'cleareddate' => isset($order['cleared_date']) ? $order['cleared_date'] : null,
                 'trackingcode' => isset($order['trackingID']) ? $order['trackingID'] : '',
                 'language' => !empty($order['languageID']) ? $order['languageID'] : 'de',
                 'dispatchID' => !empty($order['dispatchID']) ? (int) $order['dispatchID'] : 0,
@@ -1918,7 +1934,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             );
 
             if($data['cleareddate'] === '0000-00-00 00:00:00') {
-                $data['cleareddate'] = NULL;
+                $data['cleareddate'] = null;
             }
 
             if(!empty($order['orderID'])) {
