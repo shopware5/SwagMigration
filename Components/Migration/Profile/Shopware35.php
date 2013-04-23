@@ -29,7 +29,7 @@
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Components_Migration_Profile
+class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Components_Migration_Profile
 {
     /**
      * Prefix of each shopware 3.5.0 database table.
@@ -115,7 +115,15 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 od.price,
                 od.quantity,
                 od.taxID as tax,
-                od.modus
+                od.modus,
+
+				od.od_attr1                                  as attr1,
+				od.od_attr2                                  as attr2,
+				od.od_attr3                                  as attr3,
+				od.od_attr4                                  as attr4,
+				od.od_attr5                                  as attr5,
+				od.od_attr6                                  as attr6
+
             FROM {$this->quoteTable('order_details')} od
 
         ";
@@ -250,18 +258,46 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
     }
 
 
-
     /**
    	 * Returns the sql statement to select the shop system categories
    	 * @return string {String} | sql for the categories
    	 */
     public function getCategorySelect()
     {
+        
+        $sql = "
+            SELECT id, isocode as parentID
+            FROM {$this->quoteTable('core_multilanguage')}
+        ";
+
+        $shops = $this->Db()->fetchAssoc($sql);
+
+        $parent_template = "IF(cat_parent.parent=%s, '%s', %s) as parentID";
+        $language_template = "IF(cat_parent.parent=%s, '%s', %s) as languageID";
+
+        $parent_select = "%s";
+        $language_select = "%s";
+        foreach ($shops as $row) {
+            $current_parent = sprintf($parent_template, $row['id'], '', '%s');
+            $parent_select = sprintf($parent_select, $current_parent);
+
+            $current_language = sprintf($language_template, $row['id'], $row['parentID'], '%s');
+            $language_select = sprintf($language_select, $current_language);
+        }
+        $parent_select = sprintf($parent_select, 'cat.parent');
+        $language_select = sprintf($language_select, 0);
+
+        error_log($parent_select);
+        error_log($language_select);
+
+
+        $where = 'WHERE cat.parent NOT IN ('. implode(', ', array_keys($shops)) . ')';
+
         return "
             SELECT
                 cat.id as categoryID,
-                IF(cat.parent=1, 0, cat.parent) as parentID,
-                '0' as languageID,
+                $parent_select,
+                $language_select,
                 cat.description,
                 cat.position,
                 cat.metakeywords,
@@ -270,7 +306,19 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 cat.cmstext,
                 cat.active
 			FROM {$this->quoteTable('categories')} cat
-			ORDER BY 1
+
+			LEFT JOIN {$this->quoteTable('categories', 'cat_parent')}
+			ON cat_parent.id = cat.parent
+
+            LEFT JOIN {$this->quoteTable('core_multilanguage', 'm')}
+            ON cat_parent.id = m.parentID
+
+			{$where}
+
+            -- Sort out languages which have no shop associated
+            AND (cat_parent.parent != 1 || m.parentID IS NOT NULL)
+
+            ORDER BY parentID ASC
 		";
     }
 
@@ -290,15 +338,20 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
 					a.description_long,
 					a.description,
 					a.keywords,
+					a.laststock,
 					ad.suppliernumber as supplier,
 					ad.weight,
 					ad.instock,
 					ad.stockmin,
 					a.minpurchase,
 					a.maxpurchase,
-					a.taxID
+					a.taxID,
+				    a.releasedate         				as releasedate
+
+
+
 			FROM {$this->quoteTable('articles_details')} ad
-                JOIN {$this->quoteTable('articles')} a ON (a.id = ad.articleID AND ad.kind = 1)
+            JOIN {$this->quoteTable('articles')} a ON (a.id = ad.articleID AND ad.kind = 1)
         ";
 
     }
@@ -317,7 +370,7 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 od.userID                                   as customerID,
                 od.paymentID,
                 od.dispatchID,
-                od.status                                   as statusID,
+                od.status                                   as status,
                 od.customercomment,
                 od.currency,
                 od.currencyFactor,
@@ -326,6 +379,7 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 ob.ustid,
                 ob.phone,
                 ob.fax,
+                od.`language`								        as languageID,
 
 				ob.`company`								as billing_company,
 				ob.`firstname`								as billing_firstname,
@@ -348,15 +402,27 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
 				od.invoice_amount_net       				as invoice_amount_net,
 				od.invoice_amount							as invoice_amount,
 				od.invoice_shipping			    			as invoice_shipping,
-				od.invoice_shipping_net	    				as invoice_shipping_net
+				od.invoice_shipping_net	    				as invoice_shipping_net,
+
+				od.o_attr1                                  as attr1,
+				od.o_attr2                                  as attr2,
+				od.o_attr3                                  as attr3,
+				od.o_attr4                                  as attr4,
+				od.o_attr5                                  as attr5,
+				od.o_attr6                                  as attr6
 
 			FROM {$this->quoteTable('order')} od
-			    JOIN {$this->quoteTable('order_billingaddress')} ob ON (ob.orderID = od.id)
-			    JOIN {$this->quoteTable('order_shippingaddress')} os ON (os.orderID = od.id)
-                LEFT JOIN {$this->quoteTable('core_countries')} bc
-                    ON (bc.id = ob.countryID)
-                LEFT JOIN {$this->quoteTable('core_countries')} sc
-                    ON (sc.id = os.countryID)
+            INNER JOIN {$this->quoteTable('order_billingaddress')}ob
+            ON (ob.orderID = od.id)
+
+            INNER JOIN {$this->quoteTable('order_shippingaddress')} os
+            ON (os.orderID = od.id)
+
+            LEFT JOIN {$this->quoteTable('core_countries')} bc
+            ON (bc.id = ob.countryID)
+
+            LEFT JOIN {$this->quoteTable('core_countries')} sc
+            ON (sc.id = os.countryID)
 
 		";
     }
@@ -377,6 +443,7 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 us.lastlogin,
                 us.active,
                 us.customergroup as customergroupID,
+                us.password 							as md5_password,
 
 				bill.salutation                             as billing_salutation,
 				bill.`company`								as billing_company,
@@ -386,15 +453,17 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
 				bill.`city` 								as billing_city,
 				bc.countryiso							    as billing_countryiso,
 				bill.`zipcode`								as billing_zipcode,
+                bill.`streetnumber`							as billing_streetnumber,
 
 				ship.`company`								as shipping_company,
-				ship.`firstname`								as shipping_firstname,
-				ship.`lastname` 								as shipping_lastname,
+				ship.`firstname`							as shipping_firstname,
+				ship.`lastname` 							as shipping_lastname,
 				ship.`street` 								as shipping_street,
 				ship.`city`									as shipping_city,
 				sc.countryiso								as shipping_countryiso,
 				ship.`zipcode`								as shipping_zipcode,
 				ship.salutation	                        	as shipping_salutation,
+				ship.`streetnumber`							as shipping_streetnumber,
 
                 bill.phone,
                 bill.fax,
@@ -403,14 +472,18 @@ class Shopware_Components_Migration_Profile_Shopware350 extends Shopware_Compone
                 us.newsletter
 
             FROM {$this->quoteTable('user')} us
-                LEFT JOIN {$this->quoteTable('user_billingaddress')} bill
-                    ON (bill.userID = us.id)
-                LEFT JOIN {$this->quoteTable('user_shippingaddress')} ship
-                    ON (ship.userID = us.id)
-                LEFT JOIN {$this->quoteTable('core_countries')} bc
-                    ON (bc.id = bill.countryID)
-                LEFT JOIN {$this->quoteTable('core_countries')} sc
-                    ON (sc.id = ship.countryID)
+
+            LEFT JOIN {$this->quoteTable('user_billingaddress')} bill
+            ON (bill.userID = us.id)
+
+            LEFT JOIN {$this->quoteTable('user_shippingaddress')} ship
+            ON (ship.userID = us.id)
+
+            LEFT JOIN {$this->quoteTable('core_countries')} bc
+            ON (bc.id = bill.countryID)
+
+            LEFT JOIN {$this->quoteTable('core_countries')} sc
+            ON (sc.id = ship.countryID)
 		";
     }
 
