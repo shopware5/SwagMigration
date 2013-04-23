@@ -44,7 +44,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    	 */
    	public function getProductImagePath()
    	{
-        return '/images/articles';
+        return 'images/articles/';
    	}
 
     /**
@@ -287,10 +287,6 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
         $parent_select = sprintf($parent_select, 'cat.parent');
         $language_select = sprintf($language_select, 0);
 
-        error_log($parent_select);
-        error_log($language_select);
-
-
         $where = 'WHERE cat.parent NOT IN ('. implode(', ', array_keys($shops)) . ')';
 
         return "
@@ -496,7 +492,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
         return "
             SELECT
                 ai.articleID as productID,
-                ai.img as image,
+                CONCAT(ai.img, '.jpg') as image,
                 ai.description,
                 ai.position,
                 ai.main

@@ -22,6 +22,77 @@
  * our trademarks remain entirely with us.
  */
 
+class DbDecorator {
+    protected $instance;
+
+    protected $loggable = array(
+        'fetchOne',
+        'fetchCol',
+        'fetchPairs',
+        'fetchAll',
+        'fetchAssoc',
+        'query',
+        'execute'
+    );
+
+    public function __construct($instance)
+    {
+        $this->instance = $instance;
+    }
+
+    public function __call($method, $args)
+    {
+        $callers = debug_backtrace();
+        $caller = $callers[2]['function'];
+
+        if (in_array($method, $this->loggable)) {
+            $begin_line = '===============' . $caller . '===============';
+            $this->debug($begin_line);
+            $this->debug($args[0]);
+        }
+
+        $start = microtime();
+        $result = call_user_func_array(array($this->instance, $method), $args);
+        $duration = microtime() - $start;
+
+        if (in_array($method, $this->loggable)) {
+            $this->debug("Duration: " . $duration);
+            $this->debug(str_repeat('=', strlen($begin_line)));
+        }
+
+        return $result;
+
+    }
+
+    public function __get($key) {
+        return $this->instance->$key;
+    }
+
+    public function __set($key, $value) {
+        return $this->instance->$key = $value;
+    }
+
+    /**
+     * Simple logger which writes all queries to the file system
+     * @param $data
+     * @param $suffix
+     */
+    public function debug($data, $suffix = null)
+    {
+        $base = Shopware()->DocPath('media_' . 'temp');
+        $path = $base . 'migration';
+        if ($suffix) {
+            $path .= '_' . $suffix;
+        }
+        $path .= '.log';
+
+
+        error_log(print_r($data, true)."\r\n", '3', $path);
+
+    }
+
+}
+
 /**
  * Shopware SwagMigration Components - Profile
  *
@@ -70,12 +141,22 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 	protected $default_limit = 1000;
 
     /**
+     * Enable debugging?
+     * @var bool
+     */
+    protected $debugging_enabled = true;
+
+    /**
      * Class constructor to open the database connection
      * @param $config
      */
 	public function __construct($config)
 	{
-		$this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
+        if ($this->debugging_enabled) {
+            $this->db = new DbDecorator(Enlight_Components_Db::factory($this->db_adapter, $config));
+        } else {
+            $this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
+        }
     	$this->db->getConnection();
     	if(isset($config['prefix'])) {
     		$this->db_prefix = $config['prefix'];
