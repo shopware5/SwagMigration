@@ -131,16 +131,6 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
 	}
 
 
-
-
-
-
-
-
-
-
-
-
     /**
    	 * Returns the sql statement to select default shopware language
    	 * @return string {String} | sql for default language
@@ -314,7 +304,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
             -- Sort out languages which have no shop associated
             AND (cat_parent.parent != 1 || m.parentID IS NOT NULL)
 
-            ORDER BY parentID ASC
+            ORDER BY parentID ASC, position ASC
 		";
     }
 
@@ -323,7 +313,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    	 * @return string {String} | sql for the articles
    	 */
     public function getProductSelect()
-    { 
+    {
         return "
             SELECT
                     a.id as productID,
