@@ -1923,7 +1923,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
                 'taxfree' => !empty($order['tax_free']) ? 1 : 0,
                 'referer' => isset($order['referer']) ? $order['referer'] : '',
-                'cleareddate' => isset($order['cleared_date']) ? $order['cleared_date'] : NULL,
+                'cleareddate' => isset($order['cleared_date']) ? $order['cleared_date'] : null,
                 'trackingcode' => isset($order['trackingID']) ? $order['trackingID'] : '',
                 'language' => !empty($order['languageID']) ? $order['languageID'] : 'de',
                 'dispatchID' => !empty($order['dispatchID']) ? (int) $order['dispatchID'] : 0,
@@ -1934,7 +1934,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             );
 
             if($data['cleareddate'] === '0000-00-00 00:00:00') {
-                $data['cleareddate'] = NULL;
+                $data['cleareddate'] = null;
             }
 
             if(!empty($order['orderID'])) {
