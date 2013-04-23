@@ -32,7 +32,7 @@
 class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Components_Migration_Profile
 {
     /**
-     * Prefix of each shopware 3.5.0 database table.
+     * Prefix of each shopware 3.5.7 database table.
      * @var string
      */
     protected $db_prefix = 's_';

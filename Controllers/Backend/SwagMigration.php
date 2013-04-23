@@ -2160,16 +2160,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['taxID'] = Shopware()->Db()->fetchOne($sql , array($order['articleID']));
             }
 
-            $data_attributes = array(
-                'detailID'    => $order['orderID'],
-                'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
-                'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
-                'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
-                'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
-                'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
-                'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
-            );
-
             $data = array(
                 'orderID' => $order['orderID'],
                 'articleID' => isset($order['articleID']) ? (int) $order['articleID'] : 0,
@@ -2189,6 +2179,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             Shopware()->Db()->insert('s_order_details', $data);
+
+            $data_attributes = array(
+                'detailID'    => Shopware()->Db()->lastInsertId(),
+                'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
+                'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
+                'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
+                'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
+                'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
+                'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
+            );
             Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
 
 

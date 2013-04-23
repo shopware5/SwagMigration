@@ -42,11 +42,17 @@ class DbDecorator {
 
     public function __call($method, $args)
     {
-        $callers = debug_backtrace();
-        $caller = $callers[2]['function'];
-
         if (in_array($method, $this->loggable)) {
-            $begin_line = '===============' . $caller . '===============';
+            $callers = debug_backtrace();
+            $caller = array_map(
+                function ($arr) {
+                    return $arr['function'];
+                },
+                array_reverse(array_slice($callers, 1, 5))
+            );
+            $caller = implode('=>', $caller);
+
+            $begin_line = '===== ' . $caller . ' ======';
             $this->debug($begin_line);
             $this->debug($args[0]);
         }
@@ -56,7 +62,13 @@ class DbDecorator {
         $duration = microtime() - $start;
 
         if (in_array($method, $this->loggable)) {
+            $rows = 'Unknown';
+            if (method_exists($result, 'rowCount')) {
+                $rows = $result->rowCount();
+            }
+
             $this->debug("Duration: " . $duration);
+            $this->debug("RowCount: " . $rows);
             $this->debug(str_repeat('=', strlen($begin_line)));
         }
 
