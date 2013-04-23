@@ -443,17 +443,28 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	}
 
     /**
+     * Returns the Root-id for the categories
+     */
+    public function getBaseShopId()
+    {
+        $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
+        return $this->db()->fetchOne($sql);
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system categories.
    	 * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
    	 * @return string {String} | sql for the categories
    	 */
 	public function getCategorySelect()
 	{
+        $baseShopId = $this->getBaseShopId();
+
 		$keys = $this->getLanguageKeys();
 		$sql = array("
 			SELECT 
 				c.OXID as categoryID,
-				(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
+				(CASE WHEN c.OXLEFT = 1 THEN '' ELSE c.OXPARENTID END) as parentID,
 				{$this->Db()->quote($keys[0])} as languageID,
 				-- OXSHOPID as shopID,
 				c.OXTITLE as description,
@@ -469,7 +480,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('categories', 'c')}
             LEFT JOIN {$this->quoteTable('object2seodata', 's')}
             ON s.OXOBJECTID = c.OXID
-			WHERE c.OXSHOPID='oxbaseshop'
+			WHERE c.OXSHOPID='{$baseShopId}'
 		");
 		foreach ($keys as $key=>$languageID) {
 			if(empty($key)) {
@@ -494,7 +505,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				FROM {$this->quoteTable('categories', 'c')}
                 LEFT JOIN {$this->quoteTable('object2seodata', 's')}
                 ON s.OXOBJECTID = OXID
-				WHERE c.OXSHOPID='oxbaseshop'
+				WHERE c.OXSHOPID='{$baseShopId}'
 			";
 		}
 		return '('.implode(') UNION ALL (', $sql).') ORDER BY catLeft';

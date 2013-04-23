@@ -736,6 +736,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
     }
 
+    /**
+     * Helper function to format image names the way the media resource expects it
+     * @param $name
+     * @return string
+     */
+    private function removeSpecialCharacters($name)
+    {
+        $name = iconv('utf-8', 'ascii//translit', $name);
+        $name = strtolower($name);
+        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
+        $name = preg_replace('#-{2,}#', '-', $name);
+        $name = trim($name, '-');
+        return mb_substr($name, 0, 180);
+    }
+
 	/**
 	 * Copy the article images from the source shop system into the shopware image path
 	 * @return
@@ -759,8 +774,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
             $image['link'] = $image_path.$image['image'];
 			if (!isset($image['name'])) {
-				$image['name'] = basename($image['image']);
+				$image['name'] = pathinfo(basename($image['image']),  PATHINFO_FILENAME);
 			}
+            $image['name'] = $this->removeSpecialCharacters($image['name']);
 
             $sql = '
                 SELECT ad.articleID
