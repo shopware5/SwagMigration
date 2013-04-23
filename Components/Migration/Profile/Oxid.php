@@ -447,8 +447,13 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
      */
     public function getBaseShopId()
     {
-        $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
-        return $this->db()->fetchOne($sql);
+        try {
+            $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
+            return $this->db()->fetchOne($sql);
+        } catch (Exception $e) {
+            $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = 'oxbaseshop'";
+            return $this->db()->fetchOne($sql);
+        }
     }
 
     /**
