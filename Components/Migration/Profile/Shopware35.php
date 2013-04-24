@@ -308,38 +308,104 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
 		";
     }
 
+
+
+
+    /**
+     * Returns a sql statement which selects additional info for a given productID
+     */
+    public function getAdditionalProductSelect($productId)
+    {
+        return "
+            SELECT
+                GROUP_CONCAT(g.groupname SEPARATOR '|') as variant_group_names,
+                GROUP_CONCAT(go.optionname SEPARATOR '|') as additionaltext,
+
+                If(gv.standard = 1, 1, 0) as        masterWithAttributes,
+                IF(gv.standard = 0, gv_main.ordernumber, NULL) as parentID
+
+            FROM {$this->quoteTable('articles_groups_value')} gv
+
+            INNER JOIN {$this->quoteTable('articles_groups_option')} go
+            ON gv.attr1 = go.optionID
+            OR gv.attr2 = go.optionID
+            OR gv.attr3 = go.optionID
+            OR gv.attr4 = go.optionID
+            OR gv.attr5 = go.optionID
+            OR gv.attr6 = go.optionID
+            OR gv.attr7 = go.optionID
+            OR gv.attr8 = go.optionID
+            OR gv.attr9 = go.optionID
+            OR gv.attr10 = go.optionID
+
+            LEFT JOIN {$this->quoteTable('articles_groups')} g
+            ON g.groupID = go.groupID
+            AND g.articleID = go.articleID
+
+            INNER JOIN {$this->quoteTable('articles_groups_value')} gv_main
+            ON gv_main.articleID = gv.articleID
+            AND gv_main.standard = 1
+
+            WHERE gv.ordernumber = '{$productId}'
+        ";
+    }
+
     /**
    	 * Returns the sql statement to select the shop system articles
    	 * @return string {String} | sql for the articles
    	 */
     public function getProductSelect()
     {
+
         return "
             SELECT
-                    a.id as productID,
-					ad.ordernumber,
-					a.datum as added,
-					a.name,
-					ad.additionaltext,
-					a.description_long,
-					a.description,
-					a.keywords,
-					a.laststock,
-					ad.suppliernumber as supplier,
-					ad.weight,
-					ad.instock,
-					ad.stockmin,
-					a.minpurchase,
-					a.maxpurchase,
-					a.taxID,
-				    a.releasedate         				as releasedate
+                COALESCE(configurator_details.ordernumber, ad.ordernumber) as productID,
+                IF(ad_main.id = ad.id && ad.additionaltext != '', NULL, ad_main.ordernumber) as parentID,
+
+                IF(ad_main.id = ad.id && ad.additionaltext != '', 1, 0) as masterWithAttributes,
+
+                COALESCE(configurator_details.active, a.active) as active,
+
+                COALESCE(configurator_details.ordernumber, ad.ordernumber) as ordernumber,
+                ad.additionaltext,
+
+                a.datum as added,
+                a.name,
+
+                a.description_long,
+                a.description,
+                a.keywords,
+                a.laststock,
+                a.minpurchase,
+                a.maxpurchase,
+                a.taxID,
+                a.releasedate         				as releasedate,
+
+                ad.additionaltext,
+                ad.suppliernumber as supplier,
+                ad.weight,
+                ad.instock,
+                ad.stockmin
 
 
+            -- Get article
+            FROM {$this->quoteTable('articles')} a
 
-			FROM {$this->quoteTable('articles_details')} ad
-            JOIN {$this->quoteTable('articles')} a ON (a.id = ad.articleID AND ad.kind = 1)
+            -- Join all details
+            LEFT JOIN {$this->quoteTable('articles_details')} ad
+            ON a.id = ad.articleID
+
+            -- Join main detail as parent article
+            INNER JOIN {$this->quoteTable('articles_details')} ad_main
+            ON a.id = ad_main.articleID
+            AND ad_main.kind = 1
+
+            LEFT JOIN {$this->quoteTable('articles_groups_value')} configurator_details
+            ON configurator_details.articleID = a.id
+WHERE a.name LIKE '%aufpr%'
+            -- Need to make sure, that the parent details come first
+            ORDER BY ad.kind ASC, configurator_details.standard DESC
         ";
-
     }
 
     /**
@@ -487,6 +553,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 ai.position,
                 ai.main
             FROM {$this->quoteTable('articles_img')} ai
+
             ORDER BY articleID, position
         ";
     }
@@ -519,12 +586,30 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
     {
         return "
                 SELECT
-                    prices.articleID as productID,
-                    prices.from as `from`,
-                    prices.price,
-                    prices.percent,
-                    prices.pricegroup
-                FROM {$this->quoteTable('articles_prices')} prices
+                    COALESCE(ad.ordernumber,gv.ordernumber) as productID,
+                    COALESCE(ap.from               as `from`,
+                    ap.price              as net_price,
+                    ap.percent,
+                    ap.pricegroup
+
+                -- Get all products
+                FROM s_articles a
+
+                -- Get all prices for simple products
+                LEFT JOIN s_articles_prices ON ap
+                ON ap.articleID = a.id
+
+                -- Get simple product details for those prices
+                LEFT JOIN s_articles_details ad
+                ON ad.id = ap.articledetailsID
+
+                -- Get prices for configurator products
+                LEFT JOIN s_articles_groups_prices agp
+                ON agp.articleID = a.id
+
+                LEFT JOIN s_articles_groups_values gv
+                ON gv.valueID = agp.valueID
+
                 ORDER BY articleID, pricegroup, `from`
             ";
     }

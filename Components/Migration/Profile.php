@@ -29,6 +29,7 @@ class DbDecorator {
         'fetchOne',
         'fetchCol',
         'fetchPairs',
+        'fetchRow',
         'fetchAll',
         'fetchAssoc',
         'query',

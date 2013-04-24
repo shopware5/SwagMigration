@@ -1352,7 +1352,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $product_result = $import->sArticle($product);
             if(!empty($product_result)) {
                 $product = array_merge($product, $product_result);
-
+                error_log("id: ".$product_result['articledetailsID']);
 	            /**
 	             * Check if the parent article's detail has configurator options associated
 	             *
@@ -1366,6 +1366,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 					// If non is available remove the odl detail and set the new one as main detail
 					if (!$hasOptions) {
+                        error_log(1);
 						$this->Helpers()->replaceProductDetail(
 							$product['maindetailsID'],
 							$product['articledetailsID'],
