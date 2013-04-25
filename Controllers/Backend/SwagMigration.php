@@ -1375,7 +1375,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 					// If non is available remove the odl detail and set the new one as main detail
 					if (!$hasOptions) {
-                        error_log(1);
 						$this->Helpers()->replaceProductDetail(
 							$product['maindetailsID'],
 							$product['articledetailsID'],
@@ -1508,7 +1507,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         // iterate all products with attributes
         while ($product = $products_result->fetch()) {
             $id = $product['productID'];
-            error_log($id);
+
             // Skip products which have not been imported before
             $productId = $this->getBaseArticleInfo($id);
             if (false === $productId) {
@@ -1538,6 +1537,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $group = $attribute['group_name'];
                 $option = $attribute['option_name'];
                 $price = $attribute['price'];
+                $configurator_type = !empty($attribute['configurator_type']) ? (int) $attribute['configurator_type'] : 0;
+                $group_position = !empty($attribute['group_position']) ? (int) $attribute['group_position'] : 0;
+                $option_position = !empty($attribute['option_position']) ? (int) $attribute['option_position'] : 0;
 
 
                 // Create / load group
@@ -1548,7 +1550,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         WHERE `name`='{$group}' LIMIT 1
                     ");
                     if ($groupId === false) {
-                        $sql = "INSERT INTO `s_article_configurator_groups` SET `name`='{$group}'";
+                        $sql = "INSERT INTO `s_article_configurator_groups` (`name`, `position`) VALUES ('{$group}', {$group_position})";
                         Shopware()->Db()->query($sql);
                         $groupId = Shopware()->Db()->lastInsertId();
                     }
@@ -1572,7 +1574,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         WHERE `name`='{$option}' AND `group_id`={$groupId}
                     ");
                     if ($optionId === false) {
-                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`) VALUES ({$groupId}, '{$option}')";
+                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`, `position`) VALUES ({$groupId}, '{$option}', {$option_position})";
                         Shopware()->Db()->query($sql);
                         $optionId = Shopware()->Db()->lastInsertId();
                     }
@@ -1595,6 +1597,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             // Set product's configurator set
             $sql = "UPDATE s_articles SET configurator_set_id = {$configuratorSetId} WHERE `id`={$productId}";
             Shopware()->Db()->query($sql);
+
+            // Finally set the type of the configurator
+            if ($configurator_type > 0) {
+                $sql = "UPDATE `s_article_configurator_sets` SET `type`={$configurator_type} WHERE `id`={$configuratorSetId}";
+                Shopware()->Db()->query($sql);
+            }
+
 
 
             $offset++;

@@ -347,9 +347,13 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
         return "
             SELECT
                 ad.id                           as productId,
-                gp.price as price,
-                g.groupname as group_name,
-                go.optionname as option_name
+                gp.price                        as price,
+                g.groupname                     as group_name,
+                gs.type                         as configurator_type,
+                go.optionname                   as option_name,
+                go.optionposition               as option_position,
+                g.groupposition                 as group_position
+
 
             FROM {$this->quoteTable('articles_details')} ad
 
@@ -364,6 +368,9 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
             ON gp.optionID = go.optionID
             AND gp.articleID = go.articleID
             AND gp.groupkey = 'EK'
+
+            LEFT JOIN {$this->quoteTable('articles_groups_settings')} gs
+            ON gs.articleID = go.articleID
 
             WHERE ad.id = '{$id}'
 
@@ -569,7 +576,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 us.lastlogin,
                 us.active,
                 us.customergroup as customergroupID,
-                us.password 							as md5_password,
+                us.password 							    as md5_password,
 
 				bill.salutation                             as billing_salutation,
 				bill.`company`								as billing_company,
