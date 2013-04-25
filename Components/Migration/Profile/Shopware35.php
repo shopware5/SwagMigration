@@ -73,7 +73,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
        }
 
        return "
-            SELECT  trans.articleID as productID,
+            SELECT  att.articledetailsID as productID,
                     trans.languageID,
                     trans.name,
                     trans.description,
@@ -82,7 +82,9 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                     trans.keywords
                     $custom_select
             FROM {$this->quoteTable('articles_translations')} trans
-            LEFT JOIN {$this->quoteTable('articles_attributes')} att ON (trans.articleID = att.articleID)
+
+            LEFT JOIN {$this->quoteTable('articles_attributes')} att
+            ON (trans.articleID = att.articleID)
        ";
 
        }
@@ -451,6 +453,10 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 a.maxpurchase,
                 a.taxID,
                 a.releasedate         				as releasedate,
+				a.purchaseunit,
+				a.packunit,
+				a.unitID,
+				a.referenceunit,
 
                 ad.additionaltext,
                 ad.suppliernumber as supplier,
@@ -465,9 +471,6 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
             -- Join all details
             LEFT JOIN {$this->quoteTable('articles_details')} ad
             ON a.id = ad.articleID
-
-            LEFT JOIN {$this->quoteTable('articles_details')} ad2
-            ON ad.id = ad2.id
 
             -- Join main detail as parent article
             INNER JOIN {$this->quoteTable('articles_details')} ad_main
@@ -667,10 +670,13 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                     prices.from               as `from`,
                     prices.price              as net_price,
                     prices.percent,
-                    prices.pricegroup
+                    prices.pseudoprice        as net_pseudoprice,
+                    prices.pricegroup,
+                    prices.baseprice
+
                 FROM {$this->quoteTable('articles_prices')} prices
 
-                ORDER BY articleID, pricegroup, `from`
+                ORDER BY articledetailsID, pricegroup, `from`
             ";
     }
 }

@@ -710,6 +710,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         unset($price['net_price']);
                     }
                 }
+                if(isset($price['net_pseudoprice'])) {
+                    if(empty($price['tax'])) {
+                        $price['pseudoprice'] = $price['net_pseudoprice'];
+                        unset($price['net_pseudoprice'], $price['tax']);
+                    } else {
+                        $price['pseudoprice'] = round($price['net_pseudoprice']*(100+$price['tax'])/100, 2);
+                        unset($price['net_pseudoprice']);
+                    }
+                }
+
                 $price['articlepricesID'] = Shopware()->Api()->Import()->sArticlePrice($price);
             }
 
