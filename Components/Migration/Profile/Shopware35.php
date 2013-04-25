@@ -94,9 +94,15 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    	public function getProductCategorySelect()
    	{
        return "
-                SELECT articleID as productID, categoryID
-                FROM {$this->quoteTable('articles_categories')}
-                WHERE categoryID NOT IN (SELECT parentID FROM {$this->quoteTable('core_multilanguage')})
+                SELECT ad.id as productID, categoryID
+
+                FROM {$this->quoteTable('articles_categories', 'ac')}
+
+                INNER JOIN {$this->quoteTable('articles_details', 'ad')}
+                ON ad.articleID = ac.articleID
+                AND kind = 1
+
+                WHERE ac.categoryID NOT IN (SELECT parentID FROM {$this->quoteTable('core_multilanguage')})
             ";
    	}
 
