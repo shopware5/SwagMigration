@@ -75,7 +75,12 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      */
 	public function __construct($config)
 	{
-		$this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
+
+        if (Shopware()->Plugins()->Backend()->SwagMigration()->Config()->debugMigration) {
+            $this->db = new Shopware_Components_Migration_DbDecorator(Enlight_Components_Db::factory($this->db_adapter, $config));
+        } else {
+            $this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
+        }
     	$this->db->getConnection();
     	if(isset($config['prefix'])) {
     		$this->db_prefix = $config['prefix'];

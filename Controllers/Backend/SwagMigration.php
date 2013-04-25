@@ -376,7 +376,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
-//            array('id'=>'Shopware350', 	'name'=>'Shopware 3.5.0'),
+            array('id'=>'Shopware35', 	'name'=>'Experimental: Shopware 3.5.7'),
             array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.3'),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
@@ -710,6 +710,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         unset($price['net_price']);
                     }
                 }
+                if(isset($price['net_pseudoprice'])) {
+                    if(empty($price['tax'])) {
+                        $price['pseudoprice'] = $price['net_pseudoprice'];
+                        unset($price['net_pseudoprice'], $price['tax']);
+                    } else {
+                        $price['pseudoprice'] = round($price['net_pseudoprice']*(100+$price['tax'])/100, 2);
+                        unset($price['net_pseudoprice']);
+                    }
+                }
+
                 $price['articlepricesID'] = Shopware()->Api()->Import()->sArticlePrice($price);
             }
 
@@ -874,6 +884,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
+     * Get a category target id
+     * @param $id
+     * @return bool|string
+     */
+    public function getCategoryTargetLike($id)
+    {
+        if (!isset($id) || empty($id)) {
+            return false;
+        }
+        return Shopware()->Db()->fetchOne(
+            "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
+            array(
+                Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,
+                $id . $this->categoryLanguageSeparator . '%'
+            )
+        );
+    }
+
+    /**
      * Delete category target
      * @param $id
      */
@@ -924,7 +953,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             $target_parent = $this->getCategoryTarget($category['parentID']);
-
+            // More generous approach - will ignore languageIDs
+            if (empty($target_parent) && !empty($category['parentID'])) {
+                $target_parent = $this->getCategoryTargetLike($category['parentID']);
+            }
             // Do not create empty categories
             if(empty($category['description'])) {
                 $offset++;
@@ -936,9 +968,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 if (false !== $target_parent) {
                     $category['parent'] = $target_parent;
                 } else {
-                    error_log("Parent category not found: {$category['parentID']}. Will not create '{$category['description']}'");
-                    $offset++;
-                    continue;
+                    if (empty($target_parent)) {
+                        error_log("Parent category not found: {$category['parentID']}. Will not create '{$category['description']}'");
+                        $offset++;
+                        continue;
+                    }
                 }
             } elseif( !empty($category['languageID'])
                 && !empty($this->Request()->language)
@@ -1110,7 +1144,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $ratingID = Shopware()->Db()->fetchOne($sql, array(
                 $rating['articleID'],
                 $rating['name'],
-                !empty($rating['email']) ? $rating['email'] : ''
+                !empty($rating['email']) ? $rating['email'] : 'NOW()'
             ));
 
             if(!empty($ratingID)) {
@@ -1328,7 +1362,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $product_result = $import->sArticle($product);
             if(!empty($product_result)) {
                 $product = array_merge($product, $product_result);
-
 	            /**
 	             * Check if the parent article's detail has configurator options associated
 	             *
@@ -1504,6 +1537,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $group = $attribute['group_name'];
                 $option = $attribute['option_name'];
                 $price = $attribute['price'];
+                $configurator_type = !empty($attribute['configurator_type']) ? (int) $attribute['configurator_type'] : 0;
+                $group_position = !empty($attribute['group_position']) ? (int) $attribute['group_position'] : 0;
+                $option_position = !empty($attribute['option_position']) ? (int) $attribute['option_position'] : 0;
 
 
                 // Create / load group
@@ -1514,7 +1550,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         WHERE `name`='{$group}' LIMIT 1
                     ");
                     if ($groupId === false) {
-                        $sql = "INSERT INTO `s_article_configurator_groups` SET `name`='{$group}'";
+                        $sql = "INSERT INTO `s_article_configurator_groups` (`name`, `position`) VALUES ('{$group}', {$group_position})";
                         Shopware()->Db()->query($sql);
                         $groupId = Shopware()->Db()->lastInsertId();
                     }
@@ -1538,7 +1574,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                         WHERE `name`='{$option}' AND `group_id`={$groupId}
                     ");
                     if ($optionId === false) {
-                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`) VALUES ({$groupId}, '{$option}')";
+                        $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`, `position`) VALUES ({$groupId}, '{$option}', {$option_position})";
                         Shopware()->Db()->query($sql);
                         $optionId = Shopware()->Db()->lastInsertId();
                     }
@@ -1561,6 +1597,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             // Set product's configurator set
             $sql = "UPDATE s_articles SET configurator_set_id = {$configuratorSetId} WHERE `id`={$productId}";
             Shopware()->Db()->query($sql);
+
+            // Finally set the type of the configurator
+            if ($configurator_type > 0) {
+                $sql = "UPDATE `s_article_configurator_sets` SET `type`={$configurator_type} WHERE `id`={$configuratorSetId}";
+                Shopware()->Db()->query($sql);
+            }
+
 
 
             $offset++;
@@ -1714,7 +1757,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			        && !empty($this->Request()->property_options[$property['option']])
 		        ) {
 			        $property['group'] = $this->Request()->property_options[$property['option']];
-                } else {
+                } elseif(empty($property['group'])) {
 			        $property['group'] = 'Properties';
 		        }
 		        $groupName = $property['group'];
@@ -1961,6 +2004,17 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($order['shipping_countryiso']));
             }
 
+
+            $data_attributes = array(
+                'orderID'    => $order['orderID'],
+                'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
+                'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
+                'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
+                'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
+                'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
+                'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
+            );
+
             $data_billing = array(
                 'userID' => $order['userID'],
                 'orderID' => $order['orderID'],
@@ -2009,9 +2063,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if(empty($order['insert'])) {
                 Shopware()->Db()->update('s_order_billingaddress', $data_billing, array('orderID=?'=>$order['orderID']));
                 Shopware()->Db()->update('s_order_shippingaddress', $data_shipping, array('orderID=?'=>$order['orderID']));
+                Shopware()->Db()->update('s_order_attributes', $data_attributes, array('orderID=?'=>$order['orderID']));
             } else {
                 Shopware()->Db()->insert('s_order_billingaddress', $data_billing);
                 Shopware()->Db()->insert('s_order_shippingaddress', $data_shipping);
+                Shopware()->Db()->insert('s_order_attributes', $data_attributes);
             }
 
             $offset++;
@@ -2142,6 +2198,18 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
 
             Shopware()->Db()->insert('s_order_details', $data);
+
+            $data_attributes = array(
+                'detailID'    => Shopware()->Db()->lastInsertId(),
+                'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
+                'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
+                'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
+                'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
+                'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
+                'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
+            );
+            Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
+
 
             $offset++;
             if(time()-$requestTime >= $this->max_execution) {

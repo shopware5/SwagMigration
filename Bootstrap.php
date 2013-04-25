@@ -74,6 +74,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		';
 		Shopware()->Db()->query($sql);
 
+        $this->createForm();
+
 		return array(
 			'success' => true,
 			'invalidateCache' => array('backend')
@@ -140,6 +142,17 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		return true;
 
 	}
+
+    public function createForm()
+    {
+        $form = $this->Form();
+
+        $form->setElement('boolean', 'debugMigration', array(
+            'description' => 'Soll eine Debug-Ausgabe geschrieben werden? Achtung! Kann die Geschwindigkeit des Imports negativ beeinflussen.',
+            'label' => 'Debug-Ausgabe',
+            'value' => false,
+        ));
+    }
 
     /**
      * Convenience function to register template and snippet dirs
