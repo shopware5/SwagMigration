@@ -376,7 +376,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
-            array('id'=>'Shopware35', 	'name'=>'Shopware 3.5.7'),
+            array('id'=>'Shopware35', 	'name'=>'Experimental: Shopware 3.5.7'),
             array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.3'),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
@@ -1352,7 +1352,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $product_result = $import->sArticle($product);
             if(!empty($product_result)) {
                 $product = array_merge($product, $product_result);
-                error_log("id: ".$product_result['articledetailsID']);
 	            /**
 	             * Check if the parent article's detail has configurator options associated
 	             *
@@ -1499,7 +1498,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         // iterate all products with attributes
         while ($product = $products_result->fetch()) {
             $id = $product['productID'];
-
+            error_log($id);
             // Skip products which have not been imported before
             $productId = $this->getBaseArticleInfo($id);
             if (false === $productId) {
@@ -1739,7 +1738,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			        && !empty($this->Request()->property_options[$property['option']])
 		        ) {
 			        $property['group'] = $this->Request()->property_options[$property['option']];
-                } else {
+                } elseif(empty($property['group'])) {
 			        $property['group'] = 'Properties';
 		        }
 		        $groupName = $property['group'];
