@@ -62,6 +62,22 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 	}
 
     /**
+   	 * Returns the property options of the shop
+   	 */
+   	public function getPropertyOptionSelect()
+   	{
+   		return "
+   			SELECT
+   			  products_options_name as name,
+   			  products_options_name as id
+
+   			FROM {$this->quoteTable('products_options')}
+
+            WHERE language_id = {$this->Db()->quote($this->getDefaultLanguage())}
+   		";
+   	}
+
+    /**
    	 * Returns a dummy SQL statement with a default shop
    	 * @return string {String} | sql for sub shops
    	 */
@@ -134,6 +150,49 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 		";
 	}
 
+
+
+    /**
+     * Returns the sql statement to select articles with
+     * @param $id
+     * @return string
+     */
+    public function getProductPropertiesSelect($id)
+   	{
+        return "
+            SELECT
+                ''                                      as 'group',
+                po.products_options_name                as 'option',
+                p.products_id                           as productId,
+                pv.products_options_values_name         as 'value'
+
+            FROM {$this->quoteTable('products', 'p')}
+
+            INNER JOIN {$this->quoteTable('products_attributes', 'a')}
+            ON p.products_id=a.products_id
+
+            INNER JOIN {$this->quoteTable('products_options', 'po')}
+            ON po.products_options_id = a.options_id
+
+            INNER JOIN {$this->quoteTable('products_options_values', 'pv')}
+            ON pv.products_options_values_id = a.options_values_id
+            AND pv.language_id = po.language_id
+
+            WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
+            AND a.products_id = {$id}
+        ";
+
+   	}
+
+    /**
+     * Get ids of all products with properties
+     * @return string
+     */
+    public function getProductsWithPropertiesSelect()
+   	{
+   		return $this->getAttributedProductsSelect();
+   	}
+
     /**
      * Get productIds for all products with attributes
      * @return string
@@ -142,14 +201,10 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
     {
         return "
             SELECT
-            DISTINCT p.products_id as productID
+            DISTINCT a.products_id as productID
 
-            FROM  {$this->quoteTable('products', 'p')}
+            FROM  {$this->quoteTable('products_attributes', 'a')}
 
-            LEFT JOIN {$this->quoteTable('products_attributes', 'a')}
-            ON p.products_id=a.products_id
-
-            WHERE a.products_id IS NOT NULL
         ";
     }
 
