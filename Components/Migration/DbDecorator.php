@@ -159,7 +159,12 @@ class Shopware_Components_Migration_DbDecorator {
             $rows = $result->rowCount();
         }
 
-        $explained = $this->explain($args);
+        try {
+            $explained = $this->explain($args);
+        } catch(Exception $e) {
+            $explained = "";
+        }
+
 
         try {
             $this->debug("\r\nExplain:\r\n" . print_r($explained, true) . "\r\n");
