@@ -67,13 +67,15 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
    	public function getPropertyOptionSelect()
    	{
    		return "
-   			SELECT
-   			  products_options_name as name,
-   			  products_options_name as id
+   			SELECT DISTINCT
+   			  o.products_options_name as name,
+   			  o.products_options_name as id
 
-   			FROM {$this->quoteTable('products_options')}
+   			FROM {$this->quoteTable('products_attributes', 'p')}
 
-            WHERE language_id = {$this->Db()->quote($this->getDefaultLanguage())}
+   			INNER JOIN {$this->quoteTable('products_options', 'o')}
+   			ON p.options_id = o.products_options_id
+            AND o.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
    		";
    	}
 
@@ -204,7 +206,6 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
             DISTINCT a.products_id as productID
 
             FROM  {$this->quoteTable('products_attributes', 'a')}
-
         ";
     }
 
@@ -220,22 +221,23 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
                 po.products_options_name                as group_name,
                 p.products_id                           as productId,
                 pv.products_options_values_name          as option_name,
-                IF(a.price_prefix='+', a.options_values_price, CONCAT('-', a.options_values_price)) as price
+                IF(a.price_prefix='+', a.options_values_price, CONCAT('-', a.options_values_price)) as price,
+                a.sortorder                             as option_position
 
             FROM {$this->quoteTable('products', 'p')}
 
-            LEFT JOIN {$this->quoteTable('products_attributes', 'a')}
+            INNER JOIN {$this->quoteTable('products_attributes', 'a')}
             ON p.products_id=a.products_id
 
-            LEFT JOIN {$this->quoteTable('products_options', 'po')}
+            INNER JOIN {$this->quoteTable('products_options', 'po')}
             ON po.products_options_id = a.options_id
 
-            LEFT JOIN {$this->quoteTable('products_options_values', 'pv')}
+            INNER JOIN {$this->quoteTable('products_options_values', 'pv')}
             ON pv.products_options_values_id = a.options_values_id
             AND pv.language_id = po.language_id
 
             WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
-            AND a.products_id = {$id}
+            AND p.products_id = {$id}
 
 --            GROUP BY po.products_options_name
         ";
