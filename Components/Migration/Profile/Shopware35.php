@@ -661,7 +661,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
     {
         return "
             SELECT
-                at.articleID as productID,
+                ad.id as productID,
                 (SELECT id FROM {$this->quoteTable('user')} us WHERE us.email = at.email) as customerID,
                 at.name,
                 at.points as `rating`,
@@ -670,6 +670,11 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 at.comment,
                 at.headline as `title`
             FROM {$this->quoteTable('articles_vote')} at
+
+            INNER JOIN {$this->quoteTable('articles_details')} ad
+            ON ad.articleID = at.articleID
+            AND kind = 1
+
         ";
     }
 
