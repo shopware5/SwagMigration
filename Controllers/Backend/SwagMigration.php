@@ -561,6 +561,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			$rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'property_options', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
 		}
 
+        $target = self::setAliases($this->Target()->getConfiguratorOptions());
+        $attributes = self::mapArrays($this->Source()->getConfiguratorOptions(), $target);
+        foreach ($attributes as $id=>$name) {
+            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'configurator_mapping', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
+        }
 
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
@@ -600,6 +605,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	        case 'property_options':
 		        $values = $this->Target()->getProperties();
 		        break;
+            case 'configurator_mapping':
+   		        $values = $this->Target()->getConfiguratorOptions();
+   		        break;
             default:
                 break;
         }
@@ -1279,6 +1287,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 	    $taskStartTime  = $this->initTaskTimer();
 
+        $configurator_mapping = $this->Request()->configurator_mapping;
+
         $numberSnippet = $this->namespace->get('numberNotValid',
             "The product number %s is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
@@ -1295,6 +1305,15 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             if (!empty($additionalProductInfo)) {
                 // Merge the results with the pre-existing product array
                 $product = array_merge($product, $additionalProductInfo);
+            }
+
+            if (!empty($product['additionaltext']) && empty($product['variant_group_names'])) {
+                $additional = ucfirst(strtolower($product['additionaltext']));
+                if (isset($configurator_mapping[$additional])) {
+                    $product['variant_group_names'] = $configurator_mapping[$additional];
+                }else{
+                    error_log("notfound ".$additional);
+                }
             }
 
             // Check the ordernumber
@@ -1385,7 +1404,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 	            // In some cases we need to make sure, that the article configurator is
 	            // generated for the master article of master/child article architectures
-	            if (isset($product['masterWithAttributes']) && $product['masterWithAttributes'] == 1) {
+	            if (isset($product['masterWithAttributes']) && $product['masterWithAttributes'] == 1 && !empty($product['additionaltext'])) {
 		            $product['maindetailsID'] = $product['articledetailsID'];
 		            $import->sArticleLegacyVariant($product);
 	            }

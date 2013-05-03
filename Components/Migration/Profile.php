@@ -319,6 +319,23 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->fetchPairs($this->getOrderStatusSelect());
 	}
 
+    public function getConfiguratorOptions()
+    {
+        if(!method_exists($this, 'getConfiguratorOptionsSelect')) {
+            return;
+        }
+        $result = $this->db->fetchCol($this->getConfiguratorOptionsSelect());
+
+        $output = array();
+        foreach($result as $value) {
+            $value = ucfirst(strtolower($value));
+            $output[$value] = $value;
+        }
+
+        return $output;
+
+    }
+
     /**
      * Returns the article attributes, selected by the profile sql
      * @return array

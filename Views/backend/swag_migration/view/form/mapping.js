@@ -78,6 +78,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
             tax_rate: '{s name=group/taxRate}Tax rate{/s}',
             attribute: '{s name=group/attribute}Attribute{/s}',
             property_options: '{s name=group/propertyOptions}Property options{/s}',
+            configurator_mapping: '{s name=group/configuratorMapping}Configurator Mapping{/s}',
             other: '{s name=group/other}Other{/s}'
         }
     },
@@ -188,44 +189,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                     return record.data.mapping_name;
                 },
 
-                editor: {
-                    xtype: 'combo',
-                    allowBlank: false,
-                    mode: 'remote',
-                    valueField: 'id',
-                    displayField: 'name',
-                    editable: false,
-                    store: Ext.create('Ext.data.Store', {
-                        model: 'Shopware.apps.SwagMigration.model.MappingValue',
-                        proxy: {
-                            type: 'ajax',
-                            url: '{url action="mappingValuesList"}',
-                            reader: {
-                                type: 'json',
-                                root: 'data',
-                                totalProperty: 'count'
-                            }
-                        }
-
-                    }),
-                    listeners: {
-                        'select': { fn:function(combo, records, index) {
-                            var record = records[0];
-                            combo.ownerCt.editingPlugin.context.record.set('mapping_name', record.data.name);
-                            combo.ownerCt.editingPlugin.completeEdit();
-                            me.fireEvent('validate');
-//                            var disableButton = !this.areAllRequiredItemsMapped();
-//                            this.buttons[1].setDisabled(disableButton);
-
-                        }, scope: this },
-                        'beforequery': { fn:function(e){
-                            me.fireEvent('beforequery', e, me);
-                        }, scope:this },
-                        'beforeexpand': { fn:function(){
-                            return true;
-                        }, scope:this }
+                getEditor: function(record) {
+                    if (record && record.get('group') == 'configurator_mapping') {
+                        return me.getTextEditor();
                     }
+
+                    return me.getDefaultEditor();
                 }
+
+
             }, {
                 dataIndex: 'validate',
                 header: '',
@@ -311,8 +283,92 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      */
     validate: function() {
         return this.areAllRequiredItemsMapped();
-    }
+    },
 
+
+    getDefaultEditor: function() {
+        var me = this;
+        return {
+            xtype: 'combo',
+            allowBlank: false,
+            mode: 'remote',
+            valueField: 'id',
+            displayField: 'name',
+            editable: false,
+            store: Ext.create('Ext.data.Store', {
+                model: 'Shopware.apps.SwagMigration.model.MappingValue',
+                proxy: {
+                    type: 'ajax',
+                    url: '{url action="mappingValuesList"}',
+                    reader: {
+                        type: 'json',
+                        root: 'data',
+                        totalProperty: 'count'
+                    }
+                }
+
+            }),
+            listeners: {
+                'select': { fn:function(combo, records, index) {
+                    var record = records[0];
+                    combo.ownerCt.editingPlugin.context.record.set('mapping_name', record.data.name);
+                    combo.ownerCt.editingPlugin.completeEdit();
+                    me.fireEvent('validate');
+//                  var disableButton = !this.areAllRequiredItemsMapped();
+//                  this.buttons[1].setDisabled(disableButton);
+
+                }, scope: this },
+                'beforequery': { fn: function (e) {
+                    me.fireEvent('beforequery', e, me);
+                }, scope: this },
+                'beforeexpand': { fn: function () {
+                    return true;
+                }, scope: this }
+            }
+        };
+    },
+
+    getTextEditor: function() {
+        var me = this;
+
+        return {
+            xtype: 'textfield',
+            allowBlank: true,
+            editable: true,
+            listeners: {
+                focus: function(component, evO, eOpts) {
+                    var record = this.ownerCt.editingPlugin.context.record;
+
+                    if (record.get('mapping_name') == 'Bitte wählen') {
+                        this.setValue() == ''
+                    }
+                },
+                blur: function() {
+                    var record = this.ownerCt.editingPlugin.context.record;
+
+                    if (this.getValue() == '') {
+                        this.setValue('Bitte wählen');
+                    }
+                    record.set('mapping_name', this.getValue());
+                    record.set('mapping', this.getValue());
+                    this.ownerCt.editingPlugin.completeEdit();
+                },
+                specialkey: function(field, e){
+
+                    if (e.getKey() == e.ENTER) {
+                        var record = this.ownerCt.editingPlugin.context.record;
+
+                        if (this.getValue() == '') {
+                            this.setValue('Bitte wählen');
+                        }
+                        record.set('mapping_name', this.getValue());
+                        record.set('mapping', this.getValue());
+                        this.ownerCt.editingPlugin.completeEdit();
+                    }
+                }
+            }
+        };
+    }
 
 });
 //{/block}

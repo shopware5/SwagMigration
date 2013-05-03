@@ -57,6 +57,18 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    	}
 
     /**
+     * Returns configurator options without group
+     */
+    public function getConfiguratorOptionsSelect()
+    {
+        return "
+            SELECT DISTINCT additionaltext as name
+            FROM {$this->quoteTable('articles_details')}
+            WHERE additionaltext != ''
+        ";
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system article translations
    	 * @return string {String} | sql for the article translations
    	 */
