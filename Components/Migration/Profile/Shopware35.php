@@ -466,7 +466,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
 				a.referenceunit,
 
                 ad.additionaltext,
-                ad.suppliernumber as supplier,
+                supplier.name                       as supplier,
                 ad.weight,
                 ad.instock,
                 ad.stockmin
@@ -478,6 +478,10 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
             -- Join all details
             LEFT JOIN {$this->quoteTable('articles_details')} ad
             ON a.id = ad.articleID
+
+            -- Join supplier
+            LEFT JOIN {$this->quoteTable('articles_supplier')} supplier
+            ON supplier.id = a.supplierID
 
             -- Join main detail as parent article
             INNER JOIN {$this->quoteTable('articles_details')} ad_main
