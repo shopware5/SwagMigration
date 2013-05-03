@@ -339,4 +339,37 @@ class Shopware_Components_Migration_Helpers extends Enlight_Class
 		return false;
 	}
 
+    /**
+     * Import the customer debit
+     *
+     * @param $customer
+     * @return boolean
+     */
+    public function importCustomerDebit($customer)
+    {
+        $fields = array(
+            'account' => false,
+            'bankcode' => false,
+            'bankholder' => false,
+            'bankname' => false,
+            'userID' => false
+        );
+
+        // Iterate the array, remove unneeded fields and check if the required fields exist
+        foreach ($customer as $key => $value) {
+            if (array_key_exists($key, $fields)) {
+                $fields[$key] = true;
+            } else {
+                unset($customer[$key]);
+            }
+        }
+        // Required field not found
+        if (in_array(false, $fields)) {
+            return false;
+        }
+
+        Shopware()->Db()->insert('s_user_debit', $customer);
+        return true;
+    }
+
 }

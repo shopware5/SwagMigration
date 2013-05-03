@@ -598,6 +598,12 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
 				ship.salutation	                        	as shipping_salutation,
 				ship.`streetnumber`							as shipping_streetnumber,
 
+                debit.account,
+                debit.bankcode,
+                debit.bankname,
+                debit.bankholder,
+
+
                 bill.phone,
                 bill.fax,
                 bill.birthday,
@@ -605,6 +611,9 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 us.newsletter
 
             FROM {$this->quoteTable('user')} us
+
+            LEFT JOIN {$this->quoteTable('user_debit')} debit
+            ON debit.userID = us.id
 
             LEFT JOIN {$this->quoteTable('user_billingaddress')} bill
             ON (bill.userID = us.id)

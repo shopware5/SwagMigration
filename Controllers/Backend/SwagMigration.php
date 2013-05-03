@@ -1877,6 +1877,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                     Shopware()->Db()->insert('s_user_shippingaddress', $customer_shipping);
                 }
 
+                if(!empty($customer['account'])) {
+                    $this->Helpers()->importCustomerDebit($customer);
+                }
+
+
                 $sql = '
                     INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
                     VALUES (?, ?, ?)
