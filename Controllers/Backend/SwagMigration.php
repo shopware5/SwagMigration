@@ -1307,12 +1307,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $product = array_merge($product, $additionalProductInfo);
             }
 
+            // If no group name for the variants' options was specified
+            // try to get it from the initial mapping
             if (!empty($product['additionaltext']) && empty($product['variant_group_names'])) {
                 $additional = ucfirst(strtolower($product['additionaltext']));
                 if (isset($configurator_mapping[$additional])) {
                     $product['variant_group_names'] = $configurator_mapping[$additional];
-                }else{
-                    error_log("notfound ".$additional);
                 }
             }
 
