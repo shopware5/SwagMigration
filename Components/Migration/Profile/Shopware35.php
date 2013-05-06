@@ -57,6 +57,18 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    	}
 
     /**
+     * Returns configurator options without group
+     */
+    public function getConfiguratorOptionsSelect()
+    {
+        return "
+            SELECT DISTINCT additionaltext as name
+            FROM {$this->quoteTable('articles_details')}
+            WHERE additionaltext != ''
+        ";
+    }
+
+    /**
    	 * Returns the sql statement to select the shop system article translations
    	 * @return string {String} | sql for the article translations
    	 */
@@ -270,8 +282,8 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
 
         $shops = $this->Db()->fetchAssoc($sql);
 
-        $parent_template = "IF(cat_parent.parent=%s, '%s', %s) as parentID";
-        $language_template = "IF(cat_parent.parent=%s, '%s', %s) as languageID";
+        $parent_template = "IF(cat_parent.parent=%s, '%s', %s)";
+        $language_template = "IF(cat_parent.parent=%s, '%s', %s)";
 
         $parent_select = "%s";
         $language_select = "%s";
@@ -290,8 +302,8 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
         return "
             SELECT
                 cat.id as categoryID,
-                $parent_select,
-                $language_select,
+                $parent_select as parentID,
+                $language_select as languageID,
                 cat.description,
                 cat.position,
                 cat.metakeywords,
