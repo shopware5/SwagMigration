@@ -561,8 +561,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			$rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'property_options', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
 		}
 
-        $target = self::setAliases($this->Target()->getConfiguratorOptions());
+        $target = self::setAliases(sort($this->Target()->getConfiguratorOptions()));
         $attributes = self::mapArrays($this->Source()->getConfiguratorOptions(), $target);
+        ksort($attributes);
         foreach ($attributes as $id=>$name) {
             $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'configurator_mapping', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
         }
@@ -1310,7 +1311,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             // If no group name for the variants' options was specified
             // try to get it from the initial mapping
             if (!empty($product['additionaltext']) && empty($product['variant_group_names'])) {
-                $additional = ucfirst(strtolower($product['additionaltext']));
+                $additional = ucwords(strtolower($product['additionaltext']));
                 if (isset($configurator_mapping[$additional])) {
                     $product['variant_group_names'] = $configurator_mapping[$additional];
                 }

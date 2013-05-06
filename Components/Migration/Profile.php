@@ -328,7 +328,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
         $output = array();
         foreach($result as $value) {
-            $value = ucfirst(strtolower($value));
+            $value = ucwords(strtolower($value));
             $output[$value] = $value;
         }
 
