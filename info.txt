@@ -1,7 +1,7 @@
 <p style="padding-bottom:8px;color:999;font-style:italic;">
     Mit dem Shopware Migrations-Plugin können Daten aus bestehenden Shop-Systemen automatisch in Shopware übernommen werden. Der Assistent verfügt über verschiedene Migrationsprofile und wird kontinuierlich weiterentwickelt.
 
-    Weitere Informationen dazu finden Sie <a href="http://wiki.shopware.de/Migration_cat_607.html" target="_blank">Shopware Wiki</a>.<br />
+    Weitere Informationen dazu finden Sie <a href="http://wiki.shopware.de/_detail_1011.html" target="_blank">Shopware Wiki</a>.<br />
     <br />
     Die Daten können aus folgenden Shopsystemen übernommen werden:
     <ul style="padding-bottom:8px;color:999;font-style:italic;">
