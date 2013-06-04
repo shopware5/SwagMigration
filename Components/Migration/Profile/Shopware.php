@@ -25,6 +25,8 @@
 /**
  * Shopware SwagMigration Components - Shopware
  *
+ * Default target profile used to get the content for the mapping
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)

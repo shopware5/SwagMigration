@@ -56,7 +56,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     protected $namespace;
 
-	protected $max_execution = 10;
+    /**
+     * Default execution time. After the given number of seconds, the current offset is saved and the
+     * request is returned to the ExtJS controller which triggered it
+     *
+     * @var int
+     */
+    protected $max_execution = 10;
 
 	/**
      * This function add the template directory and register the Shopware_Components namespace
@@ -69,16 +75,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
-     * This function initial the source profile and creates it over the profile factory
+     * This function inits the source profile and creates it over the profile factory
      * @return Enlight_Class
      */
     public function initSource()
     {
         $config = (array) Shopware()->getOption('db');
+
         // Setting the current shopware database as default will fail,
-        // if the user wants to connect to a remote database
+        // if the user wants to connect to a remote database. So the dbname
+        // needs to be unset
         $config['dbname'] = "";
 
+        // Populate the config object by the request data
         $query = $this->Request()->getPost()+$this->Request()->getQuery();
         if(isset($query['username'])&&$query['username']!='default') {
             $config['username'] = $query['username'];
@@ -144,8 +153,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
-
-	public function clearMigrationMappings()
+    /**
+     * Truncates the migration mapping table
+     */
+    public function clearMigrationMappings()
 	{
 		$sql = '
             TRUNCATE TABLE `s_plugin_migrations`;
@@ -153,7 +164,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         Shopware()->Db()->query($sql);
 	}
 
-	public function removeMigrationMappingsByType($type)
+    /**
+     * Remove mappings by a given type
+     *
+     * @param $type
+     */
+    public function removeMigrationMappingsByType($type)
 	{
 		$sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
 		Shopware()->Db()->query($sql, array($type));
@@ -757,6 +773,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Helper function to format image names the way the media resource expects it
+     *
      * @param $name
      * @return string
      */
@@ -772,7 +789,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 	/**
 	 * Copy the article images from the source shop system into the shopware image path
-	 * @return
 	 */
     public function importProductImages()
     {
@@ -1099,13 +1115,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 			}
 		}
 
-        // Fallback for SW versions prior 4.0.6
-        Shopware()->Db()->exec('
-            DELETE ac FROM s_articles_categories ac
-            INNER JOIN s_categories c ON ac.categoryID =c.id WHERE c.`right`-c.`left` > 1
-        ');
-
-
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importedCategories', "Categories successfully imported!"),
             'success'=>true,
@@ -1118,6 +1127,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * This function import the product ratings, selected by the source profile
+     *
      * todo@dn: make this multi request capable
      */
     public function importProductRatings()
@@ -1261,6 +1271,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Takes an invalid product number and creates a valid one from it
      * by returning its md5 hash
+     *
+     * todo: Generate more readable ordernumbers
      */
     public function makeInvalidNumberValid($number, $id)
     {

@@ -84,6 +84,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
 	public function update($version)
 	{
+        // Create form
+        $this->createForm();
+
 		// Clean up the migration table in order to not have duplicate entries
 		$sql = '
 		-- Remove non existing article references

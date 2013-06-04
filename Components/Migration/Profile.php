@@ -25,6 +25,10 @@
 /**
  * Shopware SwagMigration Components - Profile
  *
+ * Base profile which all other profiles extend from. Basically offers a generic interface to the source profiles
+ * and checks if there is a method which returns a SQL query for the requested data. If so, in most cases the
+ * query will be executed and the query object will be returned. In some cases the result will directly be returned.
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
@@ -33,7 +37,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 {
     /**
      * Global variable for the database object
-     * @var #M#C\Enlight_Components_Db.factory|?
+     * @var \Enlight_Components_Db.factory|?
      */
 	protected $db;
 
@@ -95,10 +99,10 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		$this->default_limit = $default_limit;
 	}
 
-	/**
-	 * @return
-	 */
-	public function getDefaultLimit()
+    /**
+     * @return int
+     */
+    public function getDefaultLimit()
 	{
 		return $this->default_limit;
 	}
@@ -375,9 +379,11 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     /**
      * Returns the additional data for the article which will
      * be merged with the actual product
-     * @return array
+     *
+     * @param $productId
+     * @return mixed
      */
-	public function getAdditionalProductInfo($productId)
+    public function getAdditionalProductInfo($productId)
 	{
 		if(!method_exists($this, 'getAdditionalProductSelect')) {
 			return;
@@ -387,15 +393,23 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Returns the categories, selected by the profile sql
+     *
+     * @param $offset
      * @return array
      */
-	public function getCategories($offset)
+    public function getCategories($offset)
 	{
         $query = $this->queryCategories($offset);
 
 		return $query->fetchAll();
 	}
 
+    /**
+     * Query products, which have attributes associated.
+     *
+     * @param int $offset
+     * @return mixed
+     */
     public function queryAttributedProducts($offset=0)
     {
         if (!method_exists($this, 'getAttributedProductsSelect')) {
@@ -409,11 +423,13 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     }
 
     /**
-     * Executes the profile attributprofile select statement with the given offset
+     * Get attributes for a given product id
+     *
+     * @param $id
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return mixed
      */
-	public function queryProductAttributes($id, $offset=0)
+    public function queryProductAttributes($id, $offset=0)
 	{
         if (!method_exists($this, 'getProductAttributesSelect')) {
             return;
@@ -425,8 +441,13 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->query($sql);
 	}
 
-
-	public function queryProductsWithProperties($offset)
+    /**
+     * Query products which have properties
+     *
+     * @param $offset
+     * @return mixed
+     */
+    public function queryProductsWithProperties($offset)
 	{
 		if (!method_exists($this, 'getProductsWithPropertiesSelect')) {
             return;
@@ -438,7 +459,13 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->query($sql);
 	}
 
-	public function queryProductProperties($id)
+    /**
+     * Queries the properties for a given product id
+     *
+     * @param $id
+     * @return mixed
+     */
+    public function queryProductProperties($id)
 	{
 		$sql = $this->getProductPropertiesSelect($id);
         if(!empty($offset)) {
@@ -519,6 +546,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Executes the profile product image select statement with the given offset
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
@@ -533,6 +561,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Executes the profile product translation select statement with the given offset
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
@@ -547,6 +576,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Executes the profile product rating select statement with the given offset
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
@@ -561,6 +591,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Executes the profile order select statement with the given offset
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
@@ -575,6 +606,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      * Executes the profile order detail select statement with the given offset
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
@@ -590,7 +622,6 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
 	/**
 	 * Returns a rough estimation of number of entities to import
-	 *
 	 * No need for correctness, only the estimated time depends on this
 	 *
 	 * @param $for

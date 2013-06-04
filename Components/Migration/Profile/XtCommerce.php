@@ -25,6 +25,14 @@
 /**
  * Shopware SwagMigration Components - XtCommerce
  *
+ *
+ *
+ *
+ * WARNING: When changing this component also check gambio profile as this currently
+ * extens from this XTC profile. Also some methods of the Veyton profile might extend from here
+ *
+ *
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
