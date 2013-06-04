@@ -79,10 +79,10 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				eav.attribute_code as 'id'
 
 			-- Attribute configuration
-			FROM {$this->quoteTable('catalog_eav_attribute', 'eav_settings')}
+			FROM {$this->quoteTable('catalog_eav_attribute')} eav_settings
 
 			-- Actual attributes
-            INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+            INNER JOIN {$this->quoteTable('eav_attribute')} eav
             ON eav.attribute_id=eav_settings.attribute_id
             AND eav.is_user_defined=1
 
@@ -168,24 +168,24 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
                 option_value.value                      as 'value'
 
             -- The actual product
-            FROM catalog_product_entity p
+            FROM  {$this->quoteTable('catalog_product_entity')} p
 
             -- Maps Articles to attributes
-            INNER JOIN catalog_product_entity_int entity_int
+            INNER JOIN {$this->quoteTable('catalog_product_entity_int')} entity_int
             ON entity_int.entity_id=p.entity_id
 
             -- Actual attributes (groups) with names
-            INNER JOIN eav_attribute eav
+            INNER JOIN {$this->quoteTable('eav_attribute')} eav
             ON eav.attribute_id=entity_int.attribute_id
             AND eav.is_user_defined=1
 
 			-- Only get filterable attributes
-			INNER JOIN catalog_eav_attribute eav_settings
+			INNER JOIN {$this->quoteTable('catalog_eav_attribute')} eav_settings
 			ON eav_settings.attribute_id = eav.attribute_id
 			AND eav_settings.is_filterable = 1
 
             -- Joins article option relation
-            INNER  JOIN eav_attribute_option_value option_value
+            INNER  JOIN {$this->quoteTable('eav_attribute_option_value')} option_value
             ON option_value.option_id=entity_int.value
             AND option_value.store_id=0
 
@@ -203,7 +203,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
     {
         return $this->Db()->fetchOne("
             SELECT entity_type_id
-            FROM `eav_entity_type`
+            FROM {$this->quoteTable('eav_entity_type')}
             WHERE entity_type_code = '{$type}'
         ");
     }
@@ -215,15 +215,15 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	      		entity_int.entity_id                                    as productID
 
-			FROM {$this->quoteTable('catalog_product_entity_int', 'entity_int')}
+			FROM {$this->quoteTable('catalog_product_entity_int')} entity_int
 
 			-- Inner Join product attributes
-			INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+			INNER JOIN {$this->quoteTable('eav_attribute')} eav
 			ON entity_int.attribute_id = eav.attribute_id
 			AND eav.entity_type_id =  {$this->getEntityTypeId('catalog_product')}
 
 			-- Inner Join settings with is_filterable=1
-			INNER JOIN {$this->quoteTable('catalog_eav_attribute', 'eav_settings')}
+			INNER JOIN {$this->quoteTable('catalog_eav_attribute')} eav_settings
 			ON eav.attribute_id = eav_settings.attribute_id
 			AND eav_settings.is_filterable=1
 		";
@@ -242,7 +242,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				ea.frontend_label	as `name`,
 				ea.backend_type 	as `type`,
 				ea.is_required		as `required`
-			FROM {$this->quoteTable('eav_attribute', 'ea')}, {$this->quoteTable('eav_entity_type', 'et')}
+			FROM {$this->quoteTable('eav_attribute')} ea, {$this->quoteTable('eav_entity_type')} et
 			WHERE ea.`entity_type_id`=et.entity_type_id
 			AND et.entity_type_code='catalog_product'
 			AND ea.frontend_input!=''
@@ -266,28 +266,28 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             GROUP_CONCAT(option_value.value SEPARATOR '|') as additionaltext
 
             -- The actual product
-            FROM {$this->quoteTable('catalog_product_entity', 'p')}
+            FROM {$this->quoteTable('catalog_product_entity')} p
 
             -- Relation to parent article
-            LEFT JOIN {$this->quoteTable('catalog_product_relation', 'r')}
+            LEFT JOIN {$this->quoteTable('catalog_product_relation')} r
             ON r.child_id=p.entity_id
 
             -- Join parent article if available
-            LEFT JOIN {$this->quoteTable('catalog_product_entity', 'parent')}
+            LEFT JOIN {$this->quoteTable('catalog_product_entity')} parent
             ON parent.entity_id = r.parent_id
 
             -- Maps Articles to attributes
-            INNER JOIN {$this->quoteTable('catalog_product_entity_int', 'entity_int')}
+            INNER JOIN {$this->quoteTable('catalog_product_entity_int')} entity_int
             ON entity_int.entity_id=p.entity_id
 
             -- Actual attributes (groups) with names
-            INNER JOIN {$this->quoteTable('eav_attribute', 'eav')}
+            INNER JOIN {$this->quoteTable('eav_attribute')} eav
             ON eav.attribute_id=entity_int.attribute_id
             AND eav.is_user_defined=1
             AND eav.is_required=1
 
             -- Joins article option relation
-            INNER  JOIN {$this->quoteTable('eav_attribute_option_value', 'option_value')}
+            INNER  JOIN {$this->quoteTable('eav_attribute_option_value')} option_value
             ON option_value.option_id=entity_int.value
             AND option_value.store_id=0
 
@@ -344,22 +344,22 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 				$custom_select
 			
-			FROM {$this->quoteTable('catalog_product_entity', 'catalog_product')}
+			FROM {$this->quoteTable('catalog_product_entity')} catalog_product
 
 			-- Joins the attribute tables
 			{$this->createTableSelect('catalog_product', $attributes, 0)}
 
 			-- Join for instock
-			LEFT JOIN {$this->quoteTable('cataloginventory_stock_item', 'cs')}
+			LEFT JOIN {$this->quoteTable('cataloginventory_stock_item')} cs
 			ON cs.`product_id`=catalog_product.`entity_id`
 			AND cs.`stock_id`=1
 
             -- maps child articles to parents
-			LEFT JOIN {$this->quoteTable('catalog_product_relation', 'relation')}
+			LEFT JOIN {$this->quoteTable('catalog_product_relation')} relation
 			ON catalog_product.entity_id=relation.child_id
 
 			-- Joins the attribute values for the manufacturer
-			LEFT JOIN {$this->quoteTable('eav_attribute_option_value', 'manufacturer_option')}
+			LEFT JOIN {$this->quoteTable('eav_attribute_option_value')} manufacturer_option
 			ON manufacturer_option.value_id=manufacturer.value
 
             -- Need to order by parent id in order to correctly assign children later
@@ -399,9 +399,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				
 				$custom_select
 			
-			FROM {$this->quoteTable('catalog_product_entity', 'catalog_product')}
+			FROM {$this->quoteTable('catalog_product_entity')} catalog_product
 			
-			INNER JOIN {$this->quoteTable('core_store', 'store')}
+			INNER JOIN {$this->quoteTable('core_store')} store
 			ON store.store_id!=0
 			
 			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
@@ -441,8 +441,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				gv.position,
 				IF(gv.position=1, 1, 0) as main
 			FROM 
-				{$this->quoteTable('catalog_product_entity_media_gallery', 'g')},
-				{$this->quoteTable('catalog_product_entity_media_gallery_value', 'gv')}
+				{$this->quoteTable('catalog_product_entity_media_gallery')} g,
+				{$this->quoteTable('catalog_product_entity_media_gallery_value')} gv
 			WHERE gv.`value_id`=g.`value_id`
 			AND gv.`store_id`=0
 			ORDER BY productID, position
@@ -485,9 +485,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 					c.description as cmstext,
 					c.is_active as active
 				FROM 
-					{$this->quoteTable('core_store', 's')},
-					{$this->quoteTable('core_store_group', 'g')},
-					{$this->quoteTable('catalog_category_flat_store_'.$shopID, 'c')}
+					{$this->quoteTable('core_store')} s,
+					{$this->quoteTable('core_store_group')} g,
+					{$this->quoteTable('catalog_category_flat_store_'.$shopID)} c
 				WHERE g.`group_id`=s.`group_id`
 				AND c.`path` LIKE CONCAT('1/', g.`root_category_id`, '/%')
 				AND s.`store_id`={$this->Db()->quote($shopID)}
@@ -514,7 +514,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				IF(r.`status_id`=1, 1, 0) as `active`,
 				rd.`detail` as `comment`,
 				rd.`title`
-			FROM {$this->quoteTable('review', 'r')}, {$this->quoteTable('review_detail', 'rd')}
+			FROM {$this->quoteTable('review')} r, {$this->quoteTable('review_detail')} rd
 			WHERE r.`review_id`=rd.`review_id`
 			AND r.`entity_id`=1
 		";
@@ -577,15 +577,15 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				taxvat.value 							as ustid,
 				IF(newsletter.subscriber_id, 1, 0)		as newsletter
 			
-			FROM {$this->quoteTable('customer_entity', 'customer')}
+			FROM {$this->quoteTable('customer_entity')} customer
 			
-			LEFT JOIN {$this->quoteTable('newsletter_subscriber', 'newsletter')}
+			LEFT JOIN {$this->quoteTable('newsletter_subscriber')} newsletter
 			ON newsletter.customer_id=customer.entity_id
 			AND newsletter.subscriber_status=1
 			
 			{$this->createTableSelect('customer', $attributes)}
 			
-			LEFT JOIN {$this->quoteTable('customer_address_entity', 'customer_address')}
+			LEFT JOIN {$this->quoteTable('customer_address_entity')} customer_address
 			ON customer_address.parent_id=customer.entity_id
 			AND customer_address.entity_id=default_billing.value
 			
@@ -652,13 +652,13 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				o.`shipping_amount`							as invoice_shipping_net
 				
 			FROM 
-				{$this->quoteTable('sales_flat_quote', 'q')},
-				{$this->quoteTable('sales_flat_quote_payment', 'p')},
+				{$this->quoteTable('sales_flat_quote')} q,
+				{$this->quoteTable('sales_flat_quote_payment')} p,
 				{$this->quoteTable('sales_flat_order', 'o')}
-			LEFT JOIN {$this->quoteTable('sales_flat_order_address', 'ba')}
+			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} ba
 			ON ba.parent_id=o.entity_id
 			AND ba.address_type='billing'
-			LEFT JOIN {$this->quoteTable('sales_flat_order_address', 'sa')}
+			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} sa
 			ON sa.parent_id=o.entity_id
 			AND sa.address_type='shipping'
 			WHERE o.quote_id = q.entity_id
@@ -703,7 +703,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				ea.attribute_id 	as `id`,
 				ea.backend_type 	as `type`,
 				ea.is_required		as `required`
-			FROM {$this->quoteTable('eav_attribute', 'ea')}, {$this->quoteTable('eav_entity_type', 'et')}
+			FROM {$this->quoteTable('eav_attribute')} ea, {$this->quoteTable('eav_entity_type')} et
 			WHERE ea.`entity_type_id`=et.entity_type_id
 			AND et.entity_type_code=?
 			AND ea.frontend_input!=''
@@ -721,7 +721,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		
 		$select_fields = array();
 		$join_fields = '';
-		
+
+        $type_quoted = "`{$type}`";
+
 		foreach ($attributes as $attribute) {
 			if(empty($attribute_fields[$attribute])) {
 				$join_fields .= "
@@ -730,12 +732,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				";
 			} else {
 				if($attribute_fields[$attribute]['type']=='static') {
-					$select_fields[] = "{$this->quoteTable($type)}.{$attribute}";
+					$select_fields[] = "{$type_quoted}.{$attribute}";
 				} else {
 					$join_fields .= "
-						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'], $attribute)}
+						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'])} $attribute
 						ON	{$attribute}.attribute_id = {$attribute_fields[$attribute]['id']}
-						AND {$attribute}.entity_id = {$this->quoteTable($type)}.entity_id
+						AND {$attribute}.entity_id = {$type_quoted}.entity_id
 					";
 					if($store_id!==null) {
 						$join_fields .= "
@@ -752,7 +754,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			$select_fields = implode(', ', $select_fields);
 			return "
 				SELECT $select_fields
-				FROM {$this->quoteTable($type.'_entity', $type)}
+				FROM {$this->quoteTable($type.'_entity')} $type
 				$join_fields
 			";
 		}
