@@ -250,7 +250,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * @return string
      */
     public function getVersion() {
-        return '2.1.3';
+        return '2.1.4';
     }
 
     /**
