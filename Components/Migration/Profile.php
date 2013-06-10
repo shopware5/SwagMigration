@@ -92,24 +92,6 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 	}
 
 	/**
-	 * @param  $default_limit
-	 */
-	public function setDefaultLimit($default_limit)
-	{
-		$this->default_limit = $default_limit;
-	}
-
-    /**
-     * @return int
-     */
-    public function getDefaultLimit()
-	{
-		return $this->default_limit;
-	}
-
-
-
-	/**
 	 * In some shops, any single variant of an product has assigned all the product's images
 	 * In order to sort this out, return 'true' in the shop's profile
 	 */
@@ -323,6 +305,11 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->fetchPairs($this->getOrderStatusSelect());
 	}
 
+    /**
+     * Query available configurator options for
+     *
+     * @return array
+     */
     public function getConfiguratorOptions()
     {
         if(!method_exists($this, 'getConfiguratorOptionsSelect')) {

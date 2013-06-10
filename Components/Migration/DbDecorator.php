@@ -3,6 +3,9 @@
  * Simple decorator for the source database: Will log certain queries to media/temp/migration.log
  *
  * Class Shopware_Components_Migration_DbDecorator
+ * @category  Shopware
+ * @package   Shopware\Plugins\SwagMigration\Components
+ * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_DbDecorator {
 

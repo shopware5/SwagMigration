@@ -82,7 +82,13 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		);
 	}
 
-	public function update($version)
+    /**
+     * Update the plugin to the current version
+     *
+     * @param string $version
+     * @return array|bool
+     */
+    public function update($version)
 	{
         // Create form
         $this->createForm();
@@ -146,6 +152,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
 	}
 
+    /**
+     * Create the config form for the plugin
+     */
     public function createForm()
     {
         $form = $this->Form();
@@ -171,6 +180,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     }
 
     /**
+     * Register template dir on time
+     *
      * @param Enlight_Event_EventArgs $args
      */
     public function onPostDispatch(Enlight_Event_EventArgs $args)
@@ -243,7 +254,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     		      			'Prepared for Shopware 4'
     		        ))
     			),
-    		'revision' => '6'
+    		'revision' => '7'
     	);
     }
 
