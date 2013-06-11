@@ -568,25 +568,25 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				1           									as subshopID,
 
 				(
-					SELECT `value`
+					SELECT SUM(`value`)
 					FROM {$this->quoteTable('orders_total')}
 					WHERE `class` = 'ot_shipping'
 					AND `orders_id`=o.`orders_id`
 				)												as invoice_shipping,
 				(
-					SELECT `value` 
+					SELECT SUM(`value`)
 					FROM {$this->quoteTable('orders_total')}
 					WHERE `class` = 'ot_shipping'
 					AND `orders_id`=o.`orders_id`
 				)												as invoice_shipping_net,
 				(
-					SELECT `value` 
+					SELECT SUM(`value`)
 					FROM {$this->quoteTable('orders_total')}
 					WHERE `class` = 'ot_total'
 					AND `orders_id`=o.`orders_id`
 				)												as invoice_amount,
 				(
-					SELECT `value` 
+					SELECT SUM(`value`)
 					FROM {$this->quoteTable('orders_total')}
 					WHERE `class`='ot_total'
 					AND `orders_id`=o.`orders_id`
