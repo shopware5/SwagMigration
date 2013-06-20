@@ -1,5 +1,7 @@
 # Das Shopware Migrations-Tool
 
+''' Diese Dokumentation wird noch bearbeitet '''
+
 Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fremden Shopsystemen nach Shopware zu migirieren. Die grundlegende Bedienung sowie einer Übersicht der migrierbaren Felder aus den jeweiligen Shopsystemen ist im offiziellen Shopware-Wiki dokumentiert: http://wiki.shopware.de/_detail_1011.html.
 
 Zur Zeit unterstützt das Tool:
@@ -159,9 +161,6 @@ Bei Shops mit Attribut-System (XTC) werden diese Felder nicht benötigt.
 * getCategorySelect
     * Selektiert Kategorien
 
-
-
-## Übersicht möglicher Select-Methoden
 
 
 # 3. Migrationslogik
