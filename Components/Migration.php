@@ -25,6 +25,8 @@
 /**
  * Shopware SwagMigration Components - Migration
  *
+ * Factory for the migration profiles
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)

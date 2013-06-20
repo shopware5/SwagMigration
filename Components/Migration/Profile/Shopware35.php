@@ -37,7 +37,6 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
      */
     protected $db_prefix = 's_';
 
-
     /**
    	 * Returns the directory of the article images.
    	 * @return string {String} | image path

@@ -33,6 +33,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 {
 	/**
 	 * Returns the directory of the article images.
+     *
 	 * @return string {String} | image path
 	 */
 	public function getProductImagePath()
@@ -42,6 +43,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * As all variants have assigned the product's image, only allow each image one time for a product
+     *
 	 * @return bool
 	 */
 	public function checkForDuplicateImages()
@@ -51,6 +53,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the config base path
+     *
 	 * @return string {String} | sql for the config base path
 	 */
 	public function getConfigSelect()
@@ -63,6 +66,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system languages
+     *
 	 * @return string {String} | sql for languages
 	 */
 	public function getLanguageSelect()
@@ -70,7 +74,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		return $this->getShopSelect();
 	}
 
-	public function getPropertyOptionSelect()
+    /**
+     * Returns a query to select all available property options (for mapping)
+     *
+     * @return string
+     */
+    public function getPropertyOptionSelect()
 	{
 		return "
 			SELECT
@@ -105,6 +114,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system price groups
+     *
 	 * @return string {String} | sql for price groups
 	 */
 	public function getPriceGroupSelect()
@@ -117,6 +127,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system payments
+     *
 	 * @return string {String} | sql for the payments
 	 */
 	public function getPaymentMeanSelect()
@@ -129,6 +140,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns an array of the order states mapping, with keys and descriptions
+     *
 	 * @return array {Array} | order states: key - description
 	 */
 	public function getOrderStatus()
@@ -143,6 +155,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system tax rates
+     *
 	 * @return string {String} | sql for the tax rates
 	 */
 	public function getTaxRateSelect()
@@ -156,6 +169,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select articles with
+     *
+     * @param id
 	 * @return string
 	 */
 	public function getProductPropertiesSelect($id)
@@ -196,6 +211,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
     /**
      * Returns the entity type id for a given type
+     *
      * @param $type
      * @return string
      */
@@ -208,7 +224,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
         ");
     }
 
-	public function getProductsWithPropertiesSelect()
+    /**
+     * Returns a query to select all products with properties assigned
+     *
+     * @return string
+     */
+    public function getProductsWithPropertiesSelect()
 	{
 		return "
 			SELECT DISTINCT
@@ -254,6 +275,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
     /**
      * Returns a sql statement which selects additional info for a given productID
+     *
+     * @param $productId
+     * @return string
      */
     public function getAdditionalProductSelect($productId)
     {
@@ -300,6 +324,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system articles
+     *
 	 * @return string {String} | sql for the articles
 	 */
 	public function getProductSelect()
@@ -371,6 +396,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system article translations
+     *
 	 * @return string {String} | sql for the article translations
 	 */
 	public function getProductTranslationSelect()
@@ -411,6 +437,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system article prices
+     *
 	 * @return string {String} | sql for the article prices
 	 */
 	public function getProductPriceSelect()
@@ -429,6 +456,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system article image allocation
+     *
 	 * @return string {String} | sql for the article image allocation
 	 */
 	public function getProductImageSelect()
@@ -451,6 +479,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system article category allocation
+     *
 	 * @return string {String} | sql for the article category allocation
 	 */
 	public function getProductCategorySelect()
@@ -465,6 +494,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 	/**
 	 * Returns the sql statement to select the shop system categories.
 	 * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
+     *
 	 * @return string {String} | sql for the categories
 	 */
 	public function getCategorySelect()
@@ -500,6 +530,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system article ratings
+     *
 	 * @return string {String} | sql for the article ratings
 	 */
 	public function getProductRatingSelect()
@@ -522,6 +553,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system customer
+     *
 	 * @return string {String} | sql for the customer data
 	 */
 	public function getCustomerSelect()
@@ -595,6 +627,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 	/**
 	 * Returns the sql statement to select the shop system customer
+     *
 	 * @return string {String} | sql for the customer data
 	 */
 	public function getOrderSelect()
@@ -669,6 +702,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
     /**
    	 * Returns the sql statement to select all shop system order details
+     *
    	 * @return string {String} | sql for order details
    	 */
 	public function getOrderDetailSelect()
@@ -689,6 +723,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
     /**
      * Returns the sql statement to select the shop system article attribute fields
+     *
      * @param string $type
      * @param null $attributes
      * @param null $store_id
@@ -722,6 +757,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		$select_fields = array();
 		$join_fields = '';
 
+        // Do not use quoteTable for aliases!
         $type_quoted = "`{$type}`";
 
 		foreach ($attributes as $attribute) {

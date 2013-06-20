@@ -36,4 +36,10 @@ class Shopware_Components_Migration_Profile_Gambio extends Shopware_Components_M
      * @var string
      */
 	protected $db_prefix = '';
+
+    /**
+     *
+     * Currently extends from XTC profile
+     *
+     */
 }

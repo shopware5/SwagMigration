@@ -25,6 +25,8 @@
 /**
  * Shopware SwagMigration Components - Helpers
  *
+ * This class contains some general helper methods used by the SwagMigration controller
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)

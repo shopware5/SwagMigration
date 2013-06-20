@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Simple decorator for the source database: Will log certain queries to media/temp/migration.log
+ *
+ * Class Shopware_Components_Migration_DbDecorator
+ * @category  Shopware
+ * @package   Shopware\Plugins\SwagMigration\Components
+ * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
+ */
 class Shopware_Components_Migration_DbDecorator {
 
     /**
@@ -32,6 +39,8 @@ class Shopware_Components_Migration_DbDecorator {
     }
 
     /**
+     * Will prepend "EXPLAIN" to a given SQL statement and format the result as a simple table
+     *
      * @param $args
      * @return string
      * @throws \Exception If explain certain statements is not possible
@@ -74,6 +83,7 @@ class Shopware_Components_Migration_DbDecorator {
 
     /**
      * Main wrapper method which decorated the actual query with some debug output
+     *
      * @param $method
      * @param $args
      * @return mixed
@@ -99,16 +109,30 @@ class Shopware_Components_Migration_DbDecorator {
 
     }
 
+    /**
+     * Allow GET access to the wrapped instance
+     *
+     * @param $key
+     * @return mixed
+     */
     public function __get($key) {
         return $this->instance->$key;
     }
 
+    /**
+     * Allow SET access to the wrapped instance
+     *
+     * @param $key
+     * @param $value
+     * @return mixed
+     */
     public function __set($key, $value) {
         return $this->instance->$key = $value;
     }
 
     /**
      * Simple logger which writes all queries to the file system
+     *
      * @param $data
      * @param $suffix
      */
@@ -127,6 +151,8 @@ class Shopware_Components_Migration_DbDecorator {
     }
 
     /**
+     * Helper to print a "begin" block to the logfile
+     *
      * @param $args
      * @return string
      */
@@ -147,10 +173,11 @@ class Shopware_Components_Migration_DbDecorator {
     }
 
     /**
+     * Helper to print a "end" block to the logfile
+     *
      * @param $args
      * @param $result
      * @param $duration
-     * @param $begin_line
      */
     public function printEndBlock($args, $result, $duration)
     {
