@@ -1,6 +1,6 @@
 # Das Shopware Migrations-Tool
 
-''' Diese Dokumentation wird noch bearbeitet '''
+** Diese Dokumentation wird noch bearbeitet '**
 
 Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fremden Shopsystemen nach Shopware zu migirieren. Die grundlegende Bedienung sowie einer Übersicht der migrierbaren Felder aus den jeweiligen Shopsystemen ist im offiziellen Shopware-Wiki dokumentiert: http://wiki.shopware.de/_detail_1011.html.
 
@@ -26,6 +26,8 @@ Das Migrationstool besteht grundlegend aus 3 Komponenten:
 3. Der Migrations-Logik: Diese führt die von den jeweiligen Profilen zurück gegebenen Queries aus, iteriert die Results, bereitet diese auf und importiert diese mittels der Shopware API nach Shopware (zur Zeit wird hier noch die SW3-API genutzt, die in SW4 ebenfalls zur Verfügung steht).
 
 # 1. Das Backend-Modul
+
+Dokumentation folgt
 
 # 2. Die Profile
 Die einzelnen Migrations-Profile finden sich unter SwagMigration\Components\Migration\Profile. Jedes der dort vorhandenen Profile erbt von der Basis-Klasse "Shopware_Components_Migration_Profile" in SwagMigration\Components\Migration\Profile.php.
