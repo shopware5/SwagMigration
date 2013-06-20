@@ -92,6 +92,7 @@ Nicht alle Selects werden genutzt, um die entsprechenden Entitäten direkt nach 
     * Felder:
         * **id**: Id der Eigenschaft
         * **name**: Name der Eigenschaft
+
 ### Select-Methoden für den Import
 
 Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter Entitäten passende Select zurück zu geben. Grundsätzlich gilt: Die Import-Logik bereitet diese Felder auf und importiert diese dann mit Hilfe der **alten** Shopware API. Bei Fragen zu importierbaren Feldern empfiehlt sich also auch immer ein Blick in die entsprechende Dokumentation: http://wiki.shopware.de/API-Import-Funktionen_detail_210.html
