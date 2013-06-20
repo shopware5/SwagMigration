@@ -1,6 +1,6 @@
 # Das Shopware Migrations-Tool
 
-** Diese Dokumentation wird noch bearbeitet '**
+** Diese Dokumentation wird noch bearbeitet **
 
 Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fremden Shopsystemen nach Shopware zu migirieren. Die grundlegende Bedienung sowie einer Übersicht der migrierbaren Felder aus den jeweiligen Shopsystemen ist im offiziellen Shopware-Wiki dokumentiert: http://wiki.shopware.de/_detail_1011.html.
 
