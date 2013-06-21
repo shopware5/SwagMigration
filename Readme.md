@@ -1,3 +1,15 @@
+**Inhaltsverzeichnis**
+
+- [Das Shopware Migrations-Tool](#das-shopware-migrations-tool)
+- [Grundlegende Funktionsweise](#grundlegende-funktionsweise)
+- [1. Das Backend-Modul](#1-das-backend-modul)
+- [2. Die Profile](#2-die-profile)
+	- [Standard-Methoden für jedes Profile:](#standard-methoden-für-jedes-profile)
+		- [Allgemein](#allgemein)
+		- [Select-Methoden für das Mapping](#select-methoden-für-das-mapping)
+		- [Select-Methoden für den Import](#select-methoden-für-den-import)
+- [3. Migrationslogik](#3-migrationslogik)
+
 # Das Shopware Migrations-Tool
 
 ** Diese Dokumentation wird noch bearbeitet **
@@ -24,6 +36,7 @@ Das Migrationstool besteht grundlegend aus 3 Komponenten:
 1. Dem Backend-Modul, über das die Migration konfiguriert wird: Datenbankverbindungen, Mappings und die zu migrierenden Felder werden hier festgelegt.
 2. Profile für die einzelnen Shopsysteme: Die jeweiligen Profile liefern für jede zu migrierende Ressource passend aufbereitete SQL-Queries zurück.
 3. Der Migrations-Logik: Diese führt die von den jeweiligen Profilen zurück gegebenen Queries aus, iteriert die Results, bereitet diese auf und importiert diese mittels der Shopware API nach Shopware (zur Zeit wird hier noch die SW3-API genutzt, die in SW4 ebenfalls zur Verfügung steht).
+
 
 # 1. Das Backend-Modul
 
@@ -125,7 +138,7 @@ Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter E
         * **keywords**:
     * Spezielle Felder für den Varianten-Import aus Systemen, in denen die Varianten physikalisch vorhanden sind (hierunter fällt beispielsweise Oxid). Diese Varianten können ohne große Aufbereitung importiert werden, durch die folgenden Felder werden die Optionen und der Parent-Artikel gekennzeichnet:
 Bei Shops mit Attribut-System (XTC) werden diese Felder nicht benötigt.
-        * **parentID**: Vater-Artikel. Muss vorher selektiert werden
+        * **parentID**: Vater-Artikel. Muss vorher selektiert werden - hier ist also ggf. ein OrderBy nötig.
         * **additionaltext**: Mit Pipes separierte Optionen des Artikels, etwa "grün | XL"
         * **variant_group_names**: Mit Pipes separierte Gruppen des Artikels, etwa "Farbe | Größe"        
         * **masterWithAttributes**: Falls der Parent-Artikel in dem Shop-System auch Varianten-Optionen hat, muss hier '1' selektiert werden. Andernfalls '0'.
@@ -164,6 +177,13 @@ Bei Shops mit Attribut-System (XTC) werden diese Felder nicht benötigt.
 * getCategorySelect
     * Selektiert Kategorien
 
+## Produktimport
 
+Gerade Produkte sind in der Regel recht komplexe Entitäten, die in den verschiedenen Shopsystemen sehr unterschiedlich abgebildet werden. Gerade wenn es um die Abbildung von Varianten geht, sind die Shops in der Regel sehr unterschiedlich. Das Migrationsskript unterstützt daher verschiedene Möglichkeiten, Produkte und Produktvarianten zu importieren.
+
+* Parent/Child
+    * Liegen die Produkte und ihre Varianten in einer Parent/Child-Struktur vor (wie bspw. bei Oxid), dann können die Varianten sehr leicht importiert werden. In der getProductSelect-Methode können dann zusätzlich die Felder **parentId**, **additionaltext**, **variant_group_names** und **masterWithAttributes** selektiert werden. Eine genauere Beschreibung der Felder findet sich in der Dokumentation der Methode **getProductSelect**.
+* Attribute
+    * Liegen die Varianten in Form von Attributen vor (XTC, Gambio), können diese Attribute als Konfiguratoren importiert werden. Das Migrationstool wird dann automatisch die Variantengenerierung anstoßen. 
 
 # 3. Migrationslogik
