@@ -106,7 +106,6 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
         return false;
     }
 
-
     /**
      * Helper function which sets the start time for a given task
      *
@@ -129,6 +128,27 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
         $this->getProgress()->setStartTime($startTime);
 
         return $startTime;
+    }
+
+
+    /**
+     * Returns a SW-productID for a given source-productId
+     * @param $productId
+     * @return string
+     */
+    public function getBaseArticleInfo($productId)
+    {
+        $sql = '
+            SELECT
+                ad.articleID as productId
+            FROM s_plugin_migrations pm
+            LEFT JOIN s_articles_details ad
+                ON ad.id = pm.targetID
+            WHERE pm.`sourceID`=?
+            AND `typeID`=?
+        ';
+
+        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
     }
 
     /**

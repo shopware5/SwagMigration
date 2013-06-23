@@ -252,66 +252,6 @@ class Shopware_Components_Migration_Helpers extends Enlight_Class
         );
     }
 
-
-	/**
-     * Helper function which gets the configurator groups for
-     * a given product
-     * @param $productId
-     * @return Array
-     */
-	public function getConfiguratorGroups($productId)
-    {
-        // get configurator groups for the given product
-        $builder = Shopware()->Models()->createQueryBuilder();
-        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
-            ->from('Shopware\Models\Article\Article', 'article')
-            ->innerJoin('article.configuratorSet', 'configuratorSet')
-            ->leftJoin('configuratorSet.groups', 'groups')
-            ->where('article.id = ?1')
-            ->setParameter(1, $productId);
-
-        $result = array_pop($builder->getQuery()->getArrayResult());
-
-        $configuratorArray = $result['configuratorSet'];
-        $groups = $configuratorArray['groups'];
-
-        // Additionally get the options for the given configurator set
-        // this relation seems not to be available in the configurator models
-        // (the configuratorSet-Model returns all group's options, even those
-        // not related to the given set)
-        $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
-
-	     LEFT JOIN s_article_configurator_set_option_relations relations
-	     ON relations.set_id = sets.id
-
-	     LEFT JOIN s_article_configurator_options options
-	     ON options.id = relations.option_id
-
-	     WHERE sets.id = ?";
-        $results = Shopware()->Db()->fetchAll($sql, array($configuratorArray['id']));
-
-        // Sort the options by group
-        $optionsByGroups = array();
-        foreach($results as $option) {
-            $groupId = $option['group_id'];
-            if (!isset($optionsByGroups[$groupId])) {
-                $optionsByGroups[$groupId] = array();
-            }
-            $optionsByGroups[$groupId][] = $option;
-        }
-
-        // merge the options into the group
-        $totalCount = 1;
-        foreach ($groups as &$group) {
-            $group['options'] = $optionsByGroups[$group['id']];
-            if (count($group['options']) > 0 ) {
-                $totalCount = $totalCount * count($group['options']);
-            }
-        }
-
-        return $groups;
-    }
-
 	/**
      * Helper function which tells, if a given image was already assigned to a given product
      *

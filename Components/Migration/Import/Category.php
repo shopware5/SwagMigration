@@ -114,7 +114,7 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             array(
                 Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,
-                $id . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                $id . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATORnb . '%'
             )
         );
     }
@@ -166,7 +166,7 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
 
         $categories = $this->Source()->queryCategories($offset);
         $count = $categories->rowCount()+$offset;
-
+        $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
         while (!$skip && $category = $categories->fetch()) {
