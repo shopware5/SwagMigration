@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta charset="utf-8"/>
+    <title>     &raquo; \Shopware_Controllers_Backend_SwagMigration
+</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="../js/bootstrap.js" type="text/javascript"></script>
+    <script src="../js/template.js" type="text/javascript"></script>
+    <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
+
+    <link rel="shortcut icon" href="../img/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span> <span class="icon-bar"></span>
+                <span class="icon-bar"></span> </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="dropdown">
+                        <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                                                </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graph_class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../errors.html"><i class="icon-list-alt"></i>&#160;Errors</a></li>
+                            <li><a href="../markers.html"><i class="icon-list-alt"></i>&#160;Markers</a></li>
+                            <li><a href="../deprecated.html"><i class="icon-list-alt"></i>&#160;Deprecated</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="go_to_top">
+        <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
+    </div>
+</div>
+
+<div id="___" class="container">
+    <noscript>
+        <div class="alert alert-warning">
+            Javascript is disabled; several features are only available if Javascript is enabled.
+        </div>
+    </noscript>
+
+        
+    <div class="row">
+        <div class="span4">
+                    <span class="btn-group visibility" data-toggle="buttons-checkbox">
+        <button class="btn public active" title="Show public elements">Public</button>
+        <button class="btn protected" title="Show protected elements">Protected</button>
+        <button class="btn private" title="Show private elements">Private</button>
+        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+    </span>
+    <div class="btn-group view pull-right" data-toggle="buttons-radio">
+        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
+        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+    </div>
+
+        <ul class="side-nav nav nav-list">
+        <li class="nav-header">
+            <i class="icon-custom icon-method"></i> Methods
+            <ul>
+                                                                                    <li class="method public">
+        <a href="#method_init" title="init :: This function add the template directory and register the Shopware_Components namespace">
+            <span class="description">This function add the template directory and register the Shopware_Components namespace</span><pre>init</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_initSource" title="initSource :: This function inits the source profile and creates it over the profile factory">
+            <span class="description">This function inits the source profile and creates it over the profile factory</span><pre>initSource</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_Source" title="Source :: Getter function of the source profile">
+            <span class="description">Getter function of the source profile</span><pre>Source</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_initTarget" title="initTarget :: Initial the target profile. The target profile type is every time shopware">
+            <span class="description">Initial the target profile. The target profile type is every time shopware</span><pre>initTarget</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_Helpers" title="Helpers :: ">
+            <span class="description"></span><pre>Helpers</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_Target" title="Target :: Getter method of the target profile. If the profile is not set, the controller initial the profile first.">
+            <span class="description">Getter method of the target profile. If the profile is not set, the controller initial the profile first.</span><pre>Target</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_clearMigrationMappings" title="clearMigrationMappings :: Truncates the migration mapping table">
+            <span class="description">Truncates the migration mapping table</span><pre>clearMigrationMappings</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_removeMigrationMappingsByType" title="removeMigrationMappingsByType :: Remove mappings by a given type">
+            <span class="description">Remove mappings by a given type</span><pre>removeMigrationMappingsByType</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_sDeleteAllArticles" title="sDeleteAllArticles :: Truncate all article related tables">
+            <span class="description">Truncate all article related tables</span><pre>sDeleteAllArticles</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_sDeleteAllOrders" title="sDeleteAllOrders :: Truncate order related tables.">
+            <span class="description">Truncate order related tables.</span><pre>sDeleteAllOrders</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_sDeleteAllCustomers" title="sDeleteAllCustomers :: Truncate customer related tables">
+            <span class="description">Truncate customer related tables</span><pre>sDeleteAllCustomers</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_sDeleteAllFilters" title="sDeleteAllFilters :: Helper method to delete all filter properties">
+            <span class="description">Helper method to delete all filter properties</span><pre>sDeleteAllFilters</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_clearImages" title="clearImages :: Helper method which deletes images/media tables
+Also physically deletes corresponding files">
+            <span class="description">Helper method which deletes images/media tables
+Also physically deletes corresponding files</span><pre>clearImages</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_clearShopAction" title="clearShopAction :: This function is used to reset the shop. It will truncated all tables related to a given source">
+            <span class="description">This function is used to reset the shop. It will truncated all tables related to a given source</span><pre>clearShopAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_profileListAction" title="profileListAction :: Returns the possible migration profiles">
+            <span class="description">Returns the possible migration profiles</span><pre>profileListAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_databaseListAction" title="databaseListAction :: Returns the database list of the server.">
+            <span class="description">Returns the database list of the server.</span><pre>databaseListAction</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_mappingListLeftAction" title="mappingListLeftAction :: This function returns the mapping list for the left grid">
+            <span class="description">This function returns the mapping list for the left grid</span><pre>mappingListLeftAction</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_mappingListRightAction" title="mappingListRightAction :: This function returns the mapping list of the right grid panel">
+            <span class="description">This function returns the mapping list of the right grid panel</span><pre>mappingListRightAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_mappingValuesListAction" title="mappingValuesListAction :: This function returns the values for the grid combo boxes">
+            <span class="description">This function returns the values for the grid combo boxes</span><pre>mappingValuesListAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_checkFormAction" title="checkFormAction :: This function validate the first form panel">
+            <span class="description">This function validate the first form panel</span><pre>checkFormAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importProductPrices" title="importProductPrices :: This function imports the product prices, selected by the source profile product price query">
+            <span class="description">This function imports the product prices, selected by the source profile product price query</span><pre>importProductPrices</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_importProductImages" title="importProductImages :: Copy the article images from the source shop system into the shopware image path">
+            <span class="description">Copy the article images from the source shop system into the shopware image path</span><pre>importProductImages</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_setCategoryTarget" title="setCategoryTarget :: Set a category target id">
+            <span class="description">Set a category target id</span><pre>setCategoryTarget</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getCategoryTarget" title="getCategoryTarget :: Get a category target id">
+            <span class="description">Get a category target id</span><pre>getCategoryTarget</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getCategoryTargetLike" title="getCategoryTargetLike :: Get a category target id">
+            <span class="description">Get a category target id</span><pre>getCategoryTargetLike</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_deleteCategoryTarget" title="deleteCategoryTarget :: Delete category target">
+            <span class="description">Delete category target</span><pre>deleteCategoryTarget</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importCategories" title="importCategories :: Imports the categories of the target database into the shopware database
+Some shop system have only one main shop. For this shops the categories translations will split into new categories.">
+            <span class="description">Imports the categories of the target database into the shopware database
+Some shop system have only one main shop. For this shops the categories translations will split into new categories.</span><pre>importCategories</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importArticleCategories" title="importArticleCategories :: Import Article-Category assignments">
+            <span class="description">Import Article-Category assignments</span><pre>importArticleCategories</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importProductRatings" title="importProductRatings :: This function import the product ratings, selected by the source profile">
+            <span class="description">This function import the product ratings, selected by the source profile</span><pre>importProductRatings</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importProductTranslations" title="importProductTranslations :: Imports the product translation from the source database into the shopware database">
+            <span class="description">Imports the product translation from the source database into the shopware database</span><pre>importProductTranslations</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_makeInvalidNumberValid" title="makeInvalidNumberValid :: Takes an invalid product number and creates a valid one from it
+by returning its md5 hash">
+            <span class="description">Takes an invalid product number and creates a valid one from it
+by returning its md5 hash</span><pre>makeInvalidNumberValid</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_getBaseArticleInfo" title="getBaseArticleInfo :: Returns a SW-productID for a given source-productId">
+            <span class="description">Returns a SW-productID for a given source-productId</span><pre>getBaseArticleInfo</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_generateConfiguratorSetsFromAttributes" title="generateConfiguratorSetsFromAttributes :: Generates configuratorSets, configuratorOptions and configuratorGroups
+for a given article depending on its attributes">
+            <span class="description">Generates configuratorSets, configuratorOptions and configuratorGroups
+for a given article depending on its attributes</span><pre>generateConfiguratorSetsFromAttributes</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_generateVariants" title="generateVariants :: Generate variants from configuratorSets">
+            <span class="description">Generate variants from configuratorSets</span><pre>generateVariants</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importProductProperties" title="importProductProperties :: ">
+            <span class="description"></span><pre>importProductProperties</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importCustomers" title="importCustomers :: This function imports the customers, selected by the source profile.">
+            <span class="description">This function imports the customers, selected by the source profile.</span><pre>importCustomers</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importOrders" title="importOrders :: This function import all orders from the source profile database into the shopware database.">
+            <span class="description">This function import all orders from the source profile database into the shopware database.</span><pre>importOrders</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importOrderDetails" title="importOrderDetails :: This function imports all order details from the source profile into the showpare database">
+            <span class="description">This function imports all order details from the source profile into the showpare database</span><pre>importOrderDetails</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_finishImport" title="finishImport :: This function finish the import and truncate the plugin table.">
+            <span class="description">This function finish the import and truncate the plugin table.</span><pre>finishImport</pre>
+        </a>
+    </li>
+
+                                                                                                                                                                <li class="method public">
+        <a href="#method_runImport" title="runImport :: Triggers the actual import for a given type">
+            <span class="description">Triggers the actual import for a given type</span><pre>runImport</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_importAction" title="importAction :: This function imports the different data types.">
+            <span class="description">This function imports the different data types.</span><pre>importAction</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_printCurrentImportMessage" title="printCurrentImportMessage :: Helper method to print &quot;currently importing&quot; messages">
+            <span class="description">Helper method to print &quot;currently importing&quot; messages</span><pre>printCurrentImportMessage</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public">
+        <a href="#method_initTaskTimer" title="initTaskTimer :: Helper function which sets the start time for a given task">
+            <span class="description">Helper function which sets the start time for a given task</span><pre>initTaskTimer</pre>
+        </a>
+    </li>
+
+                                                </ul>
+        </li>
+        <li class="nav-header protected">» Protected
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <li class="method protected">
+                            <a href="#method_printError" title="printError :: Convenience method which prints a given error for the extjs app">
+                                <span class="description">Convenience method which prints a given error for the extjs app</span><pre>printError</pre>
+                            </a>
+                        </li>
+                                                                                                                                                                                                </ul>
+        </li>
+        <li class="nav-header private">» Private
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            <li class="method private">
+                            <a href="#method_setAliases" title="setAliases :: Helper function to set an automatic mapping when the user open the mapping panel.">
+                                <span class="description">Helper function to set an automatic mapping when the user open the mapping panel.</span><pre>setAliases</pre>
+                            </a>
+                        </li>
+                                                                                                                    <li class="method private">
+                            <a href="#method_mapArrays" title="mapArrays :: Internal helper function for the automatic mapping">
+                                <span class="description">Internal helper function for the automatic mapping</span><pre>mapArrays</pre>
+                            </a>
+                        </li>
+                                                                                                                                                                                                                                <li class="method private">
+                            <a href="#method_removeSpecialCharacters" title="removeSpecialCharacters :: Helper function to format image names the way the media resource expects it">
+                                <span class="description">Helper function to format image names the way the media resource expects it</span><pre>removeSpecialCharacters</pre>
+                            </a>
+                        </li>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            </ul>
+        </li>
+        <li class="nav-header">
+            <i class="icon-custom icon-constant"></i> Constants
+            <ul>
+                            </ul>
+        </li>
+    </ul>
+
+
+        </div>
+
+        <div class="span8">
+            <div class="element class">
+                <h1>Shopware_Controllers_Backend_SwagMigration</h1>
+                <small style="display: block; text-align: right">
+                                            Extends \Shopware_Controllers_Backend_ExtJs
+                                                        </small>
+                <p class="short_description">Shopware SwagMigration Plugin - Migration Backend Controller</p>
+                <div class="details">
+                    <div class="long_description">
+                        
+
+                    </div>
+                    <table class="table table-bordered">
+                                                                                    <tr>
+                                    <th>
+                                        category
+                                                                            </th>
+                                    <td>
+                                                                                <p>Shopware</p>
+
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        package
+                                                                            </th>
+                                    <td>
+                                                                                <p>Shopware\Plugins\SwagMigration\Controllers\Backend</p>
+
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        copyright
+                                                                            </th>
+                                    <td>
+                                                                                <p>Copyright (c) 2012, shopware AG (http://www.shopware.de)</p>
+
+                                    </td>
+                                </tr>
+                                                                        </table>
+
+                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
+                                            <a id="method_init"></a>
+                        <div class="element clickable method public method_init" data-toggle="collapse" data-target=".method_init .collapse">
+                            <h2>This function add the template directory and register the Shopware_Components namespace</h2>
+                            <pre>init() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_initSource"></a>
+                        <div class="element clickable method public method_initSource" data-toggle="collapse" data-target=".method_initSource .collapse">
+                            <h2>This function inits the source profile and creates it over the profile factory</h2>
+                            <pre>initSource() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_Source"></a>
+                        <div class="element clickable method public method_Source" data-toggle="collapse" data-target=".method_Source .collapse">
+                            <h2>Getter function of the source profile</h2>
+                            <pre>Source() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_initTarget"></a>
+                        <div class="element clickable method public method_initTarget" data-toggle="collapse" data-target=".method_initTarget .collapse">
+                            <h2>Initial the target profile. The target profile type is every time shopware</h2>
+                            <pre>initTarget() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_Helpers"></a>
+                        <div class="element clickable method public method_Helpers" data-toggle="collapse" data-target=".method_Helpers .collapse">
+                            <h2>Helpers</h2>
+                            <pre>Helpers() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_Target"></a>
+                        <div class="element clickable method public method_Target" data-toggle="collapse" data-target=".method_Target .collapse">
+                            <h2>Getter method of the target profile. If the profile is not set, the controller initial the profile first.</h2>
+                            <pre>Target() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_clearMigrationMappings"></a>
+                        <div class="element clickable method public method_clearMigrationMappings" data-toggle="collapse" data-target=".method_clearMigrationMappings .collapse">
+                            <h2>Truncates the migration mapping table</h2>
+                            <pre>clearMigrationMappings() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_removeMigrationMappingsByType"></a>
+                        <div class="element clickable method public method_removeMigrationMappingsByType" data-toggle="collapse" data-target=".method_removeMigrationMappingsByType .collapse">
+                            <h2>Remove mappings by a given type</h2>
+                            <pre>removeMigrationMappingsByType(mixed $type) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$type</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_sDeleteAllArticles"></a>
+                        <div class="element clickable method public method_sDeleteAllArticles" data-toggle="collapse" data-target=".method_sDeleteAllArticles .collapse">
+                            <h2>Truncate all article related tables</h2>
+                            <pre>sDeleteAllArticles() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_sDeleteAllOrders"></a>
+                        <div class="element clickable method public method_sDeleteAllOrders" data-toggle="collapse" data-target=".method_sDeleteAllOrders .collapse">
+                            <h2>Truncate order related tables.</h2>
+                            <pre>sDeleteAllOrders() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_sDeleteAllCustomers"></a>
+                        <div class="element clickable method public method_sDeleteAllCustomers" data-toggle="collapse" data-target=".method_sDeleteAllCustomers .collapse">
+                            <h2>Truncate customer related tables</h2>
+                            <pre>sDeleteAllCustomers() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_sDeleteAllFilters"></a>
+                        <div class="element clickable method public method_sDeleteAllFilters" data-toggle="collapse" data-target=".method_sDeleteAllFilters .collapse">
+                            <h2>Helper method to delete all filter properties</h2>
+                            <pre>sDeleteAllFilters() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_clearImages"></a>
+                        <div class="element clickable method public method_clearImages" data-toggle="collapse" data-target=".method_clearImages .collapse">
+                            <h2>Helper method which deletes images/media tables
+Also physically deletes corresponding files</h2>
+                            <pre>clearImages() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_clearShopAction"></a>
+                        <div class="element clickable method public method_clearShopAction" data-toggle="collapse" data-target=".method_clearShopAction .collapse">
+                            <h2>This function is used to reset the shop. It will truncated all tables related to a given source</h2>
+                            <pre>clearShopAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_profileListAction"></a>
+                        <div class="element clickable method public method_profileListAction" data-toggle="collapse" data-target=".method_profileListAction .collapse">
+                            <h2>Returns the possible migration profiles</h2>
+                            <pre>profileListAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_databaseListAction"></a>
+                        <div class="element clickable method public method_databaseListAction" data-toggle="collapse" data-target=".method_databaseListAction .collapse">
+                            <h2>Returns the database list of the server.</h2>
+                            <pre>databaseListAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_setAliases"></a>
+                        <div class="element clickable method private method_setAliases" data-toggle="collapse" data-target=".method_setAliases .collapse">
+                            <h2>Helper function to set an automatic mapping when the user open the mapping panel.</h2>
+                            <pre>setAliases(mixed $array) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$array</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_mappingListLeftAction"></a>
+                        <div class="element clickable method public method_mappingListLeftAction" data-toggle="collapse" data-target=".method_mappingListLeftAction .collapse">
+                            <h2>This function returns the mapping list for the left grid</h2>
+                            <pre>mappingListLeftAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_mapArrays"></a>
+                        <div class="element clickable method private method_mapArrays" data-toggle="collapse" data-target=".method_mapArrays .collapse">
+                            <h2>Internal helper function for the automatic mapping</h2>
+                            <pre>mapArrays(mixed $sourceArray, mixed $targetArray) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$sourceArray</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$targetArray</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_mappingListRightAction"></a>
+                        <div class="element clickable method public method_mappingListRightAction" data-toggle="collapse" data-target=".method_mappingListRightAction .collapse">
+                            <h2>This function returns the mapping list of the right grid panel</h2>
+                            <pre>mappingListRightAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_mappingValuesListAction"></a>
+                        <div class="element clickable method public method_mappingValuesListAction" data-toggle="collapse" data-target=".method_mappingValuesListAction .collapse">
+                            <h2>This function returns the values for the grid combo boxes</h2>
+                            <pre>mappingValuesListAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_checkFormAction"></a>
+                        <div class="element clickable method public method_checkFormAction" data-toggle="collapse" data-target=".method_checkFormAction .collapse">
+                            <h2>This function validate the first form panel</h2>
+                            <pre>checkFormAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importProductPrices"></a>
+                        <div class="element clickable method public method_importProductPrices" data-toggle="collapse" data-target=".method_importProductPrices .collapse">
+                            <h2>This function imports the product prices, selected by the source profile product price query</h2>
+                            <pre>importProductPrices() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_removeSpecialCharacters"></a>
+                        <div class="element clickable method private method_removeSpecialCharacters" data-toggle="collapse" data-target=".method_removeSpecialCharacters .collapse">
+                            <h2>Helper function to format image names the way the media resource expects it</h2>
+                            <pre>removeSpecialCharacters(mixed $name) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$name</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importProductImages"></a>
+                        <div class="element clickable method public method_importProductImages" data-toggle="collapse" data-target=".method_importProductImages .collapse">
+                            <h2>Copy the article images from the source shop system into the shopware image path</h2>
+                            <pre>importProductImages() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_setCategoryTarget"></a>
+                        <div class="element clickable method public method_setCategoryTarget" data-toggle="collapse" data-target=".method_setCategoryTarget .collapse">
+                            <h2>Set a category target id</h2>
+                            <pre>setCategoryTarget(mixed $id, mixed $target) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$target</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getCategoryTarget"></a>
+                        <div class="element clickable method public method_getCategoryTarget" data-toggle="collapse" data-target=".method_getCategoryTarget .collapse">
+                            <h2>Get a category target id</h2>
+                            <pre>getCategoryTarget(mixed $id) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getCategoryTargetLike"></a>
+                        <div class="element clickable method public method_getCategoryTargetLike" data-toggle="collapse" data-target=".method_getCategoryTargetLike .collapse">
+                            <h2>Get a category target id</h2>
+                            <pre>getCategoryTargetLike(mixed $id) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_deleteCategoryTarget"></a>
+                        <div class="element clickable method public method_deleteCategoryTarget" data-toggle="collapse" data-target=".method_deleteCategoryTarget .collapse">
+                            <h2>Delete category target</h2>
+                            <pre>deleteCategoryTarget(mixed $id) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importCategories"></a>
+                        <div class="element clickable method public method_importCategories" data-toggle="collapse" data-target=".method_importCategories .collapse">
+                            <h2>Imports the categories of the target database into the shopware database
+Some shop system have only one main shop. For this shops the categories translations will split into new categories.</h2>
+                            <pre>importCategories() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importArticleCategories"></a>
+                        <div class="element clickable method public method_importArticleCategories" data-toggle="collapse" data-target=".method_importArticleCategories .collapse">
+                            <h2>Import Article-Category assignments</h2>
+                            <pre>importArticleCategories() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importProductRatings"></a>
+                        <div class="element clickable method public method_importProductRatings" data-toggle="collapse" data-target=".method_importProductRatings .collapse">
+                            <h2>This function import the product ratings, selected by the source profile</h2>
+                            <pre>importProductRatings() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>todo@dn: make this multi request capable</p>
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importProductTranslations"></a>
+                        <div class="element clickable method public method_importProductTranslations" data-toggle="collapse" data-target=".method_importProductTranslations .collapse">
+                            <h2>Imports the product translation from the source database into the shopware database</h2>
+                            <pre>importProductTranslations() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_makeInvalidNumberValid"></a>
+                        <div class="element clickable method public method_makeInvalidNumberValid" data-toggle="collapse" data-target=".method_makeInvalidNumberValid .collapse">
+                            <h2>Takes an invalid product number and creates a valid one from it
+by returning its md5 hash</h2>
+                            <pre>makeInvalidNumberValid($number, $id) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>todo: Generate more readable ordernumbers</p>
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$number</h4>
+                                                <code></code><p>
+</p>
+                                            </div>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code></code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getBaseArticleInfo"></a>
+                        <div class="element clickable method public method_getBaseArticleInfo" data-toggle="collapse" data-target=".method_getBaseArticleInfo .collapse">
+                            <h2>Returns a SW-productID for a given source-productId</h2>
+                            <pre>getBaseArticleInfo(mixed $productId) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$productId</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_generateConfiguratorSetsFromAttributes"></a>
+                        <div class="element clickable method public method_generateConfiguratorSetsFromAttributes" data-toggle="collapse" data-target=".method_generateConfiguratorSetsFromAttributes .collapse">
+                            <h2>Generates configuratorSets, configuratorOptions and configuratorGroups
+for a given article depending on its attributes</h2>
+                            <pre>generateConfiguratorSetsFromAttributes() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_generateVariants"></a>
+                        <div class="element clickable method public method_generateVariants" data-toggle="collapse" data-target=".method_generateVariants .collapse">
+                            <h2>Generate variants from configuratorSets</h2>
+                            <pre>generateVariants() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importProductProperties"></a>
+                        <div class="element clickable method public method_importProductProperties" data-toggle="collapse" data-target=".method_importProductProperties .collapse">
+                            <h2>importProductProperties</h2>
+                            <pre>importProductProperties() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importCustomers"></a>
+                        <div class="element clickable method public method_importCustomers" data-toggle="collapse" data-target=".method_importCustomers .collapse">
+                            <h2>This function imports the customers, selected by the source profile.</h2>
+                            <pre>importCustomers() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importOrders"></a>
+                        <div class="element clickable method public method_importOrders" data-toggle="collapse" data-target=".method_importOrders .collapse">
+                            <h2>This function import all orders from the source profile database into the shopware database.</h2>
+                            <pre>importOrders() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importOrderDetails"></a>
+                        <div class="element clickable method public method_importOrderDetails" data-toggle="collapse" data-target=".method_importOrderDetails .collapse">
+                            <h2>This function imports all order details from the source profile into the showpare database</h2>
+                            <pre>importOrderDetails() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_finishImport"></a>
+                        <div class="element clickable method public method_finishImport" data-toggle="collapse" data-target=".method_finishImport .collapse">
+                            <h2>This function finish the import and truncate the plugin table.</h2>
+                            <pre>finishImport() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_printError"></a>
+                        <div class="element clickable method protected method_printError" data-toggle="collapse" data-target=".method_printError .collapse">
+                            <h2>Convenience method which prints a given error for the extjs app</h2>
+                            <pre>printError(mixed $e) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$e</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_runImport"></a>
+                        <div class="element clickable method public method_runImport" data-toggle="collapse" data-target=".method_runImport .collapse">
+                            <h2>Triggers the actual import for a given type</h2>
+                            <pre>runImport(mixed $importType) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$importType</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_importAction"></a>
+                        <div class="element clickable method public method_importAction" data-toggle="collapse" data-target=".method_importAction .collapse">
+                            <h2>This function imports the different data types.</h2>
+                            <pre>importAction() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_printCurrentImportMessage"></a>
+                        <div class="element clickable method public method_printCurrentImportMessage" data-toggle="collapse" data-target=".method_printCurrentImportMessage .collapse">
+                            <h2>Helper method to print &quot;currently importing&quot; messages</h2>
+                            <pre>printCurrentImportMessage(mixed $type) </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$type</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_initTaskTimer"></a>
+                        <div class="element clickable method public method_initTaskTimer" data-toggle="collapse" data-target=".method_initTaskTimer .collapse">
+                            <h2>Helper function which sets the start time for a given task</h2>
+                            <pre>initTaskTimer() </pre>
+                            <div class="labels">
+                                                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description"><p>Timer should be inited after the inital DB-Query of each task, as this
+query will usually take longer on the first run and therefore distort the results</p>
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                    
+                    
+                                            <h3><i class="icon-custom icon-property"></i> Properties</h3>
+                                                    <a id="property_helpers"> </a>
+                            <div class="element clickable property protected property_helpers" data-toggle="collapse" data-target=".property_helpers .collapse">
+                                <h2>Some helpers</h2>
+                                <pre>helpers</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_categoryLanguageSeparator"> </a>
+                            <div class="element clickable property protected property_categoryLanguageSeparator" data-toggle="collapse" data-target=".property_categoryLanguageSeparator .collapse">
+                                <h2>categoryLanguageSeparator</h2>
+                                <pre>categoryLanguageSeparator</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_imports"> </a>
+                            <div class="element clickable property public property_imports" data-toggle="collapse" data-target=".property_imports .collapse">
+                                <h2>Defines all availabe imports as well as the order of their import</h2>
+                                <pre>imports</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_source"> </a>
+                            <div class="element clickable property protected property_source" data-toggle="collapse" data-target=".property_source .collapse">
+                                <h2>Source shop system profile</h2>
+                                <pre>source</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_target"> </a>
+                            <div class="element clickable property protected property_target" data-toggle="collapse" data-target=".property_target .collapse">
+                                <h2>Target shop system profile</h2>
+                                <pre>target</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_namespace"> </a>
+                            <div class="element clickable property protected property_namespace" data-toggle="collapse" data-target=".property_namespace .collapse">
+                                <h2>Namespace for the snippets</h2>
+                                <pre>namespace</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                    <a id="property_max_execution"> </a>
+                            <div class="element clickable property protected property_max_execution" data-toggle="collapse" data-target=".property_max_execution .collapse">
+                                <h2>Default execution time. After the given number of seconds, the current offset is saved and the
+request is returned to the ExtJS controller which triggered it</h2>
+                                <pre>max_execution</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </div>
+            </div>
+            <a id="\Shopware_Controllers_Backend_SwagMigration"></a>
+            <ul class="breadcrumb">
+                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
+                    
+    
+    <li>
+        <span class="divider">\</span><a href="../namespaces/default.html">\</a>
+    </li>
+
+                <li class="active"><span class="divider">\</span><a href="../classes/Shopware_Controllers_Backend_SwagMigration.html">Shopware_Controllers_Backend_SwagMigration</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<footer class="span12">
+    Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
+    <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
+    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
+    generated on Sun, 23 Jun 2013 19:49:14 +0200.<br/>
+</footer>
+</body>
+</html>

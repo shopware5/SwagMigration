@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;"/>
+    <meta charset="utf-8"/>
+    <title>     &raquo; \Shopware_Components_Migration_Profile_Gambio
+</title>
+    <meta name="author" content=""/>
+    <meta name="description" content=""/>
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js" type="text/javascript"></script>
+    <![endif]-->
+
+    <link href="../css/template.css" rel="stylesheet" media="all"/>
+    <script src="../js/jquery-1.7.1.min.js" type="text/javascript"></script>
+    <script src="../js/jquery-ui-1.8.2.custom.min.js" type="text/javascript"></script>
+    <script src="../js/jquery.mousewheel.min.js" type="text/javascript"></script>
+    <script src="../js/bootstrap.js" type="text/javascript"></script>
+    <script src="../js/template.js" type="text/javascript"></script>
+    <script src="../js/prettify/prettify.min.js" type="text/javascript"></script>
+
+    <link rel="shortcut icon" href="../img/favicon.ico"/>
+    <link rel="apple-touch-icon" href="../img/apple-touch-icon.png"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="../img/apple-touch-icon-72x72.png"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="../img/apple-touch-icon-114x114.png"/>
+</head>
+<body>
+
+<div class="navbar navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <span class="icon-bar"></span> <span class="icon-bar"></span>
+                <span class="icon-bar"></span> </a>
+            <a class="brand" href="../index.html">API Documentation</a>
+
+            <div class="nav-collapse">
+                <ul class="nav">
+                    <li class="dropdown">
+                        <a href="#api" class="dropdown-toggle" data-toggle="dropdown">
+                            API Documentation <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                                                                                </ul>
+                    </li>
+                    <li class="dropdown" id="charts-menu">
+                        <a href="#charts" class="dropdown-toggle" data-toggle="dropdown">
+                            Charts <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="../graph_class.html">
+                                    <i class="icon-list-alt"></i>&#160;Class hierarchy diagram
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown" id="reports-menu">
+                        <a href="#reports" class="dropdown-toggle" data-toggle="dropdown">
+                            Reports <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="../errors.html"><i class="icon-list-alt"></i>&#160;Errors</a></li>
+                            <li><a href="../markers.html"><i class="icon-list-alt"></i>&#160;Markers</a></li>
+                            <li><a href="../deprecated.html"><i class="icon-list-alt"></i>&#160;Deprecated</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="go_to_top">
+        <a href="#___" style="color: inherit">Back to top&#160;&#160;<i class="icon-upload icon-white"></i></a>
+    </div>
+</div>
+
+<div id="___" class="container">
+    <noscript>
+        <div class="alert alert-warning">
+            Javascript is disabled; several features are only available if Javascript is enabled.
+        </div>
+    </noscript>
+
+        
+    <div class="row">
+        <div class="span4">
+                    <span class="btn-group visibility" data-toggle="buttons-checkbox">
+        <button class="btn public active" title="Show public elements">Public</button>
+        <button class="btn protected" title="Show protected elements">Protected</button>
+        <button class="btn private" title="Show private elements">Private</button>
+        <button class="btn inherited active" title="Show inherited elements">Inherited</button>
+    </span>
+    <div class="btn-group view pull-right" data-toggle="buttons-radio">
+        <button class="btn details" title="Show descriptions and method names"><i class="icon-list"></i></button>
+        <button class="btn simple" title="Show only method names"><i class="icon-align-justify"></i></button>
+    </div>
+
+        <ul class="side-nav nav nav-list">
+        <li class="nav-header">
+            <i class="icon-custom icon-method"></i> Methods
+            <ul>
+                                                                                    <li class="method public inherited">
+        <a href="#method_getProductImagePath" title="getProductImagePath :: Returns the directory of the article images.">
+            <span class="description">Returns the directory of the article images.</span><pre>getProductImagePath</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getDefaultLanguageSelect" title="getDefaultLanguageSelect :: Returns the sql statement to select default shop system language">
+            <span class="description">Returns the sql statement to select default shop system language</span><pre>getDefaultLanguageSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getLanguageSelect" title="getLanguageSelect :: Returns the sql statement to select the shop system languages">
+            <span class="description">Returns the sql statement to select the shop system languages</span><pre>getLanguageSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getPropertyOptionSelect" title="getPropertyOptionSelect :: Returns the property options of the shop">
+            <span class="description">Returns the property options of the shop</span><pre>getPropertyOptionSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getShopSelect" title="getShopSelect :: Returns a dummy SQL statement with a default shop">
+            <span class="description">Returns a dummy SQL statement with a default shop</span><pre>getShopSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getCustomerGroupSelect" title="getCustomerGroupSelect :: Returns the sql statement to select the shop system customer groups">
+            <span class="description">Returns the sql statement to select the shop system customer groups</span><pre>getCustomerGroupSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getPaymentMeanSelect" title="getPaymentMeanSelect :: Returns the sql statement to select the shop system payments">
+            <span class="description">Returns the sql statement to select the shop system payments</span><pre>getPaymentMeanSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getOrderStatusSelect" title="getOrderStatusSelect :: Returns the sql statement to select the shop system order states">
+            <span class="description">Returns the sql statement to select the shop system order states</span><pre>getOrderStatusSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getTaxRateSelect" title="getTaxRateSelect :: Returns the sql statement to select the shop system tax rates">
+            <span class="description">Returns the sql statement to select the shop system tax rates</span><pre>getTaxRateSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getAttributeSelect" title="getAttributeSelect :: Returns the sql statement to select the shop system article attributes">
+            <span class="description">Returns the sql statement to select the shop system article attributes</span><pre>getAttributeSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductPropertiesSelect" title="getProductPropertiesSelect :: Returns the sql statement to select articles with">
+            <span class="description">Returns the sql statement to select articles with</span><pre>getProductPropertiesSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductsWithPropertiesSelect" title="getProductsWithPropertiesSelect :: Get ids of all products with properties">
+            <span class="description">Get ids of all products with properties</span><pre>getProductsWithPropertiesSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getAttributedProductsSelect" title="getAttributedProductsSelect :: Get productIds for all products with attributes">
+            <span class="description">Get productIds for all products with attributes</span><pre>getAttributedProductsSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductAttributesSelect" title="getProductAttributesSelect :: Select attributes for a given article">
+            <span class="description">Select attributes for a given article</span><pre>getProductAttributesSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductSelect" title="getProductSelect :: Returns the sql statement to select the shop system articles">
+            <span class="description">Returns the sql statement to select the shop system articles</span><pre>getProductSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductPriceSelect" title="getProductPriceSelect :: Returns the sql statement to select the shop system article prices">
+            <span class="description">Returns the sql statement to select the shop system article prices</span><pre>getProductPriceSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductImageSelect" title="getProductImageSelect :: Returns the sql statement to select the shop system article image allocation">
+            <span class="description">Returns the sql statement to select the shop system article image allocation</span><pre>getProductImageSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductTranslationSelect" title="getProductTranslationSelect :: Returns the sql statement to select the shop system article translations">
+            <span class="description">Returns the sql statement to select the shop system article translations</span><pre>getProductTranslationSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductRelationSelect" title="getProductRelationSelect :: Returns the sql statement to select the shop system article relations">
+            <span class="description">Returns the sql statement to select the shop system article relations</span><pre>getProductRelationSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_queryCustomers" title="queryCustomers :: This function creates an database index on the orders table">
+            <span class="description">This function creates an database index on the orders table</span><pre>queryCustomers</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getCustomerSelect" title="getCustomerSelect :: Returns the sql statement to select the shop system customer">
+            <span class="description">Returns the sql statement to select the shop system customer</span><pre>getCustomerSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductCategorySelect" title="getProductCategorySelect :: Returns the sql statement to select the shop system article category allocation">
+            <span class="description">Returns the sql statement to select the shop system article category allocation</span><pre>getProductCategorySelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getCategorySelect" title="getCategorySelect :: Returns the sql statement to select the shop system categories">
+            <span class="description">Returns the sql statement to select the shop system categories</span><pre>getCategorySelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getProductRatingSelect" title="getProductRatingSelect :: Returns the sql statement to select the shop system article ratings">
+            <span class="description">Returns the sql statement to select the shop system article ratings</span><pre>getProductRatingSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getOrderSelect" title="getOrderSelect :: Returns the sql statement to select the shop system customer">
+            <span class="description">Returns the sql statement to select the shop system customer</span><pre>getOrderSelect</pre>
+        </a>
+    </li>
+
+                                                                                                        <li class="method public inherited">
+        <a href="#method_getOrderDetailSelect" title="getOrderDetailSelect :: Returns the sql statement to select all shop system order details">
+            <span class="description">Returns the sql statement to select all shop system order details</span><pre>getOrderDetailSelect</pre>
+        </a>
+    </li>
+
+                                                </ul>
+        </li>
+        <li class="nav-header protected">» Protected
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+        </li>
+        <li class="nav-header private">» Private
+            <ul>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    </ul>
+        </li>
+        <li class="nav-header">
+            <i class="icon-custom icon-constant"></i> Constants
+            <ul>
+                            </ul>
+        </li>
+    </ul>
+
+
+        </div>
+
+        <div class="span8">
+            <div class="element class">
+                <h1>Shopware_Components_Migration_Profile_Gambio</h1>
+                <small style="display: block; text-align: right">
+                                            Extends <a href="../classes/Shopware_Components_Migration_Profile_XtCommerce.html">\Shopware_Components_Migration_Profile_XtCommerce</a>
+                                                        </small>
+                <p class="short_description">Shopware SwagMigration Components - Gambio</p>
+                <div class="details">
+                    <div class="long_description">
+                        <p>WARNING: When changing this component also check gambio profile as this currently
+extens from this XTC profile. Also some methods of the Veyton profile might extend from here</p>
+
+                    </div>
+                    <table class="table table-bordered">
+                                                                                    <tr>
+                                    <th>
+                                        category
+                                                                            </th>
+                                    <td>
+                                                                                <p>Shopware</p>
+
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        package
+                                                                            </th>
+                                    <td>
+                                                                                <p>Shopware\Plugins\SwagMigration\Components</p>
+
+                                    </td>
+                                </tr>
+                                                                                                                <tr>
+                                    <th>
+                                        copyright
+                                                                            </th>
+                                    <td>
+                                                                                <p>Copyright (c) 2012, shopware AG (http://www.shopware.de)</p>
+
+                                    </td>
+                                </tr>
+                                                                        </table>
+
+                    <h3><i class="icon-custom icon-method"></i> Methods</h3>
+                                            <a id="method_getProductImagePath"></a>
+                        <div class="element clickable method public method_getProductImagePath inherited" data-toggle="collapse" data-target=".method_getProductImagePath .collapse">
+                            <h2>Returns the directory of the article images.</h2>
+                            <pre>getProductImagePath() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getDefaultLanguageSelect"></a>
+                        <div class="element clickable method public method_getDefaultLanguageSelect inherited" data-toggle="collapse" data-target=".method_getDefaultLanguageSelect .collapse">
+                            <h2>Returns the sql statement to select default shop system language</h2>
+                            <pre>getDefaultLanguageSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getLanguageSelect"></a>
+                        <div class="element clickable method public method_getLanguageSelect inherited" data-toggle="collapse" data-target=".method_getLanguageSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system languages</h2>
+                            <pre>getLanguageSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getPropertyOptionSelect"></a>
+                        <div class="element clickable method public method_getPropertyOptionSelect inherited" data-toggle="collapse" data-target=".method_getPropertyOptionSelect .collapse">
+                            <h2>Returns the property options of the shop</h2>
+                            <pre>getPropertyOptionSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getShopSelect"></a>
+                        <div class="element clickable method public method_getShopSelect inherited" data-toggle="collapse" data-target=".method_getShopSelect .collapse">
+                            <h2>Returns a dummy SQL statement with a default shop</h2>
+                            <pre>getShopSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getCustomerGroupSelect"></a>
+                        <div class="element clickable method public method_getCustomerGroupSelect inherited" data-toggle="collapse" data-target=".method_getCustomerGroupSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system customer groups</h2>
+                            <pre>getCustomerGroupSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getPaymentMeanSelect"></a>
+                        <div class="element clickable method public method_getPaymentMeanSelect inherited" data-toggle="collapse" data-target=".method_getPaymentMeanSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system payments</h2>
+                            <pre>getPaymentMeanSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getOrderStatusSelect"></a>
+                        <div class="element clickable method public method_getOrderStatusSelect inherited" data-toggle="collapse" data-target=".method_getOrderStatusSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system order states</h2>
+                            <pre>getOrderStatusSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getTaxRateSelect"></a>
+                        <div class="element clickable method public method_getTaxRateSelect inherited" data-toggle="collapse" data-target=".method_getTaxRateSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system tax rates</h2>
+                            <pre>getTaxRateSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getAttributeSelect"></a>
+                        <div class="element clickable method public method_getAttributeSelect inherited" data-toggle="collapse" data-target=".method_getAttributeSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article attributes</h2>
+                            <pre>getAttributeSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductPropertiesSelect"></a>
+                        <div class="element clickable method public method_getProductPropertiesSelect inherited" data-toggle="collapse" data-target=".method_getProductPropertiesSelect .collapse">
+                            <h2>Returns the sql statement to select articles with</h2>
+                            <pre>getProductPropertiesSelect(mixed $id) </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductsWithPropertiesSelect"></a>
+                        <div class="element clickable method public method_getProductsWithPropertiesSelect inherited" data-toggle="collapse" data-target=".method_getProductsWithPropertiesSelect .collapse">
+                            <h2>Get ids of all products with properties</h2>
+                            <pre>getProductsWithPropertiesSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getAttributedProductsSelect"></a>
+                        <div class="element clickable method public method_getAttributedProductsSelect inherited" data-toggle="collapse" data-target=".method_getAttributedProductsSelect .collapse">
+                            <h2>Get productIds for all products with attributes</h2>
+                            <pre>getAttributedProductsSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductAttributesSelect"></a>
+                        <div class="element clickable method public method_getProductAttributesSelect inherited" data-toggle="collapse" data-target=".method_getProductAttributesSelect .collapse">
+                            <h2>Select attributes for a given article</h2>
+                            <pre>getProductAttributesSelect(mixed $id) </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$id</h4>
+                                                <code>mixed</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductSelect"></a>
+                        <div class="element clickable method public method_getProductSelect inherited" data-toggle="collapse" data-target=".method_getProductSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system articles</h2>
+                            <pre>getProductSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductPriceSelect"></a>
+                        <div class="element clickable method public method_getProductPriceSelect inherited" data-toggle="collapse" data-target=".method_getProductPriceSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article prices</h2>
+                            <pre>getProductPriceSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductImageSelect"></a>
+                        <div class="element clickable method public method_getProductImageSelect inherited" data-toggle="collapse" data-target=".method_getProductImageSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article image allocation</h2>
+                            <pre>getProductImageSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductTranslationSelect"></a>
+                        <div class="element clickable method public method_getProductTranslationSelect inherited" data-toggle="collapse" data-target=".method_getProductTranslationSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article translations</h2>
+                            <pre>getProductTranslationSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductRelationSelect"></a>
+                        <div class="element clickable method public method_getProductRelationSelect inherited" data-toggle="collapse" data-target=".method_getProductRelationSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article relations</h2>
+                            <pre>getProductRelationSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_queryCustomers"></a>
+                        <div class="element clickable method public method_queryCustomers inherited" data-toggle="collapse" data-target=".method_queryCustomers .collapse">
+                            <h2>This function creates an database index on the orders table</h2>
+                            <pre>queryCustomers(int $offset) </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                                                            <h3>Arguments</h3>
+                                                                                    <div class="subelement argument">
+                                                <h4>$offset</h4>
+                                                <code>int</code><p>
+</p>
+                                            </div>
+                                                                            
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getCustomerSelect"></a>
+                        <div class="element clickable method public method_getCustomerSelect inherited" data-toggle="collapse" data-target=".method_getCustomerSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system customer</h2>
+                            <pre>getCustomerSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductCategorySelect"></a>
+                        <div class="element clickable method public method_getProductCategorySelect inherited" data-toggle="collapse" data-target=".method_getProductCategorySelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article category allocation</h2>
+                            <pre>getProductCategorySelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getCategorySelect"></a>
+                        <div class="element clickable method public method_getCategorySelect inherited" data-toggle="collapse" data-target=".method_getCategorySelect .collapse">
+                            <h2>Returns the sql statement to select the shop system categories</h2>
+                            <pre>getCategorySelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getProductRatingSelect"></a>
+                        <div class="element clickable method public method_getProductRatingSelect inherited" data-toggle="collapse" data-target=".method_getProductRatingSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system article ratings</h2>
+                            <pre>getProductRatingSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getOrderSelect"></a>
+                        <div class="element clickable method public method_getOrderSelect inherited" data-toggle="collapse" data-target=".method_getOrderSelect .collapse">
+                            <h2>Returns the sql statement to select the shop system customer</h2>
+                            <pre>getOrderSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                                            <a id="method_getOrderDetailSelect"></a>
+                        <div class="element clickable method public method_getOrderDetailSelect inherited" data-toggle="collapse" data-target=".method_getOrderDetailSelect .collapse">
+                            <h2>Returns the sql statement to select all shop system order details</h2>
+                            <pre>getOrderDetailSelect() </pre>
+                            <div class="labels">
+                                <span class="label">inherited</span>                                                                                                                                                            </div>
+                            <div class="row collapse">
+                                <div class="detail-description">
+                                    <div class="long_description">
+</div>
+
+                                    <table class="table">
+                                                                                    <tr>
+                                                <th>
+                                                    
+                                                </th>
+                                                <td>
+                                                                                                    </td>
+                                            </tr>
+                                                                            </table>
+
+                                    
+                                                                    </div>
+                            </div>
+                        </div>
+                    
+                    
+                                            <h3><i class="icon-custom icon-property"></i> Properties</h3>
+                                                    <a id="property_db_prefix"> </a>
+                            <div class="element clickable property protected property_db_prefix" data-toggle="collapse" data-target=".property_db_prefix .collapse">
+                                <h2>Prefix of each database tables</h2>
+                                <pre>db_prefix</pre>
+                                <div class="labels">
+                                                                                                        </div>
+                                <div class="row collapse">
+                                    <div class="detail-description">
+                                        <div class="long_description">
+</div>
+                                    </div>
+                                </div>
+                            </div>
+                                                            </div>
+            </div>
+            <a id="\Shopware_Components_Migration_Profile_Gambio"></a>
+            <ul class="breadcrumb">
+                <li><a href="../index.html"><i class="icon-custom icon-class"></i></a></li>
+                    
+    
+    <li>
+        <span class="divider">\</span><a href="../namespaces/default.html">\</a>
+    </li>
+
+                <li class="active"><span class="divider">\</span><a href="../classes/Shopware_Components_Migration_Profile_Gambio.html">Shopware_Components_Migration_Profile_Gambio</a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<footer class="span12">
+    Template is built using <a href="http://twitter.github.com/bootstrap/">Twitter Bootstrap 2</a> and icons provided by
+    <a href="http://glyphicons.com/">Glyphicons</a>.<br/>
+    Documentation is powered by <a href="http://www.phpdoc.org/">phpDocumentor </a> and<br/>
+    generated on Sun, 23 Jun 2013 19:49:14 +0200.<br/>
+</footer>
+</body>
+</html>
