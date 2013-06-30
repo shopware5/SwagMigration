@@ -53,7 +53,7 @@ class Shopware_Components_Migration_Import_Configurator extends Shopware_Compone
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('configuratorProgress', "%s out of %s configurators imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount()),
+        return sprintf($this->getNameSpace()->get('configuratorProgress', "%s out of %s configurators imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
     }
 
     /**

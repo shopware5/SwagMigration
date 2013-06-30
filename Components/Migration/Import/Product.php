@@ -267,4 +267,44 @@ class Shopware_Components_Migration_Import_Product extends Shopware_Components_M
 
         return $this->getProgress()->done();
     }
+
+
+    /**
+     * Helper function to remove an old article detail ans set another detail instead of it. Will also update
+     * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
+     *
+     * @param $oldMainDetail
+     * @param $newMainDetail
+     * @param $articleId
+     */
+    public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
+    {
+        // Delete old main detail
+        $sql = 'DELETE FROM s_articles_details WHERE id = ?';
+        Shopware()->Db()->query(
+            $sql,
+            array($oldMainDetail)
+        );
+
+        // Set the new mainDetail for the article
+        $sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
+        Shopware()->Db()->query(
+            $sql,
+            array($newMainDetail, $articleId)
+        );
+
+        // Update kind of the new main detail
+        $sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
+        Shopware()->Db()->query(
+            $sql,
+            array($newMainDetail)
+        );
+
+        // Update mapping so that references to the old dummy article point to this article
+        $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
+        Shopware()->Db()->query(
+            $sql,
+            array($newMainDetail,self::MAPPING_ARTICLE, $oldMainDetail)
+        );
+    }
 }

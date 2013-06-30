@@ -40,8 +40,11 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
-
+        if ($this->getInternalName() == 'import_categories') {
+            return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        } elseif ($this->getInternalName() == 'import_article_categories') {
+            return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        }
     }
 
     /**
@@ -53,7 +56,11 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressCategories', "%s out of %s categories imported"), $progress->getOffset(), $progress->getCount());
+        if ($this->getInternalName() == 'import_categories') {
+            return sprintf($this->getNameSpace()->get('progressCategories', "%s out of %s categories imported"), $progress->getOffset(), $progress->getCount());
+        } elseif ($this->getInternalName() == 'import_article_categories') {
+            return sprintf($this->getNameSpace()->get('progressArticleCategories', "%s out of %s articles assigned to categories"), $progress->getOffset(), $progress->getCount());
+        }
     }
 
     /**
@@ -142,16 +149,26 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
      * If you want this to work properly, think of calling:
      * - $this->initTaskTimer() at the beginning of your run method
      * - $this->getProgress()->setCount(222) to set the total number of data
-     * - $this->increaseProgress() to increase the offset/progress
+     * - $this->increaseProgress() to increase the offset/progress by one
      * - $this->getProgress()->getOffset() to get the current progress' offset
      * - return $this->getProgress()->error("Message") in order to stop with an error message
      * - return $this->getProgress() in order to be called again with the current offset
      * - return $this->getProgress()->done() in order to mark the import as finished
      *
+     * The category import adapter handles categories as well as article-category assignments.
      *
      * @return Shopware_Components_Migration_Import_Progress
      */
     public function run()
+    {
+        if ($this->getInternalName() == 'import_categories') {
+            return $this->importCategories();
+        } elseif ($this->getInternalName() == 'import_article_categories') {
+            return $this->importArticleCategories();
+        }
+    }
+
+    public function importCategories()
     {
         $offset = $this->getProgress()->getOffset();
 
@@ -237,4 +254,57 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
         $this->getProgress()->addRequestParam('import_article_categories', 1);
         return $this->getProgress()->done();
     }
+
+    public function importArticleCategories()
+    {
+        $offset = $this->getProgress()->getOffset();
+
+        $result = $this->Source()->queryProductCategories($offset);
+
+        $count = $result->rowCount()+$offset;
+        $this->getProgress()->setCount($count);
+
+        $taskStartTime  = $this->initTaskTimer();
+
+        while ($productCategory = $result->fetch()) {
+            if ($this->newRequestNeeded()) {
+                return $this->getProgress();
+            }
+            $this->increaseProgress();
+
+            $sql = '
+                SELECT ad.articleID
+                FROM s_plugin_migrations pm
+                JOIN s_articles_details ad
+                ON ad.id=pm.targetID
+                WHERE `sourceID`=?
+                AND `typeID`=?
+            ';
+            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+
+            if(empty($article)) {
+                continue;
+            }
+
+            $sql = '
+                SELECT `targetID`
+                FROM `s_plugin_migrations`
+                WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
+            ';
+            // Also take language categories into account
+            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'] . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR.'%'));
+
+            if(empty($categories)) {
+                continue;
+            }
+
+            foreach ($categories as $category) {
+                Shopware()->Api()->Import()->sArticleCategory($article, $category, false);
+            }
+        }
+
+        $this->getProgress()->done();
+
+    }
+
 }

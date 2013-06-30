@@ -130,27 +130,6 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
         return $startTime;
     }
 
-
-    /**
-     * Returns a SW-productID for a given source-productId
-     * @param $productId
-     * @return string
-     */
-    public function getBaseArticleInfo($productId)
-    {
-        $sql = '
-            SELECT
-                ad.articleID as productId
-            FROM s_plugin_migrations pm
-            LEFT JOIN s_articles_details ad
-                ON ad.id = pm.targetID
-            WHERE pm.`sourceID`=?
-            AND `typeID`=?
-        ';
-
-        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
-    }
-
     /**
      * @param $progress
      */
@@ -237,6 +216,75 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
     public function getInternalName()
     {
         return $this->internal_name;
+    }
+
+
+
+
+
+    /**
+     * Takes an invalid product number and creates a valid one from it
+     * by returning its md5 hash
+     *
+     * todo: Generate more readable ordernumbers
+     */
+    public function makeInvalidNumberValid($number, $id)
+    {
+        // Look up the id in the database - perhaps we've already created a valid number:
+        $number = Shopware()->Db()->fetchOne(
+            'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
+            array(Shopware_Components_Helpers::MAPPING_VALID_NUMBER, $id)
+        );
+
+        if ($number) {
+            return $number;
+        }
+
+        // Get number
+        $number = (int) Shopware()->Db()->fetchOne(
+            'SELECT `number` FROM `s_order_number` WHERE `name`="articleordernumber" FOR UPDATE;'
+        );
+
+        // Increase - save
+        Shopware()->Db()->update(
+            's_order_number',
+            array('number' => ++$number),
+            array('name' => 'articleordernumber')
+        );
+
+        // Save mapping
+        Shopware()->Db()->insert(
+            's_plugin_migrations',
+            array(
+                'typeID' => Shopware_Components_Helpers::MAPPING_VALID_NUMBER,
+                'sourceID' => $id,
+                'targetID' => $number
+            )
+        );
+
+        return 'sw-'.$number;
+
+//        return "sw-".md5($id);
+    }
+
+    /**
+     * Returns a SW-productID for a given source-productId
+     * @param $productId
+     * @return string
+     */
+    public function getBaseArticleInfo($productId)
+    {
+        $sql = '
+            SELECT
+                ad.articleID as productId
+            FROM s_plugin_migrations pm
+            LEFT JOIN s_articles_details ad
+                ON ad.id = pm.targetID
+            WHERE pm.`sourceID`=?
+            AND `typeID`=?
+        ';
+
+        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
     }
 
 }
