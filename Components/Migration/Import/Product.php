@@ -198,7 +198,7 @@ class Shopware_Components_Migration_Import_Product extends Shopware_Components_M
 
                     // If non is available remove the odl detail and set the new one as main detail
                     if (!$hasOptions) {
-                        $this->Helpers()->replaceProductDetail(
+                        $this->replaceProductDetail(
                             $product['maindetailsID'],
                             $product['articledetailsID'],
                             $product['articleID']
@@ -304,7 +304,7 @@ class Shopware_Components_Migration_Import_Product extends Shopware_Components_M
         $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
         Shopware()->Db()->query(
             $sql,
-            array($newMainDetail,self::MAPPING_ARTICLE, $oldMainDetail)
+            array($newMainDetail,Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $oldMainDetail)
         );
     }
 }

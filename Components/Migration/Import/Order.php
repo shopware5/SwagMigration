@@ -54,9 +54,9 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
     public function getCurrentProgressMessage($progress)
     {
         if ($this->getInternalName() == 'import_orders') {
-            return sprintf($this->namespace->get('progressOrders', "%s out of %s orders imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+            return sprintf($this->getNameSpace()->get('progressOrders', "%s out of %s orders imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
         } elseif ($this->getInternalName() == 'import_order_details') {
-            return sprintf($this->namespace->get('progressOrderDetails', "%s out of %s order details imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+            return sprintf($this->getNameSpace()->get('progressOrderDetails', "%s out of %s order details imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
         }
     }
 
@@ -111,7 +111,7 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
 
         $result = $this->Source()->queryOrders($offset);
         $count = $result->rowCount()+$offset;
-        $this->getProgress()->setCount($count):
+        $this->getProgress()->setCount($count);
 
         $taskStartTime  = $this->initTaskTimer();
 
@@ -281,7 +281,7 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
         $offset = $this->getProgress()->getOffset();
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
-        $numberSnippet = $this->namespace->get('numberNotValid',
+        $numberSnippet = $this->getNameSpace()->get('numberNotValid',
             "The product number %s is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
             * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>

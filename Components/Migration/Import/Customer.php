@@ -53,7 +53,7 @@ class Shopware_Components_Migration_Import_Customer extends Shopware_Components_
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->namespace->get('progressCustomers', "%s out of %s customers imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf($this->getNameSpace()->get('progressCustomers', "%s out of %s customers imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
     }
 
     /**
@@ -97,7 +97,7 @@ class Shopware_Components_Migration_Import_Customer extends Shopware_Components_
         $count = $result->rowCount()+$offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $this->initTaskTimer();
 
         while ($customer = $result->fetch()) {
 
@@ -109,6 +109,11 @@ class Shopware_Components_Migration_Import_Customer extends Shopware_Components_
                 $customer['subshopID'] = $this->Request()->shop[$customer['subshopID']];
             } else {
                 unset($customer['subshopID']);
+            }
+            if(isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
+                $customer['language'] = $this->Request()->language[$customer['language']];
+            } else {
+                unset($customer['language']);
             }
             if(!empty($customer['billing_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
@@ -126,6 +131,16 @@ class Shopware_Components_Migration_Import_Customer extends Shopware_Components_
             if(!empty($customer['md5_password']) && !empty($salt)) {
                 $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
             }
+
+            // If language is not set, read language from subshop
+            if (empty($customer['language']) && !empty($customer['subshopID'])) {
+                $sql = 'SELECT `locale_id` FROM s_core_shops WHERE id=?';
+                $languageId = (int) Shopware()->Db()->fetchOne($sql, array($customer['subshopID']));
+                if (!empty($languageId)) {
+                    $customer['language'] = $languageId;
+                }
+            }
+
 
             if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
                 $customer_shipping = array(

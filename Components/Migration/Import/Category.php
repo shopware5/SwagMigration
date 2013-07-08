@@ -121,7 +121,7 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             array(
                 Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,
-                $id . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATORnb . '%'
+                $id . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR . '%'
             )
         );
     }

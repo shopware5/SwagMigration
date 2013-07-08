@@ -96,6 +96,7 @@ class Shopware_Components_Migration_Import_Variant extends Shopware_Components_M
         if (empty($products_result)) {
             $this->getProgress()->addRequestParam('import_generate_variants', null);
             $this->getProgress()->addRequestParam('import_create_configurator_variants', null);
+            return $this->getProgress()->done();
         }
 
         $count = $products_result->rowCount()+$offsetProduct;
@@ -126,7 +127,6 @@ class Shopware_Components_Migration_Import_Variant extends Shopware_Components_M
             // The ExtJS frontend will care of the generation by triggering
             // the default article controller
 
-            // @todo: CHECK
             $this->getProgress()->addRequestParam('params', $params);
             $this->getProgress()->addRequestParam('create_variants', true);
             return $this->getProgress();

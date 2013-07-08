@@ -146,6 +146,9 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                         if ("PrestaShop" == profile) {
                             activeCard = layout.getActiveItem();
                             activeCard.setSaltInputNeeded(true);
+                        } else {
+                            activeCard = layout.getActiveItem();
+                            activeCard.setSaltInputNeeded(false);
                         }
                         break;
                     case 2:

@@ -140,7 +140,7 @@ class Shopware_Components_Migration_Import_Translation extends Shopware_Componen
             }
         }
 
-        retunr $this->getProgress()->done();
+        return $this->getProgress()->done();
     }
 
 

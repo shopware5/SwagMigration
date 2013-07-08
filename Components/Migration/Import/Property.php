@@ -100,7 +100,7 @@ class Shopware_Components_Migration_Import_Property extends Shopware_Components_
         $count = $result->rowCount()+$offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $this->initTaskTimer();
 
         // Iterate those products, get properties, import them
         while ($product = $result->fetch()) {

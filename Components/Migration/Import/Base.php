@@ -70,14 +70,22 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
     protected $source;
 
     /**
+     * Target-Object
+     * @var Shopware_Components_Migration_Profile
+     */
+    protected $target;
+
+    /**
      * @param Shopware_Components_Migration_Import_Progress $progress
      * @param Shopware_Components_Migration_Profile $source
+     * @param Shopware_Components_Migration_Profile $target
      * @param int $maxExecution
      * @param $request
      */
-    public function __construct($progress, $source, $maxExecution, $request)
+    public function __construct($progress, $source, $target, $maxExecution, $request)
     {
         $this->progress = $progress;
+        $this->target = $target;
         $this->source = $source;
         $this->requestTime =  !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $this->maxExecution = $maxExecution;
@@ -195,6 +203,14 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
     }
 
     /**
+     * @return Shopware_Components_Migration_Profile
+     */
+    public function Target()
+    {
+        return $this->target;
+    }
+
+    /**
      * @return mixed
      */
     public function increaseProgress()
@@ -225,15 +241,13 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
     /**
      * Takes an invalid product number and creates a valid one from it
      * by returning its md5 hash
-     *
-     * todo: Generate more readable ordernumbers
      */
     public function makeInvalidNumberValid($number, $id)
     {
         // Look up the id in the database - perhaps we've already created a valid number:
         $number = Shopware()->Db()->fetchOne(
             'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            array(Shopware_Components_Helpers::MAPPING_VALID_NUMBER, $id)
+            array(Shopware_Components_Migration_Helpers::MAPPING_VALID_NUMBER, $id)
         );
 
         if ($number) {
@@ -256,7 +270,7 @@ abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class i
         Shopware()->Db()->insert(
             's_plugin_migrations',
             array(
-                'typeID' => Shopware_Components_Helpers::MAPPING_VALID_NUMBER,
+                'typeID' => Shopware_Components_Migration_Helpers::MAPPING_VALID_NUMBER,
                 'sourceID' => $id,
                 'targetID' => $number
             )
