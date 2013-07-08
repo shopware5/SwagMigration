@@ -40,7 +40,7 @@ class Shopware_Components_Migration_Import_Price extends Shopware_Components_Mig
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorImportingPrices', "An error occurred while importing prices");
 
     }
 

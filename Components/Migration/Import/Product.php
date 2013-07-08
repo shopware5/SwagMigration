@@ -129,8 +129,11 @@ class Shopware_Components_Migration_Import_Product extends Shopware_Components_M
 
             // Check the ordernumber
             $number = $product['ordernumber'];
-            if ($numberValidationMode !== 'ignore' && isset($number) &&
-                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            if (!isset($number)) {
+                $number = '';
+            }
+            if ($numberValidationMode !== 'ignore' &&
+                (empty($number) || strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
                 switch ($numberValidationMode) {
                     case 'complain':

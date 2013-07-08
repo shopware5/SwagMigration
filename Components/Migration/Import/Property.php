@@ -40,7 +40,7 @@ class Shopware_Components_Migration_Import_Property extends Shopware_Components_
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorImportingProductProperties', "An error occurred while importing product properties");
 
     }
 

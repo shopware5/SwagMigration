@@ -41,9 +41,9 @@ class Shopware_Components_Migration_Import_Category extends Shopware_Components_
     public function getDefaultErrorMessage()
     {
         if ($this->getInternalName() == 'import_categories') {
-            return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+            return $this->getNameSpace()->get('errorImportingCategories', "An error occurred while importing categories");
         } elseif ($this->getInternalName() == 'import_article_categories') {
-            return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+            return $this->getNameSpace()->get('errorImportingArticleCategories', "An error assigning articles to categories");
         }
     }
 

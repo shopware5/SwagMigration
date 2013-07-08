@@ -765,11 +765,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Convenience method which prints a given error for the extjs app
      * @param $e
+     * @param $errorDescription A simple explanation of what happened
      */
-    protected function printError($e)
+    protected function printError($e, $errorDescription)
     {
         $error = array(
-            'message'=>$errorMessage,
+            'message'=>$errorDescription,
             'error'=>$e->getMessage(),
             'code'=>$e->getCode(),
             'file'=>$e->getFile(),
@@ -821,7 +822,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $progress = $retProgress;
             }
         } catch (Exception $e) {
-            $this->printError($e);
+            $this->printError($e, $import->getDefaultErrorMessage());
             return;
         }
 
@@ -843,7 +844,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * This function imports the different data types.
-     * @return mixed|void
+     * @return void
      */
     public function importAction()
     {
@@ -867,106 +868,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             'progress'=>1,
             'done'=>true
         ));
-        return;
-
-
-        try {
-            $errorMessage = '';
-
-            if(!empty($this->Request()->import_products)) {
-                return $this->runImport('import_products');
-            }
-
-            if(!empty($this->Request()->import_translations)) {
-                $errorMessage = $this->namespace->get('errorImportingTranslations', "An error occurred while importing translations");
-				return $this->importProductTranslations();
-            }
-
-	        if(!empty($this->Request()->import_properties)) {
-                $errorMessage = $this->namespace->get('errorImportingProductProperties', "An error occurred while importing product properties");
-				return $this->importProductProperties();
-            }
-
-            if(!empty($this->Request()->import_categories)) {
-                $errorMessage = $this->namespace->get('errorImportingCategories', "An error occurred while importing categories");
-                return $this->importCategories();
-            }
-
-            if(!empty($this->Request()->import_article_categories)) {
-                $errorMessage = $this->namespace->get('errorImportingArticleCategories', "An error assigning articles to categories");
-                return $this->importArticleCategories();
-            }
-
-            if(!empty($this->Request()->import_prices)) {
-                $errorMessage = $this->namespace->get('errorImportingPrices', "An error occurred while importing prices");
-                return $this->importProductPrices();
-            }
-
-            if(!empty($this->Request()->import_generate_variants)) {
-                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configuratos");
-                return $this->generateConfiguratorSetsFromAttributes();
-            }
-
-            if(!empty($this->Request()->import_create_configurator_variants)) {
-                $errorMessage = $this->namespace->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configurator variants");
-                return $this->generateVariants();
-            }
-
-            if(!empty($this->Request()->import_images)) {
-                $errorMessage = $this->namespace->get('errorImportingImages', "An error occurred while importing images");
-                return $this->importProductImages();
-            }
-
-            if(!empty($this->Request()->import_customers)) {
-                $errorMessage = $this->namespace->get('errorImportingCustomers', "An error occurred while importing customers");
-                return $this->importCustomers();
-            }
-
-            if(!empty($this->Request()->import_ratings)) {
-                $errorMessage = $this->namespace->get('errorImportingRatings', "An error occurred while importing ratings");
-                return $this->importProductRatings();
-            }
-
-            if(!empty($this->Request()->import_orders)) {
-                $errorMessage = $this->namespace->get('errorImportingOrders', "An error occurred while importing orders");
-                return $this->importOrders();
-            }
-
-            if(!empty($this->Request()->import_order_details)) {
-                $errorMessage = $this->namespace->get('errorImportingOrderDetails', "An error occurred while importing order details");
-                return $this->importOrderDetails();
-            }
-
-            if(!empty($this->Request()->finish_import)) {
-                return $this->finishImport();
-            }
-
-            echo Zend_Json::encode(array(
-                'message'=>$this->namespace->get('importedSelectedData', "Selected data successfully imported!"),
-                'success'=>true,
-                'progress'=>1,
-                'done'=>true
-            ));
-
-        } catch (Exception $e) {
-            $error = array(
-                'message'=>$errorMessage,
-                'error'=>$e->getMessage(),
-                'code'=>$e->getCode(),
-                'file'=>$e->getFile(),
-                'line'=>$e->getLine(),
-                'trace'=>$e->getTraceAsString(),
-                'success'=>false,
-                'progress'=>1,
-                'done'=>true
-            );
-            if (!$this->Front()->Plugins()->Json()->getRenderer()) {
-                echo Zend_Json::encode($error);
-            } else {
-                $this->view->assign($error);
-            }
-
-        }
     }
 
     /**

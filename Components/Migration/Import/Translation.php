@@ -40,7 +40,7 @@ class Shopware_Components_Migration_Import_Translation extends Shopware_Componen
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorImportingTranslations', "An error occurred while importing translations");
 
     }
 

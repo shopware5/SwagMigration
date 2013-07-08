@@ -40,7 +40,7 @@ class Shopware_Components_Migration_Import_Configurator extends Shopware_Compone
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configuratos");
 
     }
 

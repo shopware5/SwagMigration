@@ -40,7 +40,7 @@ class Shopware_Components_Migration_Import_Rating extends Shopware_Components_Mi
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorImportingRatings', "An error occurred while importing ratings");
 
     }
 

@@ -40,7 +40,11 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        if ($this->getInternalName() == 'import_orders') {
+            return $this->getNameSpace()->get('errorImportingOrders', "An error occurred while importing orders");
+        } elseif ($this->getInternalName() == 'import_order_details') {
+            return $this->getNameSpace()->get('errorImportingOrderDetails', "An error occurred while importing order details");
+        }
 
     }
 
@@ -113,7 +117,7 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
         $count = $result->rowCount()+$offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
 
@@ -282,7 +286,7 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
         $numberSnippet = $this->getNameSpace()->get('numberNotValid',
-            "The product number %s is not valid. A valid product number must:<br>
+            "The product number '%s' is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
             * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
             <br>
@@ -298,11 +302,13 @@ class Shopware_Components_Migration_Import_Order extends Shopware_Components_Mig
         $taskStartTime  = $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
-
             // Check the ordernumber
             $number = $order['article_ordernumber'];
-            if ($numberValidationMode !== 'ignore' && isset($number) &&
-                (strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+            if (!isset($number)) {
+                $number = '';
+            }
+            if ($numberValidationMode !== 'ignore' &&
+                (empty($number) || strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
                 switch ($numberValidationMode) {
                     case 'complain':
