@@ -301,7 +301,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function finishImport()
     {
-        $this->clearMigrationMappings();
+        $cleanup = new Shopware_Components_Migration_Cleanup();
+        $cleanup->clearMigrationMappings();
+
         echo Zend_Json::encode(array(
             'message'=>$this->namespace->get('importFinished', "Import finished"),
             'success'=>true,
@@ -312,7 +314,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Convenience method which prints a given error for the extjs app
-     * @param $e
+     * @param $e \Exception
      * @param $errorDescription A simple explanation of what happened
      */
     protected function printError($e, $errorDescription)
@@ -340,7 +342,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      *
      * Will also inject the dependencies needed and return the created object
      *
-     * @param $importType The import resource to create
+     * @param $importType string The import resource to create
      * @return Shopware_Components_Migration_Import_Resource_Abstract
      */
     public function initImport($importType)
@@ -418,7 +420,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         if(!empty($this->Request()->finish_import)) {
-            return $this->finishImport();
+            $this->finishImport();
+            return;
         }
 
         echo Zend_Json::encode(array(
