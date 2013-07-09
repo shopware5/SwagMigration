@@ -45,7 +45,6 @@ class Shopware_Components_Migration extends Enlight_Class
 
     const CATEGORY_LANGUAGE_SEPARATOR = '_LANG_';
 
-
     /*
      * Base profile names
      */

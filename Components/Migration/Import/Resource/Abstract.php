@@ -28,6 +28,10 @@
  * Abstract base class for all the import resources. Holds some convenience methods like initTaskTimer(),
  * newRequestNeeded() or increaseProgress() which make implementing imports somewhat easier.
  *
+ * In order to add a new import, extend from this class, implement the Shopware_Components_Migration_Import_Resource_Interface
+ * interface and add your logic to the run() method. How to implement multi request capability is described in the
+ * docs of the run()-method in Shopware_Components_Migration_Import_Resource_Interface.
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)

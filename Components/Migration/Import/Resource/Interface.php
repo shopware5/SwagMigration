@@ -32,7 +32,7 @@ interface Shopware_Components_Migration_Import_Resource_Interface
      * If you want to import multiple entities with one import-class, you might want to check for
      * $this->getInternalName() in order to distinct which (sub)entity you where called for.
      *
-     * The run method may only return instances of Shopware_Components_Migration_Import_Progress
+     * The run method should only return instances of Shopware_Components_Migration_Import_Progress
      * The calling instance will use those progress object to communicate with the ExtJS backend.
      * If you want this to work properly, think of calling:
      * - $this->initTaskTimer() at the beginning of your run method

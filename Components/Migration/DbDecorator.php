@@ -7,8 +7,8 @@
  * @package   Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_DbDecorator {
-
+class Shopware_Components_Migration_DbDecorator
+{
     /**
      * The decorated Zend_Db instance
      * @var

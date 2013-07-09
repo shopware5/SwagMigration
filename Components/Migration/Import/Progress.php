@@ -44,14 +44,45 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
     const STATUS_ERROR = 1;
     const STATUS_DONE = 3;
 
+    /**
+     * Progress message
+     * @var string
+     */
     protected $message;
+    /**
+     * Progress successfull?
+     * @var int
+     */
     protected $success;
+    /**
+     * Progress offset
+     * @var int
+     */
     protected $offset;
+    /**
+     * Total number of items
+     * @var int
+     */
     protected $count;
+    /**
+     * Progress. If not set, the progress is calculated dynamically
+     * @var null|float
+     */
     protected $progress = null;
+    /**
+     * Additional request params
+     * @var array
+     */
     protected $requestParams = array();
+    /**
+     * Progress status
+     * @var 0, STATUS_ERROR or STATUS_DONE
+     */
     protected $status = 0;
-
+    /**
+     * When did the progress start
+     * @var int
+     */
     protected $startTime;
 
     /**
