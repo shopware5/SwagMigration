@@ -70,7 +70,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     protected $mapping;
 
     /**
-     * Namespace for the snippets
+     * Snippet namespace
+     * @var Enlight_Components_Snippet_Namespace
      */
     protected $namespace;
 
@@ -81,6 +82,29 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * @var int
      */
     protected $max_execution = 10;
+
+    /**
+     * @return Enlight_Components_Snippet_Namespace
+     */
+    public function getNamespace()
+    {
+        if (!isset($this->namespace)) {
+            $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
+        }
+        return $this->namespace;
+    }
+
+    /**
+     * Set the renderer - most often used, to disable the renderer
+     *
+     * @param $renderer
+     */
+    public function setRenderer($renderer)
+    {
+        /** @var Enlight_Controller_Plugins_Json_Bootstrap $json */
+        $json = $this->Front()->Plugins()->Json();
+        $json->setRenderer($renderer);
+    }
 
 	/**
      * This function add the template directory and register the Shopware_Components namespace
@@ -181,7 +205,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
 	public function clearShopAction()
 	{
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
         $data = $this->Request()->getParams();
 
         $cleanup = new Shopware_Components_Migration_Cleanup();
@@ -195,7 +219,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function profileListAction()
     {
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         $rows = array(
             array('id'=>'Magento', 		'name'=>'Magento 1.4.2 bis 1.7.2'),
@@ -214,7 +238,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function databaseListAction()
     {
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         $rows = array();
         try {
@@ -237,7 +261,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function mappingListLeftAction()
     {
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         $rows = $this->Mapping()->getMappingLeft();
 
@@ -249,7 +273,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function mappingListRightAction()
     {
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         $rows = $this->Mapping()->getMappingRight();
 
@@ -261,7 +285,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function mappingValuesListAction()
     {
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         $rows = $this->Mapping()->getMappingForEntity($this->Request()->mapping);
 
@@ -273,8 +297,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function checkFormAction()
     {
-        $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         try {
             $shops = $this->Source()->getShops();
@@ -286,7 +309,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         } catch (Zend_Db_Statement_Exception $e) {
             switch($e->getCode()) {
                 case 42:
-                    echo Zend_Json::encode(array('success'=>false, 'message'=>$this->namespace->get('databaseProfileDoesNotMatch', "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
+                    echo Zend_Json::encode(array('success'=>false, 'message'=>$this->getNamespace()->get('databaseProfileDoesNotMatch', "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
                     break;
                 default:
                     echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
@@ -305,7 +328,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $cleanup->clearMigrationMappings();
 
         echo Zend_Json::encode(array(
-            'message'=>$this->namespace->get('importFinished', "Import finished"),
+            'message'=>$this->getNamespace()->get('importFinished', "Import finished"),
             'success'=>true,
             'progress'=>1,
             'done'=>true
@@ -315,7 +338,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Convenience method which prints a given error for the extjs app
      * @param $e \Exception
-     * @param $errorDescription A simple explanation of what happened
+     * @param $errorDescription string A simple explanation of what happened
      */
     protected function printError($e, $errorDescription)
     {
@@ -409,8 +432,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function importAction()
     {
-        $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
-        $this->Front()->Plugins()->Json()->setRenderer(false);
+        $this->setRenderer(false);
 
         foreach ($this->imports as $key => $name) {
             if(!empty($this->Request()->$key)) {
@@ -425,7 +447,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         echo Zend_Json::encode(array(
-            'message'=>$this->namespace->get('importedSelectedData', "Selected data successfully imported!"),
+            'message'=>$this->getNamespace()->get('importedSelectedData', "Selected data successfully imported!"),
             'success'=>true,
             'progress'=>1,
             'done'=>true
@@ -447,10 +469,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if ($messageShown) {
             return false;
         }
-        $import = $this->namespace->get("currentImport".$type, $type);
+        $import = $this->getNamespace()->get("currentImport".$type, $type);
 
         echo Zend_Json::encode(array(
-            'message'=>sprintf($this->namespace->get('currentlyImporting', "Current import step: %s"), $import),
+            'message'=>sprintf($this->getNamespace()->get('currentlyImporting', "Current import step: %s"), $import),
             'success'=>true,
             'offset'=>0,
             'progress'=>0,
