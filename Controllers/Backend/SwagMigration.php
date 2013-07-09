@@ -125,7 +125,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if(isset($query['database'])&&$query['database']!='default') {
             $config['dbname'] = $query['database'];
         }
-        return Shopware_Components_Migration::factory($query['profile'], $config);
+        return Shopware_Components_Migration::profileFactory($query['profile'], $config);
     }
 
     /**
@@ -160,7 +160,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function initTarget()
     {
         $config = (array) Shopware()->getOption('db');
-        return Shopware_Components_Migration::factory('Shopware', $config);
+        return Shopware_Components_Migration::profileFactory('Shopware', $config);
     }
 
     /**
@@ -336,33 +336,44 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
-     * Triggers the actual import for a given type
+     * Creates an instance of the import resource needed to import $importType
      *
+     * Will also inject the dependencies needed and return the created object
+     *
+     * @param $importType The import resource to create
+     * @return Shopware_Components_Migration_Import_Resource_Abstract
+     */
+    public function initImport($importType)
+    {
+        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $name = $this->imports[$importType];
+
+        /** @var $progress Shopware_Components_Migration_Import_Progress */
+        $progress = new Shopware_Components_Migration_Import_Progress();
+        $progress->setOffset($offset);
+
+        $import = Shopware_Components_Migration::resourceFactory($name, $progress, $this->Source(), $this->Target(), $this->request);
+        $import->setInternalName($importType);
+        $import->setMaxExecution($this->max_execution);
+
+        return $import;
+    }
+
+    /**
+     * Triggers the actual import for a given type
      *
      * @param $importType
      */
     public function runImport($importType)
     {
-        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
         $name = $this->imports[$importType];
 
         if ($this->printCurrentImportMessage($name)) {
             return;
         }
 
-        /** @var $progress Shopware_Components_Migration_Import_Progress */
-        $progress = new Shopware_Components_Migration_Import_Progress();
-        $progress->setOffset($offset);
-
-
-        /** @var $import Shopware_Components_Migration_Import_Base */
-        $className = 'Shopware_Components_Migration_Import_Resource_' . $name;
-        $import = Enlight_Class::Instance($className, array(
-            $progress,
-            $this->Source(), $this->Target(), $this->max_execution, $this->Request()
-        ));
-
-        $import->setInternalName($importType);
+        $import = $this->initImport($importType);
+        $progress = $import->getProgress();
 
         try {
             $retProgress = $import->run();

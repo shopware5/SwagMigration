@@ -79,16 +79,14 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
      * @param Shopware_Components_Migration_Import_Progress $progress
      * @param Shopware_Components_Migration_Profile $source
      * @param Shopware_Components_Migration_Profile $target
-     * @param int $maxExecution
      * @param $request
      */
-    public function __construct($progress, $source, $target, $maxExecution, $request)
+    public function __construct($progress, $source, $target, $request)
     {
         $this->progress = $progress;
         $this->target = $target;
         $this->source = $source;
         $this->requestTime =  !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
-        $this->maxExecution = $maxExecution;
         $this->request = $request;
     }
 

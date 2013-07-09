@@ -22,6 +22,9 @@
  * our trademarks remain entirely with us.
  */
 
+/**
+ * Various methods for mapping source entities to target entities
+ */
 class Shopware_Components_Migration_Mapping
 {
     /**
