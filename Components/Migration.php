@@ -27,7 +27,7 @@
  *
  * Factory for the migration profiles and import resources
  *
- * @category  Shopware
+ * @category Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
@@ -45,10 +45,16 @@ class Shopware_Components_Migration extends Enlight_Class
 
     const CATEGORY_LANGUAGE_SEPARATOR = '_LANG_';
 
-    /*
-     * Base profile names
+    /**
+     * Namespace for the profiles
+     * @var string
      */
-	static protected $profileNamespace = 'Shopware_Components_Migration_Profile';
+    static protected $profileNamespace = 'Shopware_Components_Migration_Profile';
+
+    /**
+     * Namespace for the import resources
+     * @var string
+     */
     static protected $resourceNamespace = 'Shopware_Components_Migration_Import_Resource';
 
     /**
@@ -74,8 +80,8 @@ class Shopware_Components_Migration extends Enlight_Class
     /**
      * Generates an instances of an import resource
      *
-     * @param $progress
      * @param $name
+     * @param $progress
      * @param $source
      * @param $target
      * @param $request

@@ -31,6 +31,10 @@
  */
 class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Components_Migration_Profile
 {
+    /**
+     * Database prefix
+     * @var string
+     */
     protected $db_prefix = 'ps_';
 
     /**

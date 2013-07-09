@@ -122,6 +122,8 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 
     /**
      * Returns a sql statement which selects additional info for a given productID
+     * @param $productId int The product to query
+     * @return string
      */
     public function getAdditionalProductSelect($productId)
     {

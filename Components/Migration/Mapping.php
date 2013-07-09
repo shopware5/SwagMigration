@@ -44,6 +44,12 @@ class Shopware_Components_Migration_Mapping
      */
     protected $target;
 
+    /**
+     * Constructor. Sets some dependencies.
+     *
+     * @param $source
+     * @param $target
+     */
     public function __construct($source, $target)
     {
         $this->source = $source;

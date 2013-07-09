@@ -84,6 +84,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     protected $max_execution = 10;
 
     /**
+     * Returns the snippet namespace object for the migration namespace
      * @return Enlight_Components_Snippet_Namespace
      */
     public function getNamespace()

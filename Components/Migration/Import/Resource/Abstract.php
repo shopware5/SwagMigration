@@ -81,6 +81,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     protected $target;
 
     /**
+     * Constructor
+     *
      * @param Shopware_Components_Migration_Import_Progress $progress
      * @param Shopware_Components_Migration_Profile $source
      * @param Shopware_Components_Migration_Profile $target
@@ -142,6 +144,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Set the progress object for this instance
+     *
      * @param $progress
      */
     public function setProgress($progress)
@@ -150,6 +154,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Return the progress instance of this class
+     *
      * @return Shopware_Components_Migration_Import_Progress
      */
     public function getProgress()
@@ -158,6 +164,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Set the time of the request
+     *
      * @param $requestTime
      */
     public function setRequestTime($requestTime)
@@ -166,6 +174,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Get the time of the request
+     *
      * @return int
      */
     public function getRequestTime()
@@ -174,6 +184,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Set the max execution time. Needed for the newRequestNeeded() check
+     *
      * @param $maxExecution
      */
     public function setMaxExecution($maxExecution)
@@ -182,6 +194,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Get the max_execution time
+     *
      * @return int
      */
     public function getMaxExecution()
@@ -190,6 +204,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Legacy getter for the request object
+     *
      * @return mixed
      */
     public function Request()
@@ -198,6 +214,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Legacy getter for the source profile
      * @return Shopware_Components_Migration_Profile
      */
     public function Source()
@@ -206,6 +223,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Legacy getter for the target profile
+     *
      * @return Shopware_Components_Migration_Profile
      */
     public function Target()
@@ -214,6 +233,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Increase the progress by one
+     *
      * @return mixed
      */
     public function increaseProgress()
@@ -222,6 +243,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Setter for the internal name of the current resource
+     *
      * @param $internal_name
      */
     public function setInternalName($internal_name)
@@ -230,6 +253,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     }
 
     /**
+     * Getter for the internal name of the current resource
      * @return mixed
      */
     public function getInternalName()
@@ -244,6 +268,10 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * Takes an invalid product number and creates a valid one from it
      * by returning its md5 hash
+     *
+     * @param $number int The invalid ordernumber to fix
+     * @param $id int Id of the article
+     * @return string
      */
     public function makeInvalidNumberValid($number, $id)
     {

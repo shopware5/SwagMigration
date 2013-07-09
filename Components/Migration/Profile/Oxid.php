@@ -31,6 +31,10 @@
  */
 class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Migration_Profile
 {
+    /**
+     * Database prefix
+     * @var string
+     */
 	protected $db_prefix = 'ox';
 
 	/**
@@ -221,6 +225,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 	/**
 	 * Returns the sql statement to select articles with
+     * @param $id int Id of the product to query
 	 * @return string
 	 */
 	public function getProductPropertiesSelect($id)
@@ -244,8 +249,11 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 		";
 	}
 
-
-	public function getProductsWithPropertiesSelect()
+    /**
+     * Select all products ifs of products with properties
+     * @return string
+     */
+    public function getProductsWithPropertiesSelect()
 	{
 		return "
 			SELECT a.OXID as productID

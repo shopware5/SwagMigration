@@ -34,6 +34,9 @@
 class Shopware_Components_Migration_Cleanup
 {
 
+    /**
+     * Constructor: Disable foreign key checks
+     */
     public function __construct()
     {
         // Disable foreign key checks

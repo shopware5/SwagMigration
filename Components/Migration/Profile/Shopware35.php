@@ -426,8 +426,11 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
    		";
    	}
 
-
-   	public function getProductsWithPropertiesSelect()
+    /**
+     * Selects all ids of all products with properties
+     * @return string
+     */
+    public function getProductsWithPropertiesSelect()
    	{
    		return "
    			SELECT ad.id as productID
