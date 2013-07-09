@@ -2,9 +2,9 @@
 
 /**
  * Basic interface for the import classes
- * Class Shopware_Components_Migration_Import_Interface
+ * Class Shopware_Components_Migration_Import_Resource_Interface
  */
-interface Shopware_Components_Migration_Import_Interface
+interface Shopware_Components_Migration_Import_Resource_Interface
 {
     /**
      * The generic error message of an import

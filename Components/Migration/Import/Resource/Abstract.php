@@ -31,7 +31,7 @@
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-abstract class Shopware_Components_Migration_Import_Base extends Enlight_Class implements Shopware_Components_Migration_Import_Interface
+abstract class Shopware_Components_Migration_Import_Resource_Abstract extends Enlight_Class implements Shopware_Components_Migration_Import_Resource_Interface
 {
     /**
      * Internal name of the import step used by the controller

@@ -70,6 +70,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     protected $target;
 
     /**
+     * Mapping helper
+     * @var Shopware_Components_Migration_Mapping
+     */
+    protected $mapping;
+
+    /**
      * Namespace for the snippets
      */
     protected $namespace;
@@ -129,6 +135,19 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     }
 
     /**
+     * Returns an instance of the migration mapping helper
+     *
+     * @return Shopware_Components_Migration_Mapping
+     */
+    public function Mapping()
+    {
+        if (!isset($this->mapping)) {
+            $this->mapping = new Shopware_Components_Migration_Mapping($this->Source(), $this->Target());
+        }
+        return $this->mapping;
+    }
+
+    /**
      * Getter function of the source profile
      * @return Shopware_Components_Migration_Profile
      */
@@ -171,167 +190,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
-    /**
-     * Truncates the migration mapping table
-     */
-    public function clearMigrationMappings()
-	{
-		$sql = '
-            TRUNCATE TABLE `s_plugin_migrations`;
-        ';
-        Shopware()->Db()->query($sql);
-	}
-
-    /**
-     * Remove mappings by a given type
-     *
-     * @param $type
-     */
-    public function removeMigrationMappingsByType($type)
-	{
-		$sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
-		Shopware()->Db()->query($sql, array($type));
-	}
-
-    /**
-     * Truncate all article related tables
-     */
-    public function sDeleteAllArticles()
-    {
-        $sql = "
-			TRUNCATE s_articles;
-			TRUNCATE s_filter_articles;
-			TRUNCATE s_articles_attributes;
-			TRUNCATE s_articles_avoid_customergroups;
-			TRUNCATE s_articles_categories;
-			TRUNCATE s_articles_details;
-			TRUNCATE s_articles_downloads;
-			TRUNCATE s_articles_downloads_attributes;
-			TRUNCATE s_articles_esd;
-			TRUNCATE s_articles_esd_attributes;
-			TRUNCATE s_articles_esd_serials;
-			TRUNCATE s_articles_img;
-			TRUNCATE s_articles_img_attributes;
-			TRUNCATE s_articles_information;
-			TRUNCATE s_articles_information_attributes;
-			TRUNCATE s_articles_notification;
-			TRUNCATE s_articles_prices;
-			TRUNCATE s_articles_prices_attributes;
-			TRUNCATE s_articles_relationships;
-			TRUNCATE s_articles_similar;
-			TRUNCATE s_articles_translations;
-			TRUNCATE s_article_configurator_dependencies;
-			TRUNCATE s_article_configurator_groups;
-			TRUNCATE s_article_configurator_options;
-			TRUNCATE s_article_configurator_option_relations;
-			TRUNCATE s_article_configurator_price_surcharges;
-			TRUNCATE s_article_configurator_sets;
-			TRUNCATE s_article_configurator_set_group_relations;
-			TRUNCATE s_article_configurator_set_option_relations;
-			TRUNCATE s_article_configurator_templates;
-			TRUNCATE s_article_configurator_templates_attributes;
-			TRUNCATE s_article_configurator_template_prices;
-			TRUNCATE s_article_configurator_template_prices_attributes;
-			TRUNCATE s_article_img_mappings;
-			TRUNCATE s_article_img_mapping_rules;
-        ";
-        Shopware()->Db()->query($sql);
-    }
-
-    /**
-     * Truncate order related tables.
-     */
-    public function sDeleteAllOrders()
-    {
-        $sql = "
-        TRUNCATE s_order;
-        TRUNCATE s_order_attributes;
-        TRUNCATE s_order_basket;
-        TRUNCATE s_order_basket_attributes;
-        TRUNCATE s_order_billingaddress;
-        TRUNCATE s_order_billingaddress_attributes;
-        TRUNCATE s_order_comparisons;
-        TRUNCATE s_order_details;
-        TRUNCATE s_order_details_attributes;
-        TRUNCATE s_order_shippingaddress;
-        TRUNCATE s_order_shippingaddress_attributes;
-        TRUNCATE s_order_documents;
-        TRUNCATE s_order_documents_attributes;
-        TRUNCATE s_order_esd;
-        TRUNCATE s_order_history;
-        TRUNCATE s_order_notes;
-        ";
-
-        Shopware()->Db()->query($sql);
-    }
-
-    /**
-     * Truncate customer related tables
-	 */
-	public function sDeleteAllCustomers()
-	{
-	   $sql = "
-	       TRUNCATE s_user;
-	       TRUNCATE s_user_attributes;
-	       TRUNCATE s_user_billingaddress;
-	       TRUNCATE s_user_billingaddress_attributes;
-	       TRUNCATE s_user_shippingaddress;
-	       TRUNCATE s_user_shippingaddress_attributes;
-	       TRUNCATE s_user_shippingaddress_attributes;
-	       TRUNCATE s_user_debit;
-	   ";
-
-	   Shopware()->Db()->query($sql);
-	}
-
-	/**
-	 * Helper method to delete all filter properties
-	 */
-	public function sDeleteAllFilters()
-	{
-		$sql = '
-			TRUNCATE s_filter;
-			TRUNCATE s_filter_articles;
-			TRUNCATE s_filter_attributes;
-			TRUNCATE s_filter_options;
-			TRUNCATE s_filter_relations;
-			TRUNCATE s_filter_values;
-		';
-
-		Shopware()->Db()->query($sql);
-	}
-
-	/**
-	 * Helper method which deletes images/media tables
-	 * Also physically deletes corresponding files
-	 */
-	public function clearImages()
-	{
-		$sql = '
-			TRUNCATE s_articles_img;
-			TRUNCATE s_articles_img_attributes;
-			TRUNCATE s_article_img_mappings;
-			TRUNCATE s_article_img_mapping_rules;
-			TRUNCATE s_media;
-		';
-		Shopware()->Db()->query($sql);
-
-		$foldersToClean = array(
-			Shopware()->DocPath('media/image'),
-			Shopware()->DocPath('media/image/thumbnail')
-		);
-
-		foreach($foldersToClean as $path) {
-			if ($handle = opendir($path)) {
-				while (false !== ($file = readdir($handle))) {
-					// only delete .jpg, .jpeg, .png and .gif; ignore case
-					if (preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
-						unlink($path.$file);
-					}
-				}
-			}
-		}
-	}
 
     /**
      * This function is used to reset the shop. It will truncated all tables related to a given source
@@ -339,60 +197,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 	public function clearShopAction()
 	{
         $this->Front()->Plugins()->Json()->setRenderer(false);
-
-        // Disable foreign key checks
-        Shopware()->Db()->exec("SET foreign_key_checks = 0;");
-
-        // Iterate fields and delete all data
         $data = $this->Request()->getParams();
-        foreach ($data as $key => $value) {
-            switch ($key) {
-                case 'clear_customers':
-                    $this->sDeleteAllCustomers();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
-                    break;
-                case 'clear_orders':
-                    $this->sDeleteAllCustomers();
-                    $this->sDeleteAllOrders();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ORDER);
-                    break;
-                case 'clear_votes':
-                    Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
-                    break;
-                case 'clear_articles':
-                    $this->sDeleteAllArticles();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE);
-                    break;
-                case 'clear_categories':
-                    Shopware()->Api()->Import()->sDeleteAllCategories();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET);
-                    break;
-                case 'clear_supplier':
-                    // As one might want to clear the suppliers without leaving all related articles
-                    // invalid, we create a new 'Default'-Supplier and set it for all articles
-                    Shopware()->Db()->exec("
-                        TRUNCATE s_articles_supplier;
-                        TRUNCATE s_articles_supplier_attributes;
-                        INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
-                        INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
-                        UPDATE s_articles SET supplierID=1 WHERE 1;
-                    ");
-                    break;
-                case 'clear_properties':
-	                $this->sDeleteAllFilters();
-	                break;
-                case 'clear_mappings':
-	                $this->clearMigrationMappings();
-	                break;
-                case 'clear_images':
-	                $this->clearImages();
-	                break;
-                default:
-                    break;
-            }
-        }
+
+        $cleanup = new Shopware_Components_Migration_Cleanup();
+        $cleanup->cleanUpByArray($data);
 
 		echo Zend_Json::encode(array('success'=>true));
 	}
@@ -437,48 +245,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
-    /**
-     * Helper function to set an automatic mapping when the user open the mapping panel.
-     * @param $array
-     * @return mixed
-     */
-    private function setAliases($array) {
-        $aliasList = array(
-            //Languages - Shops
-            array("deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"),
-            array("englisch", "english", "default english"),
-            array("französisch", "french"),
 
-            //Payments
-            array("vorkasse", "vorauskasse", "prepayment", "in advance"),
-
-            //order states
-            array("in bearbeitung(wartet)", "in bearbeitung", "wird bearbeitet", "bearbeitung", "in progress", "in process", "processing"),
-            array("offen", "open", "opened"),
-            array("komplett abgeschlossen", "abgeschlossen", "completed", "fully completed", "finish", "finished"),
-            array("teilweise abgeschlossen", "partially completed", "partially finished"),
-            array("storniert / abgelehnt", "storniert", "abgelehnt", "canceled", "declined", "rejected", "denied"),
-            array("zur lieferung bereit", "lieferbereit", "ready for delivery", "ready for deliver", "ready to ship"),
-            array("klärung notwendig", "klärung", "mehr informationen notwendig", "clarification needed", "declaration needed", "more information needed"),
-            array("abgebrochen", "canceled", "aborted"),
-
-            //taxes
-            array("Standardsatz", "standard tax rate", "19%", "19 %"),
-            array("ermäßigter Steuersatz", "reduced tax rate", "7%", "7 %")
-        );
-
-        foreach($array as &$element) {
-            $temp = $element;
-            foreach($aliasList as $alias) {
-                if(in_array(strtolower($temp), $alias)) {
-                    array_unshift($alias, $temp);
-                    $element = $alias;
-                    break;
-                }
-            }
-        }
-        return $array;
-    }
 
     /**
      * This function returns the mapping list for the left grid
@@ -487,73 +254,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
-        $rows = array();
-
-        $target = self::setAliases($this->Target()->getShops());
-        $shops = self::mapArrays($this->Source()->getShops(), $target);
-        foreach ($shops as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'shop', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
-        }
-
-        $target = self::setAliases($this->Target()->getLanguages());
-        $languages = self::mapArrays($this->Source()->getLanguages(), $target);
-        foreach ($languages as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'language', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
-        }
-
-        $target = self::setAliases($this->Target()->getCustomerGroups());
-        $customerGroups = self::mapArrays($this->Source()->getCustomerGroups(), $target);
-        foreach ($customerGroups as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'customer_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"], 'required'=>true);
-        }
-
-        $target = self::setAliases($this->Target()->getPriceGroups());
-        $priceGroups = self::mapArrays($this->Source()->getPriceGroups(), $target);
-        foreach ($priceGroups as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'price_group', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
+        $rows = $this->Mapping()->getMappingLeft();
 
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
-    }
-
-    /**
-     * Internal helper function for the automatic mapping
-     * @param $sourceArray
-     * @param $targetArray
-     * @return mixed
-     */
-    private function mapArrays($sourceArray, $targetArray) {
-        foreach($sourceArray as &$source) {
-            $source = array("value"=> $source, "mapping"=>'', "mapping_value"=>'');
-            foreach($targetArray as $key => $target) {
-                if(is_array($target)){
-                    foreach($target as $alias) {
-                        if(strtolower($source["value"]) == strtolower($alias)
-                            || (strtolower(substr($source["value"],0,6)) == strtolower(substr($alias,0,6))))
-                        {
-                            $source["mapping"] = $target[0];
-                            $source["mapping_value"] = $key;
-                            break;
-                        }
-                    }
-                } else {
-                    if(strtolower($source["value"])==strtolower($target)
-                        || (strtolower(substr($source["value"],0,6)) == strtolower(substr($target,0,6))))
-                    {
-                        $source["mapping"] = $target;
-                        $source["mapping_value"] = $key;
-                        break;
-                    }
-                }
-            }
-
-            if ($source['mapping'] === '' && $source['mapping_value'] === '') {
-                $source["mapping"] = 'Bitte wählen';
-                $source["mapping_value"] = 'Bitte wählen';
-            }
-
-        }
-        return $sourceArray;
     }
 
     /**
@@ -563,44 +266,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
-        $rows = array();
-
-        $target = self::setAliases($this->Target()->getPaymentMeans());
-        $paymentMeans = self::mapArrays($this->Source()->getPaymentMeans(), $target);
-        foreach ($paymentMeans as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'payment_mean', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
-
-        $target = self::setAliases($this->Target()->getOrderStatus());
-        $orderStatus = self::mapArrays($this->Source()->getOrderStatus(), $target);
-        foreach ($orderStatus as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'order_status', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
-
-        $target = self::setAliases($this->Target()->getTaxRates());
-        $taxRates = self::mapArrays($this->Source()->getTaxRates(), $target);
-        foreach ($taxRates as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'tax_rate', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
-
-        $target = self::setAliases($this->Target()->getAttributes());
-        $attributes = self::mapArrays($this->Source()->getAttributes(), $target);
-        foreach ($attributes as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'attribute', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
-
-		$target = self::setAliases($this->Target()->getProperties());
-		$attributes = self::mapArrays($this->Source()->getProperties(), $target);
-		foreach ($attributes as $id=>$name) {
-			$rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'property_options', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-		}
-
-        $target = self::setAliases(sort($this->Target()->getConfiguratorOptions()));
-        $attributes = self::mapArrays($this->Source()->getConfiguratorOptions(), $target);
-        ksort($attributes);
-        foreach ($attributes as $id=>$name) {
-            $rows[] = array('internalId'=>$id, 'name'=>$name["value"], 'group'=>'configurator_mapping', 'mapping_name'=>$name["mapping"], 'mapping'=>$name["mapping_value"]);
-        }
+        $rows = $this->Mapping()->getMappingRight();
 
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
@@ -612,50 +278,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->Front()->Plugins()->Json()->setRenderer(false);
 
-        switch ($this->Request()->mapping) {
-            case 'shop':
-                $values = $this->Target()->getShops();
-                break;
-            case 'language':
-                $values = $this->Target()->getLanguages();
-                break;
-            case 'customer_group':
-                $values = $this->Target()->getCustomerGroups();
-                break;
-            case 'price_group':
-                $values = $this->Target()->getPriceGroups();
-                break;
-            case 'payment_mean':
-                $values = $this->Target()->getPaymentMeans();
-                break;
-            case 'order_status':
-                $values = $this->Target()->getOrderStatus();
-                break;
-            case 'tax_rate':
-                $values = $this->Target()->getTaxRates();
-                break;
-            case 'attribute':
-                $values = $this->Target()->getAttributes();
-                break;
-	        case 'property_options':
-		        $values = $this->Target()->getProperties();
-		        break;
-            case 'configurator_mapping':
-   		        $values = $this->Target()->getConfiguratorOptions();
-   		        break;
-            default:
-                break;
-        }
+        $rows = $this->Mapping()->getMappingForEntity($this->Request()->mapping);
 
-	    // The id is not needed later - it just may not collide with any other id
-	    $rows = array(array('id'=>'Bitte wählen', 'name'=>'Bitte wählen'));
-
-
-        if(!empty($values)) {
-            foreach ($values as $key=>$value) {
-                $rows[] = array('id'=>$key, 'name'=>$value);
-            }
-        }
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
 
@@ -685,67 +309,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         } catch (Exception $e) {
             echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
         }
-    }
-
-    /**
-     * Helper function to format image names the way the media resource expects it
-     *
-     * @param $name
-     * @return string
-     */
-    private function removeSpecialCharacters($name)
-    {
-        $name = iconv('utf-8', 'ascii//translit', $name);
-        $name = strtolower($name);
-        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
-        $name = preg_replace('#-{2,}#', '-', $name);
-        $name = trim($name, '-');
-        return mb_substr($name, 0, 180);
-    }
-
-    /**
-     * Takes an invalid product number and creates a valid one from it
-     * by returning its md5 hash
-     *
-     * todo: Generate more readable ordernumbers
-     */
-    public function makeInvalidNumberValid($number, $id)
-    {
-        // Look up the id in the database - perhaps we've already created a valid number:
-        $number = Shopware()->Db()->fetchOne(
-            'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            array(Shopware_Components_Helpers::MAPPING_VALID_NUMBER, $id)
-        );
-
-        if ($number) {
-            return $number;
-        }
-
-        // Get number
-        $number = (int) Shopware()->Db()->fetchOne(
-            'SELECT `number` FROM `s_order_number` WHERE `name`="articleordernumber" FOR UPDATE'
-        );
-
-        // Increase - save
-        Shopware()->Db()->update(
-            's_order_number',
-            array('number' => ++$number),
-            array('name' => 'articleordernumber')
-        );
-
-        // Save mapping
-        Shopware()->Db()->insert(
-            's_plugin_migrations',
-            array(
-                'typeID' => Shopware_Components_Helpers::MAPPING_VALID_NUMBER,
-                'sourceID' => $id,
-                'targetID' => $number
-            )
-        );
-
-        return 'sw-'.$number;
-
-//        return "sw-".md5($id);
     }
 
     /**
@@ -808,7 +371,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
 
         /** @var $import Shopware_Components_Migration_Import_Base */
-        $className = 'Shopware_Components_Migration_Import_' . $name;
+        $className = 'Shopware_Components_Migration_Import_Resource_' . $name;
         $import = Enlight_Class::Instance($className, array(
             $progress,
             $this->Source(), $this->Target(), $this->max_execution, $this->Request()
@@ -896,26 +459,4 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         ));
         return true;
     }
-
-	/**
-	 * Helper function which sets the start time for a given task
-	 *
-	 * Timer should be inited after the inital DB-Query of each task, as this
-	 * query will usually take longer on the first run and therefore distort the results
-	 *
-	 * @return int
-	 */
-	public function initTaskTimer()
-	{
-		$startTime = (int) $this->Request()->getParam('task_start_time', 0);
-		$offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
-
-		if ($startTime == 0 || $offset == 0) {
-			$startTime = time();
-		}
-
-		$this->Request()->setParam('task_start_time', $startTime);
-		return $startTime;
-	}
-
 }

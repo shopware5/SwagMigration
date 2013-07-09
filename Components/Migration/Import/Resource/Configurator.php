@@ -31,7 +31,7 @@
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_Import_Configurator extends Shopware_Components_Migration_Import_Base
+class Shopware_Components_Migration_Import_Resource_Configurator extends Shopware_Components_Migration_Import_Resource_Abstract
 {
 
     /**
