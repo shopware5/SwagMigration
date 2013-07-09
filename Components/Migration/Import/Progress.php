@@ -31,7 +31,7 @@
  * As the progress class basically wraps a HttpResponse and prints the data as a Json-object, you might
  * want to add custom information by using addRequestParam().
  *
- * Keep in mind,that the ExtJs application will forward all recieved information back to the php controller;
+ * Keep in mind,that the ExtJs application will forward all received information back to the php controller;
  * for this reason, addRequestParam('hi', true) will result in a request-var "hi' being available within
  * the next request.
  *
@@ -50,7 +50,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
      */
     protected $message;
     /**
-     * Progress successfull?
+     * Progress successful?
      * @var int
      */
     protected $success;
@@ -128,7 +128,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
     }
 
     /**
-     * Finish progress successfull
+     * Finish progress successful
      *
      * @return $this
      */
