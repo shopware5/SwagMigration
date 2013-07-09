@@ -1,0 +1,4 @@
+From: feature/pt-1158-refactor
+To: master
+Conflict: (content) Merge conflict in Controllers/Backend/SwagMigration.php
+	MODIFY|Controllers/Backend/SwagMigration.php
