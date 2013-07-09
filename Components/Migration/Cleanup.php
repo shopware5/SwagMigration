@@ -26,6 +26,10 @@
  * Helper to clean up the target shop
  *
  * Class Shopware_Components_Migration_Cleanup
+ *
+ * @category  Shopware
+ * @package Shopware\Plugins\SwagMigration\Components\Migration
+ * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Cleanup
 {

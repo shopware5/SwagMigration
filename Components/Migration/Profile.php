@@ -30,7 +30,7 @@
  * query will be executed and the query object will be returned. In some cases the result will directly be returned.
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
+ * @package Shopware\Plugins\SwagMigration\Components\Migration
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 abstract class Shopware_Components_Migration_Profile extends Enlight_Class

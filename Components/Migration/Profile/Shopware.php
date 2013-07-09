@@ -28,7 +28,7 @@
  * Default target profile used to get the content for the mapping
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
+ * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components_Migration_Profile

@@ -33,7 +33,7 @@
  * docs of the run()-method in Shopware_Components_Migration_Import_Resource_Interface.
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
+ * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 abstract class Shopware_Components_Migration_Import_Resource_Abstract extends Enlight_Class implements Shopware_Components_Migration_Import_Resource_Interface

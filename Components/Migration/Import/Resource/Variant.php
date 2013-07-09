@@ -28,7 +28,7 @@
  * Variant import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
+ * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Components_Migration_Import_Resource_Abstract

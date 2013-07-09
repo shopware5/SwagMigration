@@ -24,6 +24,9 @@
 
 /**
  * Various methods for mapping source entities to target entities
+ * @category  Shopware
+ * @package Shopware\Plugins\SwagMigration\Components\Migration
+ * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Mapping
 {
