@@ -23,9 +23,10 @@
  */
 
 /**
- * Shopware SwagMigration Components - Base
+ * Shopware SwagMigration Components - Abstract
  *
- * Base import
+ * Abstract base class for all the import resources. Holds some convenience methods like initTaskTimer(),
+ * newRequestNeeded() or increaseProgress() which make implementing imports somewhat easier.
  *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components

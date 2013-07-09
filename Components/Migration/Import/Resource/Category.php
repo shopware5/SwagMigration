@@ -168,6 +168,11 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         }
     }
 
+    /**
+     * Will import the actual categories
+     *
+     * @return $this|Shopware_Components_Migration_Import_Progress
+     */
     public function importCategories()
     {
         $offset = $this->getProgress()->getOffset();
@@ -255,6 +260,11 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         return $this->getProgress()->done();
     }
 
+    /**
+     * Will assign articles to categories
+     *
+     * @return Shopware_Components_Migration_Import_Progress
+     */
     public function importArticleCategories()
     {
         $offset = $this->getProgress()->getOffset();

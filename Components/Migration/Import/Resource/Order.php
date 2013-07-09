@@ -107,7 +107,8 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
     /**
      * This function import all orders from the source profile database into the shopware database.
-     * @return mixed
+     *
+     * @return $this|Shopware_Components_Migration_Import_Progress
      */
     public function importOrders()
     {
@@ -278,7 +279,8 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
     /**
      * This function imports all order details from the source profile into the showpare database
-     * @return mixed
+     *
+     * @return $this|Shopware_Components_Migration_Import_Progress
      */
     public function importOrderDetails()
     {
