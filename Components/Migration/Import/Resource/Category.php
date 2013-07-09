@@ -41,9 +41,15 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function getDefaultErrorMessage()
     {
         if ($this->getInternalName() == 'import_categories') {
-            return $this->getNameSpace()->get('errorImportingCategories', "An error occurred while importing categories");
+            return $this->getNameSpace()->get(
+                'errorImportingCategories',
+                "An error occurred while importing categories"
+            );
         } elseif ($this->getInternalName() == 'import_article_categories') {
-            return $this->getNameSpace()->get('errorImportingArticleCategories', "An error assigning articles to categories");
+            return $this->getNameSpace()->get(
+                'errorImportingArticleCategories',
+                "An error assigning articles to categories"
+            );
         }
     }
 
@@ -57,9 +63,17 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function getCurrentProgressMessage($progress)
     {
         if ($this->getInternalName() == 'import_categories') {
-            return sprintf($this->getNameSpace()->get('progressCategories', "%s out of %s categories imported"), $progress->getOffset(), $progress->getCount());
+            return sprintf(
+                $this->getNameSpace()->get('progressCategories', "%s out of %s categories imported"),
+                $progress->getOffset(),
+                $progress->getCount()
+            );
         } elseif ($this->getInternalName() == 'import_article_categories') {
-            return sprintf($this->getNameSpace()->get('progressArticleCategories', "%s out of %s articles assigned to categories"), $progress->getOffset(), $progress->getCount());
+            return sprintf(
+                $this->getNameSpace()->get('progressArticleCategories', "%s out of %s articles assigned to categories"),
+                $progress->getOffset(),
+                $progress->getCount()
+            );
         }
     }
 

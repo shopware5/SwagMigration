@@ -41,7 +41,6 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingPrices', "An error occurred while importing prices");
-
     }
 
     /**
@@ -53,7 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressPrices', "%s out of %s prices imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('progressPrices', "%s out of %s prices imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +67,6 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
     {
         return $this->getNameSpace()->get('importedPrices', "Prices successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate

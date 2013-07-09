@@ -41,7 +41,6 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
-
     }
 
     /**
@@ -53,7 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressProducts', "%s out of %s products imported"), $progress->getOffset(), $progress->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('progressProducts', "%s out of %s products imported"),
+            $progress->getOffset(),
+            $progress->getCount()
+        );
     }
 
     /**

@@ -41,7 +41,6 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingImages', "An error occurred while importing images");
-
     }
 
     /**
@@ -53,7 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressImages', "%s out of %s images imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('progressImages', "%s out of %s images imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +67,6 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
     {
         return $this->getNameSpace()->get('importedImages', "Images successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate

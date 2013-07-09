@@ -40,8 +40,10 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configurator variants");
-
+        return $this->getNameSpace()->get(
+            'errorGeneratingVariantsFromAttributes',
+            "An error occurred while generating configurator variants"
+        );
     }
 
     /**
@@ -53,7 +55,11 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('variantsArticleProgress', "Generating variants for product %s out of %s"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('variantsArticleProgress', "Generating variants for product %s out of %s"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +70,6 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
     {
         return $this->getNameSpace()->get('generatedVariants', "Variants successfully generated");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
@@ -99,7 +104,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
             return $this->getProgress()->done();
         }
 
-        $count = $products_result->rowCount()+$offsetProduct;
+        $count = $products_result->rowCount() + $offsetProduct;
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
@@ -135,7 +140,6 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
         echo $this->getProgress()->done();
     }
 
-
     /**
      * Helper function which gets the configurator groups for
      * a given product
@@ -146,12 +150,13 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
     {
         // get configurator groups for the given product
         $builder = Shopware()->Models()->createQueryBuilder();
-        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
-            ->from('Shopware\Models\Article\Article', 'article')
-            ->innerJoin('article.configuratorSet', 'configuratorSet')
-            ->leftJoin('configuratorSet.groups', 'groups')
-            ->where('article.id = ?1')
-            ->setParameter(1, $productId);
+        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))->from(
+                    'Shopware\Models\Article\Article',
+                    'article'
+                )->innerJoin('article.configuratorSet', 'configuratorSet')->leftJoin(
+                    'configuratorSet.groups',
+                    'groups'
+                )->where('article.id = ?1')->setParameter(1, $productId);
 
         $result = array_pop($builder->getQuery()->getArrayResult());
 
@@ -175,7 +180,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
 
         // Sort the options by group
         $optionsByGroups = array();
-        foreach($results as $option) {
+        foreach ($results as $option) {
             $groupId = $option['group_id'];
             if (!isset($optionsByGroups[$groupId])) {
                 $optionsByGroups[$groupId] = array();
@@ -187,7 +192,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
         $totalCount = 1;
         foreach ($groups as &$group) {
             $group['options'] = $optionsByGroups[$group['id']];
-            if (count($group['options']) > 0 ) {
+            if (count($group['options']) > 0) {
                 $totalCount = $totalCount * count($group['options']);
             }
         }

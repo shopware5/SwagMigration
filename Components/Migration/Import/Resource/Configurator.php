@@ -40,8 +40,10 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorGeneratingVariantsFromAttributes', "An error occurred while generating configuratos");
-
+        return $this->getNameSpace()->get(
+            'errorGeneratingVariantsFromAttributes',
+            "An error occurred while generating configuratos"
+        );
     }
 
     /**
@@ -53,7 +55,11 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('configuratorProgress', "%s out of %s configurators imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('configuratorProgress', "%s out of %s configurators imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +70,6 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
     {
         return $this->getNameSpace()->get('generatedConfigurators', "Configurators successfully generated!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate

@@ -41,7 +41,6 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingRatings', "An error occurred while importing ratings");
-
     }
 
     /**
@@ -53,7 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressRatings', "%s out of %s ratings imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('progressRatings', "%s out of %s ratings imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**

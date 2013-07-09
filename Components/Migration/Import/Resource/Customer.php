@@ -41,7 +41,6 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingCustomers', "An error occurred while importing customers");
-
     }
 
     /**
@@ -53,7 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->getNameSpace()->get('progressCustomers', "%s out of %s customers imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->getNameSpace()->get('progressCustomers', "%s out of %s customers imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +67,6 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
     {
         return $this->getNameSpace()->get('importedCustomers', "Customers successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate

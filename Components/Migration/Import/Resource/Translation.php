@@ -40,8 +40,10 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingTranslations', "An error occurred while importing translations");
-
+        return $this->getNameSpace()->get(
+            'errorImportingTranslations',
+            "An error occurred while importing translations"
+        );
     }
 
     /**
@@ -53,7 +55,11 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->namespace->get('progressTranslations', "%s out of %s translations imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->namespace->get('progressTranslations', "%s out of %s translations imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**

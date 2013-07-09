@@ -43,9 +43,11 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
         if ($this->getInternalName() == 'import_orders') {
             return $this->getNameSpace()->get('errorImportingOrders', "An error occurred while importing orders");
         } elseif ($this->getInternalName() == 'import_order_details') {
-            return $this->getNameSpace()->get('errorImportingOrderDetails', "An error occurred while importing order details");
+            return $this->getNameSpace()->get(
+                'errorImportingOrderDetails',
+                "An error occurred while importing order details"
+            );
         }
-
     }
 
     /**
@@ -58,9 +60,17 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
     public function getCurrentProgressMessage($progress)
     {
         if ($this->getInternalName() == 'import_orders') {
-            return sprintf($this->getNameSpace()->get('progressOrders', "%s out of %s orders imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+            return sprintf(
+                $this->getNameSpace()->get('progressOrders', "%s out of %s orders imported"),
+                $this->getProgress()->getOffset(),
+                $this->getProgress()->getCount()
+            );
         } elseif ($this->getInternalName() == 'import_order_details') {
-            return sprintf($this->getNameSpace()->get('progressOrderDetails', "%s out of %s order details imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+            return sprintf(
+                $this->getNameSpace()->get('progressOrderDetails', "%s out of %s order details imported"),
+                $this->getProgress()->getOffset(),
+                $this->getProgress()->getCount()
+            );
         }
     }
 

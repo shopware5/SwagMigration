@@ -40,8 +40,10 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProductProperties', "An error occurred while importing product properties");
-
+        return $this->getNameSpace()->get(
+            'errorImportingProductProperties',
+            "An error occurred while importing product properties"
+        );
     }
 
     /**
@@ -53,7 +55,11 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
      */
     public function getCurrentProgressMessage($progress)
     {
-        return sprintf($this->namespace->get('progressProductProperties', "%s out of %s product properties imported"), $this->getProgress()->getOffset(), $this->getProgress()->getCount());
+        return sprintf(
+            $this->namespace->get('progressProductProperties', "%s out of %s product properties imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
+        );
     }
 
     /**
@@ -64,7 +70,6 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
     {
         return $this->getNameSpace()->get('importProductProperties', "Properties imported");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
