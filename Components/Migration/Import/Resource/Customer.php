@@ -180,7 +180,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
+                Shopware()->Db()->query($sql , array(Shopware_Components_Migration::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
             }
             $this->increaseProgress();
 

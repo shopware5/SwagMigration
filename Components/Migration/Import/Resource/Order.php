@@ -138,11 +138,11 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER, $order['customerID']));
+            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_CUSTOMER, $order['customerID']));
 
             $order['sourceID'] = $order['orderID'];
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -186,7 +186,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 	            VALUES (?, ?, ?)
 	            ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
 	            ';
-                Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
+                Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
             }
 
             if(!empty($order['billing_countryiso'])) {
@@ -329,7 +329,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
 
             $sql = '
                 SELECT ad.articleID
@@ -339,7 +339,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             //TaxRate
             if(!empty($this->Request()->tax_rate) && isset($order['taxID'])) {

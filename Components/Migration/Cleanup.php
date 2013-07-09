@@ -47,25 +47,25 @@ class Shopware_Components_Migration_Cleanup
             switch ($key) {
                 case 'clear_customers':
                     $this->sDeleteAllCustomers();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CUSTOMER);
                     break;
                 case 'clear_orders':
                     $this->sDeleteAllCustomers();
                     $this->sDeleteAllOrders();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CUSTOMER);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ORDER);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CUSTOMER);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ORDER);
                     break;
                 case 'clear_votes':
                     Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
                     break;
                 case 'clear_articles':
                     $this->sDeleteAllArticles();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ARTICLE);
                     break;
                 case 'clear_categories':
                     Shopware()->Api()->Import()->sDeleteAllCategories();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY);
+                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET);
                     break;
                 case 'clear_supplier':
                     // As one might want to clear the suppliers without leaving all related articles

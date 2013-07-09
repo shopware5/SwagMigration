@@ -105,7 +105,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             if(empty($rating['articleID'])) {
                 continue;

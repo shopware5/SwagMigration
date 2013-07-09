@@ -123,7 +123,7 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(

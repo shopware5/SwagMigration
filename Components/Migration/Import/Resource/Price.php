@@ -133,7 +133,7 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
                 WHERE pm.sourceID=?
                 AND pm.typeID=?
             ";
-            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
             if(!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if(isset($price['net_price'])) {

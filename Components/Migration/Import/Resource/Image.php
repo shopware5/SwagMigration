@@ -114,7 +114,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -124,7 +124,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             if(!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {

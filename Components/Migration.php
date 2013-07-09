@@ -33,6 +33,18 @@
  */
 class Shopware_Components_Migration extends Enlight_Class
 {
+    /**
+     * Default constants for the mappings from the foreign IDs to Shopware IDs
+     */
+    const MAPPING_ARTICLE = 1;
+    const MAPPING_CATEGORY = 2;
+    const MAPPING_CUSTOMER = 3;
+    const MAPPING_ORDER = 4;
+    const MAPPING_VALID_NUMBER = 23;
+    const MAPPING_CATEGORY_TARGET = 99;
+
+    const CATEGORY_LANGUAGE_SEPARATOR = '_LANG_';
+
 	static protected $profileNamespace = 'Shopware_Components_Migration_Profile';
 
     /**

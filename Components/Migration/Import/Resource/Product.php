@@ -170,7 +170,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
             //Parent
             if(!empty($product['parentID'])) {
                 $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $product['parentID']));
+                $product['maindetailsID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_ARTICLE, $product['parentID']));
             }
 
             if(isset($product['description_long'])) {
@@ -258,7 +258,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
+                Shopware()->Db()->query($sql , array(Shopware_Components_Migration::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
             }
 
 
@@ -307,7 +307,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
         $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
         Shopware()->Db()->query(
             $sql,
-            array($newMainDetail,Shopware_Components_Migration_Helpers::MAPPING_ARTICLE, $oldMainDetail)
+            array($newMainDetail,Shopware_Components_Migration::MAPPING_ARTICLE, $oldMainDetail)
         );
     }
 }

@@ -31,12 +31,6 @@
  */
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
-	/**
-	 * Some helpers
-	 * @var Shopware_Components_Migration_Helpers
-	 */
-	protected $helpers;
-
     /**
      * Defines all availabe imports as well as the order of their import
      * @var array
@@ -168,15 +162,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $config = (array) Shopware()->getOption('db');
         return Shopware_Components_Migration::factory('Shopware', $config);
     }
-
-
-	public function Helpers()
-	{
-		if (!isset($this->helpers)) {
-			$this->helpers = new Shopware_Components_Migration_Helpers();
-		}
-		return $this->helpers;
-	}
 
     /**
      * Getter method of the target profile. If the profile is not set, the controller initial the profile first.

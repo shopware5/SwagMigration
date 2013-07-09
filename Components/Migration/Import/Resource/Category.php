@@ -88,7 +88,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET, $id, $target));
+        Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target));
     }
 
     /**
@@ -103,7 +103,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         }
         return Shopware()->Db()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
-            array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET, $id)
+            array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id)
         );
     }
 
@@ -120,8 +120,8 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         return Shopware()->Db()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             array(
-                Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,
-                $id . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                Shopware_Components_Migration::MAPPING_CATEGORY_TARGET,
+                $id . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
             )
         );
     }
@@ -133,7 +133,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function deleteCategoryTarget($id)
     {
         $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
-        Shopware()->Db()->query($sql, array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET));
+        Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET));
     }
 
 
@@ -177,7 +177,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         // Cleanup previous category imports
         if (!$skip && $offset === 0) {
             Shopware()->Db()->query("DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
-                array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY_TARGET,2)
+                array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET,2)
             );
         }
 
@@ -188,11 +188,11 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
 
         while (!$skip && $category = $categories->fetch()) {
             //check if the category split into the different translations
-            if(!empty($category['languageID'])&& strpos($category['categoryID'], Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR)===false) {
-                $category['categoryID'] = $category['categoryID'] . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
+            if(!empty($category['languageID'])&& strpos($category['categoryID'], Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR)===false) {
+                $category['categoryID'] = $category['categoryID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
 
                 if(!empty($category['parentID'])) {
-                    $category['parentID'] = $category['parentID'] . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
+                    $category['parentID'] = $category['parentID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
                 }
             }
 
@@ -243,7 +243,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            Shopware()->Db()->query($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
+            Shopware()->Db()->query($sql , array(Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
@@ -280,7 +280,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 WHERE `sourceID`=?
                 AND `typeID`=?
             ';
-            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+            $article = Shopware()->Db()->fetchOne($sql , array($productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             if(empty($article)) {
                 continue;
@@ -292,7 +292,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
             // Also take language categories into account
-            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration_Helpers::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'] . Shopware_Components_Migration_Helpers::CATEGORY_LANGUAGE_SEPARATOR.'%'));
+            $categories = Shopware()->Db()->fetchCol($sql , array(Shopware_Components_Migration::MAPPING_CATEGORY, $productCategory['categoryID'], $productCategory['categoryID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR.'%'));
 
             if(empty($categories)) {
                 continue;

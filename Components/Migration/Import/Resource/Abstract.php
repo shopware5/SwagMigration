@@ -247,7 +247,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         // Look up the id in the database - perhaps we've already created a valid number:
         $number = Shopware()->Db()->fetchOne(
             'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            array(Shopware_Components_Migration_Helpers::MAPPING_VALID_NUMBER, $id)
+            array(Shopware_Components_Migration::MAPPING_VALID_NUMBER, $id)
         );
 
         if ($number) {
@@ -270,7 +270,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         Shopware()->Db()->insert(
             's_plugin_migrations',
             array(
-                'typeID' => Shopware_Components_Migration_Helpers::MAPPING_VALID_NUMBER,
+                'typeID' => Shopware_Components_Migration::MAPPING_VALID_NUMBER,
                 'sourceID' => $id,
                 'targetID' => $number
             )
@@ -298,7 +298,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
             AND `typeID`=?
         ';
 
-        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration_Helpers::MAPPING_ARTICLE));
+        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration::MAPPING_ARTICLE));
     }
 
 }
