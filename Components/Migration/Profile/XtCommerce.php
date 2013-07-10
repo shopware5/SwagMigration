@@ -54,7 +54,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
    	 */
 	public function getDefaultLanguageSelect()
 	{
-		return 'SELECT `languages_id` FROM `languages` ORDER BY `sort_order` ASC';
+		return "SELECT `languages_id` FROM {$this->quoteTable('languages')} ORDER BY `sort_order` ASC";
 	}
 
     /**

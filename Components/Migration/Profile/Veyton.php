@@ -119,6 +119,16 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
     }
 
 
+    /**
+   	 * Returns the property options of the shop
+   	 */
+   	public function getPropertyOptionSelect()
+   	{
+   		return "
+   			SELECT 0;
+   		";
+   	}
+
 
     /**
      * Returns a sql statement which selects additional info for a given productID
