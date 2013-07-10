@@ -206,7 +206,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
         $hashes = $args->getReturn();
 
-        $hashes[] = new Shopware_Components_Migration_PasswordEncoder_Magento();
+        $hashes[] = new Shopware_Components_Migration_PasswordEncoder_Md5Reversed();
 
         return $hashes;
     }

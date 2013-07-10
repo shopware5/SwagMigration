@@ -25,13 +25,13 @@
 use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
 
 /**
- * Password interface for magento migrations
+ * Password interface for md5 hashed with salt first
  *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components
  * @copyright Copyright (c) 2013, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_PasswordEncoder_Magento implements PasswordEncoderInterface
+class Shopware_Components_Migration_PasswordEncoder_Md5Reversed implements PasswordEncoderInterface
 {
 
     /**
@@ -39,7 +39,7 @@ class Shopware_Components_Migration_PasswordEncoder_Magento implements PasswordE
      */
     public function getName()
     {
-        return 'magento';
+        return 'md5reversed';
     }
 
     /**
