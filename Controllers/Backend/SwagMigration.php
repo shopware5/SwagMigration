@@ -112,6 +112,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function init()
     {
+        $this->setMaxExecutionTime();
+
         Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__).'/../../Components/');
         $this->View()->addTemplateDir(dirname(__FILE__) . "/../../Views/");
         parent::init();
@@ -200,6 +202,35 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         return $this->target;
     }
 
+    /**
+     * Set the max_execution_timout. After the configured amount of seconds the controller will return
+     * to the ExtJS controller in order to trigger a new request.
+     *
+     * The default value is 10 seconds, if a higher value is configured, this will used (reduced by 10).
+     * However: No value higher than 60 seconds is possible - we need *some* responsiveness
+     *
+     * @return void
+     */
+    public function setMaxExecutionTime()
+    {
+        $value = 10;
+
+        $configValue = (int) ini_get('max_execution_time');
+
+        // We don't want infinite execution time - set it to 40 seconds in case
+        if ($configValue <= 0) {
+            $configValue = 40;
+        }
+
+        if ($configValue > 20) {
+            $value = $configValue - 10;
+        }
+
+        // Don't allow values above a minute
+        $value = min(60, $value);
+
+        $this->max_execution = $value;
+    }
 
     /**
      * This function is used to reset the shop. It will truncated all tables related to a given source

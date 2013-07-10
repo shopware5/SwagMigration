@@ -256,6 +256,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
         Ext.Ajax.request({
             url: '{url controller="SwagMigration"}/'+config.action,
+            // Don't intercept the request
+            timeout: 4000000,
             params : config,
             method: 'POST',
             success: function (response, request) {
