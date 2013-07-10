@@ -259,7 +259,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
             array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
             array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
-            array('id'=>'Shopware35', 	'name'=>'Experimental: Shopware 3.5.7'),
+            array('id'=>'Shopware35', 	'name'=>'Shopware 3.5.7 (Beta)'),
             array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.3'),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
