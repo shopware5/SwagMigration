@@ -205,7 +205,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				u.OXUSTID 									as ustid,
 
 				CONCAT(u.OXPASSWORD, ':', UNHEX(u.OXPASSSALT)) as md5_password,
-				'md5'										as hashType,
+				'md5'										as encoder,
 
 				u.OXCREATE									as firstlogin,
 				u.OXSHOPID									as subshopID,

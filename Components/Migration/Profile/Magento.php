@@ -605,7 +605,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				fax.value								as fax,
 				dob.value 								as birthday,
 				password_hash.value 					as md5_password,
-				'md5'									as hashType,
+				'magento'							    as encoder,
 				taxvat.value 							as ustid,
 				IF(newsletter.subscriber_id, 1, 0)		as newsletter
 			

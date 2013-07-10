@@ -37,16 +37,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
 	public function install()
 	{
-		$this->subscribeEvent(
-	 		'Enlight_Controller_Dispatcher_ControllerPath_Backend_SwagMigration',
-	 		'onGetControllerPath'
-	 	);
-
-        $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch',
-            'onPostDispatch',
-            110
-        );
+        $this->subscribeEvents();
 
 	 	$parent = $this->Menu()->findOneBy('label', 'Inhalte');
 		$item = $this->createMenuItem(array(
@@ -90,6 +81,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function update($version)
 	{
+        $this->subscribeEvents();
+
+
         // Create form
         $this->createForm();
 
@@ -151,6 +145,29 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 	}
 
     /**
+     * Subscribe the needed events
+     */
+    public function subscribeEvents()
+    {
+        $this->subscribeEvent(
+            'Enlight_Controller_Dispatcher_ControllerPath_Backend_SwagMigration',
+            'onGetControllerPath'
+        );
+
+        $this->subscribeEvent(
+            'Shopware_Components_Password_Manager_AddEncoder',
+            'onAddPasswordEncoder'
+        );
+
+        $this->subscribeEvent(
+            'Enlight_Controller_Action_PostDispatch',
+            'onPostDispatch',
+            110
+        );
+    }
+
+
+    /**
      * Create the config form for the plugin
      */
     public function createForm()
@@ -175,6 +192,23 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $this->Application()->Template()->addTemplateDir(
             $this->Path() . 'Views/'
         );
+    }
+
+    /**
+     * Callback function to register our password encoders
+     *
+     * @param Enlight_Event_EventArgs $args
+     * @return array
+     */
+    public function onAddPasswordEncoder(\Enlight_Event_EventArgs $args)
+    {
+        Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__) . '/Components/');
+
+        $hashes = $args->getReturn();
+
+        $hashes[] = new Shopware_Components_Migration_PasswordEncoder_Magento();
+
+        return $hashes;
     }
 
     /**
