@@ -127,10 +127,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		try {
 			Shopware()->Db()->query($sql);
 		} catch(\Exception $e) {
-			return array(
-				'success' => false,
-				'message' => "Update failed. Please clear the content of the table s_plugin_migration. After that run the update again."
-				);
+            // The above statement is just a cleanup statement, so errors should not
+            // cancel the whole update process
 		}
 
         // Make sure that s_order_number is valid

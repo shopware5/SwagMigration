@@ -385,7 +385,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 			-- Joins the attribute values for the manufacturer
 			LEFT JOIN {$this->quoteTable('eav_attribute_option_value')} manufacturer_option
-			ON manufacturer_option.value_id=manufacturer.value
+			ON manufacturer_option.option_id=manufacturer.value
 
             -- Need to order by parent id in order to correctly assign children later
 			ORDER BY relation.parent_id ASC
