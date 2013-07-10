@@ -11,6 +11,6 @@
         <li>xt:Commerce 3.0.4</li>
         <li>Gambio GX 2.0.10</li>
         <li>PrestaShop 1.5.2</li>
-        <li>Shopware 3 (Experimentell)</li>
+        <li>Shopware 3 (Beta)</li>
     </ul>
 </p>
