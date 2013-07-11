@@ -143,11 +143,15 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     case 1:
                         layout.next();
                         me.checkLayoutButtons(panel);
+                        activeCard = layout.getActiveItem();
+                        if ("Magento" == profile || "PrestaShop" == profile) {
+                            activeCard.setShowPasswordInfo(true);
+                        } else {
+                            activeCard.setShowPasswordInfo(true);
+                        }
                         if ("PrestaShop" == profile) {
-                            activeCard = layout.getActiveItem();
                             activeCard.setSaltInputNeeded(true);
                         } else {
-                            activeCard = layout.getActiveItem();
                             activeCard.setSaltInputNeeded(false);
                         }
                         break;

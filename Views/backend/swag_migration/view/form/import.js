@@ -64,6 +64,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     saltInputNeeded: false,
 
     /**
+     * Will be set to true, if the migration plugin provides password encoder for the selected profile
+     */
+    showPasswordInfo: false,
+
+    /**
 	 * The initComponent template method is an important initialization step for a Component.
      * It is intended to be implemented by each subclass of Ext.Component to provide any needed constructor logic.
      * The initComponent method of the class being created is called first,
@@ -93,6 +98,9 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
      */
     createItems: function() {
         var me = this;
+
+        me.passwordInfo = Shopware.Notification.createBlockMessage('{s name=passwordInfo}Attention: If you want the customer to be able to login with his old password, you should not uninstall the migration tool, as it provides the password encoder for migrated customers. Once a customer has logged in, his password will be converted to a shopware-password, so in most cases it should be safe to uninstall the migration tool after a year.{/s}', 'notice');
+        me.passwordInfo .margin = '10 5';
 
         me.fieldSet = {
             xtype:'fieldset',
@@ -125,7 +133,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             collapsed: true
         };
 
-        return  [ me.fieldSet, me.advancedOptionsFieldset, clearShopFieldSet ];
+        return  [ me.passwordInfo,  me.fieldSet, me.advancedOptionsFieldset, clearShopFieldSet ];
     },
 
     getContainers:function () {
@@ -337,6 +345,18 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         return [radioGroup];
 
+    },
+
+    setShowPasswordInfo: function(value) {
+        var me = this;
+
+        me.showPasswordInfo = value;
+
+        if (value) {
+            me.passwordInfo.show();
+        } else {
+            me.passwordInfo.hide();
+        }
     },
 
     setSaltInputNeeded: function(value) {
