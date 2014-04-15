@@ -39,7 +39,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 	{
         $this->subscribeEvents();
 
-	 	$parent = $this->Menu()->findOneBy('label', 'Inhalte');
+	 	$parent = $this->Menu()->findOneBy(array('label'=> 'Inhalte'));
 		$item = $this->createMenuItem(array(
 			'label' => 'Shop-Migration',
             'class' => 'sprite-database-import',
