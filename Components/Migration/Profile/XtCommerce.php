@@ -342,11 +342,11 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 		return "
 			(
 				SELECT `products_id` as productID, `products_image` as image, 1 as main, 0 as position
-				FROM products
+				FROM {$this->quoteTable('products')}
 				WHERE `products_image`!='' AND `products_image` IS NOT NULL
 			) UNION ALL (
 				SELECT `products_id` as productID, `image_name` as image, 0 as main, image_nr as position
-				FROM products_images
+				FROM {$this->quoteTable('products_images')}
 			)
 		";
 	}
