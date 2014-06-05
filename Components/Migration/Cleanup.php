@@ -73,6 +73,11 @@ class Shopware_Components_Migration_Cleanup
                     Shopware()->Api()->Import()->sDeleteAllCategories();
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY);
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET);
+                    try {
+                        Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
+                    } catch(Exception $e) {
+                        // if table does not exist - resume, it might be just an old SW version
+                    }
                     break;
                 case 'clear_supplier':
                     // As one might want to clear the suppliers without leaving all related articles
@@ -165,6 +170,13 @@ class Shopware_Components_Migration_Cleanup
 			TRUNCATE s_article_img_mapping_rules;
         ";
         Shopware()->Db()->query($sql);
+
+        try {
+            Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
+        } catch(Exception $e) {
+            // if table does not exist - resume, it might be just an old SW version
+        }
+
     }
 
     /**
