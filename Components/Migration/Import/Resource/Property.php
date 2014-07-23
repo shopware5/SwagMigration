@@ -56,7 +56,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
     public function getCurrentProgressMessage($progress)
     {
         return sprintf(
-            $this->namespace->get('progressProductProperties', "%s out of %s product properties imported"),
+            $this->getNameSpace()->get('progressProductProperties', "%s out of %s product properties imported"),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
