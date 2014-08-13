@@ -83,6 +83,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
         }
     },
 
+    selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
+
     /**
 	 * The initComponent template method is an important initialization step for a Component.
      * It is intended to be implemented by each subclass of Ext.Component to provide any needed constructor logic.
@@ -204,7 +206,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                 sortable: false,
                 flex: 1,
                 renderer: function(val, p, r){
-                    if(r.data.mapping_name && r.data.mapping_name != 'Bitte wählen') {
+                    if(r.data.mapping_name && r.data.mapping_name != me.selectionNeeded) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
                                 'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
                                 "{s name=mappedProperty}This property has been mapped{/s}");
@@ -233,11 +235,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * @return  Boolean
      */
     areAllRequiredItemsMapped: function() {
-        var allMapped = true;
+        var me = this,
+            allMapped = true;
 
         this.mappingStoreLeft.each(function(record){
             if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == 'Bitte wählen' || record.data.mapping == '') {
+                if(record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
@@ -245,7 +248,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
 
         this.mappingStoreRight.each(function(record){
             if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == 'Bitte wählen' || record.data.mapping == '') {
+                if(record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
@@ -339,15 +342,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                 focus: function(component, evO, eOpts) {
                     var record = this.ownerCt.editingPlugin.context.record;
 
-                    if (record.get('mapping_name') == 'Bitte wählen') {
-                        this.setValue() == ''
+                    if (record.get('mapping_name') == me.selectionNeeded) {
+                        this.setValue('');
                     }
                 },
                 blur: function() {
                     var record = this.ownerCt.editingPlugin.context.record;
 
                     if (this.getValue() == '') {
-                        this.setValue('Bitte wählen');
+                        this.setValue(me.selectionNeeded);
                     }
                     record.set('mapping_name', this.getValue());
                     record.set('mapping', this.getValue());
@@ -359,7 +362,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                         var record = this.ownerCt.editingPlugin.context.record;
 
                         if (this.getValue() == '') {
-                            this.setValue('Bitte wählen');
+                            this.setValue(me.selectionNeeded);
                         }
                         record.set('mapping_name', this.getValue());
                         record.set('mapping', this.getValue());

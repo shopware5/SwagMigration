@@ -43,6 +43,10 @@ class Shopware_Components_Migration_Mapping
      * @var
      */
     protected $target;
+    /**
+     * @var Enlight_Components_Snippet_Namespace
+     */
+    private $namespace;
 
     /**
      * Constructor. Sets some dependencies.
@@ -50,10 +54,11 @@ class Shopware_Components_Migration_Mapping
      * @param $source
      * @param $target
      */
-    public function __construct($source, $target)
+    public function __construct($source, $target, \Enlight_Components_Snippet_Namespace $namespace)
     {
         $this->source = $source;
         $this->target = $target;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -205,7 +210,7 @@ class Shopware_Components_Migration_Mapping
         }
 
 	    // The id is not needed later - it just may not collide with any other id
-	    $rows = array(array('id'=>'Bitte wählen', 'name'=>'Bitte wählen'));
+	    $rows = array(array('id'=>$this->namespace->get('pleaseSelect', 'Please select'), 'name'=>$this->namespace->get('pleaseSelect', 'Please select')));
 
 
         if(!empty($values)) {
@@ -292,8 +297,8 @@ class Shopware_Components_Migration_Mapping
             }
 
             if ($source['mapping'] === '' && $source['mapping_value'] === '') {
-                $source["mapping"] = 'Bitte wählen';
-                $source["mapping_value"] = 'Bitte wählen';
+                $source["mapping"] = $this->namespace->get('pleaseSelect', 'Please select');
+                $source["mapping_value"] = $this->namespace->get('pleaseSelect', 'Please select');
             }
 
         }

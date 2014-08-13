@@ -60,6 +60,9 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      */
     cancel: false,
 
+    selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
+
+
     /**
      * A template method that is called when your application boots.
      * It is called before the Application's launch function is executed
@@ -197,7 +200,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         config.tasks = total;
 
         mappingStore.each(function(record){
-            if(record.get('mapping') == 0 || record.get('mapping') == 'Bitte wählen') {
+            if(record.get('mapping') == 0 || record.get('mapping') == me.selectionNeeded) {
                 config[record.get('group')+'['+record.get('internalId')+']'] = "";
             } else {
                 config[record.get('group')+'['+record.get('internalId')+']'] = record.get('mapping');

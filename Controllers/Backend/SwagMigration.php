@@ -163,7 +163,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function Mapping()
     {
         if (!isset($this->mapping)) {
-            $this->mapping = new Shopware_Components_Migration_Mapping($this->Source(), $this->Target());
+            $this->mapping = new Shopware_Components_Migration_Mapping($this->Source(), $this->Target(), $this->getNamespace());
         }
         return $this->mapping;
     }
@@ -253,14 +253,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setRenderer(false);
 
+
+
         $rows = array(
-            array('id'=>'Magento', 		'name'=>'Magento 1.4.2 bis 1.7.2'),
-            array('id'=>'Oxid', 		'name'=>'OXID eShop bis 4.7.1'),
-            array('id'=>'Veyton', 		'name'=>'xt:Commerce VEYTON 4.0'),
-            array('id'=>'Gambio', 		'name'=>'Gambio GX 2.0.10'),
-            array('id'=>'Xt Commerce', 	'name'=>'XTModified & xt:Commerce 3.04'),
-            array('id'=>'Shopware35', 	'name'=>'Shopware 3.5.7 (Beta)'),
-            array('id'=>'PrestaShop', 	'name'=>'PrestaShop 1.5.3'),
+            array('id'=>'Magento', 		'name'=>$this->getNamespace()->get('profile-magento')),
+            array('id'=>'Oxid', 		'name'=>$this->getNamespace()->get('profile-oxid')),
+            array('id'=>'Veyton', 		'name'=>$this->getNamespace()->get('profile-xt4')),
+            array('id'=>'Gambio', 		'name'=>$this->getNamespace()->get('profile-gambio')),
+            array('id'=>'Xt Commerce', 	'name'=>$this->getNamespace()->get('profile-xt')),
+            array('id'=>'Shopware35', 	'name'=>$this->getNamespace()->get('profile-shopware')),
+            array('id'=>'PrestaShop', 	'name'=>$this->getNamespace()->get('profile-presta')),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }

@@ -247,6 +247,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             fieldLabel: '{s name=importArticleImages}Import product images{/s}',
             name: 'import_images',
             xtype: 'checkbox',
+            helpText: '{s name=thumbnailGenerationNeeded}After image import you need to generate the image thumbnails in the media manager for the article album.{/s}',
             listeners: {
                 change: function(checkBox, newValue, oldValue, eOpts) {
                     // if the product images are going to be imported, the basePath field is mandatory
