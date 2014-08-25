@@ -559,7 +559,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 	public function getCustomerSelect()
 	{
 		$attributes = array(
-			'gender', 'firstname', 'middlename', 'lastname', 'company', 
+			'gender', 'firstname', 'middlename', 'lastname', 'company',
 			'dob', 'password_hash', 'taxvat',
 			'default_billing', 'default_shipping'
 		);
@@ -582,7 +582,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				
 				IF(gender.value=2, 'ms', 'mr')			as billing_salutation,
 				company.value 							as billing_company,
-				TRIM(CONCAT(firstname.value, ' ', middlename.value))
+				TRIM(CONCAT(firstname.value, ' ', IFNULL(middlename.value, '')))
 														as billing_firstname, 
 				lastname.value 							as billing_lastname,
 				street.value							as billing_street,

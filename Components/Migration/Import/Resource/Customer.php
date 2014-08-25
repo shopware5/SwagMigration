@@ -102,7 +102,6 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         $this->initTaskTimer();
 
         while ($customer = $result->fetch()) {
-
             if(isset($customer['customergroupID']) && isset($this->Request()->customer_group[$customer['customergroupID']])) {
                 $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
             }
