@@ -611,7 +611,10 @@ class Shopware_Components_Migration_Profile_Prestashop15 extends Shopware_Compon
 				od.`id_order` as orderID,
 				od.`product_id` as productID,
 				o.`reference`	as ordernumber,
-                if(p.reference='', CONCAT('sw', p.id_product), p.reference) as article_ordernumber,
+                IFNULL(
+                    if(p.reference='', null, p.reference),
+                    CONCAT('sw', od.product_id)
+                ) as article_ordernumber,
 				od.`product_name` as name,
 				od.`product_price` as price,
 				od.`product_quantity` as quantity,
