@@ -609,12 +609,12 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 			SELECT
 				od.`id_order` as orderID,
 				od.`product_id` as productID,
-				o.`reference`	as ordernumber,
+				od.`id_order_detail`	as ordernumber,
                 if(p.reference='', CONCAT('sw', p.id_product), p.reference) as article_ordernumber,
 				od.`product_name` as name,
 				od.`product_price` as price,
 				od.`product_quantity` as quantity,
-				odt.id_tax as tax
+				od.tax_rate as tax_rate
 
 
 			FROM {$this->quoteTable('order_detail', 'od')}
@@ -624,11 +624,6 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 
             LEFT JOIN {$this->quoteTable('product', 'p')}
             ON p.id_product=od.product_id
-
-            LEFT JOIN {$this->quoteTable('order_detail_tax', 'odt')}
-            ON odt.id_order_detail=od.id_order_detail
-
-
 		";
 	}
 }
