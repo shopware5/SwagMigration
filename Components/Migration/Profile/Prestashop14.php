@@ -29,7 +29,7 @@
  * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Components_Migration_Profile
+class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Components_Migration_Profile
 {
     /**
      * Database prefix
@@ -72,9 +72,7 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 	public function getShopSelect()
 	{
 		return "
-			SELECT s.id_shop as id, s.name as name, CONCAT(su.domain, su.physical_uri) as url
-			FROM {$this->quoteTable('shop', 's')}
-			LEFT JOIN {$this->quoteTable('shop_url', 'su')} ON su.id_shop = s.id_shop
+			SELECT 1 as id, 'Default' as name
 		";
 	}
 
@@ -224,7 +222,7 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 			SELECT
 				a.id_product							as productID,
 
-				st.quantity     						as instock,
+				a.quantity       						as instock,
 				-- a.products_average_quantity			as stockmin,
                 -- a.products_shippingtime					as shippingtime,
 				if(a.reference='', CONCAT('sw', a.id_product), a.reference)						as ordernumber,
@@ -232,7 +230,6 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				a.price         						as net_price,
 				a.wholesale_price                       as baseprice,
 
-				a.available_date         				as releasedate,
 				a.date_add          					as added,
 				a.date_upd 						        as changed,
 				a.weight        						as weight,
@@ -258,10 +255,6 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 
 			LEFT JOIN {$this->quoteTable('manufacturer', 's')}
 			ON s.id_manufacturer=a.id_manufacturer
-
-            LEFT JOIN {$this->quoteTable('stock_available', 'st')}
-            ON st.id_product=a.id_product
-            AND st.id_product_attribute=0
 
 			LEFT JOIN {$this->quoteTable('product_lang', 'd')}
 			ON d.id_product=a.id_product
@@ -377,12 +370,12 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 			SELECT
 				u.id_customer 										as customerID,
 				u.id_customer 										as customernumber,
-				u.id_shop                                           as subshopID,
+				1                                                   as subshopID,
 
-				IF(g.type=0, 'mr', 'ms')		                    as billing_salutation,
+				IF(u.id_gender=1, 'mr', 'ms')		                as billing_salutation,
 				u.firstname                                         as billing_firstname,
 				u.lastname       	 								as billing_lastname,
-				u.company   		 								as billing_company,
+				a.company   		 								as billing_company,
 				'' 													as billing_department,
 				a.address1          	 							as billing_street,
 				'' 													as billing_streetnumber,
@@ -390,10 +383,10 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				a.city	 								        	as billing_city,
 				c2.iso_code           								as billing_countryiso,
 
-				IF(g.type=0, 'mr', 'ms')                    	    as shipping_salutation,
+				IF(u.id_gender=1, 'mr', 'ms')                       as shipping_salutation,
 				u.firstname 						        		as shipping_firstname,
 				u.lastname 							            	as shipping_lastname,
-				u.company 							        		as shipping_company,
+				a.company 							        		as shipping_company,
 				'' 													as shipping_department,
 				a.address1  						            	as shipping_street,
 				'' 													as shipping_streetnumber,
@@ -427,9 +420,6 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
             	WHERE a2.id_customer=u.id_customer
             	LIMIT 1
             )
-
-			LEFT JOIN {$this->quoteTable('gender', 'g')}
-			ON g.id_gender=u.id_gender
 
 			LEFT JOIN {$this->quoteTable('country_lang', 'c')}
 			ON c.id_country=a.id_country
@@ -518,16 +508,16 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 		return "
 			SELECT
 				o.`id_order`									as orderID,
-				o.`reference`									as ordernumber,
+				o.`id_order`									as ordernumber,
 				u.`id_customer`								as customerID,
 				aBilling.`vat_number`							as ustid,
-				o.id_shop                                       as subshopID,
+				1                                              as subshopID,
 
 
-				IF(g.type=0, 'mr', 'ms')		                as billing_salutation,
+				IF(u.id_gender=1, 'mr', 'ms')   	                as billing_salutation,
 				u.firstname                                         as billing_firstname,
 				u.lastname       	 								as billing_lastname,
-				u.company   		 								as billing_company,
+				aBilling.company   		 							as billing_company,
 				'' 													as billing_department,
 				aBilling.address1          	 						as billing_street,
 				'' 													as billing_streetnumber,
@@ -536,10 +526,10 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				cBilling.iso_code           						as billing_countryiso,
 
 
-				IF(g.type=0, 'mr', 'ms')		                    as shipping_salutation,
+				IF(u.id_gender=1, 'mr', 'ms')		                as shipping_salutation,
 				u.firstname                                         as shipping_firstname,
 				u.lastname       	 								as shipping_lastname,
-				u.company   		 								as shipping_company,
+				aShipping.company   		 						as shipping_company,
 				'' 													as shipping_department,
 				aShipping.address1          	 					as shipping_street,
 				'' 													as shipping_streetnumber,
@@ -555,23 +545,32 @@ class Shopware_Components_Migration_Profile_Prestashop extends Shopware_Componen
 				o.`id_lang`								        as languageID,
 				GROUP_CONCAT(cm.`message`)                      as customercomment,
 				o.`date_add`								        as date,
-				`current_state`									as status,
+				-- Need a subselect to get the current order status
+				-- Removing this might have a positive performance impact
+				(
+				    SELECT id_order_state
+				    FROM {$this->quoteTable('order_history', 'history')}
+				    WHERE history.id_order = o.id_order
+				    ORDER BY id_order_history DESC
+				    LIMIT 1
+                )									            as status,
 				-- `orders_date_finished`,
 				-- IF(o.`allow_tax`=1,0,1)						as tax_free,
 				-- o.`customers_ip`								as remote_addr,
 
-				o.total_shipping_tax_incl                       as invoice_shipping,
-				o.total_shipping                                as invoice_shipping_net,
-				o.total_paid_tax_incl   						as invoice_amount,
-				o.total_paid_tax_excl							as invoice_amount_net
+				o.total_shipping                               as invoice_shipping,
+				IF(
+				    carrier_tax_rate<1,
+				    total_shipping ,
+				    total_shipping / ((carrier_tax_rate + 100)/100)
+                )                                               as invoice_shipping_net,
+				o.total_paid               						as invoice_amount
+				-- o.total_paid_tax_excl							as invoice_amount_net
 
 			FROM {$this->quoteTable('orders', 'o')}
 
 			LEFT JOIN {$this->quoteTable('customer', 'u')}
 			ON u.id_customer=o.id_customer
-
-			LEFT JOIN {$this->quoteTable('gender', 'g')}
-			ON g.id_gender=u.id_gender
 
 			LEFT JOIN {$this->quoteTable('address', 'aShipping')}
 			ON aShipping.id_address=o.id_address_delivery

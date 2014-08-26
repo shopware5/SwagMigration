@@ -262,7 +262,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             array('id'=>'Gambio', 		'name'=>$this->getNamespace()->get('profile-gambio')),
             array('id'=>'Xt Commerce', 	'name'=>$this->getNamespace()->get('profile-xt')),
             array('id'=>'Shopware35', 	'name'=>$this->getNamespace()->get('profile-shopware')),
-            array('id'=>'PrestaShop', 	'name'=>$this->getNamespace()->get('profile-presta')),
+            array('id'=>'Prestashop15',	'name'=>$this->getNamespace()->get('profile-presta')),
+            array('id'=>'Prestashop14', 'name'=>$this->getNamespace()->get('profile-presta-old')),
         );
         echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
     }
