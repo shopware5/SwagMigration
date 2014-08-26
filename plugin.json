@@ -8,7 +8,7 @@
     },
 
     "compatibility": {
-        "minimumVersion": "4.1.0",
+        "minimumVersion": "4.3.0",
         "maximumVersion": null,
         "blacklist": [
         ]
