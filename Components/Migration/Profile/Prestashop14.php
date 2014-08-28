@@ -305,23 +305,12 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
    	 */
 	public function getProductImageSelect()
 	{
-        // prestashop generates the image path from the "id_image" ID by splitting it after
-        // each char and concatening it with slashes. This behaviour is somewhat hard
-        // to reproduce with sql
-        // perhaps this should rather be done via php
-        $replaceSql = "
-        CONCAT(
-            REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(
-            REPLACE(REPLACE(REPLACE(REPLACE(
-                id_image,
-            0, '0/'), 1, '1/') , 2, '2/') , 3, '3/') , 4, '4/'), 5, '5/'),
-            6, '6/'), 7, '7/'), 8, '8/'), 9, '9/'),
-        id_image,
-        '.jpg'
-        ) as image";
-
 		return "
-				SELECT `id_product` as productID, $replaceSql, cover as main, position as position
+				SELECT
+				    `id_product` as productID,
+				    CONCAT(id_product, '-', id_image, '.jpg') as image,
+				    cover as main,
+				    position as position
 				FROM {$this->quoteTable('image')}
 		";
 	}
