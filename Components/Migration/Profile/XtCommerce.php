@@ -631,7 +631,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
                 `products_id` as productID,
                 `products_model` as article_ordernumber,
 
-                IFNULL (CONCAT(
+                IFNULL(CONCAT(
                     products.products_name,
                     ' ',
                     GROUP_CONCAT(attributes.products_options_values SEPARATOR ', '),

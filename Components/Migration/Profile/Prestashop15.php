@@ -214,7 +214,7 @@ class Shopware_Components_Migration_Profile_Prestashop15 extends Shopware_Compon
 	public function getProductSelect()
 	{
         $taxSelect = "
-            IFNULL (
+            IFNULL(
                 (SELECT tr.id_tax FROM {$this->quoteTable('tax_rule', 'tr')}  WHERE id_tax_rule=1 LIMIT 1),
                 1
             ) as taxID,
