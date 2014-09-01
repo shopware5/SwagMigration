@@ -1,7 +1,8 @@
 {
-    "currentVersion": "2.2.0",
+    "currentVersion": "2.2.1",
 
     "changelogs": {
+        "2.2.1": "Compatibility with older servers",
         "2.2.0": "Adds presta 1.4 profile",
         "2.1.9": "Updates magento version; adds some snippets",
         "2.1.8": "Fixes Property not found failure during product-attribute import"
