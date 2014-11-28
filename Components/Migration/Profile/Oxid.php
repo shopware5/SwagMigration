@@ -1,33 +1,13 @@
 <?php
-/**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+/*
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
 /**
  * Shopware SwagMigration Components - Oxid
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Migration_Profile
 {
@@ -185,7 +165,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			SELECT
 				u.OXID										as customerID,
 				u.OXCUSTNR 									as customernumber,
-				
+
 				u.OXCOMPANY 								as billing_company,
 				'' 											as billing_department,
 				IF(u.OXSAL IN ('m','Herr','MR'), 'mr', 'ms') 	as billing_salutation,
@@ -197,7 +177,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				u.OXCITY 									as billing_city,
 				bc.OXISOALPHA2								as billing_countryiso,
 				u.OXADDINFO 								as billing_text1,
-				
+
 				IF(u.OXFON='', u.OXMOBFON, u.OXFON) 		as phone,
 				u.OXFAX 									as fax,
 				u.OXUSERNAME 								as email,
@@ -209,16 +189,16 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 				u.OXCREATE									as firstlogin,
 				u.OXSHOPID									as subshopID,
-				
+
 				IF(gb.OXID, 0, IF(u.OXACTIVE,1,0))			as active,
 				IF(n.OXID, IF(gb.OXID, 0, IF(u.OXACTIVE,1,0)), 0)	as newsletter
-				
+
 			FROM {$this->quoteTable('user', 'u')}
 
 			LEFT JOIN {$this->quoteTable('object2group', 'n')} ON n.OXOBJECTID=u.OXID AND n.OXGROUPSID='oxidnewsletter'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb')} ON gb.OXOBJECTID=u.OXID AND gb.OXGROUPSID='oxidblacklist'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb2')} ON gb2.OXOBJECTID=u.OXID AND gb2.OXGROUPSID='oxidblocked'
-			
+
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
 		";
 	}
@@ -346,7 +326,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('articles')}
 			WHERE `OXPRICEA`!=0
 		 UNION ALL
-			SELECT 
+			SELECT
 				`OXID` as productID,
 				1 as `from`,
 				`OXPRICEB` as `price`,
@@ -355,7 +335,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('articles')}
 			WHERE `OXPRICEB`!=0
 		UNION ALL
-			SELECT 
+			SELECT
 				`OXID` as productID,
 				1 as `from`,
 				`OXPRICEC` as `price`,
@@ -415,9 +395,9 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 					a.OXSEARCHKEYS_$key 	as keywords,
 					e.OXLONGDESC_$key 		as description_long,
 					e.OXTAGS_$key 			as tags
-				
+
 				FROM {$this->quoteTable('articles', 'a')}
-				
+
 				LEFT JOIN {$this->quoteTable('artextends', 'e')}
 				ON e.OXID=a.OXID
 			";
@@ -475,7 +455,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 		$keys = $this->getLanguageKeys();
 		$sql = array("
-			SELECT 
+			SELECT
 				c.OXID as categoryID,
 				(CASE WHEN c.OXLEFT = 1 THEN '' ELSE c.OXPARENTID END) as parentID,
 				{$this->Db()->quote($keys[0])} as languageID,
@@ -500,7 +480,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				continue;
 			}
 			$sql[] = "
-				SELECT 
+				SELECT
 					c.OXID as categoryID,
 					(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
 					{$this->Db()->quote($languageID)} as languageID,
@@ -571,7 +551,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				`OXBILLUSTID`								as ustid,
 				`OXBILLFON`									as phone,
 				`OXBILLFAX`									as fax,
-				
+
 				`OXBILLCOMPANY`								as billing_company,
 				`OXBILLFNAME`								as billing_firstname,
 				`OXBILLLNAME`								as billing_lastname,
@@ -583,7 +563,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				`OXBILLZIP`									as billing_zipcode,
 				IF(`OXBILLSAL` IN ('m', 'Herr', 'MR'), 'mr', 'ms')
 															as billing_salutation,
-				
+
 				`OXDELCOMPANY`								as shipping_company,
 				`OXDELFNAME`								as shipping_firstname,
 				`OXDELLNAME` 								as shipping_lastname,
@@ -595,23 +575,23 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				`OXDELZIP`									as shipping_zipcode,
 				IF(`OXDELSAL` IN ('m', 'Herr', 'MR'), 'mr', 'ms')
 															as shipping_salutation,
-				
+
 				`OXTOTALNETSUM`								as invoice_amount_net,
 				`OXTOTALORDERSUM`							as invoice_amount,
 				`OXDELCOST`+`OXPAYCOST`						as invoice_shipping,
 				`OXDELCOST`+`OXPAYCOST`						as invoice_shipping_net,
 				-- (`OXDELCOST`+`OXPAYCOST`)
 				-- 	- (`OXDELVAT`+`OXPAYVAT`)				as invoice_shipping_net,
-					
+
 				-- `OXARTVAT1`,
 				-- `OXARTVATPRICE1`,
 				-- `OXARTVAT2`,
-				-- `OXARTVATPRICE2`,					
+				-- `OXARTVATPRICE2`,
 				-- `OXWRAPCOST`,
 				-- `OXWRAPVAT`,
-				-- `OXVOUCHERDISCOUNT`,	
+				-- `OXVOUCHERDISCOUNT`,
 				-- `OXDISCOUNT`,
-				
+
 				`OXTRACKCODE`								as trackingID,
 				`OXREMARK`									as customercomment,
 				`OXCURRENCY`								as currency,
@@ -622,9 +602,9 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				`OXIP` 										as remote_addr,
 				-- `OXLANG`									as languageID,
 				`OXDELTYPE`									as dispatchID
-				
+
 			FROM {$this->quoteTable('order', 'o')}
-			
+
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=o.OXBILLCOUNTRYID
 			LEFT JOIN {$this->quoteTable('country', 'sc')} ON sc.OXID=o.OXDELCOUNTRYID
 		";
@@ -639,17 +619,17 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 	{
 		return "
 			SELECT
-			
+
 				OXORDERID as orderID,
 				OXARTID  as productID,
-				
+
 				OXARTNUM as article_ordernumber,
 				OXTITLE as name,
 				OXPRICE as price,
 				OXAMOUNT as quantity,
 				OXVAT as tax,
 				IF(OXSUBCLASS='oxarticle', 0, IF(OXPRICE>0, 4, 3)) as modus
-				
+
 			FROM {$this->quoteTable('orderarticles')}
 		";
 	}

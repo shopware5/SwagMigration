@@ -51,11 +51,11 @@ Die Profile.php hat eine eigene Datenbankverbindung zu dem zu migrierenden Shops
 
 Im Folgenden sollen kurz alle zur Verfügung stehenden Methoden besprochen werden, die während der Migrations ggf. gelesen werden. Hierbei gibt es einige Grundsätze zu beachten:
 
-* Bei allen Selects, bei denen IDs selektiert werden (Benutzergruppen, Artikel u.v.m.), müssen die selben IDs auch selektiert werden, wenn die entsprechenden Entities an anderer Stelle referenziert werden. Sprich: Wird die Benutzergruppe "Shopkunden" mit der numerischen ID '1' selektiert, kann diese später beim Benutzer-Import nicht über die ID 'EK' referenziert werden. 
+* Bei allen Selects, bei denen IDs selektiert werden (Benutzergruppen, Artikel u.v.m.), müssen die selben IDs auch selektiert werden, wenn die entsprechenden Entities an anderer Stelle referenziert werden. Sprich: Wird die Benutzergruppe "Shopkunden" mit der numerischen ID '1' selektiert, kann diese später beim Benutzer-Import nicht über die ID 'EK' referenziert werden.
 
 ### Allgemein
 * getProductImagePath
-    * Gibt den relativen Standard-Pfad zu den Produktbildern des Quellshops zurück. 
+    * Gibt den relativen Standard-Pfad zu den Produktbildern des Quellshops zurück.
 
 ### Select-Methoden für das Mapping
 
@@ -71,26 +71,26 @@ Nicht alle Selects werden genutzt, um die entsprechenden Entitäten direkt nach 
         * **id**: ID der Sprache.
         * **name**: Angezeigte Sprache für das Mapping
 * getShopSelect
-    * Selektiert alle (Sub)shops des Shopsystems 
+    * Selektiert alle (Sub)shops des Shopsystems
     * Felder:
-        * **id**: 
+        * **id**:
         * **name**: Name des Shops - wird im Mapping angezeigt
         * **url**: (Optional) URL zum Shop
 * getCustomerGroupSelect
-    * Selektiert alle Benutzergruppen des Quell-Shops 
+    * Selektiert alle Benutzergruppen des Quell-Shops
     * Felder:
         * **id**: Id der Benutzergruppe
         * **name**: Name der Benutzergruppe für die Anzeige im Mapping
 * getPaymentMeanSelect
-    * Selektiert alle Zahlungsarten 
+    * Selektiert alle Zahlungsarten
     * **id**: Id der Zahlungsart
-    * **name**: Name der Zahlungsart (für die Anzeige im Mapping)    
+    * **name**: Name der Zahlungsart (für die Anzeige im Mapping)
 * getOrderStatusSelect
     * Selektiert alle Bestellstati
     * Felder:
         * **id**: Id der Bestellstati
         * **name**: Name des Bestellstatus fürs Mapping
-* getTaxRateSelect           
+* getTaxRateSelect
     * Selektiert alle Steuersätze
     * Felder:
         * **id**: Id des Steuersatzes
@@ -116,22 +116,22 @@ Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter E
         * **productID**:
         * **instock**:
         * **stockmin**:
-        * **shippingtime**:        
-        * **net_price**:        
-        * **price**:                
+        * **shippingtime**:
+        * **net_price**:
+        * **price**:
         * **baseprice**:
         * **releasedate**:
         * **added**:
-        * **changed**:        
-        * **length**:        
-        * **width**:        
-        * **height**:        
-        * **supplier**:        
-        * **taxID**:        
-        * **active**:        
-        * **ean**:        
-        * **name**:        
-        * **description_long**:        
+        * **changed**:
+        * **length**:
+        * **width**:
+        * **height**:
+        * **supplier**:
+        * **taxID**:
+        * **active**:
+        * **ean**:
+        * **name**:
+        * **description_long**:
         * **description**:
         * **meta_title**:
         * **meta_description**:
@@ -140,7 +140,7 @@ Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter E
 Bei Shops mit Attribut-System (XTC) werden diese Felder nicht benötigt.
         * **parentID**: Vater-Artikel. Muss vorher selektiert werden - hier ist also ggf. ein OrderBy nötig.
         * **additionaltext**: Mit Pipes separierte Optionen des Artikels, etwa "grün | XL"
-        * **variant_group_names**: Mit Pipes separierte Gruppen des Artikels, etwa "Farbe | Größe"        
+        * **variant_group_names**: Mit Pipes separierte Gruppen des Artikels, etwa "Farbe | Größe"
         * **masterWithAttributes**: Falls der Parent-Artikel in dem Shop-System auch Varianten-Optionen hat, muss hier '1' selektiert werden. Andernfalls '0'.
 * getAttributedProductsSelect:
     * Selektiert alle IDs von Produkten, die Attribute haben. Diese Methode wird nur benötigt, wenn der Quellshop Varianten in Form von Attributen implementiert, wie es bspw. bei XTC der Fall ist.
@@ -154,7 +154,7 @@ Bei Shops mit Attribut-System (XTC) werden diese Felder nicht benötigt.
         * **option_name**: Attribut-Name. Bspw. "grün"
         * **price**: Price-Aufschlag für dieses Attribut
 * getProductsWithPropertiesSelect
-    * Selektiert Produkte, die Eigenschaften (SW-Nomenklatur) haben. 
+    * Selektiert Produkte, die Eigenschaften (SW-Nomenklatur) haben.
     * Felder:
         * **productID**: Id der Produkte, die Eigenschaften haben
 * getProductPropertiesSelect($id)
@@ -184,6 +184,10 @@ Gerade Produkte sind in der Regel recht komplexe Entitäten, die in den verschie
 * Parent/Child
     * Liegen die Produkte und ihre Varianten in einer Parent/Child-Struktur vor (wie bspw. bei Oxid), dann können die Varianten sehr leicht importiert werden. In der getProductSelect-Methode können dann zusätzlich die Felder **parentId**, **additionaltext**, **variant_group_names** und **masterWithAttributes** selektiert werden. Eine genauere Beschreibung der Felder findet sich in der Dokumentation der Methode **getProductSelect**.
 * Attribute
-    * Liegen die Varianten in Form von Attributen vor (XTC, Gambio), können diese Attribute als Konfiguratoren importiert werden. Das Migrationstool wird dann automatisch die Variantengenerierung anstoßen. 
+    * Liegen die Varianten in Form von Attributen vor (XTC, Gambio), können diese Attribute als Konfiguratoren importiert werden. Das Migrationstool wird dann automatisch die Variantengenerierung anstoßen.
 
 # 3. Migrationslogik
+
+## License
+
+The MIT License (MIT). Please see [License File](LICENSE) for more information.

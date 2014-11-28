@@ -34,10 +34,6 @@
  * Keep in mind,that the ExtJs application will forward all received information back to the php controller;
  * for this reason, addRequestParam('hi', true) will result in a request-var "hi' being available within
  * the next request.
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Shopware_Components_Migration_Import_Progress extends Enlight_Class
 {
