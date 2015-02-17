@@ -68,6 +68,11 @@ class Shopware_Components_Migration_Cleanup
                 case 'clear_articles':
                     $this->sDeleteAllArticles();
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ARTICLE);
+                    try {
+                        Shopware()->Db()->query('TRUNCATE s_articles_categories_seo;');
+                    } catch(Exception $e) {
+                        // if table does not exist - resume, it might be just an old SW version
+                    }
                     break;
                 case 'clear_categories':
                     Shopware()->Api()->Import()->sDeleteAllCategories();
