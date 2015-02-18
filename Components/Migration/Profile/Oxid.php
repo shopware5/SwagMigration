@@ -653,4 +653,25 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('orderarticles')}
 		";
 	}
+
+    /**
+     * Returns the sql statement to select all article downloads
+     * @return string
+     */
+    public function getDownloadSelect()
+    {
+        return "
+			SELECT
+				oxmediaurls.*,
+				oxarticles.OXARTNUM,
+				oxarticles.oxtitle
+
+			FROM {$this->quoteTable('mediaurls')}, {$this->quoteTable('articles')}
+			WHERE
+			    OXOBJECTID = oxarticles.OXID
+			ORDER BY
+			    oxarticles.OXARTNUM ASC
+		";
+    }
+
 }

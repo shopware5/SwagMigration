@@ -48,7 +48,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         'import_customers' => 'Customer',
         'import_ratings' => 'Rating',
         'import_orders' => 'Order',
-        'import_order_details' => 'Order'
+        'import_order_details' => 'Order',
+        'import_downloads' => 'Download'
     );
 
     /**
