@@ -66,9 +66,9 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         $remotePath = rtrim($this->Request()->basepath, '/') . '/out/media/';
 
         while ($media = $result->fetch()) {
-            $orderNumber = $media["OXARTNUM"];
-            $description = $media["OXDESC"];
-            $path = $media["OXURL"];
+            $orderNumber = $media['number'];
+            $description = $media['description'];
+            $path = $media['url'];
 
             // Clear-Path
             $path = basename($path);

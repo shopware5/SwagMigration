@@ -662,9 +662,10 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
     {
         return "
 			SELECT
-				oxmediaurls.*,
-				oxarticles.OXARTNUM,
-				oxarticles.oxtitle
+				oxmediaurls.oxurl as url,
+				oxarticles.oxartnum as number,
+				oxmediaurls.oxdesc as description,
+				oxarticles.oxtitle as name
 
 			FROM {$this->quoteTable('mediaurls')}, {$this->quoteTable('articles')}
 			WHERE
