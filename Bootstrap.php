@@ -38,6 +38,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 	public function install()
 	{
         $this->subscribeEvents();
+        $this->checkVersion('4.3.0');
 
 	 	$parent = $this->Menu()->findOneBy(array('label'=> 'Inhalte'));
 		$item = $this->createMenuItem(array(
@@ -72,6 +73,13 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 			'invalidateCache' => array('backend')
 		);
 	}
+
+    public function checkVersion($version)
+    {
+        if (!$this->assertVersionGreaterThen($version)) {
+            throw new \Exception('This plugin requires Shopware ' . $version.' or a later version');
+        }
+    }
 
     /**
      * Update the plugin to the current version
