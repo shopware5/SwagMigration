@@ -622,7 +622,20 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		$sql = $this->getEstimationSelect($for);
 
 		return $this->db->fetchOne($sql);
-
-
 	}
+
+    /**
+     *
+     * @return bool|string
+     */
+    public function queryArticleDownload()
+    {
+        if (!method_exists($this, 'getDownloadSelect')) {
+            return false;
+        }
+        $sql = $this->getDownloadSelect();
+
+        return $this->db->query($sql);
+    }
+
 }

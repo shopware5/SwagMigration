@@ -71,6 +71,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     showPasswordInfo: false,
 
     /**
+     * Will be set to true, if migration plugin provides importing of downloads
+     */
+    importAllowed: false,
+
+    importImages: true,
+
+    /**
 	 * The initComponent template method is an important initialization step for a Component.
      * It is intended to be implemented by each subclass of Ext.Component to provide any needed constructor logic.
      * The initComponent method of the class being created is called first,
@@ -173,9 +180,10 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     },
 
     getLeftItems: function() {
-        var me = this;
+        var me = this,
+            items = [];
 
-        return [{
+        items = [{
             fieldLabel: '{s name=importProducts}Import products{/s}',
             name: 'import_products',
             xtype: 'checkbox'
@@ -212,6 +220,31 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             checked: false,
             hidden: true
         }];
+
+        me.importInput = Ext.create('Ext.form.field.Checkbox', {
+            labelWidth: 250,
+            fieldLabel: '{s name=importDownloads}Import downloads{/s}',
+            name: 'import_downloads',
+            checked: false,
+            hidden: !me.importAllowed,
+            listeners: {
+                change: function(checkBox, newValue, oldValue, eOpts) {
+                    me.importAllowed = newValue;
+
+                    me.basePath.allowBlank = (!newValue && !me.importImages);
+                    if(newValue || me.importImages) {
+                        me.basePath.show();
+                    }else{
+                        me.basePath.hide();
+                    }
+                    me.fireEvent('validate');
+                }
+            }
+        });
+        items.push(me.importInput);
+
+
+        return items;
     },
 
     getRightItems: function() {
@@ -245,16 +278,20 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             }
         });
 
-        return [{
+        me.imageInput = Ext.create('Ext.form.field.Checkbox', {
             fieldLabel: '{s name=importArticleImages}Import product images{/s}',
             name: 'import_images',
             xtype: 'checkbox',
+            labelWidth: 250,
             helpText: '{s name=thumbnailGenerationNeeded}After image import you need to generate the image thumbnails in the media manager for the article album.{/s}',
+            checked: me.importImages,
             listeners: {
-                change: function(checkBox, newValue, oldValue, eOpts) {
+                change: function(checkBox, newValue) {
+                    me.importImages = newValue;
+
                     // if the product images are going to be imported, the basePath field is mandatory
-                    me.basePath.allowBlank = !newValue;
-                    if(newValue) {
+                    me.basePath.allowBlank = (!newValue && !me.importAllowed);
+                    if(newValue || me.importAllowed) {
                         me.basePath.show();
                     }else{
                         me.basePath.hide();
@@ -262,7 +299,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                     me.fireEvent('validate');
                 }
             }
-        }, {
+        });
+
+        return [
+            me.imageInput,
+        {
             fieldLabel: '{s name=importCustomers}Import customers{/s}',
             name: 'import_customers',
             xtype: 'checkbox',
@@ -373,6 +414,20 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         }else{
             me.saltInput.hide();
             me.saltInput.allowBlank = true;
+        }
+    },
+
+    setImportAllowed: function(value) {
+        var me = this;
+
+        me.importAllowed = value;
+
+        if (value) {
+            me.importInput.show();
+            me.importInput.allowBlank = false;
+        } else {
+            me.importInput.hide();
+            me.importInput.allowBlank = true;
         }
     }
 
