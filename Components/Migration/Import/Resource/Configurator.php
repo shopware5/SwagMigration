@@ -191,7 +191,12 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
                 Shopware()->Db()->query($sql);
 
                 if ($price) {
-                    $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
+                    if(version_compare(Shopware()::VERSION, '4.4', '>=') || Shopware()::VERSION == "___VERSION___") {
+                        $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `options`, `surcharge`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
+                    }
+                    else {
+                        $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
+                    }
                     Shopware()->Db()->query($sql);
                 }
 
