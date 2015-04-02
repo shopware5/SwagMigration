@@ -114,6 +114,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
             ");
 
         while ($product = $result->fetch()) {
+            $existingOrderNumber = true;
             // Select additional data for the article if needed
             $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
             if (!empty($additionalProductInfo)) {
@@ -144,6 +145,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                         break;
                     case 'make_valid':
                         $product['ordernumber'] = $this->makeInvalidNumberValid($number, $product['productID']);
+                        $existingOrderNumber = false;
                         break;
                 }
             }
@@ -227,9 +229,6 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                     );
                 }
 
-
-
-
                 //Price
                 if(isset($product['net_price'])) {
                     if(empty($product['tax'])) {
@@ -255,13 +254,15 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                     }
                 }
 
-
-                $sql = '
+                //If we create valid order number don't insert it again.
+                if ($existingOrderNumber) {
+                    $sql = '
                     INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(Shopware_Components_Migration::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
+                    Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_ARTICLE, $product['productID'], $product['articledetailsID']));
+                }
             }
 
 
