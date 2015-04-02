@@ -57,6 +57,7 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
         $result = $this->Source()->queryArticleDownload();
         $count = $result->rowCount() + $offset;
@@ -64,6 +65,16 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
 
         $localPath = Shopware()->DocPath('files/downloads');
         $remotePath = rtrim($this->Request()->basepath, '/') . '/out/media/';
+
+        $numberSnippet = $this->getNameSpace()->get('numberNotValid',
+            "The product number %s is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            ");
 
         while ($media = $result->fetch()) {
             $orderNumber = $media['number'];
@@ -76,6 +87,23 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
 
             $documentUrl = $remotePath . $path;
             $document = file_get_contents($documentUrl);
+
+            // Check the ordernumber
+            if (!isset($orderNumber)) {
+                $orderNumber = '';
+            }
+            if ($numberValidationMode !== 'ignore' &&
+                (empty($orderNumber) || strlen($orderNumber) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $orderNumber)))
+            {
+                switch ($numberValidationMode) {
+                    case 'complain':
+                        return $this->getProgress()->error(sprintf($numberSnippet, $orderNumber));
+                        break;
+                    case 'make_valid':
+                        $orderNumber = $this->makeInvalidNumberValid($orderNumber, $media['productID']);
+                        break;
+                }
+            }
 
             if(strlen($document) == 0) {
                 continue;

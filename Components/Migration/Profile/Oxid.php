@@ -662,6 +662,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
     {
         return "
 			SELECT
+			    oxarticles.oxid as productID,
 				oxmediaurls.oxurl as url,
 				oxarticles.oxartnum as number,
 				oxmediaurls.oxdesc as description,

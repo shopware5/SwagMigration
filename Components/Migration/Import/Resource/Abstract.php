@@ -282,7 +282,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         );
 
         if ($number) {
-            return $number;
+            return 'sw-'.$number;
         }
 
         // Get number
