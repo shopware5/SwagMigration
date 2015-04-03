@@ -230,7 +230,6 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'firstname' => !empty($order['billing_firstname']) ? $order['billing_firstname'] : '',
                 'lastname' => !empty($order['billing_lastname']) ? $order['billing_lastname'] : '',
                 'street' => !empty($order['billing_street']) ? $order['billing_street'] : '',
-                'streetnumber' => !empty($order['billing_streetnumber']) ? $order['billing_streetnumber'] : '',
                 'zipcode' => !empty($order['billing_zipcode']) ? $order['billing_zipcode'] : '',
                 'city' => !empty($order['billing_city']) ? $order['billing_city'] : '',
                 'phone' => !empty($order['phone']) ? $order['phone'] : '',
@@ -248,11 +247,15 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'firstname' => !empty($order['shipping_lastname']) ? $order['shipping_firstname'] : $data_billing['firstname'],
                 'lastname' => !empty($order['shipping_lastname']) ? $order['shipping_lastname'] : $data_billing['lastname'],
                 'street' => !empty($order['shipping_lastname']) ? $order['shipping_street'] : $data_billing['street'],
-                'streetnumber' => !empty($order['shipping_lastname'])&&!empty($order['shipping_streetnumber']) ? $order['shipping_streetnumber'] : $data_billing['streetnumber'],
                 'zipcode' => !empty($order['shipping_lastname']) ? $order['shipping_zipcode'] : $data_billing['zipcode'],
                 'city' => !empty($order['shipping_lastname']) ? $order['shipping_city'] : $data_billing['city'],
                 'countryID' => !empty($order['shipping_lastname'])&&!empty($order['shipping_countryID']) ? $order['shipping_countryID'] : $data_billing['countryID'],
             );
+
+            if (version_compare(Shopware::VERSION, '5.0', '=<')) {
+                $data_billing['streetnumber'] = !empty($order['billing_streetnumber']) ? $order['billing_streetnumber'] : '';
+                $data_shipping['streetnumber'] = !empty($order['shipping_lastname'])&&!empty($order['shipping_streetnumber']) ? $order['shipping_streetnumber'] : $data_billing['streetnumber'];
+            }
 
             foreach($data_billing as $key => $attribute) {
                 if($attribute === null) {

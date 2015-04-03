@@ -151,12 +151,15 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                     'firstname' => !empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : '',
                     'lastname' => !empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : '',
                     'street' => !empty($customer['shipping_street']) ? $customer['shipping_street'] : '',
-                    'streetnumber' => !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '',
                     'zipcode' => !empty($customer['shipping_zipcode']) ? $customer['shipping_zipcode'] : '',
                     'city' => !empty($customer['shipping_city']) ? $customer['shipping_city'] : '',
                     'countryID' => !empty($customer['shipping_countryID']) ? $customer['shipping_countryID'] : 0,
                 );
                 $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
+
+                if (version_compare(Shopware::VERSION, '5.0', '=<')) {
+                    $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
+                }
             } else {
                 $customer_shipping = array();
             }
