@@ -72,7 +72,7 @@ class Shopware_Components_Migration extends Enlight_Class
 		$profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
 				
 		$migrationAdapter = Enlight_Class::Instance($profileName, array($config));
-		
+
 		return $migrationAdapter;
 	}
 

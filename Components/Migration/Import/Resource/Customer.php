@@ -142,6 +142,12 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                 }
             }
 
+            if($this->isShopwareFive()) {
+                if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
+                    $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
+                }
+            }
+
 
             if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
                 $customer_shipping = array(
@@ -157,7 +163,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                 );
                 $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
 
-                if (version_compare(Shopware::VERSION, '5.0', '=<')) {
+                if (!$this->isShopwareFive()) {
                     $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
                 }
             } else {
@@ -230,5 +236,17 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         return true;
     }
 
+    /**
+     * Returns true if the current SW-Version is Shopware 5
+     *
+     * @return bool
+     */
+    private function isShopwareFive()
+    {
+        if (version_compare(Shopware::VERSION, '5.0.0', '>=')) {
+            return true;
+        }
+        return false;
+    }
 
 }

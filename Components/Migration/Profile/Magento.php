@@ -307,13 +307,17 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             -- Actual attributes (groups) with names
             INNER JOIN {$this->quoteTable('eav_attribute')} eav
             ON eav.attribute_id=entity_int.attribute_id
-            AND eav.is_user_defined=1
-            AND eav.is_required=1
+            AND eav.is_user_defined = 1
+            AND eav.is_required = 0
+
+            INNER JOIN {$this->quoteTable('catalog_eav_attribute')} eav_attr
+            ON eav_attr.attribute_id = eav.attribute_id
+            AND eav_attr.is_configurable = 1
 
             -- Joins article option relation
             INNER  JOIN {$this->quoteTable('eav_attribute_option_value')} option_value
             ON option_value.option_id=entity_int.value
-            AND option_value.store_id=0
+            AND option_value.store_id = 0
 
             WHERE p.entity_type_id = {$this->getEntityTypeId('catalog_product')}
             AND p.entity_id = {$productId}
