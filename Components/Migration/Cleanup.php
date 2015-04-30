@@ -154,8 +154,8 @@ class Shopware_Components_Migration_Cleanup
 			TRUNCATE s_articles_information;
 			TRUNCATE s_articles_information_attributes;
 			TRUNCATE s_articles_notification;
+            TRUNCATE s_articles_prices_attributes;
 			TRUNCATE s_articles_prices;
-			TRUNCATE s_articles_prices_attributes;
 			TRUNCATE s_articles_relationships;
 			TRUNCATE s_articles_similar;
 			TRUNCATE s_articles_translations;
@@ -164,19 +164,32 @@ class Shopware_Components_Migration_Cleanup
 			TRUNCATE s_article_configurator_options;
 			TRUNCATE s_article_configurator_option_relations;
 			TRUNCATE s_article_configurator_price_surcharges;
-			TRUNCATE s_article_configurator_sets;
+			TRUNCATE s_article_configurator_price_variations;
 			TRUNCATE s_article_configurator_set_group_relations;
 			TRUNCATE s_article_configurator_set_option_relations;
+			TRUNCATE s_article_configurator_sets;
+            TRUNCATE s_article_configurator_templates_attributes;
+            TRUNCATE s_article_configurator_template_prices_attributes;
+            TRUNCATE s_article_configurator_template_prices;
 			TRUNCATE s_article_configurator_templates;
-			TRUNCATE s_article_configurator_templates_attributes;
-			TRUNCATE s_article_configurator_template_prices;
-			TRUNCATE s_article_configurator_template_prices_attributes;
-			TRUNCATE s_article_img_mappings;
 			TRUNCATE s_article_img_mapping_rules;
+			TRUNCATE s_article_img_mappings;
         ";
+
         Shopware()->Db()->query($sql);
 
         try {
+            // Follow-up: Truncate the tables that were not cleared in the first round
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_accessory_groups;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_accessory_articles;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_sets;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_set_group_relations;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_set_option_relations;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_templates;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_templates_attributes;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_template_prices;');
+            Shopware()->Db()->query('TRUNCATE s_article_configurator_price_variations;');
+
             Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
         } catch(Exception $e) {
             // if table does not exist - resume, it might be just an old SW version
