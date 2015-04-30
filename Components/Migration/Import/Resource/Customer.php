@@ -243,7 +243,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
      */
     private function isShopwareFive()
     {
-        if (version_compare(Shopware::VERSION, '5.0.0', '>=')) {
+        if (version_compare(Shopware::VERSION, '5.0.0', '>=') || Shopware::VERSION == '___VERSION___') {
             return true;
         }
         return false;
