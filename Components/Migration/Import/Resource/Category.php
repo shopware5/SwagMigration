@@ -248,8 +248,16 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             try {
                 $category['targetID'] = Shopware()->Api()->Import()->sCategory($category);
                 $this->setCategoryTarget($category['categoryID'], $category['targetID']);
-            }
-            catch(Exception $e) {
+                // if meta_title isset update the Category
+                if(!empty($category['meta_title']))
+                {
+                    Shopware()->Db()->update(
+                        's_categories',
+                        array('meta_title' => $category['meta_title']),
+                        array('id=?'=>$category['targetID'])
+                    );
+                }
+            } catch(Exception $e) {
                 echo "<pre>";
                 print_r($e);
                 echo "</pre>";
