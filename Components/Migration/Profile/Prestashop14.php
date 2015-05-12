@@ -446,6 +446,7 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 				cl.id_lang as languageID,
 				cl.name as description,
 				c.position as position,
+				cl.meta_title as meta_title,
 				cl.meta_keywords as metaKeywords,
 				cl.meta_description as metaDescription,
 				c.active as active,
