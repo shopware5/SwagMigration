@@ -137,7 +137,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 $number = '';
             }
             if ($numberValidationMode !== 'ignore' &&
-                (empty($number) || strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+                (empty($number) || strlen($number) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
                 switch ($numberValidationMode) {
                     case 'complain':

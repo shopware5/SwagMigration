@@ -93,7 +93,7 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
                 $orderNumber = '';
             }
             if ($numberValidationMode !== 'ignore' &&
-                (empty($orderNumber) || strlen($orderNumber) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $orderNumber)))
+                (empty($orderNumber) || strlen($orderNumber) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $orderNumber)))
             {
                 switch ($numberValidationMode) {
                     case 'complain':

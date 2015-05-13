@@ -291,11 +291,8 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         );
 
         // Increase - save
-        Shopware()->Db()->update(
-            's_order_number',
-            array('number' => ++$number),
-            array('name' => 'articleordernumber')
-        );
+        $sql= "UPDATE s_order_number SET number = ? WHERE name = ?";
+        Shopware()->Db()->query($sql, array(++$number, 'articleordernumber'));
 
         // Save mapping
         Shopware()->Db()->insert(
