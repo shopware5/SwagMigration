@@ -35,22 +35,24 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * Defines all availabe imports as well as the order of their import
      * @var array
      */
-    public $imports = array(
-        'import_products' => 'Product',
-        'import_translations' => 'Translation',
-        'import_properties' => 'Property',
-        'import_categories' => 'Category',
-        'import_article_categories' => 'Category',
-        'import_prices' => 'Price',
-        'import_generate_variants' => 'Configurator',
-        'import_create_configurator_variants' => 'Variant',
-        'import_images' => 'Image',
-        'import_customers' => 'Customer',
-        'import_ratings' => 'Rating',
-        'import_orders' => 'Order',
-        'import_order_details' => 'Order',
-        'import_downloads' => 'Download'
-    );
+	public $imports = array(
+			'import_products'                     => 'Product',
+			'import_translations'                 => 'Translation',
+			'import_properties'                   => 'Property',
+			'import_categories'                   => 'Category',
+			'import_article_categories'           => 'Category',
+			'import_prices'                       => 'Price',
+			'import_generate_variants'            => 'Configurator',
+			'import_create_configurator_variants' => 'Variant',
+			'import_images'                       => 'Image',
+			'import_customers'                    => 'Customer',
+			'import_ratings'                      => 'Rating',
+			'import_orders'                       => 'Order',
+			'import_order_details'                => 'Order',
+			'import_downloads'                    => 'Download',
+			'import_downloads_esd'                => 'DownloadESD',
+			'import_orders_esd'                   => 'DownloadESDOrder'
+	);
 
     /**
      * Source shop system profile

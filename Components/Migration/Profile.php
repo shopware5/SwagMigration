@@ -606,6 +606,22 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 		return $this->db->query($sql);
 	}
 
+    /**
+     * Executes the profile ESD order select statement with the given offset
+     *
+     * @param int $offset
+     * @return Zend_Db_Statement_Interface
+     */
+	public function queryEsdOrder($offset=0)
+	{
+		$sql = $this->getEsdOrderSelect();
+		if(!empty($offset)) {
+			$sql = $this->limit($sql, null, $offset);
+		}
+		return $this->db->query($sql);
+	}
+
+
 
 	/**
 	 * Returns a rough estimation of number of entities to import
@@ -634,6 +650,20 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
             return false;
         }
         $sql = $this->getDownloadSelect();
+
+        return $this->db->query($sql);
+    }
+
+    /**
+     *
+     * @return bool|string
+     */
+    public function queryArticleDownloadESD()
+    {
+        if (!method_exists($this, 'getDownloadEsdSelect')) {
+            return false;
+        }
+        $sql = $this->getDownloadEsdSelect();
 
         return $this->db->query($sql);
     }
