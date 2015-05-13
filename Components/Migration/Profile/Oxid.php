@@ -667,13 +667,51 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				oxarticles.oxartnum as number,
 				oxmediaurls.oxdesc as description,
 				oxarticles.oxtitle as name
-
 			FROM {$this->quoteTable('mediaurls')}, {$this->quoteTable('articles')}
 			WHERE
 			    OXOBJECTID = oxarticles.OXID
 			ORDER BY
 			    oxarticles.OXARTNUM ASC
 		";
+    }
+
+    /**
+     * Returns the sql statement to select all ESD article downloads
+     *
+     * @return string
+     */
+    public function getDownloadEsdSelect()
+    {
+        return "
+            SELECT
+                of.OXID       	as downloadId,
+                'download/?sorderfileid=' as path,
+                f.OXFILENAME  	as filename,
+                a.OXARTNUM    	as number,
+                of.OXTIMESTAMP 	as datum
+            FROM {$this->quoteTable('orderfiles')} of
+            INNER JOIN {$this->quoteTable('files')} f    ON of.OXFILEID = f.OXID
+            INNER JOIN {$this->quoteTable('articles')} a ON f.OXARTID = a.OXID
+                ";
+    }
+
+    /**
+     * Return the sql statement to select all _orders_ with ESD article downloads
+     *
+     * @return string
+     */
+    public function getEsdOrderSelect()
+    {
+        return "
+            SELECT
+                of.OXFILENAME  as filename,
+                o.OXORDERNR    as ordernumber,
+                o.OXORDERDATE  as orderdate,
+				o.OXPAID       as cleared_date,
+				o.OXSENDDATE   as senddate
+            FROM {$this->quoteTable('orderfiles')} of
+            INNER JOIN {$this->quoteTable('order')} o ON of.OXORDERID = o.OXID
+        ";
     }
 
 }

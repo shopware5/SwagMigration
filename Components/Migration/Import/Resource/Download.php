@@ -54,6 +54,11 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         return $this->getNameSpace()->get('importedDownload', "Downloads successfully imported!");
     }
 
+	/**
+	 * run() method of the import adapter for downloads (article attached)
+	 *
+	 * @return $this|\Shopware_Components_Migration_Import_Progress
+	 */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();

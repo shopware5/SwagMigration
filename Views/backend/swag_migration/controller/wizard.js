@@ -265,7 +265,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             me.cancel = false;
             return;
         }
-
         Ext.Ajax.request({
             url: '{url controller="SwagMigration"}/'+config.action,
             // Don't intercept the request

@@ -150,7 +150,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
     },
 
     /**
-     * Helper function which returns the midleof the "init shop" fieldSet
+     * Helper function which returns the middle of the "init shop" fieldSet
      * @return Array
      */
     getMiddleElements: function() {
@@ -165,6 +165,14 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
                 boxLabel: '{s name=clearCustomersAndOrders}Delete customers and orders{/s}',
                 name: 'clear_orders'
             }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearArticleDownloads}Delete article downloads{/s}',
+                name: 'clear_article_downloads'
+            }),
+            Ext.create('Ext.form.field.Checkbox', {
+                boxLabel: '{s name=clearEsdArticleDownloads}Delete ESD article downloads{/s}',
+                name: 'clear_esd_article_downloads'
+            })
         ];
 
         return me.middleCheckBoxes;

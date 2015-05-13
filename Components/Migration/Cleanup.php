@@ -104,6 +104,13 @@ class Shopware_Components_Migration_Cleanup
                 case 'clear_images':
 	                $this->clearImages();
 	                break;
+	            case 'clear_article_downloads':
+					$this->sDeleteArticleDownloads();
+		            break;
+	            case 'clear_esd_article_downloads':
+					$this->sDeleteEsdArticleDownloads();
+		            break;
+
                 default:
                     break;
             }
@@ -275,18 +282,49 @@ class Shopware_Components_Migration_Cleanup
 		';
 		Shopware()->Db()->query($sql);
 
-		$foldersToClean = array(
-			Shopware()->DocPath('media/image'),
-			Shopware()->DocPath('media/image/thumbnail')
-		);
+		$this->clearFolder(Shopware()->DocPath('media/image'), 'image');
+		$this->clearFolder(Shopware()->DocPath('media/image/thumbnail'), 'image');
+	}
 
-		foreach($foldersToClean as $path) {
-			if ($handle = opendir($path)) {
-				while (false !== ($file = readdir($handle))) {
-					// only delete .jpg, .jpeg, .png and .gif; ignore case
-					if (preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
-						unlink($path.$file);
-					}
+	private function sDeleteArticleDownloads()
+	{
+		// Truncate tables
+		Shopware()->Db()->query("TRUNCATE s_articles_downloads");
+
+		// delete files
+		$this->clearFolder(Shopware()->DocPath('files/downloads'));
+	}
+
+	private function sDeleteEsdArticleDownloads()
+	{
+		// Truncate tables
+		Shopware()->Db()->query("TRUNCATE s_articles_esd");
+
+		// delete files
+		$this->clearFolder(
+				Shopware()->DocPath('files') . Shopware()->Config()->get('sESDKEY')
+		);
+	}
+
+	/**
+	 * Cleans a folder
+	 *
+	 * @param $path string folder to clean
+	 * @param $type string file type of files - one of 'image' | null
+	 */
+	private function clearFolder($path, $type = null)
+	{
+		if($handle = opendir($path)) {
+			while(false !== ($file = readdir($handle))) {
+				switch($type) {
+					case 'image':
+						// only delete .jpg, .jpeg, .png and .gif; ignore case
+						if(preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
+							unlink($path . $file);
+						}
+						break;
+					default:
+						unlink($path . $file);
 				}
 			}
 		}

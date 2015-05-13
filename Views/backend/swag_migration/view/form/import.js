@@ -156,7 +156,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 buttonAlign: 'left',
                 checked: true
             },
-            padding: '0 20 0 0',
+            padding: '0 5 0 0',
             layout: 'anchor',
             border:false,
             items:me.getLeftItems()
@@ -223,7 +223,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
-            fieldLabel: '{s name=importDownloads}Import downloads{/s}',
+            fieldLabel: '{s name=importDownloads}Import article downloads{/s}',
+            helpText: '{s name=importDownloadsHelptext}Imports article attached downloads (e.g. a pdf-manual){/s}',
             name: 'import_downloads',
             checked: false,
             hidden: !me.importAllowed,
@@ -243,6 +244,51 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         });
         items.push(me.importInput);
 
+        me.importEsdInput = Ext.create('Ext.form.field.Checkbox', {
+            labelWidth: 250,
+            fieldLabel: '{s name=importDownloadsEsd}Import ESD Downloads{/s}',
+            helpText: '{s name=importDownloadsEsdHelptext}There is no guarantee that esd downloads can be imported. Main restriction: the particular file must be available for download in the customer area of the base shop. Reasons for a file not to be downloadable may include: max number of downloads reached or download link expired.{/s}',
+            name: 'import_downloads_esd',
+            checked: false,
+            hidden: !me.importAllowed,
+            listeners: {
+                change: function (checkBox, newValue, oldValue, eOpts) {
+                    me.importAllowed = newValue;
+
+                    me.basePath.allowBlank = (!newValue && !me.importImages);
+                    if (newValue || me.importImages) {
+                        me.basePath.show();
+                    } else {
+                        me.basePath.hide();
+                    }
+                    me.fireEvent('validate');
+                }
+            }
+        });
+        items.push(me.importEsdInput);
+
+        me.importEsdOrderInput = Ext.create('Ext.form.field.Checkbox', {
+            labelWidth: 250,
+            fieldLabel: '{s name=importEsdOrders}Import ESD Orders{/s}',
+            helpText: '{s name="importEsdOrdersHelptext"}Makes ESD articles available for download by customers in the frontend.{/s}',
+            name: 'import_orders_esd',
+            checked: false,
+            hidden: !me.importAllowed,
+            listeners: {
+                change: function (checkBox, newValue, oldValue, eOpts) {
+                    me.importAllowed = newValue;
+
+                    me.basePath.allowBlank = (!newValue && !me.importImages);
+                    if (newValue || me.importImages) {
+                        me.basePath.show();
+                    } else {
+                        me.basePath.hide();
+                    }
+                    me.fireEvent('validate');
+                }
+            }
+        });
+        items.push(me.importEsdOrderInput);
 
         return items;
     },
@@ -425,9 +471,17 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         if (value) {
             me.importInput.show();
             me.importInput.allowBlank = false;
+            me.importEsdInput.show();
+            me.importEsdInput.allowBlank = false;
+            me.importEsdOrderInput.show();
+            me.importEsdOrderInput.allowBlank = false;
         } else {
             me.importInput.hide();
             me.importInput.allowBlank = true;
+            me.importEsdInput.hide();
+            me.importEsdInput.allowBlank = true;
+            me.importEsdOrderInput.hide();
+            me.importEsdOrderInput.allowBlank = true;
         }
     }
 
