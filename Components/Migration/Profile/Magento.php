@@ -516,6 +516,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 					c.meta_keywords as metaKeywords,
 					c.meta_description as metaDescription,
 					c.meta_title as cmsheadline,
+                    c.meta_title as meta_title,
 					c.description as cmstext,
 					c.is_active as active
 				FROM 

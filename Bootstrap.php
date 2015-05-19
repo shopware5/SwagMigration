@@ -148,8 +148,27 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         ";
         Shopware()->Db()->query($sql);
 
-		return true;
+        //Fix snippet
+        $oldSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
+            * höchstens 40 Zeichen lang sein<br>
+            * keine anderen Zeichen als : 'a-zA-Z0-9-_. ' und SPACE beinhalten<br>
+            <br>
+            Sie können den Import dennoch erzwingen. Beachten Sie: <br>
+            * Dabei werden zu lange Produkt-Nummern abgeschnitten. Dies kann zu 'Duplicate Key'-Fehlern führen<br>
+            * Artikel mit ungültigen Nummern werden Sie später nur ändern und speichern können, wenn Sie dabei die Nummer anpassen<br>
+        ";
+        $newSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
+            * höchstens 30 Zeichen lang sein<br>
+            * keine anderen Zeichen als : 'a-zA-Z0-9-_. ' und SPACE beinhalten<br>
+            <br>
+            Sie können den Import dennoch erzwingen. Beachten Sie: <br>
+            * Dabei werden zu lange Produkt-Nummern abgeschnitten. Dies kann zu 'Duplicate Key'-Fehlern führen<br>
+            * Artikel mit ungültigen Nummern werden Sie später nur ändern und speichern können, wenn Sie dabei die Nummer anpassen<br>
+        ";
+        $sql = "UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?";
+        Shopware()->Db()->query($sql, array($newSnippet, 'numberNotValid', $oldSnippet));
 
+		return true;
 	}
 
     /**

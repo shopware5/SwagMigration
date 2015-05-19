@@ -137,7 +137,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 $number = '';
             }
             if ($numberValidationMode !== 'ignore' &&
-                (empty($number) || strlen($number) > 40 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
+                (empty($number) || strlen($number) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
             {
                 switch ($numberValidationMode) {
                     case 'complain':
@@ -221,10 +221,20 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                     $import->sArticleLegacyVariant($product);
                 }
 
+                // Meta-title... if is import the meta-title set them
+                if(!empty($product['meta_title'])){
+                    $metaTitle = $product['meta_title'];
+                }
+
                 if($product['kind']==1 && $product_description!==null) {
+                    if($metaTitle) {
+                        $array =  array('description_long' => $product_description, 'metaTitle' => $metaTitle);
+                    } else {
+                        $array = array('description_long' => $product_description);
+                    }
                     Shopware()->Db()->update(
                         's_articles',
-                        array('description_long'=>$product_description),
+                        $array,
                         array('id=?'=>$product_result['articleID'])
                     );
                 }

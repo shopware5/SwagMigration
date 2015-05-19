@@ -305,6 +305,7 @@ class Shopware_Components_Migration_Profile_Shopware35 extends Shopware_Componen
                 $language_select as languageID,
                 cat.description,
                 cat.position,
+                cat.meta_title,
                 cat.metakeywords,
                 cat.metadescription,
                 cat.cmsheadline,
