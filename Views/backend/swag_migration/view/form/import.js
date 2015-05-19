@@ -299,6 +299,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         me.basePath = Ext.create('Ext.form.field.Text', {
             fieldLabel: '{s name=articleImagesPath}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
             name: 'basepath',
+            helpText: '{s name=helpTextBasePathTrailingSlash}Please append trailing slash to base path.{/s}',
             value: '',
             labelWidth: 250,
             allowBlank: false,
