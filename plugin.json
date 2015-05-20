@@ -1,15 +1,36 @@
 {
-    "currentVersion": "2.2.1",
 
-    "changelogs": {
-        "2.2.1": "Compatibility with older servers",
-        "2.2.0": "Adds presta 1.4 profile",
-        "2.1.9": "Updates magento version; adds some snippets",
-        "2.1.8": "Fixes Property not found failure during product-attribute import"
+    "label": {
+        "de": "Shopware Migration",
+        "en": "Shopware Migration Tool"
+    },
+
+    "copyright": "(c) by Shopware AG",
+    "license": "proprietary",
+    "link": "http://store.shopware.com",
+    "author": "Shopware AG",
+
+    "currentVersion": "2.3.0",
+
+    "changelog": {
+        "de": {
+			"2.3.0": "PT-2920 - SW5 Kompatibilität; PT-2746 - Fix: SEO-Kategorien zurück setzen; PT-2749 - Verbesserung: Oxid ESD + Downloads;PT-2799 - Fix: Bestellnummern werden korrekt importiert; PT-3091 - Import von Metadaten bei Artikeln und Kategorien",
+			"2.2.1": "Compatibility with older servers",
+			"2.2.0": "Adds presta 1.4 profile",
+			"2.1.9": "Updates magento version; adds some snippets",
+			"2.1.8": "Fixes Property not found failure during product-attribute import"
+        },
+        "en": {
+			"2.3.0": "PT-2920 - SW5 compatibility; PT-2746 - Fix: Reset SEO categories; PT-2749 - Improvement: Oxid ESD + Downloads;PT-2799 - Fix: Import order numbers properly; PT-3091 - Import metadata for products and categories",
+			"2.2.1": "Compatibility with older servers",
+			"2.2.0": "Adds presta 1.4 profile",
+			"2.1.9": "Updates magento version; adds some snippets",
+			"2.1.8": "Fixes Property not found failure during product-attribute import"
+        }
     },
 
     "compatibility": {
-        "minimumVersion": "4.3.0",
+        "minimumVersion": "5.0.0",
         "maximumVersion": null,
         "blacklist": [
         ]
