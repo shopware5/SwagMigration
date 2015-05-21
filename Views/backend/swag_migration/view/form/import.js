@@ -446,6 +446,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         if (value) {
             me.passwordInfo.show();
         } else {
+            me.passwordInfo.reset();
             me.passwordInfo.hide();
         }
     },
@@ -455,10 +456,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.saltInputNeeded = value;
 
-        if(value) {
+        if (value) {
             me.saltInput.show();
             me.saltInput.allowBlank = false;
-        }else{
+        } else {
+            me.saltInput.reset();
             me.saltInput.hide();
             me.saltInput.allowBlank = true;
         }
@@ -477,10 +479,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             me.importEsdOrderInput.show();
             me.importEsdOrderInput.allowBlank = false;
         } else {
+            me.importInput.reset();
             me.importInput.hide();
             me.importInput.allowBlank = true;
+            me.importEsdInput.reset();
             me.importEsdInput.hide();
             me.importEsdInput.allowBlank = true;
+            me.importEsdOrderInput.reset();
             me.importEsdOrderInput.hide();
             me.importEsdOrderInput.allowBlank = true;
         }
