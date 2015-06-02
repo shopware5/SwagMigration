@@ -149,7 +149,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         var leftContainer, rightContainer, me = this;
 
         leftContainer = Ext.create('Ext.container.Container', {
-            columnWidth:0.3,
+            columnWidth:0.33,
             defaults: {
                 labelWidth: 250,
                 anchor: '100%',
@@ -163,7 +163,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         });
 
         rightContainer = Ext.create('Ext.container.Container', {
-            columnWidth:0.7,
+            columnWidth:0.67,
             layout: 'anchor',
             defaults: {
                 labelWidth: 250,
@@ -171,7 +171,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                 buttonAlign: 'left',
                 checked: true
             },
-            padding: '0 0 0 80',
+            margin: '0 0 0 80',
             border:false,
             items:me.getRightItems()
         });
@@ -246,6 +246,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importEsdInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
+
             fieldLabel: '{s name=importDownloadsEsd}Import ESD Downloads{/s}',
             helpText: '{s name=importDownloadsEsdHelptext}There is no guarantee that esd downloads can be imported. Main restriction: the particular file must be available for download in the customer area of the base shop. Reasons for a file not to be downloadable may include: max number of downloads reached or download link expired.{/s}',
             name: 'import_downloads_esd',
