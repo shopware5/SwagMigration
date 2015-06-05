@@ -70,12 +70,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
      */
     showPasswordInfo: false,
 
-    /**
-     * Will be set to true, if migration plugin provides importing of downloads
-     */
-    importAllowed: false,
-
-    importImages: true,
+    basePathAllow: true,
 
     /**
 	 * The initComponent template method is an important initialization step for a Component.
@@ -227,17 +222,22 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             helpText: '{s name=importDownloadsHelptext}Imports article attached downloads (e.g. a pdf-manual){/s}',
             name: 'import_downloads',
             checked: false,
-            hidden: !me.importAllowed,
             listeners: {
-                change: function(checkBox, newValue, oldValue, eOpts) {
-                    me.importAllowed = newValue;
-
-                    me.basePath.allowBlank = (!newValue && !me.importImages);
-                    if(newValue || me.importImages) {
+                change: function(checkBox, newValue) {
+                    me.basePath.allowBlank = (!newValue && !me.imageInput.getValue());
+                    if(newValue || me.imageInput.getValue()) {
                         me.basePath.show();
-                    }else{
+                    } else {
                         me.basePath.hide();
                     }
+
+                    if(newValue) {
+                        me.importEsdInput.show();
+                    } else {
+                        me.importEsdInput.hide();
+                        me.importEsdInput.reset();
+                    }
+
                     me.fireEvent('validate');
                 }
             }
@@ -246,22 +246,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importEsdInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
-
             fieldLabel: '{s name=importDownloadsEsd}Import ESD Downloads{/s}',
             helpText: '{s name=importDownloadsEsdHelptext}There is no guarantee that esd downloads can be imported. Main restriction: the particular file must be available for download in the customer area of the base shop. Reasons for a file not to be downloadable may include: max number of downloads reached or download link expired.{/s}',
             name: 'import_downloads_esd',
             checked: false,
-            hidden: !me.importAllowed,
+            hidden: true,
             listeners: {
-                change: function (checkBox, newValue, oldValue, eOpts) {
-                    me.importAllowed = newValue;
-
-                    me.basePath.allowBlank = (!newValue && !me.importImages);
-                    if (newValue || me.importImages) {
-                        me.basePath.show();
-                    } else {
-                        me.basePath.hide();
-                    }
+                change: function () {
                     me.fireEvent('validate');
                 }
             }
@@ -274,17 +265,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             helpText: '{s name="importEsdOrdersHelptext"}Makes ESD articles available for download by customers in the frontend.{/s}',
             name: 'import_orders_esd',
             checked: false,
-            hidden: !me.importAllowed,
             listeners: {
-                change: function (checkBox, newValue, oldValue, eOpts) {
-                    me.importAllowed = newValue;
-
-                    me.basePath.allowBlank = (!newValue && !me.importImages);
-                    if (newValue || me.importImages) {
-                        me.basePath.show();
-                    } else {
-                        me.basePath.hide();
-                    }
+                change: function () {
                     me.fireEvent('validate');
                 }
             }
@@ -332,16 +314,14 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             xtype: 'checkbox',
             labelWidth: 250,
             helpText: '{s name=thumbnailGenerationNeeded}After image import you need to generate the image thumbnails in the media manager for the article album.{/s}',
-            checked: me.importImages,
+            checked: me.basePathAllow,
             listeners: {
                 change: function(checkBox, newValue) {
-                    me.importImages = newValue;
-
                     // if the product images are going to be imported, the basePath field is mandatory
-                    me.basePath.allowBlank = (!newValue && !me.importAllowed);
-                    if(newValue || me.importAllowed) {
+                    me.basePath.allowBlank = (!newValue && !me.importInput.getValue());
+                    if(newValue || me.importInput.getValue()) {
                         me.basePath.show();
-                    }else{
+                    } else {
                         me.basePath.hide();
                     }
                     me.fireEvent('validate');
@@ -374,7 +354,17 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         }, {
             fieldLabel: '{s name=importOrders}Import orders{/s}',
             name: 'import_orders',
-            xtype: 'checkbox'
+            xtype: 'checkbox',
+            listeners: {
+                change: function(checkBox, newValue) {
+                    if(newValue) {
+                        me.importEsdOrderInput.show();
+                    } else {
+                        me.importEsdOrderInput.hide();
+                        me.importEsdOrderInput.reset();
+                    }
+                }
+            }
         }, {
             fieldLabel: '{s name=finish}Finish import{/s}',
             name: 'finish_import',
@@ -470,13 +460,9 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     setImportAllowed: function(value) {
         var me = this;
 
-        me.importAllowed = value;
-
         if (value) {
             me.importInput.show();
             me.importInput.allowBlank = false;
-            me.importEsdInput.show();
-            me.importEsdInput.allowBlank = false;
             me.importEsdOrderInput.show();
             me.importEsdOrderInput.allowBlank = false;
         } else {
