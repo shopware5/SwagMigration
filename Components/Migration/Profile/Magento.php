@@ -343,7 +343,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		$custom_select = '';
 		foreach ($this->getAttributes() as $attributeID=>$attribute) {
 			$custom_select .= ",
-				$attributeID.value									as $attributeID";
+				$attributeID.value									as `$attributeID`";
 			$attributes[] = $attributeID;
 		}
 
@@ -394,7 +394,6 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             -- Need to order by parent id in order to correctly assign children later
 			ORDER BY relation.parent_id ASC
 		";
-
         return $sql;
 	}
 
@@ -412,7 +411,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 		$custom_select = '';
 		foreach ($this->getAttributes() as $attributeID=>$attribute) {
 			$custom_select .= ",
-				$attributeID.value									as $attributeID";
+				`$attributeID`.value									as `$attributeID`";
 			$attributes[] = $attributeID;
 		}
 		$sql = "
@@ -776,9 +775,9 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 					$select_fields[] = "{$type_quoted}.{$attribute}";
 				} else {
 					$join_fields .= "
-						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'])} $attribute
-						ON	{$attribute}.attribute_id = {$attribute_fields[$attribute]['id']}
-						AND {$attribute}.entity_id = {$type_quoted}.entity_id
+						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'])} `$attribute`
+						ON	`{$attribute}`.attribute_id = {$attribute_fields[$attribute]['id']}
+						AND `{$attribute}`.entity_id = {$type_quoted}.entity_id
 					";
 					if($store_id!==null) {
 						$join_fields .= "
