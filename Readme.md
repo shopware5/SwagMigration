@@ -14,7 +14,7 @@
 
 ** Diese Dokumentation wird noch bearbeitet **
 
-Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fremden Shopsystemen nach Shopware zu migirieren. Die grundlegende Bedienung sowie einer Übersicht der migrierbaren Felder aus den jeweiligen Shopsystemen ist im offiziellen Shopware-Wiki dokumentiert: http://wiki.shopware.de/_detail_1011.html.
+Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fremden Shopsystemen nach Shopware zu migirieren. Die grundlegende Bedienung sowie einer Übersicht der migrierbaren Felder aus den jeweiligen Shopsystemen ist im offiziellen Shopware-Wiki dokumentiert: http://wiki.shopware.com/Plugin-Migration-von-anderen-Shopsystemen-zu-Shopware_detail_1011.html.
 
 Zur Zeit unterstützt das Tool:
 
@@ -24,7 +24,6 @@ Zur Zeit unterstützt das Tool:
 * Gambio GX
 * xtModified & xt:Commerce bis 3.04
 * Prestashop bis 1.5.3.1
-* Shopware 3
 
 Mit der Veröffentlichung des Migrations-Tools unter AGPL soll die Möglichkeit geschaffen werden, Änderungen aus der Community schneller in das Tool zurück fließen zu lassen. Außerdem soll es erleichtert werden, das Tool um eigene Profile zu erweitern, um auch Shopsysteme anzubinden, für die es bisher keinen Migrationsweg gibt.
 
@@ -108,7 +107,7 @@ Nicht alle Selects werden genutzt, um die entsprechenden Entitäten direkt nach 
 
 ### Select-Methoden für den Import
 
-Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter Entitäten passende Select zurück zu geben. Grundsätzlich gilt: Die Import-Logik bereitet diese Felder auf und importiert diese dann mit Hilfe der **alten** Shopware API. Bei Fragen zu importierbaren Feldern empfiehlt sich also auch immer ein Blick in die entsprechende Dokumentation: http://wiki.shopware.de/API-Import-Funktionen_detail_210.html
+Folgende Select-Methoden haben jeweils die Aufgabe, für den Import bestimmter Entitäten passende Select zurück zu geben. Grundsätzlich gilt: Die Import-Logik bereitet diese Felder auf und importiert diese dann mit Hilfe der **alten** Shopware API. Bei Fragen zu importierbaren Feldern empfiehlt sich also auch immer ein Blick in die entsprechende Dokumentation: http://wiki.shopware.com/API-Import-Funktionen_detail_210.html
 
 * getProductSelect
     * Selektiert alle Produkte für den Import
