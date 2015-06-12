@@ -31,48 +31,48 @@
  */
 class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_Migration_Profile
 {
-	/**
-	 * Returns the directory of the article images.
+    /**
+     * Returns the directory of the article images.
      *
-	 * @return string {String} | image path
-	 */
-	public function getProductImagePath()
-	{
-		return '/media/catalog/product';
-	}
+     * @return string {String} | image path
+     */
+    public function getProductImagePath()
+    {
+        return '/media/catalog/product';
+    }
 
-	/**
-	 * As all variants have assigned the product's image, only allow each image one time for a product
+    /**
+     * As all variants have assigned the product's image, only allow each image one time for a product
      *
-	 * @return bool
-	 */
-	public function checkForDuplicateImages()
-	{
-		return true;
-	}
+     * @return bool
+     */
+    public function checkForDuplicateImages()
+    {
+        return true;
+    }
 
-	/**
-	 * Returns the sql statement to select the config base path
+    /**
+     * Returns the sql statement to select the config base path
      *
-	 * @return string {String} | sql for the config base path
-	 */
-	public function getConfigSelect()
-	{
-		return "
+     * @return string {String} | sql for the config base path
+     */
+    public function getConfigSelect()
+    {
+        return "
 			SELECT `path` as name, `value`
 			FROM {$this->quoteTable('core_config_data')}
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system languages
+    /**
+     * Returns the sql statement to select the shop system languages
      *
-	 * @return string {String} | sql for languages
-	 */
-	public function getLanguageSelect()
-	{
-		return $this->getShopSelect();
-	}
+     * @return string {String} | sql for languages
+     */
+    public function getLanguageSelect()
+    {
+        return $this->getShopSelect();
+    }
 
     /**
      * Returns a query to select all available property options (for mapping)
@@ -80,8 +80,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      * @return string
      */
     public function getPropertyOptionSelect()
-	{
-		return "
+    {
+        return "
 			SELECT
 
 				eav.attribute_code as 'name',
@@ -97,85 +97,85 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
 			WHERE  eav_settings.is_filterable = 1
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system sub shops
-	 * @return string {String} | sql for sub shops
-	 */
-	public function getShopSelect()
-	{
-		return "
+    /**
+     * Returns the sql statement to select the shop system sub shops
+     *
+     * @return string {String} | sql for sub shops
+     */
+    public function getShopSelect()
+    {
+        return "
 			SELECT `store_id` as id, `name` as name
 			FROM {$this->quoteTable('core_store')}
 			WHERE `store_id`!=0
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system price groups
+    /**
+     * Returns the sql statement to select the shop system price groups
      *
-	 * @return string {String} | sql for price groups
-	 */
-	public function getPriceGroupSelect()
-	{
-		return "
+     * @return string {String} | sql for price groups
+     */
+    public function getPriceGroupSelect()
+    {
+        return "
 			SELECT `customer_group_id` as id, `customer_group_code` as name
 			FROM {$this->quoteTable('customer_group')}
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system payments
+    /**
+     * Returns the sql statement to select the shop system payments
      *
-	 * @return string {String} | sql for the payments
-	 */
-	public function getPaymentMeanSelect()
-	{
-		return "
+     * @return string {String} | sql for the payments
+     */
+    public function getPaymentMeanSelect()
+    {
+        return "
 			SELECT `method` as id, `method` as name
 			FROM {$this->quoteTable('sales_flat_quote_payment')}
 		";
-	}
+    }
 
-	/**
-	 * Returns an array of the order states mapping, with keys and descriptions
+    /**
+     * Returns an array of the order states mapping, with keys and descriptions
      *
-	 * @return array {Array} | order states: key - description
-	 */
-	public function getOrderStatus()
-	{
-		return array(
-			'pending' => 'Pending',
-			'holded' => 'On Hold',
-			'processing' => 'Processing',
-			'complete' => 'Complete'
-		);
-	}
+     * @return array {Array} | order states: key - description
+     */
+    public function getOrderStatus()
+    {
+        return array(
+            'pending' => 'Pending',
+            'holded' => 'On Hold',
+            'processing' => 'Processing',
+            'complete' => 'Complete'
+        );
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system tax rates
+    /**
+     * Returns the sql statement to select the shop system tax rates
      *
-	 * @return string {String} | sql for the tax rates
-	 */
-	public function getTaxRateSelect()
-	{
-		return "
+     * @return string {String} | sql for the tax rates
+     */
+    public function getTaxRateSelect()
+    {
+        return "
 			SELECT `class_id` as id, `class_name` as name
 			FROM {$this->quoteTable('tax_class')}
 		";
+    }
 
-	}
-
-	/**
-	 * Returns the sql statement to select articles with
+    /**
+     * Returns the sql statement to select articles with
      *
      * @param id
-	 * @return string
-	 */
-	public function getProductPropertiesSelect($id)
-	{
-		return "
+     * @return string
+     */
+    public function getProductPropertiesSelect($id)
+    {
+        return "
             SELECT
 
 				p.entity_id                             as productID,
@@ -207,7 +207,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             WHERE p.entity_type_id =  {$this->getEntityTypeId('catalog_product')}
             AND p.entity_id = {$id}
 		";
-	}
+    }
 
     /**
      * Returns the entity type id for a given type
@@ -217,11 +217,13 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getEntityTypeId($type)
     {
-        return $this->Db()->fetchOne("
+        return $this->Db()->fetchOne(
+            "
             SELECT entity_type_id
             FROM {$this->quoteTable('eav_entity_type')}
             WHERE entity_type_code = '{$type}'
-        ");
+        "
+        );
     }
 
     /**
@@ -230,8 +232,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      * @return string
      */
     public function getProductsWithPropertiesSelect()
-	{
-		return "
+    {
+        return "
 			SELECT DISTINCT
 
 	      		entity_int.entity_id                                    as productID
@@ -248,15 +250,16 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			ON eav.attribute_id = eav_settings.attribute_id
 			AND eav_settings.is_filterable=1
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system article attributes
-	 * @return string {String} | sql for the article attributes
-	 */
-	public function getAttributeSelect()
-	{
-		return "
+    /**
+     * Returns the sql statement to select the shop system article attributes
+     *
+     * @return string {String} | sql for the article attributes
+     */
+    public function getAttributeSelect()
+    {
+        return "
 			SELECT
 				-- ea.attribute_id 	as `id`,
 				ea.attribute_code 	as `id`,
@@ -271,7 +274,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			AND ea.attribute_code NOT IN ('cost', 'manufacturer')
 			ORDER BY `name`
 		";
-	}
+    }
 
     /**
      * Returns a sql statement which selects additional info for a given productID
@@ -281,7 +284,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getAdditionalProductSelect($productId)
     {
-        return  "
+        return "
             SELECT
 
             p.entity_id                                    as productID,
@@ -326,29 +329,35 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
         ";
     }
 
-	/**
-	 * Returns the sql statement to select the shop system articles
+    /**
+     * Returns the sql statement to select the shop system articles
      *
-	 * @return string {String} | sql for the articles
-	 */
-	public function getProductSelect()
-	{
-		$attributes = array(
-			'description', 'name', 'short_description', 
-			'status', 'manufacturer',
-			'price', 'cost', 'tax_class_id', 
-			'meta_keyword', 'special_price'
-		);
-		
-		$custom_select = '';
-		foreach ($this->getAttributes() as $attributeID=>$attribute) {
-			$custom_select .= ",
-				$attributeID.value									as `$attributeID`";
-			$attributes[] = $attributeID;
-		}
+     * @return string {String} | sql for the articles
+     */
+    public function getProductSelect()
+    {
+        $attributes = array(
+            'description',
+            'name',
+            'short_description',
+            'status',
+            'manufacturer',
+            'price',
+            'cost',
+            'tax_class_id',
+            'meta_keyword',
+            'special_price'
+        );
 
-		$sql = "
-			SELECT 
+        $custom_select = '';
+        foreach ($this->getAttributes() as $attributeID => $attribute) {
+            $custom_select .= ",
+				$attributeID.value									as `$attributeID`";
+            $attributes[] = $attributeID;
+        }
+
+        $sql = "
+			SELECT
 				
 				catalog_product.entity_id						as productID,
 				catalog_product.sku								as ordernumber,
@@ -394,28 +403,32 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             -- Need to order by parent id in order to correctly assign children later
 			ORDER BY relation.parent_id ASC
 		";
-        return $sql;
-	}
 
-	/**
-	 * Returns the sql statement to select the shop system article translations
+        return $sql;
+    }
+
+    /**
+     * Returns the sql statement to select the shop system article translations
      *
-	 * @return string {String} | sql for the article translations
-	 */
-	public function getProductTranslationSelect()
-	{
-		$attributes = array(
-			'description', 'name', 'short_description', 'meta_keyword', 
-		);
-		
-		$custom_select = '';
-		foreach ($this->getAttributes() as $attributeID=>$attribute) {
-			$custom_select .= ",
+     * @return string {String} | sql for the article translations
+     */
+    public function getProductTranslationSelect()
+    {
+        $attributes = array(
+            'description',
+            'name',
+            'short_description',
+            'meta_keyword',
+        );
+
+        $custom_select = '';
+        foreach ($this->getAttributes() as $attributeID => $attribute) {
+            $custom_select .= ",
 				`$attributeID`.value									as `$attributeID`";
-			$attributes[] = $attributeID;
-		}
-		$sql = "
-			SELECT 
+            $attributes[] = $attributeID;
+        }
+        $sql = "
+			SELECT
 				
 				catalog_product.entity_id						as productID,
 				store.store_id									as languageID,
@@ -435,17 +448,18 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			
 			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
 		";
-        return $sql;
-	}
 
-	/**
-	 * Returns the sql statement to select the shop system article prices
+        return $sql;
+    }
+
+    /**
+     * Returns the sql statement to select the shop system article prices
      *
-	 * @return string {String} | sql for the article prices
-	 */
-	public function getProductPriceSelect()
-	{
-		return "
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        return "
 			SELECT
 				`entity_id` as `productID`,
 				`qty` as `from`,
@@ -455,57 +469,57 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			FROM {$this->quoteTable('catalog_product_entity_tier_price')}
 			ORDER BY `productID`, `pricegroup`, `from`
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system article image allocation
+    /**
+     * Returns the sql statement to select the shop system article image allocation
      *
-	 * @return string {String} | sql for the article image allocation
-	 */
-	public function getProductImageSelect()
-	{
-		return "
-			SELECT 
+     * @return string {String} | sql for the article image allocation
+     */
+    public function getProductImageSelect()
+    {
+        return "
+			SELECT
 				g.entity_id as productID,
 				g.value as image,
 				gv.label as description,
 				gv.position,
 				IF(gv.position=1, 1, 0) as main
-			FROM 
+			FROM
 				{$this->quoteTable('catalog_product_entity_media_gallery')} g,
 				{$this->quoteTable('catalog_product_entity_media_gallery_value')} gv
 			WHERE gv.`value_id`=g.`value_id`
 			AND gv.`store_id`=0
 			ORDER BY productID, position
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system article category allocation
+    /**
+     * Returns the sql statement to select the shop system article category allocation
      *
-	 * @return string {String} | sql for the article category allocation
-	 */
-	public function getProductCategorySelect()
-	{
-		return "
+     * @return string {String} | sql for the article category allocation
+     */
+    public function getProductCategorySelect()
+    {
+        return "
 			SELECT product_id as productID, category_id as categoryID
 			FROM {$this->quoteTable('catalog_category_product')}
 			ORDER BY position
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system categories.
-	 * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
+    /**
+     * Returns the sql statement to select the shop system categories.
+     * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
      *
-	 * @return string {String} | sql for the categories
-	 */
-	public function getCategorySelect()
-	{
-		$sql = array();
-		foreach ($this->getShops() as $shopID=>$shop) {
-			$sql[] = "
-				SELECT 
+     * @return string {String} | sql for the categories
+     */
+    public function getCategorySelect()
+    {
+        $sql = array();
+        foreach ($this->getShops() as $shopID => $shop) {
+            $sql[] = "
+				SELECT
 					IF(entity_id=g.`root_category_id`, 0, entity_id) as categoryID,
 					IF(parent_id=g.`root_category_id`, 0, parent_id) as parentID,
 					s.`store_id` as languageID,
@@ -518,7 +532,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
                     c.meta_title as meta_title,
 					c.description as cmstext,
 					c.is_active as active
-				FROM 
+				FROM
 					{$this->quoteTable('core_store')} s,
 					{$this->quoteTable('core_store_group')} g,
 					{$this->quoteTable('catalog_category_flat_store_'.$shopID)} c
@@ -528,19 +542,20 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
                 ORDER BY parentID ASC
 			";
-		}
-		return  '('.implode(') UNION ALL (', $sql).')'.' ORDER BY languageID ASC, level, parentID ASC';
-	}
+        }
 
-	/**
-	 * Returns the sql statement to select the shop system article ratings
+        return '(' . implode(') UNION ALL (', $sql) . ')' . ' ORDER BY languageID ASC, level, parentID ASC';
+    }
+
+    /**
+     * Returns the sql statement to select the shop system article ratings
      *
-	 * @return string {String} | sql for the article ratings
-	 */
-	public function getProductRatingSelect()
-	{
-		return "
-			SELECT 
+     * @return string {String} | sql for the article ratings
+     */
+    public function getProductRatingSelect()
+    {
+        return "
+			SELECT
 				r.`entity_pk_value` as `productID`,
 				rd.`customer_id` as `customerID`,
 				rd.`nickname` as `name`,
@@ -553,27 +568,39 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			WHERE r.`review_id`=rd.`review_id`
 			AND r.`entity_id`=1
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system customer
+    /**
+     * Returns the sql statement to select the shop system customer
      *
-	 * @return string {String} | sql for the customer data
-	 */
-	public function getCustomerSelect()
-	{
-		$attributes = array(
-			'gender', 'firstname', 'middlename', 'lastname', 'company',
-			'dob', 'password_hash', 'taxvat',
-			'default_billing', 'default_shipping'
-		);
-		$addressAttributes = array(
-			//'firstname', 'middlename', 'lastname', 'company', 'region',
-			'city', 'country_id', 'postcode', 'street', 'telephone', 'fax'
-		);
-		
-		return "
-			SELECT 
+     * @return string {String} | sql for the customer data
+     */
+    public function getCustomerSelect()
+    {
+        $attributes = array(
+            'gender',
+            'firstname',
+            'middlename',
+            'lastname',
+            'company',
+            'dob',
+            'password_hash',
+            'taxvat',
+            'default_billing',
+            'default_shipping'
+        );
+        $addressAttributes = array(
+            //'firstname', 'middlename', 'lastname', 'company', 'region',
+            'city',
+            'country_id',
+            'postcode',
+            'street',
+            'telephone',
+            'fax'
+        );
+
+        return "
+			SELECT
 				
 				customer.entity_id						as customerID,
 				customer.increment_id					as customernumber,
@@ -587,7 +614,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				IF(gender.value=2, 'ms', 'mr')			as billing_salutation,
 				company.value 							as billing_company,
 				TRIM(CONCAT(firstname.value, ' ', IFNULL(middlename.value, '')))
-														as billing_firstname, 
+														as billing_firstname,
 				lastname.value 							as billing_lastname,
 				street.value							as billing_street,
 				-- 										as billing_streetnumber,
@@ -627,17 +654,17 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			
 			{$this->createTableSelect('customer_address', $addressAttributes)}
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select the shop system customer
+    /**
+     * Returns the sql statement to select the shop system customer
      *
-	 * @return string {String} | sql for the customer data
-	 */
-	public function getOrderSelect()
-	{
-		return "
-			SELECT 
+     * @return string {String} | sql for the customer data
+     */
+    public function getOrderSelect()
+    {
+        return "
+			SELECT
 				o.`entity_id`								as orderID,
 				o.`increment_id`							as ordernumber,
 				
@@ -688,7 +715,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				o.`shipping_incl_tax`						as invoice_shipping,
 				o.`shipping_amount`							as invoice_shipping_net
 				
-			FROM 
+			FROM
 				{$this->quoteTable('sales_flat_quote')} q,
 				{$this->quoteTable('sales_flat_quote_payment')} p,
 				{$this->quoteTable('sales_flat_order', 'o')}
@@ -701,18 +728,17 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			WHERE o.quote_id = q.entity_id
 			AND p.quote_id = q.entity_id
 		";
-
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select all shop system order details
+     * Returns the sql statement to select all shop system order details
      *
-   	 * @return string {String} | sql for order details
-   	 */
-	public function getOrderDetailSelect()
-	{
-		return "		
-			SELECT	
+     * @return string {String} | sql for order details
+     */
+    public function getOrderDetailSelect()
+    {
+        return "
+			SELECT
 				order_id as orderID,
 				product_id  as productID,
 				sku as article_ordernumber,
@@ -723,7 +749,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				0 as modus
 			FROM {$this->quoteTable('sales_flat_order_item')}
 		";
-	}
+    }
 
     /**
      * Returns the sql statement to select the shop system article attribute fields
@@ -734,9 +760,13 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      * @param bool $full_select
      * @return string
      */
-	public function createTableSelect($type='catalog_product', $attributes=null, $store_id=null, $full_select=false)
-	{
-		$sql = "
+    public function createTableSelect(
+        $type = 'catalog_product',
+        $attributes = null,
+        $store_id = null,
+        $full_select = false
+    ) {
+        $sql = "
 			SELECT
 				ea.attribute_code 	as `name`,
 				ea.attribute_id 	as `id`,
@@ -747,56 +777,57 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			AND et.entity_type_code=?
 			AND ea.frontend_input!=''
 		";
-		if(!empty($attributes)) {
-			$sql .= 'AND ea.attribute_code IN ('.$this->Db()->quote($attributes).')';
-		} else {
-			$sql .= 'ORDER BY `required` DESC, `name`';
-		}
-		$attribute_fields = $this->Db()->fetchAssoc($sql, array($type));
-		
-		if(empty($attributes)) {
-			$attributes = array_keys($attribute_fields);
-		}
-		
-		$select_fields = array();
-		$join_fields = '';
+        if (!empty($attributes)) {
+            $sql .= 'AND ea.attribute_code IN (' . $this->Db()->quote($attributes) . ')';
+        } else {
+            $sql .= 'ORDER BY `required` DESC, `name`';
+        }
+        $attribute_fields = $this->Db()->fetchAssoc($sql, array($type));
+
+        if (empty($attributes)) {
+            $attributes = array_keys($attribute_fields);
+        }
+
+        $select_fields = array();
+        $join_fields = '';
 
         // Do not use quoteTable for aliases!
         $type_quoted = "`{$type}`";
 
-		foreach ($attributes as $attribute) {
-			if(empty($attribute_fields[$attribute])) {
-				$join_fields .= "
+        foreach ($attributes as $attribute) {
+            if (empty($attribute_fields[$attribute])) {
+                $join_fields .= "
 					LEFT JOIN (SELECT 1 as attribute_id, NULL as value) as `$attribute`
 					ON 1
 				";
-			} else {
-				if($attribute_fields[$attribute]['type']=='static') {
-					$select_fields[] = "{$type_quoted}.{$attribute}";
-				} else {
-					$join_fields .= "
+            } else {
+                if ($attribute_fields[$attribute]['type'] == 'static') {
+                    $select_fields[] = "{$type_quoted}.{$attribute}";
+                } else {
+                    $join_fields .= "
 						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'])} `$attribute`
 						ON	`{$attribute}`.attribute_id = {$attribute_fields[$attribute]['id']}
 						AND `{$attribute}`.entity_id = {$type_quoted}.entity_id
 					";
-					if($store_id!==null) {
-						$join_fields .= "
+                    if ($store_id !== null) {
+                        $join_fields .= "
 						AND {$attribute_fields[$attribute]['name']}.store_id = {$this->Db()->quote($store_id)}
 						";
-					}
-					$select_fields[] = "{$attribute}.value as `{$attribute}`";
-				}
-			}
-		}
-		if(!$full_select) {
-			return $join_fields;
-		} else {
-			$select_fields = implode(', ', $select_fields);
-			return "
+                    }
+                    $select_fields[] = "{$attribute}.value as `{$attribute}`";
+                }
+            }
+        }
+        if (!$full_select) {
+            return $join_fields;
+        } else {
+            $select_fields = implode(', ', $select_fields);
+
+            return "
 				SELECT $select_fields
 				FROM {$this->quoteTable($type.'_entity')} $type
 				$join_fields
 			";
-		}
-	}
+        }
+    }
 }

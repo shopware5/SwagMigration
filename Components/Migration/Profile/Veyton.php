@@ -35,65 +35,71 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 {
     /**
      * Prefix of each database tables
+     *
      * @var string
      */
-	protected $db_prefix = 'xt_';
+    protected $db_prefix = 'xt_';
 
     /**
-   	 * Returns the directory of the article images.
-   	 * @return string {String} | image path
-   	 */
-	public function getProductImagePath()
-	{
-		return 'media/images/org/';
-	}
+     * Returns the directory of the article images.
+     *
+     * @return string {String} | image path
+     */
+    public function getProductImagePath()
+    {
+        return 'media/images/org/';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system sub shops
-   	 * @return string {String} | sql for sub shops
-   	 */
-	public function getShopSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system sub shops
+     *
+     * @return string {String} | sql for sub shops
+     */
+    public function getShopSelect()
+    {
+        return "
 			SELECT `shop_id` as id, `shop_title` as name, `shop_domain` as domain
 			FROM {$this->quoteTable('stores')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer groups
-   	 * @return string {String} | sql for customer groups
-   	 */
-	public function getCustomerGroupSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer groups
+     *
+     * @return string {String} | sql for customer groups
+     */
+    public function getCustomerGroupSelect()
+    {
+        return "
 			SELECT `customers_status_id` as id, `customers_status_name` as name
 			FROM {$this->quoteTable('customers_status_description')}
 			WHERE language_code='de'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system payments
-   	 * @return string {String} | sql for the payments
-   	 */
-	public function getPaymentMeanSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system payments
+     *
+     * @return string {String} | sql for the payments
+     */
+    public function getPaymentMeanSelect()
+    {
+        return "
 			SELECT `payment_code` as id, `payment_name` as name
 			FROM {$this->quoteTable('payment', 'p')}, {$this->quoteTable('payment_description', 'pd')}
 			WHERE p.`payment_id`=pd.`payment_id`
 			AND `language_code`='de'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system order states
-   	 * @return string {String} | sql for the order states
-   	 */
-	public function getOrderStatusSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system order states
+     *
+     * @return string {String} | sql for the order states
+     */
+    public function getOrderStatusSelect()
+    {
+        return "
 			SELECT s.`status_id` as id, `status_name` as name
 			FROM {$this->quoteTable('system_status', 's')}
 			LEFT JOIN {$this->quoteTable('system_status_description', 'sd')}
@@ -101,8 +107,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			AND sd.language_code='de'
 			WHERE `status_class` = 'order_status'
 		";
-	}
-
+    }
 
     /**
      * At this point the Veyton import differs from the Xtc import:
@@ -118,20 +123,19 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
         return "SELECT 0;";
     }
 
-
     /**
-   	 * Returns the property options of the shop
-   	 */
-   	public function getPropertyOptionSelect()
-   	{
-   		return "
+     * Returns the property options of the shop
+     */
+    public function getPropertyOptionSelect()
+    {
+        return "
    			SELECT 0;
    		";
-   	}
-
+    }
 
     /**
      * Returns a sql statement which selects additional info for a given productID
+     *
      * @param $productId int The product to query
      * @return string
      */
@@ -188,13 +192,14 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
     }
 
     /**
-   	 * Returns the sql statement to select the shop system articles
-   	 * @return string {String} | sql for the articles
-   	 */
-	public function getProductSelect()
-	{
-		return "
-			SELECT 
+     * Returns the sql statement to select the shop system articles
+     *
+     * @return string {String} | sql for the articles
+     */
+    public function getProductSelect()
+    {
+        return "
+			SELECT
 				a.products_id							as productID,
 
 				a.products_quantity						as instock,
@@ -234,24 +239,25 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 
 			ORDER BY a.date_added ASC
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article prices
-   	 * @return string {String} | sql for the article prices
-   	 */
-	public function getProductPriceSelect()
-	{
-		$sql = "
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        $sql = "
 			SELECT `customers_status_id`
 			FROM {$this->quoteTable('customers_status')}
 			WHERE `customers_status_graduated_prices`=1
 		";
-		$price_groups = $this->db->fetchCol($sql);
-		
-		$sql = "
+        $price_groups = $this->db->fetchCol($sql);
+
+        $sql = "
 			(
-				SELECT 
+				SELECT
 					`products_id` as productID,
 					`discount_quantity` as `from`,
 					`price`,
@@ -260,12 +266,12 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				ORDER BY productID, `from`
 			)
 		";
-		
-		if(!empty($price_groups)) {
-			foreach ($price_groups as $price_group) {
-				$sql .= "
+
+        if (!empty($price_groups)) {
+            foreach ($price_groups as $price_group) {
+                $sql .= "
 				UNION ALL (
-					SELECT 
+					SELECT
 						`products_id` as productID,
 						`discount_quantity` as `from`,
 						`price`,
@@ -274,20 +280,21 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 					ORDER BY productID, `from`
 				)
 				";
-			}
-		}
-		
-		return $sql;
-	}
+            }
+        }
+
+        return $sql;
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article image allocation
-   	 * @return string {String} | sql for the article image allocation
-   	 */
-	public function getProductImageSelect()
-	{
-		return "
-			SELECT 
+     * Returns the sql statement to select the shop system article image allocation
+     *
+     * @return string {String} | sql for the article image allocation
+     */
+    public function getProductImageSelect()
+    {
+        return "
+			SELECT
 				IFNULL(p.products_id, ml.link_id) as productID,
 				m.file as image,
 				md.media_name as description,
@@ -310,50 +317,52 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			AND m.`class`='product'
 			AND m.`status`='true'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article translations
-   	 * @return string {String} | sql for the article translations
-   	 */
-	public function getProductTranslationSelect()
-	{
-		return "
-			SELECT 
+     * Returns the sql statement to select the shop system article translations
+     *
+     * @return string {String} | sql for the article translations
+     */
+    public function getProductTranslationSelect()
+    {
+        return "
+			SELECT
 				d.products_id as productID,
 				d.language_code as languageID,
 				d.products_name as name,
 				d.products_description as description_long,
 				d.products_short_description as description,
 				d.products_keywords as keywords
-			FROM {$this->quoteTable('products_description', 'd')}  
+			FROM {$this->quoteTable('products_description', 'd')}
 			WHERE `language_code`!='de'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article relations
-   	 * @return string {String} | sql for the article relations
-   	 */
-	public function getProductRelationSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article relations
+     *
+     * @return string {String} | sql for the article relations
+     */
+    public function getProductRelationSelect()
+    {
+        return "
 			SELECT `products_id` as productID, `products_id_cross_sell` as relatedID, 1 as groupID
 			FROM {$this->quoteTable('products_cross_sell')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
+     * Returns the sql statement to select the shop system customer
      *
      * Selection of SHIPPING-data was removed on purpose: The is no index
      * for the corresponding join
      *
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getCustomerSelect()
-	{
-		return "
+     * @return string {String} | sql for the customer data
+     */
+    public function getCustomerSelect()
+    {
+        return "
 			SELECT
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
@@ -389,24 +398,26 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			ON a.customers_id=u.customers_id
 			AND a.address_class='default'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article category allocation
-   	 * @return string {String} | sql for the article category allocation
-   	 */
-	public function getProductCategorySelect()
-	{
-		return parent::getProductCategorySelect().', `master_link` DESC';
-	} 
+     * Returns the sql statement to select the shop system article category allocation
+     *
+     * @return string {String} | sql for the article category allocation
+     */
+    public function getProductCategorySelect()
+    {
+        return parent::getProductCategorySelect() . ', `master_link` DESC';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system categories
-   	 * @return string {String} | sql for the categories
-   	 */
-	public function getCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system categories
+     *
+     * @return string {String} | sql for the categories
+     */
+    public function getCategorySelect()
+    {
+        return "
 			SELECT
 				co.categories_id as categoryID,
 				co.parent_id as parentID,
@@ -416,7 +427,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				cd.categories_heading_title as cmsheadline,
 				cd.categories_description as cmstext,
 				co.categories_status as active
-			FROM 
+			FROM
 				{$this->quoteTable('categories', 'co')},
 				{$this->quoteTable('categories_description', 'cd')},
 				{$this->quoteTable('languages', 'lg')}
@@ -425,16 +436,16 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 
 			ORDER BY co.parent_id
 		";
-
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article ratings
-   	 * @return string {String} | sql for the article ratings
-   	 */
-	public function getProductRatingSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article ratings
+     *
+     * @return string {String} | sql for the article ratings
+     */
+    public function getProductRatingSelect()
+    {
+        return "
 			SELECT
 				`products_id` as `productID`,
 				c.`customers_id` as `customerID`,
@@ -453,24 +464,25 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			AND a.customers_id=c.customers_id
 			AND a.address_class='default'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getOrderSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getOrderSelect()
+    {
+        return "
 			SELECT
 				o.`orders_id`								as orderID,
 				o.`orders_id`								as ordernumber,
 				`customers_id`								as customerID,
 				`customers_vat_id`							as ustid,
 				
-				IF(`billing_gender` IN ('m','Herr'), 'mr', 'ms') 
+				IF(`billing_gender` IN ('m','Herr'), 'mr', 'ms')
 															as billing_salutation,
-				`billing_firstname`, 
+				`billing_firstname`,
 				`billing_lastname`,
 				`billing_company`,
 				-- `billing_company_2`,
@@ -479,7 +491,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				-- `billing_suburb`,
 				`billing_city`,
 				`billing_postcode`							as billing_zipcode,
-				`billing_country_code`						as billing_countryiso,		
+				`billing_country_code`						as billing_countryiso,
 						
 				IF(`delivery_gender` IN ('m','Herr'), 'mr', 'ms')
 															as shipping_salutation,
@@ -516,7 +528,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				SUM(
 					ROUND(op.`products_price` * (IF(op.`allow_tax`=1,op.`products_tax`,0)+100)/100, 2) *
 					op.`products_quantity`
-				) +	IFNULL(ROUND(`orders_total_price`*(IF(ot.`allow_tax`=1,`orders_total_tax`,0)+100)/100, 2),0)								
+				) +	IFNULL(ROUND(`orders_total_price`*(IF(ot.`allow_tax`=1,`orders_total_tax`,0)+100)/100, 2),0)
 															as invoice_amount,
 				ROUND(`orders_total_price`*`orders_total_quantity`, 2)
 															as invoice_shipping_net,
@@ -534,15 +546,16 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			
 			GROUP BY o.`orders_id`
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select all shop system order details
-   	 * @return string {String} | sql for order details
-   	 */
-	public function getOrderDetailSelect()
-	{
-		return "
+     * Returns the sql statement to select all shop system order details
+     *
+     * @return string {String} | sql for order details
+     */
+    public function getOrderDetailSelect()
+    {
+        return "
 			SELECT
 			
 				orders_id as orderID,
@@ -557,5 +570,5 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				
 			FROM {$this->quoteTable('orders_products')}
 		";
-	}
+    }
 }

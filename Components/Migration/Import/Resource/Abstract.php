@@ -40,42 +40,49 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 {
     /**
      * Internal name of the import step used by the controller
+     *
      * @var
      */
     public $internal_name;
 
     /**
      * References the progress object
+     *
      * @var Shopware_Components_Migration_Import_Progress
      */
     protected $progress;
 
     /**
      * When was the request started?
+     *
      * @var int
      */
     protected $requestTime;
 
     /**
      * How long may the request take at most?
+     *
      * @var int
      */
     protected $maxExecution;
 
     /**
      * Request object
+     *
      * @var
      */
     protected $request;
 
     /**
      * Source-Object
+     *
      * @var Shopware_Components_Migration_Profile
      */
     protected $source;
 
     /**
      * Target-Object
+     *
      * @var Shopware_Components_Migration_Profile
      */
     protected $target;
@@ -93,12 +100,13 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         $this->progress = $progress;
         $this->target = $target;
         $this->source = $source;
-        $this->requestTime =  !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $this->requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $this->request = $request;
     }
 
     /**
      * Get the snippet object
+     *
      * @return mixed
      */
     public function getNameSpace()
@@ -108,6 +116,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 
     /**
      * Check if a new request is needed (in order not to brake the max_execution_time)
+     *
      * @return bool
      */
     public function newRequestNeeded()
@@ -215,6 +224,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 
     /**
      * Legacy getter for the source profile
+     *
      * @return Shopware_Components_Migration_Profile
      */
     public function Source()
@@ -254,16 +264,13 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 
     /**
      * Getter for the internal name of the current resource
+     *
      * @return mixed
      */
     public function getInternalName()
     {
         return $this->internal_name;
     }
-
-
-
-
 
     /**
      * Takes an invalid product number and creates a valid one from it
@@ -282,7 +289,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         );
 
         if ($number) {
-            return 'sw-'.$number;
+            return 'sw-' . $number;
         }
 
         // Get number
@@ -291,7 +298,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         );
 
         // Increase - save
-        $sql= "UPDATE s_order_number SET number = ? WHERE name = ?";
+        $sql = "UPDATE s_order_number SET number = ? WHERE name = ?";
         Shopware()->Db()->query($sql, array(++$number, 'articleordernumber'));
 
         // Save mapping
@@ -304,13 +311,14 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
             )
         );
 
-        return 'sw-'.$number;
+        return 'sw-' . $number;
 
 //        return "sw-".md5($id);
     }
 
     /**
      * Returns a SW-productID for a given source-productId
+     *
      * @param $productId
      * @return string
      */
@@ -318,7 +326,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     {
         $sql = '
             SELECT
-                ad.articleID as productId
+                ad.articleID AS productId
             FROM s_plugin_migrations pm
             LEFT JOIN s_articles_details ad
                 ON ad.id = pm.targetID
@@ -328,5 +336,4 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 
         return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration::MAPPING_ARTICLE));
     }
-
 }

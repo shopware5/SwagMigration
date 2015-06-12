@@ -33,7 +33,6 @@
  */
 class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
@@ -70,25 +69,26 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
         $localPath = Shopware()->DocPath('files/' . Shopware()->Config()->get('sESDKEY'));
         $remotePath = $this->Request()->basepath;
 
-	    $downloadNotPossibleSnippet = $this->getNameSpace()->get('downloadNotPossible',
-			    "Download for ESD file %s was not succesful");
+        $downloadNotPossibleSnippet = $this->getNameSpace()->get(
+            'downloadNotPossible',
+            "Download for ESD file %s was not succesful"
+        );
 
         while ($esdFile = $result->fetch()) {
-	        $orderNumber = $esdFile['number'];
-	        $filename    = $esdFile['filename'];
-	        $path        = $esdFile['path'] . $esdFile['downloadId'];
-	        $datum       = $esdFile['datum'];
+            $orderNumber = $esdFile['number'];
+            $filename = $esdFile['filename'];
+            $path = $esdFile['path'] . $esdFile['downloadId'];
+            $datum = $esdFile['datum'];
             $documentUrl = $remotePath . $path;
 
             // execute the actual download and check for success
             $document = file_get_contents($documentUrl);
 
-            if (
-                $this->get_http_response_code($documentUrl) != 200 || // check http response code and only continue if document can be accessed
-                strlen($document) == 0 ||
-                !isset($orderNumber) // We have to check for an existing article number. Otherwise the file can't be associated with existing shopware's ESD article
+            if ($this->get_http_response_code($documentUrl) != 200 // check http response code and only continue if document can be accessed
+                || strlen($document) == 0
+                || !isset($orderNumber) // We have to check for an existing article number. Otherwise the file can't be associated with existing shopware's ESD article
             ) {
-	            return $this->getProgress()->error(sprintf($downloadNotPossibleSnippet, $filename));
+                return $this->getProgress()->error(sprintf($downloadNotPossibleSnippet, $filename));
                 continue;
             }
 
@@ -97,9 +97,9 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
 
             // get article_detail information
             list($articleDetailsId, $articleId) = Shopware()->Db()->fetchRow(
-	            "SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?",
-	            array( $orderNumber ),
-	            ZEND_Db::FETCH_NUM
+                "SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?",
+                array($orderNumber),
+                ZEND_Db::FETCH_NUM
             );
 
             // if no articleId was found, skip this article
@@ -114,18 +114,19 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
 
             // check if we already have the current esd file associated: if the query for s_articles_esd.id is successful then skip
             $existingId = Shopware()->Db()->fetchOne(
-		            "SELECT id FROM s_articles_esd WHERE articleID = ? AND file = ?",
-		            array($articleId, $filename)
+                "SELECT id FROM s_articles_esd WHERE articleID = ? AND file = ?",
+                array($articleId, $filename)
             );
 
-            if($existingId) {
+            if ($existingId) {
                 continue;
             }
 
             // Add actual download to s_articles_esd
-	        Shopware()->Db()->query("INSERT INTO s_articles_esd (articleID, articledetailsID, file, datum) VALUES (?,?,?,?)",
-			        array( $articleId, $articleDetailsId, $filename, $datum )
-	        );
+            Shopware()->Db()->query(
+                "INSERT INTO s_articles_esd (articleID, articledetailsID, file, datum) VALUES (?,?,?,?)",
+                array($articleId, $articleDetailsId, $filename, $datum)
+            );
         }
 
         return $this->getProgress()->done();
@@ -140,6 +141,7 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
     private function get_http_response_code($url)
     {
         $headers = get_headers($url);
+
         return substr($headers[0], 9, 3);
     }
 }

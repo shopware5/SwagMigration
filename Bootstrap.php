@@ -32,52 +32,56 @@
 class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
     /**
-     * Install method of the plugin. Register the migration controller, create the backend menu item and creates the plugin database table.
+     * Install method of the plugin. Register the migration controller, create the backend menu item and creates the
+     * plugin database table.
+     *
      * @return bool
      */
-	public function install()
-	{
+    public function install()
+    {
         $this->subscribeEvents();
         $this->checkVersion('4.3.0');
 
-	 	$parent = $this->Menu()->findOneBy(array('label'=> 'Inhalte'));
-		$item = $this->createMenuItem(array(
-			'label' => 'Shop-Migration',
-            'class' => 'sprite-database-import',
-			'active' => 1,
-			'parent' => $parent,
-            'position' => 0,
-            'controller' => 'SwagMigration',
-            'action' => 'Index'
-		));
-		
-		$this->Menu()->addItem($item);
-		$this->Menu()->save();
-		
-		$sql = '
+        $parent = $this->Menu()->findOneBy(array('label' => 'Inhalte'));
+        $item = $this->createMenuItem(
+            array(
+                'label' => 'Shop-Migration',
+                'class' => 'sprite-database-import',
+                'active' => 1,
+                'parent' => $parent,
+                'position' => 0,
+                'controller' => 'SwagMigration',
+                'action' => 'Index'
+            )
+        );
+
+        $this->Menu()->addItem($item);
+        $this->Menu()->save();
+
+        $sql = '
 			CREATE TABLE IF NOT EXISTS `s_plugin_migrations` (
-			  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			  `typeID` int(11) unsigned NOT NULL,
-			  `sourceID` varchar(255) NOT NULL,
-			  `targetID` int(11) unsigned NOT NULL,
+			  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `typeID` INT(11) UNSIGNED NOT NULL,
+			  `sourceID` VARCHAR(255) NOT NULL,
+			  `targetID` INT(11) UNSIGNED NOT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `typeID` (`typeID`,`sourceID`)
 			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
 		';
-		Shopware()->Db()->query($sql);
+        Shopware()->Db()->query($sql);
 
         $this->createForm();
 
-		return array(
-			'success' => true,
-			'invalidateCache' => array('backend')
-		);
-	}
+        return array(
+            'success' => true,
+            'invalidateCache' => array('backend')
+        );
+    }
 
     public function checkVersion($version)
     {
         if (!$this->assertVersionGreaterThen($version)) {
-            throw new \Exception('This plugin requires Shopware ' . $version.' or a later version');
+            throw new \Exception('This plugin requires Shopware ' . $version . ' or a later version');
         }
     }
 
@@ -88,15 +92,15 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * @return array|bool
      */
     public function update($version)
-	{
+    {
         $this->subscribeEvents();
 
 
         // Create form
         $this->createForm();
 
-		// Clean up the migration table in order to not have duplicate entries
-		$sql = '
+        // Clean up the migration table in order to not have duplicate entries
+        $sql = '
 		-- Remove non existing article references
 		DELETE m FROM `s_plugin_migrations` m
 		LEFT JOIN s_articles_details ad
@@ -126,12 +130,12 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 		ADD UNIQUE  `typeID` (  `typeID` ,  `sourceID` );
 		';
 
-		try {
-			Shopware()->Db()->query($sql);
-		} catch(\Exception $e) {
+        try {
+            Shopware()->Db()->query($sql);
+        } catch (\Exception $e) {
             // The above statement is just a cleanup statement, so errors should not
             // cancel the whole update process
-		}
+        }
 
         // Make sure that s_order_number is valid
         $sql = "
@@ -168,8 +172,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $sql = "UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?";
         Shopware()->Db()->query($sql, array($newSnippet, 'numberNotValid', $oldSnippet));
 
-		return true;
-	}
+        return true;
+    }
 
     /**
      * Subscribe the needed events
@@ -193,7 +197,6 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         );
     }
 
-
     /**
      * Create the config form for the plugin
      */
@@ -201,11 +204,15 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     {
         $form = $this->Form();
 
-        $form->setElement('boolean', 'debugMigration', array(
-            'description' => 'Soll eine Debug-Ausgabe geschrieben werden? Achtung! Kann die Geschwindigkeit des Imports negativ beeinflussen.',
-            'label' => 'Debug-Ausgabe',
-            'value' => false,
-        ));
+        $form->setElement(
+            'boolean',
+            'debugMigration',
+            array(
+                'description' => 'Soll eine Debug-Ausgabe geschrieben werden? Achtung! Kann die Geschwindigkeit des Imports negativ beeinflussen.',
+                'label' => 'Debug-Ausgabe',
+                'value' => false,
+            )
+        );
     }
 
     /**
@@ -250,29 +257,31 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
     /**
      * Uninstall method of the plugin. The plugin database table will be dropped.
+     *
      * @return bool
      */
-	public function uninstall()
-	{
-		$sql = '
+    public function uninstall()
+    {
+        $sql = '
 			DROP TABLE IF EXISTS `s_plugin_migrations`;
 		';
-		Shopware()->Db()->query($sql);
-		
-		return parent::uninstall();
-	}
+        Shopware()->Db()->query($sql);
+
+        return parent::uninstall();
+    }
 
     /**
      * Backend controller path event. Returns the path of the backend migration controller.
+     *
      * @static
      * @param Enlight_Event_EventArgs $args
      * @return string
      */
-	public function onGetControllerPath(Enlight_Event_EventArgs $args)
+    public function onGetControllerPath(Enlight_Event_EventArgs $args)
     {
         $this->registerMyTemplateDir();
-        return $this->Path(). 'Controllers/Backend/SwagMigration.php';
 
+        return $this->Path() . 'Controllers/Backend/SwagMigration.php';
     }
 
     /**
@@ -285,45 +294,65 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function getInfo()
     {
-    	return array(
-    		'version' => $this->getVersion(),
-    		'label' => $this->getLabel(),
+        return array(
+            'version' => $this->getVersion(),
+            'label' => $this->getLabel(),
             'author' => 'shopware AG',
             'description' => file_get_contents($this->Path() . 'info.txt'),
-    		'support' => 'http://www.forum.shopware.de',
-    		'changes' =>array(
-    				'1.3.1'=>array('releasedate'=>'2010-01-18', 'lines' => array(
-    					'Solves some problems of gambio profile'
-    				)),
-    				'1.3.2'=>array('releasedate'=>'2010-01-20', 'lines' => array(
-    					'Some bug fixes in customer import'
-    				)),
-    				'1.3.3'=>array('releasedate'=>'2010-01-21', 'lines' => array(
-    					'Add fix for errors of long description'
-    				)),
-    				'1.3.4'=>array('releasedate'=>'2010-01-24', 'lines' => array(
-    					'Add better handling for category import',
-    					'Improved support for large databases'
-    				)),
-    				'1.3.5'=>array('releasedate'=>'2010-01-25', 'lines' => array(
-    					'Fix the problem of long category text',
-    					'Fix the problem if the country is not available'
-    				)),
-    		        '2.0.0'=>array('releasedate'=>'2012-11-10', 'lines' => array(
-    		      			'Prepared for Shopware 4'
-    		        ))
-    			),
-    		'revision' => '7'
-    	);
+            'support' => 'http://www.forum.shopware.de',
+            'changes' => array(
+                '1.3.1' => array(
+                    'releasedate' => '2010-01-18',
+                    'lines' => array(
+                        'Solves some problems of gambio profile'
+                    )
+                ),
+                '1.3.2' => array(
+                    'releasedate' => '2010-01-20',
+                    'lines' => array(
+                        'Some bug fixes in customer import'
+                    )
+                ),
+                '1.3.3' => array(
+                    'releasedate' => '2010-01-21',
+                    'lines' => array(
+                        'Add fix for errors of long description'
+                    )
+                ),
+                '1.3.4' => array(
+                    'releasedate' => '2010-01-24',
+                    'lines' => array(
+                        'Add better handling for category import',
+                        'Improved support for large databases'
+                    )
+                ),
+                '1.3.5' => array(
+                    'releasedate' => '2010-01-25',
+                    'lines' => array(
+                        'Fix the problem of long category text',
+                        'Fix the problem if the country is not available'
+                    )
+                ),
+                '2.0.0' => array(
+                    'releasedate' => '2012-11-10',
+                    'lines' => array(
+                        'Prepared for Shopware 4'
+                    )
+                )
+            ),
+            'revision' => '7'
+        );
     }
 
     /**
      * Returns the version of the plugin as a string
      *
      * @return string
+     * @throws Exception
      */
-    public function getVersion() {
-        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR .'plugin.json'), true);
+    public function getVersion()
+    {
+        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
 
         if ($info) {
             return $info['currentVersion'];

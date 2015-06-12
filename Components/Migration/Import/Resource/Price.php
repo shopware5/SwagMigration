@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -61,6 +61,7 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -103,25 +104,25 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
         }
 
         $result = $this->Source()->queryProductPrices($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $taskStartTime = $this->initTaskTimer();
 
         while ($price = $result->fetch()) {
-            if(!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
-                if(isset($this->Request()->price_group[$price['pricegroup']])) {
+            if (!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
+                if (isset($this->Request()->price_group[$price['pricegroup']])) {
                     $price['pricegroup'] = $this->Request()->price_group[$price['pricegroup']];
                 } else {
                     continue;
                 }
             }
-            if(empty($price['pricegroup'])) {
+            if (empty($price['pricegroup'])) {
                 $price['pricegroup'] = 'EK';
             }
 
             $sql = "
-                SELECT ad.id as articledetailsID, IF(cg.taxinput=1, t.tax, 0) as tax
+                SELECT ad.id AS articledetailsID, IF(cg.taxinput=1, t.tax, 0) AS tax
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
@@ -135,24 +136,31 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
                 WHERE pm.sourceID=?
                 AND pm.typeID=?
             ";
-            $price_config = Shopware()->Db()->fetchRow($sql, array($price['pricegroup'], $price['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
-            if(!empty($price_config)) {
+            $price_config = Shopware()->Db()->fetchRow(
+                $sql,
+                array(
+                    $price['pricegroup'],
+                    $price['productID'],
+                    Shopware_Components_Migration::MAPPING_ARTICLE
+                )
+            );
+            if (!empty($price_config)) {
                 $price = array_merge($price, $price_config);
-                if(isset($price['net_price'])) {
-                    if(empty($price['tax'])) {
+                if (isset($price['net_price'])) {
+                    if (empty($price['tax'])) {
                         $price['price'] = $price['net_price'];
                         unset($price['net_price'], $price['tax']);
                     } else {
-                        $price['price'] = round($price['net_price']*(100+$price['tax'])/100, 2);
+                        $price['price'] = round($price['net_price'] * (100 + $price['tax']) / 100, 2);
                         unset($price['net_price']);
                     }
                 }
-                if(isset($price['net_pseudoprice'])) {
-                    if(empty($price['tax'])) {
+                if (isset($price['net_pseudoprice'])) {
+                    if (empty($price['tax'])) {
                         $price['pseudoprice'] = $price['net_pseudoprice'];
                         unset($price['net_pseudoprice'], $price['tax']);
                     } else {
-                        $price['pseudoprice'] = round($price['net_pseudoprice']*(100+$price['tax'])/100, 2);
+                        $price['pseudoprice'] = round($price['net_pseudoprice'] * (100 + $price['tax']) / 100, 2);
                         unset($price['net_pseudoprice']);
                     }
                 }

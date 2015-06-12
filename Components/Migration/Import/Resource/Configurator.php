@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Configurator extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -64,6 +64,7 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -100,10 +101,11 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
         if (empty($products_result)) {
             $this->getProgress()->addRequestParam('import_generate_variants', null);
             $this->getProgress()->addRequestParam('import_create_configurator_variants', null);
+
             return $this->getProgress()->done();
         }
 
-        $count = $products_result->rowCount()+$offset;
+        $count = $products_result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
@@ -118,13 +120,14 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
             }
 
             // Create configurator set for product
-            $configuratorSetName = "Generated Set - ".$id;
-            $configuratorSetId = Shopware()->Db()->fetchOne("
+            $configuratorSetName = "Generated Set - " . $id;
+            $configuratorSetId = Shopware()->Db()->fetchOne(
+                "
                 SELECT `id`
                 FROM `s_article_configurator_sets`
-                WHERE `name`='{$configuratorSetName}' LIMIT 1
-            ");
-            if(false === $configuratorSetId) {
+                WHERE `name`='{$configuratorSetName}' LIMIT 1"
+            );
+            if (false === $configuratorSetId) {
                 $sql = "INSERT INTO s_article_configurator_sets SET `name`='{$configuratorSetName}'";
                 Shopware()->Db()->query($sql);
                 $configuratorSetId = Shopware()->Db()->lastInsertId();
@@ -144,14 +147,14 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
                 $group_position = !empty($attribute['group_position']) ? (int) $attribute['group_position'] : 0;
                 $option_position = !empty($attribute['option_position']) ? (int) $attribute['option_position'] : 0;
 
-
                 // Create / load group
                 if (!isset($groups[$group])) {
-                    $groupId = Shopware()->Db()->fetchOne("
+                    $groupId = Shopware()->Db()->fetchOne(
+                        "
                         SELECT `id`
                         FROM `s_article_configurator_groups`
-                        WHERE `name`='{$group}' LIMIT 1
-                    ");
+                        WHERE `name`='{$group}' LIMIT 1"
+                    );
                     if ($groupId === false) {
                         $sql = "INSERT INTO `s_article_configurator_groups` (`name`, `position`) VALUES ('{$group}', {$group_position})";
                         Shopware()->Db()->query($sql);
@@ -171,11 +174,12 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
 
                 // Create / load option
                 if (!isset($options[$option])) {
-                    $optionId = Shopware()->Db()->fetchOne("
+                    $optionId = Shopware()->Db()->fetchOne(
+                        "
                         SELECT `id`
                         FROM `s_article_configurator_options`
-                        WHERE `name`='{$option}' AND `group_id`={$groupId}
-                    ");
+                        WHERE `name`='{$option}' AND `group_id`={$groupId}"
+                    );
                     if ($optionId === false) {
                         $sql = "INSERT INTO `s_article_configurator_options` (`group_id`, `name`, `position`) VALUES ({$groupId}, '{$option}', {$option_position})";
                         Shopware()->Db()->query($sql);
@@ -191,18 +195,15 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
                 Shopware()->Db()->query($sql);
 
                 if ($price) {
-                    if (version_compare(Shopware::VERSION, '5.0', '>=')) {
+                    if (version_compare(Shopware::VERSION, '5.0', '>=') || Shopware::VERSION == "___VERSION___") {
                         $sql = "INSERT INTO `s_article_configurator_price_variations` (`configurator_set_id`, `options`, `variation`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
-                    }
-                    else if(version_compare(Shopware::VERSION, '4.4', '>=') || Shopware::VERSION == "___VERSION___") {
+                    } elseif (version_compare(Shopware::VERSION, '4.4', '>=')) {
                         $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `options`, `surcharge`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
-                    }
-                    else {
+                    } else {
                         $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
                     }
                     Shopware()->Db()->query($sql);
                 }
-
             }
 
             // Set product's configurator set
@@ -215,8 +216,6 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
                 Shopware()->Db()->query($sql);
             }
 
-
-
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
                 return $this->getProgress();
@@ -225,6 +224,7 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
 
         // Set variant generation to be the next step
         $this->getProgress()->addRequestParam('import_create_configurator_variants', 1);
+
         return $this->getProgress()->done();
     }
 }

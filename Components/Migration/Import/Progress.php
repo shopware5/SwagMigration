@@ -46,41 +46,49 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
 
     /**
      * Progress message
+     *
      * @var string
      */
     protected $message;
     /**
      * Progress successful?
+     *
      * @var int
      */
     protected $success;
     /**
      * Progress offset
+     *
      * @var int
      */
     protected $offset;
     /**
      * Total number of items
+     *
      * @var int
      */
     protected $count;
     /**
      * Progress. If not set, the progress is calculated dynamically
+     *
      * @var null|float
      */
     protected $progress = null;
     /**
      * Additional request params
+     *
      * @var array
      */
     protected $requestParams = array();
     /**
      * Progress status
+     *
      * @var 0, STATUS_ERROR or STATUS_DONE
      */
     protected $status = 0;
     /**
      * When did the progress start
+     *
      * @var int
      */
     protected $startTime;
@@ -95,7 +103,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
 
         $output = array(
             'message' => $this->getMessage(),
-            'success'=> $this->getSuccess(),
+            'success' => $this->getSuccess(),
             'offset' => $this->getOffset(),
             'progress' => $progress,
             'estimated' => $this->getEstimation(),
@@ -108,6 +116,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
         }
 
         echo Zend_Json::encode($output);
+
         return;
     }
 
@@ -117,7 +126,8 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
      * @param $message
      * @return $this
      */
-    public function error($message) {
+    public function error($message)
+    {
         $this->setMessage($message);
         $this->setSuccess(false);
         $this->setOffset(0);
@@ -150,7 +160,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
     public function getEstimation()
     {
         if ($this->count && $this->offset) {
-            return (time()-$this->startTime)/$this->offset * ($this->count-$this->offset);
+            return (time() - $this->startTime) / $this->offset * ($this->count - $this->offset);
         }
 
         return -1;
@@ -326,6 +336,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
     public function addRequestParam($key, $value)
     {
         $this->requestParams[$key] = $value;
+
         return $this;
     }
 
@@ -341,6 +352,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
 
     /**
      * Get the progress' status
+     *
      * @return int
      */
     public function getStatus()
@@ -350,6 +362,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
 
     /**
      * Check if there was an error
+     *
      * @return bool
      */
     public function isError()
@@ -366,6 +379,4 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
     {
         return self::STATUS_DONE == $this->getStatus();
     }
-
-
 }

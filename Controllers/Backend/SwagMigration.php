@@ -1,4 +1,4 @@
-﻿﻿<?php
+﻿<?php
 /**
  * Shopware 4.0
  * Copyright © 2012 shopware AG
@@ -33,47 +33,52 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 {
     /**
      * Defines all availabe imports as well as the order of their import
+     *
      * @var array
      */
-	public $imports = array(
-			'import_products'                     => 'Product',
-			'import_translations'                 => 'Translation',
-			'import_properties'                   => 'Property',
-			'import_categories'                   => 'Category',
-			'import_article_categories'           => 'Category',
-			'import_prices'                       => 'Price',
-			'import_generate_variants'            => 'Configurator',
-			'import_create_configurator_variants' => 'Variant',
-			'import_images'                       => 'Image',
-			'import_customers'                    => 'Customer',
-			'import_ratings'                      => 'Rating',
-			'import_orders'                       => 'Order',
-			'import_order_details'                => 'Order',
-			'import_downloads'                    => 'Download',
-			'import_downloads_esd'                => 'DownloadESD',
-			'import_orders_esd'                   => 'DownloadESDOrder'
-	);
+    public $imports = array(
+        'import_products'                     => 'Product',
+        'import_translations'                 => 'Translation',
+        'import_properties'                   => 'Property',
+        'import_categories'                   => 'Category',
+        'import_article_categories'           => 'Category',
+        'import_prices'                       => 'Price',
+        'import_generate_variants'            => 'Configurator',
+        'import_create_configurator_variants' => 'Variant',
+        'import_images'                       => 'Image',
+        'import_customers'                    => 'Customer',
+        'import_ratings'                      => 'Rating',
+        'import_orders'                       => 'Order',
+        'import_order_details'                => 'Order',
+        'import_downloads'                    => 'Download',
+        'import_downloads_esd'                => 'DownloadESD',
+        'import_orders_esd'                   => 'DownloadESDOrder'
+    );
 
     /**
      * Source shop system profile
+     *
      * @var Shopware_Components_Migration_Profile
      */
     protected $source;
 
     /**
      * Target shop system profile
+     *
      * @var Shopware_Components_Migration_Profile
      */
     protected $target;
 
     /**
      * Mapping helper
+     *
      * @var Shopware_Components_Migration_Mapping
      */
     protected $mapping;
 
     /**
      * Snippet namespace
+     *
      * @var Enlight_Components_Snippet_Namespace
      */
     protected $namespace;
@@ -88,6 +93,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * Returns the snippet namespace object for the migration namespace
+     *
      * @return Enlight_Components_Snippet_Namespace
      */
     public function getNamespace()
@@ -95,6 +101,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if (!isset($this->namespace)) {
             $this->namespace = Shopware()->Snippets()->getNamespace('backend/swag_migration/main');
         }
+
         return $this->namespace;
     }
 
@@ -110,20 +117,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $json->setRenderer($renderer);
     }
 
-	/**
+    /**
      * This function add the template directory and register the Shopware_Components namespace
      */
     public function init()
     {
         $this->setMaxExecutionTime();
 
-        Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__).'/../../Components/');
+        Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__) . '/../../Components/');
         $this->View()->addTemplateDir(dirname(__FILE__) . "/../../Views/");
         parent::init();
     }
 
     /**
      * This function inits the source profile and creates it over the profile factory
+     *
      * @return Enlight_Class
      */
     public function initSource()
@@ -136,25 +144,26 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $config['dbname'] = "";
 
         // Populate the config object by the request data
-        $query = $this->Request()->getPost()+$this->Request()->getQuery();
-        if(isset($query['username'])&&$query['username']!='default') {
+        $query = $this->Request()->getPost() + $this->Request()->getQuery();
+        if (isset($query['username']) && $query['username'] != 'default') {
             $config['username'] = $query['username'];
         }
-        if(isset($query['prefix'])&&$query['prefix']!='default') {
+        if (isset($query['prefix']) && $query['prefix'] != 'default') {
             $config['prefix'] = $query['prefix'];
         }
-        if(isset($query['password'])&&$query['password']!='default') {
+        if (isset($query['password']) && $query['password'] != 'default') {
             $config['password'] = $query['password'];
         }
-        if(isset($query['host'])&&$query['host']!='default') {
+        if (isset($query['host']) && $query['host'] != 'default') {
             $config['host'] = $query['host'];
         }
-        if(isset($query['port'])&&$query['port']!='default') {
+        if (isset($query['port']) && $query['port'] != 'default') {
             $config['port'] = $query['port'];
         }
-        if(isset($query['database'])&&$query['database']!='default') {
+        if (isset($query['database']) && $query['database'] != 'default') {
             $config['dbname'] = $query['database'];
         }
+
         return Shopware_Components_Migration::profileFactory($query['profile'], $config);
     }
 
@@ -166,42 +175,53 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     public function Mapping()
     {
         if (!isset($this->mapping)) {
-            $this->mapping = new Shopware_Components_Migration_Mapping($this->Source(), $this->Target(), $this->getNamespace());
+            $this->mapping = new Shopware_Components_Migration_Mapping(
+                $this->Source(),
+                $this->Target(),
+                $this->getNamespace()
+            );
         }
+
         return $this->mapping;
     }
 
     /**
      * Getter function of the source profile
+     *
      * @return Shopware_Components_Migration_Profile
      */
     public function Source()
     {
-        if(!isset($this->source)) {
+        if (!isset($this->source)) {
             $this->source = $this->initSource();
         }
+
         return $this->source;
     }
 
     /**
      * Initial the target profile. The target profile type is every time shopware
+     *
      * @return Enlight_Class
      */
     public function initTarget()
     {
         $config = (array) Shopware()->getOption('db');
+
         return Shopware_Components_Migration::profileFactory('Shopware', $config);
     }
 
     /**
      * Getter method of the target profile. If the profile is not set, the controller initial the profile first.
+     *
      * @return Shopware_Components_Migration_Profile
      */
     public function Target()
     {
-        if(!isset($this->target)) {
+        if (!isset($this->target)) {
             $this->target = $this->initTarget();
         }
+
         return $this->target;
     }
 
@@ -238,16 +258,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * This function is used to reset the shop. It will truncated all tables related to a given source
      */
-	public function clearShopAction()
-	{
+    public function clearShopAction()
+    {
         $this->setRenderer(false);
         $data = $this->Request()->getParams();
 
         $cleanup = new Shopware_Components_Migration_Cleanup();
         $cleanup->cleanUpByArray($data);
 
-		echo Zend_Json::encode(array('success'=>true));
-	}
+        echo Zend_Json::encode(array('success' => true));
+    }
 
     /**
      * Returns the possible migration profiles
@@ -256,19 +276,16 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setRenderer(false);
 
-
-
         $rows = array(
-            array('id'=>'Magento', 		'name'=>$this->getNamespace()->get('profile-magento')),
-            array('id'=>'Oxid', 		'name'=>$this->getNamespace()->get('profile-oxid')),
-            array('id'=>'Veyton', 		'name'=>$this->getNamespace()->get('profile-xt4')),
-            array('id'=>'Gambio', 		'name'=>$this->getNamespace()->get('profile-gambio')),
-            array('id'=>'Xt Commerce', 	'name'=>$this->getNamespace()->get('profile-xt')),
-            array('id'=>'Shopware35', 	'name'=>$this->getNamespace()->get('profile-shopware')),
-            array('id'=>'Prestashop15',	'name'=>$this->getNamespace()->get('profile-presta')),
-            array('id'=>'Prestashop14', 'name'=>$this->getNamespace()->get('profile-presta-old')),
+            array('id' => 'Magento',      'name' => $this->getNamespace()->get('profile-magento')),
+            array('id' => 'Oxid',         'name' => $this->getNamespace()->get('profile-oxid')),
+            array('id' => 'Veyton',       'name' => $this->getNamespace()->get('profile-xt4')),
+            array('id' => 'Gambio',       'name' => $this->getNamespace()->get('profile-gambio')),
+            array('id' => 'Xt Commerce',  'name' => $this->getNamespace()->get('profile-xt')),
+            array('id' => 'Prestashop15', 'name' => $this->getNamespace()->get('profile-presta')),
+            array('id' => 'Prestashop14', 'name' => $this->getNamespace()->get('profile-presta-old')),
         );
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
+        echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
 
     /**
@@ -281,18 +298,17 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $rows = array();
         try {
             foreach ($this->Source()->getDatabases() as $database) {
-                $rows[] = array('name'=>$database);
+                $rows[] = array('name' => $database);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             $msg = sprintf("An error occured: %s", $e->getMessage());
-            echo Zend_Json::encode(array('success'=>false, 'message'=>$msg));
+            echo Zend_Json::encode(array('success' => false, 'message' => $msg));
+
             return;
         }
 
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
+        echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
-
-
 
     /**
      * This function returns the mapping list for the left grid
@@ -303,7 +319,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingLeft();
 
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
+        echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
 
     /**
@@ -315,7 +331,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingRight();
 
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
+        echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
 
     /**
@@ -327,7 +343,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingForEntity($this->Request()->mapping);
 
-        echo Zend_Json::encode(array('data'=>$rows, 'count'=>count($rows)));
+        echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
 
     /**
@@ -342,18 +358,25 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $languages = $this->Source()->getLanguages();
             //$image_path = rtrim($this->Request()->basepath.$this->Source()->getProductImagePath(), '/').'/';
             //$client = new Zend_Http_Client($image_path);
-            echo Zend_Json::encode(array('success'=>true));
-
+            echo Zend_Json::encode(array('success' => true));
         } catch (Zend_Db_Statement_Exception $e) {
-            switch($e->getCode()) {
+            switch ($e->getCode()) {
                 case 42:
-                    echo Zend_Json::encode(array('success'=>false, 'message'=>$this->getNamespace()->get('databaseProfileDoesNotMatch', "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.")));
+                    echo Zend_Json::encode(
+                        array(
+                            'success' => false,
+                            'message' => $this->getNamespace()->get(
+                                'databaseProfileDoesNotMatch',
+                                "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import."
+                            )
+                        )
+                    );
                     break;
                 default:
-                    echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
+                    echo Zend_Json::encode(array('success' => false, 'message' => $e->getMessage()));
             }
         } catch (Exception $e) {
-            echo Zend_Json::encode(array('success'=>false, 'message'=>$e->getMessage()));
+            echo Zend_Json::encode(array('success' => false, 'message' => $e->getMessage()));
         }
     }
 
@@ -365,31 +388,34 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $cleanup = new Shopware_Components_Migration_Cleanup();
         $cleanup->clearMigrationMappings();
 
-        echo Zend_Json::encode(array(
-            'message'=>$this->getNamespace()->get('importFinished', "Import finished"),
-            'success'=>true,
-            'progress'=>1,
-            'done'=>true
-        ));
+        echo Zend_Json::encode(
+            array(
+                'message' => $this->getNamespace()->get('importFinished', "Import finished"),
+                'success' => true,
+                'progress' => 1,
+                'done' => true
+            )
+        );
     }
 
     /**
      * Convenience method which prints a given error for the extjs app
+     *
      * @param $e \Exception
      * @param $errorDescription string A simple explanation of what happened
      */
     protected function printError($e, $errorDescription)
     {
         $error = array(
-            'message'=>$errorDescription,
-            'error'=>$e->getMessage(),
-            'code'=>$e->getCode(),
-            'file'=>$e->getFile(),
-            'line'=>$e->getLine(),
-            'trace'=>$e->getTraceAsString(),
-            'success'=>false,
-            'progress'=>1,
-            'done'=>true
+            'message' => $errorDescription,
+            'error' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+            'success' => false,
+            'progress' => 1,
+            'done' => true
         );
         if (!$this->Front()->Plugins()->Json()->getRenderer()) {
             echo Zend_Json::encode($error);
@@ -415,7 +441,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $progress = new Shopware_Components_Migration_Import_Progress();
         $progress->setOffset($offset);
 
-        $import = Shopware_Components_Migration::resourceFactory($name, $progress, $this->Source(), $this->Target(), $this->request);
+        $import = Shopware_Components_Migration::resourceFactory(
+            $name,
+            $progress,
+            $this->Source(),
+            $this->Target(),
+            $this->request
+        );
         $import->setInternalName($importType);
         $import->setMaxExecution($this->max_execution);
 
@@ -445,6 +477,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         } catch (Exception $e) {
             $this->printError($e, $import->getDefaultErrorMessage());
+
             return;
         }
 
@@ -466,6 +499,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * This function imports the different data types.
+     *
      * @return void
      */
     public function importAction()
@@ -473,27 +507,32 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $this->setRenderer(false);
 
         foreach ($this->imports as $key => $name) {
-            if(!empty($this->Request()->$key)) {
+            if (!empty($this->Request()->$key)) {
                 $this->runImport($key);
+
                 return;
             }
         }
 
-        if(!empty($this->Request()->finish_import)) {
+        if (!empty($this->Request()->finish_import)) {
             $this->finishImport();
+
             return;
         }
 
-        echo Zend_Json::encode(array(
-            'message'=>$this->getNamespace()->get('importedSelectedData', "Selected data successfully imported!"),
-            'success'=>true,
-            'progress'=>1,
-            'done'=>true
-        ));
+        echo Zend_Json::encode(
+            array(
+                'message' => $this->getNamespace()->get('importedSelectedData', "Selected data successfully imported!"),
+                'success' => true,
+                'progress' => 1,
+                'done' => true
+            )
+        );
     }
 
     /**
      * Helper method to print "currently importing" messages
+     *
      * @param $type
      * @return bool
      */
@@ -507,15 +546,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if ($messageShown) {
             return false;
         }
-        $import = $this->getNamespace()->get("currentImport".$type, $type);
+        $import = $this->getNamespace()->get("currentImport" . $type, $type);
 
-        echo Zend_Json::encode(array(
-            'message'=>sprintf($this->getNamespace()->get('currentlyImporting', "Current import step: %s"), $import),
-            'success'=>true,
-            'offset'=>0,
-            'progress'=>0,
-            'messageShown'=>1
-        ));
+        echo Zend_Json::encode(
+            array(
+                'message' => sprintf(
+                    $this->getNamespace()->get('currentlyImporting', "Current import step: %s"),
+                    $import
+                ),
+                'success' => true,
+                'offset' => 0,
+                'progress' => 0,
+                'messageShown' => 1
+            )
+        );
+
         return true;
     }
 }

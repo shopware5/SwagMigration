@@ -31,10 +31,8 @@
  * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
  * @copyright Copyright (c), shopware AG (http://www.shopware.de)
  */
-
 class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
@@ -54,11 +52,11 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         return $this->getNameSpace()->get('importedDownload', "Downloads successfully imported!");
     }
 
-	/**
-	 * run() method of the import adapter for downloads (article attached)
-	 *
-	 * @return $this|\Shopware_Components_Migration_Import_Progress
-	 */
+    /**
+     * run() method of the import adapter for downloads (article attached)
+     *
+     * @return $this|\Shopware_Components_Migration_Import_Progress
+     */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
@@ -71,7 +69,8 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         $localPath = Shopware()->DocPath('files/downloads');
         $remotePath = rtrim($this->Request()->basepath, '/') . '/out/media/';
 
-        $numberSnippet = $this->getNameSpace()->get('numberNotValid',
+        $numberSnippet = $this->getNameSpace()->get(
+            'numberNotValid',
             "The product number %s is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
             * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
@@ -79,7 +78,8 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
             You can force the migration to continue. But be aware that this will: <br>
             * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
             * Will not allow you to modify and save articles having an invalid ordernumber <br>
-            ");
+            "
+        );
 
         while ($media = $result->fetch()) {
             $orderNumber = $media['number'];
@@ -88,7 +88,7 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
 
             // Clear-Path
             $path = basename($path);
-            $path = str_replace(" ","%20",$path);
+            $path = str_replace(" ", "%20", $path);
 
             $documentUrl = $remotePath . $path;
             $document = file_get_contents($documentUrl);
@@ -97,9 +97,10 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
             if (!isset($orderNumber)) {
                 $orderNumber = '';
             }
-            if ($numberValidationMode !== 'ignore' &&
-                (empty($orderNumber) || strlen($orderNumber) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $orderNumber)))
-            {
+            if ($numberValidationMode !== 'ignore'
+                && (empty($orderNumber) || strlen($orderNumber) > 30
+                || preg_match('/[^a-zA-Z0-9-_. ]/', $orderNumber))
+            ) {
                 switch ($numberValidationMode) {
                     case 'complain':
                         return $this->getProgress()->error(sprintf($numberSnippet, $orderNumber));
@@ -110,14 +111,14 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
                 }
             }
 
-            if(strlen($document) == 0) {
+            if (strlen($document) == 0) {
                 continue;
             }
             file_put_contents($localPath . str_replace("%20", " ", $path), $document);
 
             // Write entry to database
             $getShopwareArticleId = Shopware()->Db()->fetchOne("SELECT articleID FROM s_articles_details WHERE ordernumber = ?", array($orderNumber));
-            if (empty($getShopwareArticleId)){
+            if (empty($getShopwareArticleId)) {
                 //No article
                 continue;
             }
@@ -128,11 +129,12 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
             }
 
             // Add entry to s_articles_downloads
-            Shopware()->Db()->query("INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)",
-                array($getShopwareArticleId, $description, "/files/downloads/" . $path, filesize($localPath . $path)));
+            Shopware()->Db()->query(
+                "INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)",
+                array($getShopwareArticleId, $description, "/files/downloads/" . $path, filesize($localPath . $path))
+            );
         }
 
         return $this->getProgress()->done();
     }
-
 }

@@ -33,7 +33,6 @@
  */
 class Shopware_Components_Migration_Cleanup
 {
-
     /**
      * Constructor: Disable foreign key checks
      */
@@ -70,7 +69,7 @@ class Shopware_Components_Migration_Cleanup
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ARTICLE);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_seo;');
-                    } catch(Exception $e) {
+                    } catch (Exception $e) {
                         // if table does not exist - resume, it might be just an old SW version
                     }
                     break;
@@ -80,36 +79,38 @@ class Shopware_Components_Migration_Cleanup
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
-                    } catch(Exception $e) {
+                    } catch (Exception $e) {
                         // if table does not exist - resume, it might be just an old SW version
                     }
                     break;
                 case 'clear_supplier':
                     // As one might want to clear the suppliers without leaving all related articles
                     // invalid, we create a new 'Default'-Supplier and set it for all articles
-                    Shopware()->Db()->exec("
+                    Shopware()->Db()->exec(
+                        "
                         TRUNCATE s_articles_supplier;
                         TRUNCATE s_articles_supplier_attributes;
                         INSERT INTO s_articles_supplier (`id`, `name`) VALUES (1, 'Default');
                         INSERT INTO s_articles_supplier_attributes (`id`) VALUES (1);
                         UPDATE s_articles SET supplierID=1 WHERE 1;
-                    ");
+                    "
+                    );
                     break;
                 case 'clear_properties':
-	                $this->sDeleteAllFilters();
-	                break;
+                    $this->sDeleteAllFilters();
+                    break;
                 case 'clear_mappings':
-	                $this->clearMigrationMappings();
-	                break;
+                    $this->clearMigrationMappings();
+                    break;
                 case 'clear_images':
-	                $this->clearImages();
-	                break;
-	            case 'clear_article_downloads':
-					$this->sDeleteArticleDownloads();
-		            break;
-	            case 'clear_esd_article_downloads':
-					$this->sDeleteEsdArticleDownloads();
-		            break;
+                    $this->clearImages();
+                    break;
+                case 'clear_article_downloads':
+                    $this->sDeleteArticleDownloads();
+                    break;
+                case 'clear_esd_article_downloads':
+                    $this->sDeleteEsdArticleDownloads();
+                    break;
 
                 default:
                     break;
@@ -121,12 +122,12 @@ class Shopware_Components_Migration_Cleanup
      * Truncates the migration mapping table
      */
     public function clearMigrationMappings()
-	{
-		$sql = '
+    {
+        $sql = '
             TRUNCATE TABLE `s_plugin_migrations`;
         ';
         Shopware()->Db()->query($sql);
-	}
+    }
 
     /**
      * Remove mappings by a given type
@@ -134,10 +135,10 @@ class Shopware_Components_Migration_Cleanup
      * @param $type
      */
     public function removeMigrationMappingsByType($type)
-	{
-		$sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
-		Shopware()->Db()->query($sql, array($type));
-	}
+    {
+        $sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
+        Shopware()->Db()->query($sql, array($type));
+    }
 
     /**
      * Truncate all article related tables
@@ -198,10 +199,9 @@ class Shopware_Components_Migration_Cleanup
             Shopware()->Db()->query('TRUNCATE s_article_configurator_price_variations;');
 
             Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // if table does not exist - resume, it might be just an old SW version
         }
-
     }
 
     /**
@@ -233,10 +233,10 @@ class Shopware_Components_Migration_Cleanup
 
     /**
      * Truncate customer related tables
-	 */
-	public function sDeleteAllCustomers()
-	{
-	   $sql = "
+     */
+    public function sDeleteAllCustomers()
+    {
+        $sql = "
 	       TRUNCATE s_user;
 	       TRUNCATE s_user_attributes;
 	       TRUNCATE s_user_billingaddress;
@@ -247,15 +247,15 @@ class Shopware_Components_Migration_Cleanup
 	       TRUNCATE s_user_debit;
 	   ";
 
-	   Shopware()->Db()->query($sql);
-	}
+        Shopware()->Db()->query($sql);
+    }
 
-	/**
-	 * Helper method to delete all filter properties
-	 */
-	public function sDeleteAllFilters()
-	{
-		$sql = '
+    /**
+     * Helper method to delete all filter properties
+     */
+    public function sDeleteAllFilters()
+    {
+        $sql = '
 			TRUNCATE s_filter;
 			TRUNCATE s_filter_articles;
 			TRUNCATE s_filter_attributes;
@@ -264,69 +264,69 @@ class Shopware_Components_Migration_Cleanup
 			TRUNCATE s_filter_values;
 		';
 
-		Shopware()->Db()->query($sql);
-	}
+        Shopware()->Db()->query($sql);
+    }
 
-	/**
-	 * Helper method which deletes images/media tables
-	 * Also physically deletes corresponding files
-	 */
-	public function clearImages()
-	{
-		$sql = '
+    /**
+     * Helper method which deletes images/media tables
+     * Also physically deletes corresponding files
+     */
+    public function clearImages()
+    {
+        $sql = '
 			TRUNCATE s_articles_img;
 			TRUNCATE s_articles_img_attributes;
 			TRUNCATE s_article_img_mappings;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_media;
 		';
-		Shopware()->Db()->query($sql);
+        Shopware()->Db()->query($sql);
 
-		$this->clearFolder(Shopware()->DocPath('media/image'), 'image');
-		$this->clearFolder(Shopware()->DocPath('media/image/thumbnail'), 'image');
-	}
+        $this->clearFolder(Shopware()->DocPath('media/image'), 'image');
+        $this->clearFolder(Shopware()->DocPath('media/image/thumbnail'), 'image');
+    }
 
-	private function sDeleteArticleDownloads()
-	{
-		// Truncate tables
-		Shopware()->Db()->query("TRUNCATE s_articles_downloads");
+    private function sDeleteArticleDownloads()
+    {
+        // Truncate tables
+        Shopware()->Db()->query("TRUNCATE s_articles_downloads");
 
-		// delete files
-		$this->clearFolder(Shopware()->DocPath('files/downloads'));
-	}
+        // delete files
+        $this->clearFolder(Shopware()->DocPath('files/downloads'));
+    }
 
-	private function sDeleteEsdArticleDownloads()
-	{
-		// Truncate tables
-		Shopware()->Db()->query("TRUNCATE s_articles_esd");
+    private function sDeleteEsdArticleDownloads()
+    {
+        // Truncate tables
+        Shopware()->Db()->query("TRUNCATE s_articles_esd");
 
-		// delete files
-		$this->clearFolder(
-				Shopware()->DocPath('files') . Shopware()->Config()->get('sESDKEY')
-		);
-	}
+        // delete files
+        $this->clearFolder(
+            Shopware()->DocPath('files') . Shopware()->Config()->get('sESDKEY')
+        );
+    }
 
-	/**
-	 * Cleans a folder
-	 *
-	 * @param $path string folder to clean
-	 * @param $type string file type of files - one of 'image' | null
-	 */
-	private function clearFolder($path, $type = null)
-	{
-		if($handle = opendir($path)) {
-			while(false !== ($file = readdir($handle))) {
-				switch($type) {
-					case 'image':
-						// only delete .jpg, .jpeg, .png and .gif; ignore case
-						if(preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
-							unlink($path . $file);
-						}
-						break;
-					default:
-						unlink($path . $file);
-				}
-			}
-		}
-	}
+    /**
+     * Cleans a folder
+     *
+     * @param $path string folder to clean
+     * @param $type string file type of files - one of 'image' | null
+     */
+    private function clearFolder($path, $type = null)
+    {
+        if ($handle = opendir($path)) {
+            while (false !== ($file = readdir($handle))) {
+                switch ($type) {
+                    case 'image':
+                        // only delete .jpg, .jpeg, .png and .gif; ignore case
+                        if (preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
+                            unlink($path . $file);
+                        }
+                        break;
+                    default:
+                        unlink($path . $file);
+                }
+            }
+        }
+    }
 }

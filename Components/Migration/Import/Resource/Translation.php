@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Translation extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -64,13 +64,13 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedTranslations', "Translations successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
@@ -98,17 +98,17 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductTranslations($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $taskStartTime = $this->initTaskTimer();
 
         while ($translation = $result->fetch()) {
 
             //Attribute
-            if(!empty($this->Request()->attribute)) {
-                foreach ($this->Request()->attribute as $source=>$target) {
-                    if(!empty($target) && isset($translation[$source])) {
+            if (!empty($this->Request()->attribute)) {
+                foreach ($this->Request()->attribute as $source => $target) {
+                    if (!empty($target) && isset($translation[$source])) {
                         $translation[$target] = $translation[$source];
                         unset($translation[$source]);
                     }
@@ -116,13 +116,13 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
             }
 
             //set the language id of the translation
-            if(isset($this->Request()->language[$translation['languageID']])) {
+            if (isset($this->Request()->language[$translation['languageID']])) {
                 $translation['languageID'] = $this->Request()->language[$translation['languageID']];
             }
 
             //get the product data
             $sql = '
-                SELECT ad.articleID, ad.id as articledetailsID, kind
+                SELECT ad.articleID, ad.id AS articledetailsID, kind
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
@@ -131,10 +131,10 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
             ';
             $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
-            if(!empty($product_data)) {
+            if (!empty($product_data)) {
                 $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(
-                    $product_data['kind']==1 ? 'article' : 'variant',
-                    $product_data['kind']==1 ? $product_data['articleID'] : $product_data['articledetailsID'],
+                    $product_data['kind'] == 1 ? 'article' : 'variant',
+                    $product_data['kind'] == 1 ? $product_data['articleID'] : $product_data['articledetailsID'],
                     $translation['languageID'],
                     $translation
                 );
@@ -148,6 +148,4 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
 
         return $this->getProgress()->done();
     }
-
-
 }

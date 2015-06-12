@@ -40,41 +40,44 @@
 class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Components_Migration_Profile
 {
     /**
-   	 * Returns the directory of the article images.
-   	 * @return string {String} | image path
-   	 */
-	public function getProductImagePath()
-	{
-		return 'images/product_images/original_images/';
-	}
+     * Returns the directory of the article images.
+     *
+     * @return string {String} | image path
+     */
+    public function getProductImagePath()
+    {
+        return 'images/product_images/original_images/';
+    }
 
     /**
-   	 * Returns the sql statement to select default shop system language
-   	 * @return string {String} | sql for default language
-   	 */
-	public function getDefaultLanguageSelect()
-	{
-		return "SELECT `languages_id` FROM {$this->quoteTable('languages')} ORDER BY `sort_order` ASC";
-	}
+     * Returns the sql statement to select default shop system language
+     *
+     * @return string {String} | sql for default language
+     */
+    public function getDefaultLanguageSelect()
+    {
+        return "SELECT `languages_id` FROM {$this->quoteTable('languages')} ORDER BY `sort_order` ASC";
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system languages
-   	 * @return string {String} | sql for languages
-   	 */
-	public function getLanguageSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system languages
+     *
+     * @return string {String} | sql for languages
+     */
+    public function getLanguageSelect()
+    {
+        return "
 			SELECT `languages_id` as id, `name`
 			FROM {$this->quoteTable('languages')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the property options of the shop
-   	 */
-   	public function getPropertyOptionSelect()
-   	{
-   		return "
+     * Returns the property options of the shop
+     */
+    public function getPropertyOptionSelect()
+    {
+        return "
    			SELECT DISTINCT
    			  o.products_options_name as name,
    			  o.products_options_name as id
@@ -85,90 +88,95 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
    			ON p.options_id = o.products_options_id
             AND o.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
    		";
-   	}
+    }
 
     /**
-   	 * Returns a dummy SQL statement with a default shop
-   	 * @return string {String} | sql for sub shops
-   	 */
-	public function getShopSelect()
-	{
-		return "
+     * Returns a dummy SQL statement with a default shop
+     *
+     * @return string {String} | sql for sub shops
+     */
+    public function getShopSelect()
+    {
+        return "
 			SELECT 1 as id, 'Default' as name
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer groups
-   	 * @return string {String} | sql for customer groups
-   	 */
-	public function getCustomerGroupSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer groups
+     *
+     * @return string {String} | sql for customer groups
+     */
+    public function getCustomerGroupSelect()
+    {
+        return "
 			SELECT `customers_status_id` as id, `customers_status_name` as name
 			FROM {$this->quoteTable('customers_status')}
 			WHERE language_id={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system payments
-   	 * @return string {String} | sql for the payments
-   	 */
-	public function getPaymentMeanSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system payments
+     *
+     * @return string {String} | sql for the payments
+     */
+    public function getPaymentMeanSelect()
+    {
+        return "
 			SELECT `payment_method` as id, `payment_class` as name
 			FROM {$this->quoteTable('orders')}
 			GROUP BY `payment_class`
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system order states
-   	 * @return string {String} | sql for the order states
-   	 */
-	public function getOrderStatusSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system order states
+     *
+     * @return string {String} | sql for the order states
+     */
+    public function getOrderStatusSelect()
+    {
+        return "
 			SELECT `orders_status_id` as id, `orders_status_name` as name
 			FROM {$this->quoteTable('orders_status')}
 			WHERE `language_id`={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system tax rates
-   	 * @return string {String} | sql for the tax rates
-   	 */
-	public function getTaxRateSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system tax rates
+     *
+     * @return string {String} | sql for the tax rates
+     */
+    public function getTaxRateSelect()
+    {
+        return "
 			SELECT `tax_class_id` as id, `tax_class_title` as name
 			FROM {$this->quoteTable('tax_class')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article attributes
-   	 * @return string {String} | sql for the article attributes
-   	 */
-	public function getAttributeSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article attributes
+     *
+     * @return string {String} | sql for the article attributes
+     */
+    public function getAttributeSelect()
+    {
+        return "
 				SELECT 'asin' as id, 'ASIN' as name
 		";
-	}
-
-
+    }
 
     /**
      * Returns the sql statement to select articles with
+     *
      * @param $id
      * @return string
      */
     public function getProductPropertiesSelect($id)
-   	{
+    {
         return "
             SELECT
                 ''                                      as 'group',
@@ -191,20 +199,21 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
             WHERE po.language_id = {$this->Db()->quote($this->getDefaultLanguage())}
             AND a.products_id = {$id}
         ";
-
-   	}
+    }
 
     /**
      * Get ids of all products with properties
+     *
      * @return string
      */
     public function getProductsWithPropertiesSelect()
-   	{
-   		return $this->getAttributedProductsSelect();
-   	}
+    {
+        return $this->getAttributedProductsSelect();
+    }
 
     /**
      * Get productIds for all products with attributes
+     *
      * @return string
      */
     public function getAttributedProductsSelect()
@@ -219,6 +228,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 
     /**
      * Select attributes for a given article
+     *
      * @param $id
      * @return string
      */
@@ -252,13 +262,14 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
     }
 
     /**
-   	 * Returns the sql statement to select the shop system articles
-   	 * @return string {String} | sql for the articles
-   	 */
-	public function getProductSelect()
-	{
-		return "
-			SELECT 
+     * Returns the sql statement to select the shop system articles
+     *
+     * @return string {String} | sql for the articles
+     */
+    public function getProductSelect()
+    {
+        return "
+			SELECT
 				a.products_id							as productID,
 
 				a.products_quantity						as instock,
@@ -299,27 +310,28 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			AND d.language_id={$this->Db()->quote($this->getDefaultLanguage())}
 
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article prices
-   	 * @return string {String} | sql for the article prices
-   	 */
-	public function getProductPriceSelect()
-	{
-		$sql = "
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        $sql = "
 			SELECT `customers_status_id`
 			FROM {$this->quoteTable('customers_status')}
 			WHERE `customers_status_graduated_prices`=1
 		";
-		$price_groups = $this->db->fetchCol($sql);
-		
-		$sql = array();
-		
-		if(!empty($price_groups)) {
-			foreach ($price_groups as $price_group) {
-				$sql[] = "
-					SELECT 
+        $price_groups = $this->db->fetchCol($sql);
+
+        $sql = array();
+
+        if (!empty($price_groups)) {
+            foreach ($price_groups as $price_group) {
+                $sql[] = "
+					SELECT
 						`products_id` as productID,
 						`quantity` as `from`,
 						`personal_offer` as `net_price`,
@@ -328,18 +340,20 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 					WHERE `personal_offer`!=0
 					ORDER BY productID, `from`
 				";
-			}
-		}
-		return '('.implode(') UNION ALL (', $sql).')';
-	}
+            }
+        }
+
+        return '(' . implode(') UNION ALL (', $sql) . ')';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article image allocation
-   	 * @return string {String} | sql for the article image allocation
-   	 */
-	public function getProductImageSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article image allocation
+     *
+     * @return string {String} | sql for the article image allocation
+     */
+    public function getProductImageSelect()
+    {
+        return "
 			(
 				SELECT `products_id` as productID, `products_image` as image, 1 as main, 0 as position
 				FROM {$this->quoteTable('products')}
@@ -349,16 +363,17 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				FROM {$this->quoteTable('products_images')}
 			)
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article translations
-   	 * @return string {String} | sql for the article translations
-   	 */
-	public function getProductTranslationSelect()
-	{
-		return "
-			SELECT 
+     * Returns the sql statement to select the shop system article translations
+     *
+     * @return string {String} | sql for the article translations
+     */
+    public function getProductTranslationSelect()
+    {
+        return "
+			SELECT
 				d.products_id 					as productID,
 				d.language_id 					as languageID,
 				d.products_name 				as name,
@@ -368,50 +383,56 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				d.products_meta_title			as meta_title,
 				d.products_meta_description 	as meta_description,
 				d.products_meta_keywords		as keywords
-			FROM {$this->quoteTable('products_description', 'd')}  
+			FROM {$this->quoteTable('products_description', 'd')}
 			WHERE `language_id`!={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article relations
-   	 * @return string {String} | sql for the article relations
-   	 */
-	public function getProductRelationSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article relations
+     *
+     * @return string {String} | sql for the article relations
+     */
+    public function getProductRelationSelect()
+    {
+        return "
 			SELECT `products_id` as productID, `xsell_id` as relatedID, `products_xsell_grp_name_id` as groupID
 			FROM {$this->quoteTable('products_xsell')}
 		";
-	}
+    }
 
     /**
      * This function creates an database index on the orders table
+     *
      * @param int $offset
      * @return Zend_Db_Statement_Interface
      */
-	public function queryCustomers($offset=0)
-	{
-		if($offset===0) {
-			try {
-				$sql = 'ALTER TABLE `orders` DROP INDEX `customers_id`;';
-				$this->Db()->exec($sql);
-			} catch (Exception $e) {}
-			try {
-				$sql = 'ALTER TABLE `orders` ADD INDEX ( `customers_id` );';
-				$this->Db()->exec($sql);
-			} catch (Exception $e) {}
-		}
-		return parent::queryCustomers($offset);
-	}
+    public function queryCustomers($offset = 0)
+    {
+        if ($offset === 0) {
+            try {
+                $sql = 'ALTER TABLE `orders` DROP INDEX `customers_id`;';
+                $this->Db()->exec($sql);
+            } catch (Exception $e) {
+            }
+            try {
+                $sql = 'ALTER TABLE `orders` ADD INDEX ( `customers_id` );';
+                $this->Db()->exec($sql);
+            } catch (Exception $e) {
+            }
+        }
+
+        return parent::queryCustomers($offset);
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getCustomerSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getCustomerSelect()
+    {
+        return "
 			SELECT
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
@@ -453,28 +474,30 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			LEFT JOIN {$this->quoteTable('countries', 'c')}
 			ON c.countries_id=a.entry_country_id
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article category allocation
-   	 * @return string {String} | sql for the article category allocation
-   	 */
-	public function getProductCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article category allocation
+     *
+     * @return string {String} | sql for the article category allocation
+     */
+    public function getProductCategorySelect()
+    {
+        return "
 			SELECT `products_id` as productID, `categories_id` as categoryID
 			FROM {$this->quoteTable('products_to_categories')}
 			ORDER BY `products_id`
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system categories
-   	 * @return string {String} | sql for the categories
-   	 */
-	public function getCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system categories
+     *
+     * @return string {String} | sql for the categories
+     */
+    public function getCategorySelect()
+    {
+        return "
 			SELECT
 				co.categories_id as categoryID,
 				parent_id as parentID,
@@ -486,23 +509,24 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				categories_meta_description as metaDescription,
 				categories_heading_title as cmsheadline,
 				categories_description as cmstext,
-				categories_status as active		
-			FROM 
+				categories_status as active
+			FROM
 				{$this->quoteTable('categories', 'co')},
 				{$this->quoteTable('categories_description', 'cd')}
 			WHERE co.categories_id=cd.categories_id
 
 			ORDER BY parent_id
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article ratings
-   	 * @return string {String} | sql for the article ratings
-   	 */
-	public function getProductRatingSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article ratings
+     *
+     * @return string {String} | sql for the article ratings
+     */
+    public function getProductRatingSelect()
+    {
+        return "
 			SELECT
 				`products_id` as `productID`,
 				r.`customers_id` as `customerID`,
@@ -521,15 +545,16 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			LEFT JOIN {$this->quoteTable('customers', 'c')}
 			ON r.customers_id=c.customers_id
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getOrderSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getOrderSelect()
+    {
+        return "
 			SELECT
 				o.`orders_id`									as orderID,
 				o.`orders_id`									as ordernumber,
@@ -537,7 +562,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				o.`customers_vat_id`							as ustid,
 				
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms')	as billing_salutation,
-				`billing_firstname`, 
+				`billing_firstname`,
 				`billing_lastname`,
 				`billing_company`,
 				-- `billing_company_2`,
@@ -546,7 +571,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				-- `billing_suburb`,
 				`billing_city`,
 				`billing_postcode`								as billing_zipcode,
-				`billing_country_iso_code_2`					as billing_countryiso,		
+				`billing_country_iso_code_2`					as billing_countryiso,
 						
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms') as shipping_salutation,
 				`delivery_firstname`							as shipping_firstname,
@@ -618,19 +643,20 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			ON a.customers_id=u.customers_id
 			AND a.address_book_id=u.customers_default_address_id
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select all shop system order details
-   	 * @return string {String} | sql for order details
-   	 */
-	public function getOrderDetailSelect()
-	{
-		return "
+     * Returns the sql statement to select all shop system order details
+     *
+     * @return string {String} | sql for order details
+     */
+    public function getOrderDetailSelect()
+    {
+        return "
             SELECT
-                products.`orders_id` as orderID,
-                `products_id` as productID,
-                `products_model` as article_ordernumber,
+                products.`orders_id` AS orderID,
+                `products_id` AS productID,
+                `products_model` AS article_ordernumber,
 
                 IFNULL(CONCAT(
                     products.products_name,
@@ -639,9 +665,9 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
                     ' (',
                     GROUP_CONCAT(attributes.products_options SEPARATOR ', '),
                     ')'
-                ), products.products_name) as name,
-                `products_price` as price,
-                `products_quantity` as quantity
+                ), products.products_name) AS name,
+                `products_price` AS price,
+                `products_quantity` AS quantity
 
             FROM orders_products products
 
@@ -651,8 +677,5 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 
             GROUP BY (products.orders_products_id)
 		";
-	}
-
-
-
+    }
 }

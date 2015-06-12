@@ -26,6 +26,7 @@
  * Simple decorator for the source database: Will log certain queries to media/temp/migration.log
  *
  * Class Shopware_Components_Migration_DbDecorator
+ *
  * @category Shopware
  * @package Shopware\Plugins\SwagMigration\Components\Migration
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
@@ -34,12 +35,14 @@ class Shopware_Components_Migration_DbDecorator
 {
     /**
      * The decorated Zend_Db instance
+     *
      * @var
      */
     protected $instance;
 
     /**
      * Logable method calls
+     *
      * @var array
      */
     protected $logable = array(
@@ -55,6 +58,7 @@ class Shopware_Components_Migration_DbDecorator
 
     /**
      * Constructor: Set the decorated class as $this->instance
+     *
      * @param $instance
      */
     public function __construct($instance)
@@ -88,21 +92,21 @@ class Shopware_Components_Migration_DbDecorator
         $length = array();
         foreach ($rows as $r) {
             foreach ($r as $c => $column) {
-                $length[$c] =  strlen($column) > $length[$c] ? strlen($column) : $length[$c];
+                $length[$c] = strlen($column) > $length[$c] ? strlen($column) : $length[$c];
             }
         }
 
         // format the rows
         $result = array();
-        foreach($rows as &$row) {
+        foreach ($rows as &$row) {
             foreach ($row as $c => &$column) {
                 $column = sprintf("%-{$length[$c]}s", $column);
             }
             $result[] = implode(" | ", $row);
         }
+
         // Concatenate the rows with newline chars
         return implode("\r\n", $result);
-
     }
 
     /**
@@ -130,7 +134,6 @@ class Shopware_Components_Migration_DbDecorator
         }
 
         return $result;
-
     }
 
     /**
@@ -139,7 +142,8 @@ class Shopware_Components_Migration_DbDecorator
      * @param $key
      * @return mixed
      */
-    public function __get($key) {
+    public function __get($key)
+    {
         return $this->instance->$key;
     }
 
@@ -150,7 +154,8 @@ class Shopware_Components_Migration_DbDecorator
      * @param $value
      * @return mixed
      */
-    public function __set($key, $value) {
+    public function __set($key, $value)
+    {
         return $this->instance->$key = $value;
     }
 
@@ -170,8 +175,7 @@ class Shopware_Components_Migration_DbDecorator
         $path .= '.log';
 
 
-        error_log(print_r($data, true)."\r\n", '3', $path);
-
+        error_log(print_r($data, true) . "\r\n", '3', $path);
     }
 
     /**
@@ -212,14 +216,14 @@ class Shopware_Components_Migration_DbDecorator
 
         try {
             $explained = $this->explain($args);
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             $explained = "";
         }
 
 
         try {
             $this->debug("\r\nExplain:\r\n" . print_r($explained, true) . "\r\n");
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             // Query is not explainable
         }
 
