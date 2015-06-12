@@ -310,7 +310,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         echo Zend_Json::encode(array('data' => $rows, 'count' => count($rows)));
     }
 
-
     /**
      * This function returns the mapping list for the left grid
      */

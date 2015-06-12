@@ -23,7 +23,7 @@ Zur Zeit unterstützt das Tool:
 * xt:Commerce Veyton
 * Gambio GX
 * xtModified & xt:Commerce bis 3.04
-* Prestashop bis 1.5.3.1
+* Prestashop bis 1.6.14
 
 Mit der Veröffentlichung des Migrations-Tools unter AGPL soll die Möglichkeit geschaffen werden, Änderungen aus der Community schneller in das Tool zurück fließen zu lassen. Außerdem soll es erleichtert werden, das Tool um eigene Profile zu erweitern, um auch Shopsysteme anzubinden, für die es bisher keinen Migrationsweg gibt.
 
