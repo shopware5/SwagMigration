@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -64,6 +64,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -102,7 +103,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
             return $this->getProgress()->done();
         }
 
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
@@ -129,12 +130,12 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
                 }
 
                 // In SW a product can only have *ONE* property group associated
-                if(empty($property['group'])
+                if (empty($property['group'])
                     && isset($this->Request()->property_options[$property['option']])
                     && !empty($this->Request()->property_options[$property['option']])
                 ) {
                     $property['group'] = $this->Request()->property_options[$property['option']];
-                } elseif(empty($property['group'])) {
+                } elseif (empty($property['group'])) {
                     $property['group'] = 'Properties';
                 }
                 $groupName = $property['group'];
@@ -174,26 +175,26 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
      *
      * Example Array:
      *
-     *	array(
-     *		'productID' => 12,
-     * 		'group' =>	array (
-     *		     'id' => 33,
-     *			'name' => 'Edelbrände',
-     *			'position' => 0,
-     *			'comparable' => true,
-     *			'sortmode' => 3,
-     *			'options' => array(
-     *				'name' => 'test',
-     *				'id' => 3,
-     *				'filterable' => true,
-     *				'default' => ''
-     *				'values' => array(
-     *					array('position' => 3, 'value' => 'Mein Wert'),
-     *					array('position' => 3, 'value' => 'Mein Wert2')
-     *				)
-     *			)
-     *		)
-     *	)
+     *    array(
+     *        'productID' => 12,
+     *        'group' =>    array (
+     *             'id' => 33,
+     *            'name' => 'Edelbrände',
+     *            'position' => 0,
+     *            'comparable' => true,
+     *            'sortmode' => 3,
+     *            'options' => array(
+     *                'name' => 'test',
+     *                'id' => 3,
+     *                'filterable' => true,
+     *                'default' => ''
+     *                'values' => array(
+     *                    array('position' => 3, 'value' => 'Mein Wert'),
+     *                    array('position' => 3, 'value' => 'Mein Wert2')
+     *                )
+     *            )
+     *        )
+     *    )
      *
      * @param $data
      * @return bool
@@ -213,29 +214,31 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
         if (isset($group['id'])) {
             $sql = "SELECT `id` FROM `s_filter` WHERE `id` = ?";
             $groupId = Shopware()->Db()->fetchOne($sql, array($group['id']));
-        }elseif (isset($group['name'])) {
+        } elseif (isset($group['name'])) {
             $sql = "SELECT `id` FROM `s_filter` WHERE `name` = ?";
             $groupId = Shopware()->Db()->fetchOne($sql, array($group['name']));
-        }else{
+        } else {
             error_log("no group info passed");
+
             return;
         }
 
-        if(false == $groupId && isset($group['name'])) {
+        if (false == $groupId && isset($group['name'])) {
             $sql = 'INSERT INTO `s_filter` (`name`, `position`, `comparable`, `sortmode`) VALUES(?, ?, ?, ?)';
             Shopware()->Db()->query($sql, array($group['name'], $group['position'], $group['comparable'], $group['sortmode']));
             $groupId = Shopware()->Db()->lastInsertId();
         }
 
-        if(false === $groupId) {
+        if (false === $groupId) {
             error_log("no group not found");
+
             return false;
         }
 
         /**
          * Get existing options or create new ones
          */
-        foreach($group['options'] as &$option) {
+        foreach ($group['options'] as &$option) {
             $option['filterable'] = isset($group['filterable']) ? (int) $group['filterable'] : 1;
             $option['default'] = isset($group['default']) ? $group['default'] : '';
 
@@ -246,7 +249,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 					WHERE o.`id` = ?
 				";
                 $optionId = Shopware()->Db()->fetchOne($sql, array($option['id']));
-            }elseif (isset($option['name'])) {
+            } elseif (isset($option['name'])) {
                 // First try to get option by name with associated group
                 $sql = "
 					SELECT o.`id`
@@ -277,8 +280,9 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
                 $optionId = Shopware()->Db()->lastInsertId();
             }
 
-            if(false === $optionId) {
+            if (false === $optionId) {
                 error_log("option not found");
+
                 return false;
             }
 
@@ -287,7 +291,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
             Shopware()->Db()->query($sql, array($groupId, $optionId));
 
 
-            foreach($option['values'] as &$value) {
+            foreach ($option['values'] as &$value) {
                 $value['position'] = isset($value['position']) ? $value['position'] : '';
 
 
@@ -298,7 +302,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 						WHERE v.`id` = ?
 					";
                     $valueId = Shopware()->Db()->fetchOne($sql, array($value['id']));
-                }elseif (isset($value['value'])) {
+                } elseif (isset($value['value'])) {
                     // Try to get value by value with associated option
                     $sql = "
 						SELECT v.`id`
@@ -316,21 +320,19 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
                     $valueId = Shopware()->Db()->lastInsertId();
                 }
 
-                if(false === $valueId) {
+                if (false === $valueId) {
                     error_log("value not found");
+
                     return false;
                 }
 
                 // Finally assign filter values to article
                 $sql = 'INSERT IGNORE INTO `s_filter_articles` (`articleID`, `valueID`) VALUES (?, ?)';
                 Shopware()->Db()->query($sql, array($productId, $valueId));
-
             }
-
         }
 
         // Set filter group for the given article
         Shopware()->Db()->query('UPDATE s_articles SET filtergroupID = ? WHERE id = ?', array($groupId, $productId));
-
     }
 }

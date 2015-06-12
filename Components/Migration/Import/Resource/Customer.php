@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -61,6 +61,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -96,40 +97,42 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         $salt = $this->Request()->salt;
 
         $result = $this->Source()->queryCustomers($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
 
         while ($customer = $result->fetch()) {
-            if(isset($customer['customergroupID']) && isset($this->Request()->customer_group[$customer['customergroupID']])) {
+            if (isset($customer['customergroupID'])
+                && isset($this->Request()->customer_group[$customer['customergroupID']])
+            ) {
                 $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
             }
             unset($customer['customergroupID']);
-            if(isset($customer['subshopID']) && isset($this->Request()->shop[$customer['subshopID']])) {
+            if (isset($customer['subshopID']) && isset($this->Request()->shop[$customer['subshopID']])) {
                 $customer['subshopID'] = $this->Request()->shop[$customer['subshopID']];
             } else {
                 unset($customer['subshopID']);
             }
-            if(isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
+            if (isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
                 $customer['language'] = $this->Request()->language[$customer['language']];
             } else {
                 unset($customer['language']);
             }
-            if(!empty($customer['billing_countryiso'])) {
+            if (!empty($customer['billing_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($customer['billing_countryiso']));
+                $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($customer['billing_countryiso']));
             }
-            if(isset($customer['shipping_countryiso'])) {
+            if (isset($customer['shipping_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($customer['shipping_countryiso']));
+                $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($customer['shipping_countryiso']));
             }
 
-            if(!isset($customer['paymentID'])) {
+            if (!isset($customer['paymentID'])) {
                 $customer['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
-            if(!empty($customer['md5_password']) && !empty($salt)) {
+            if (!empty($customer['md5_password']) && !empty($salt)) {
                 $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
             }
 
@@ -142,14 +145,13 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                 }
             }
 
-            if($this->isShopwareFive()) {
+            if ($this->isShopwareFive()) {
                 if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
                     $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
                 }
             }
 
-
-            if(!empty($customer['shipping_company'])||!empty($customer['shipping_firstname'])||!empty($customer['shipping_lastname'])) {
+            if (!empty($customer['shipping_company']) || !empty($customer['shipping_firstname']) || !empty($customer['shipping_lastname'])) {
                 $customer_shipping = array(
                     'company' => !empty($customer['shipping_company']) ? $customer['shipping_company'] : '',
                     'department' => !empty($customer['shipping_department']) ? $customer['shipping_department'] : '',
@@ -172,25 +174,31 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
 
             $customer_result = Shopware()->Api()->Import()->sCustomer($customer);
 
-            if(!empty($customer_result)) {
+            if (!empty($customer_result)) {
                 $customer = array_merge($customer, $customer_result);
 
-                if(!empty($customer_shipping)) {
+                if (!empty($customer_shipping)) {
                     $customer_shipping['userID'] = $customer['userID'];
                     Shopware()->Db()->insert('s_user_shippingaddress', $customer_shipping);
                 }
 
-                if(!empty($customer['account'])) {
+                if (!empty($customer['account'])) {
                     $this->importCustomerDebit($customer);
                 }
-
 
                 $sql = '
                     INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
                     VALUES (?, ?, ?)
                     ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
                 ';
-                Shopware()->Db()->query($sql , array(Shopware_Components_Migration::MAPPING_CUSTOMER, $customer['customerID'], $customer['userID']));
+                Shopware()->Db()->query(
+                    $sql,
+                    array(
+                        Shopware_Components_Migration::MAPPING_CUSTOMER,
+                        $customer['customerID'],
+                        $customer['userID']
+                    )
+                );
             }
             $this->increaseProgress();
 
@@ -200,7 +208,6 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         }
 
         return $this->getProgress()->done();
-
     }
 
     /**
@@ -233,6 +240,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         }
 
         Shopware()->Db()->insert('s_user_debit', $customer);
+
         return true;
     }
 
@@ -246,7 +254,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
         if (version_compare(Shopware::VERSION, '5.0.0', '>=') || Shopware::VERSION == '___VERSION___') {
             return true;
         }
+
         return false;
     }
-
 }

@@ -35,33 +35,36 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
 {
     /**
      * Prefix of each shopware database table.
+     *
      * @var string
      */
     protected $db_prefix = 's_';
 
-	/**
-	 * Returns the property options of the shop
-	 */
-	public function getPropertyOptionSelect()
-	{
-		return "
+    /**
+     * Returns the property options of the shop
+     */
+    public function getPropertyOptionSelect()
+    {
+        return "
 			SELECT name as name, name as id FROM {$this->quoteTable('filter')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select default shopware language
-   	 * @return string {String} | sql for default language
-   	 */
+     * Returns the sql statement to select default shopware language
+     *
+     * @return string {String} | sql for default language
+     */
     public function getDefaultLanguageSelect()
     {
         return 'SELECT `isocode` FROM `s_core_multilanguage` WHERE `default` =1';
     }
 
     /**
-   	 * Returns the sql statement to select the shop system sub shops
-   	 * @return string {String} | sql for sub shops
-   	 */
+     * Returns the sql statement to select the shop system sub shops
+     *
+     * @return string {String} | sql for sub shops
+     */
     public function getShopSelect()
     {
         return "
@@ -71,9 +74,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system languages
-   	 * @return string {String} | sql for languages
-   	 */
+     * Returns the sql statement to select the shop system languages
+     *
+     * @return string {String} | sql for languages
+     */
     public function getLanguageSelect()
     {
         return "
@@ -90,9 +94,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system customer groups
-   	 * @return string {String} | sql for customer groups
-   	 */
+     * Returns the sql statement to select the shop system customer groups
+     *
+     * @return string {String} | sql for customer groups
+     */
     public function getCustomerGroupSelect()
     {
         return "
@@ -102,9 +107,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system price groups
-   	 * @return string {String} | sql for price groups
-   	 */
+     * Returns the sql statement to select the shop system price groups
+     *
+     * @return string {String} | sql for price groups
+     */
     public function getPriceGroupSelect()
     {
         return "
@@ -114,9 +120,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system payments
-   	 * @return string {String} | sql for the payments
-   	 */
+     * Returns the sql statement to select the shop system payments
+     *
+     * @return string {String} | sql for the payments
+     */
     public function getPaymentMeanSelect()
     {
         return "
@@ -127,9 +134,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system order states
-   	 * @return string {String} | sql for the order states
-   	 */
+     * Returns the sql statement to select the shop system order states
+     *
+     * @return string {String} | sql for the order states
+     */
     public function getOrderStatusSelect()
     {
         return "
@@ -141,9 +149,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system tax rates
-   	 * @return string {String} | sql for the tax rates
-   	 */
+     * Returns the sql statement to select the shop system tax rates
+     *
+     * @return string {String} | sql for the tax rates
+     */
     public function getTaxRateSelect()
     {
         return "
@@ -153,9 +162,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system article attributes
-   	 * @return string {String} | sql for the article attributes
-   	 */
+     * Returns the sql statement to select the shop system article attributes
+     *
+     * @return string {String} | sql for the article attributes
+     */
     public function getAttributeSelect()
     {
         return "
@@ -168,9 +178,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system suppliers
-   	 * @return string {String} | sql for the suppliers
-   	 */
+     * Returns the sql statement to select the shop system suppliers
+     *
+     * @return string {String} | sql for the suppliers
+     */
     public function getSupplierSelect()
     {
         return "
@@ -181,9 +192,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system categories
-   	 * @return string {String} | sql for the categories
-   	 */
+     * Returns the sql statement to select the shop system categories
+     *
+     * @return string {String} | sql for the categories
+     */
     public function getCategorySelect()
     {
         return "
@@ -193,9 +205,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system articles
-   	 * @return string {String} | sql for the articles
-   	 */
+     * Returns the sql statement to select the shop system articles
+     *
+     * @return string {String} | sql for the articles
+     */
     public function getProductSelect()
     {
         return "
@@ -205,9 +218,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
     public function getOrderSelect()
     {
         return "
@@ -217,9 +231,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
     public function getCustomerSelect()
     {
         return "
@@ -229,9 +244,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system article image allocation
-   	 * @return string {String} | sql for the article image allocation
-   	 */
+     * Returns the sql statement to select the shop system article image allocation
+     *
+     * @return string {String} | sql for the article image allocation
+     */
     public function getProductImageSelect()
     {
         return "
@@ -241,9 +257,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system article ratings
-   	 * @return string {String} | sql for the article ratings
-   	 */
+     * Returns the sql statement to select the shop system article ratings
+     *
+     * @return string {String} | sql for the article ratings
+     */
     public function getProductRatingSelect()
     {
         return "
@@ -253,9 +270,10 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     }
 
     /**
-   	 * Returns the sql statement to select the shop system article prices
-   	 * @return string {String} | sql for the article prices
-   	 */
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
     public function getProductPriceSelect()
     {
         return "

@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -64,6 +64,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -101,6 +102,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
         if (empty($products_result)) {
             $this->getProgress()->addRequestParam('import_generate_variants', null);
             $this->getProgress()->addRequestParam('import_create_configurator_variants', null);
+
             return $this->getProgress()->done();
         }
 
@@ -134,6 +136,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
 
             $this->getProgress()->addRequestParam('params', $params);
             $this->getProgress()->addRequestParam('create_variants', true);
+
             return $this->getProgress();
         }
 
@@ -143,6 +146,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
     /**
      * Helper function which gets the configurator groups for
      * a given product
+     *
      * @param $productId
      * @return Array
      */
@@ -150,13 +154,12 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
     {
         // get configurator groups for the given product
         $builder = Shopware()->Models()->createQueryBuilder();
-        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))->from(
-                    'Shopware\Models\Article\Article',
-                    'article'
-                )->innerJoin('article.configuratorSet', 'configuratorSet')->leftJoin(
-                    'configuratorSet.groups',
-                    'groups'
-                )->where('article.id = ?1')->setParameter(1, $productId);
+        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
+                ->from('Shopware\Models\Article\Article', 'article')
+                ->innerJoin('article.configuratorSet', 'configuratorSet')
+                ->leftJoin('configuratorSet.groups', 'groups')
+                ->where('article.id = ?1')
+                ->setParameter(1, $productId);
 
         $result = array_pop($builder->getQuery()->getArrayResult());
 
@@ -167,7 +170,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
         // this relation seems not to be available in the configurator models
         // (the configuratorSet-Model returns all group's options, even those
         // not related to the given set)
-        $sql = "SELECT options.group_id, true as active, options.id FROM `s_article_configurator_sets` sets
+        $sql = "SELECT options.group_id, TRUE AS active, options.id FROM `s_article_configurator_sets` sets
 
 	     LEFT JOIN s_article_configurator_set_option_relations relations
 	     ON relations.set_id = sets.id

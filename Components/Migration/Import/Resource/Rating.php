@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -61,13 +61,13 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedRatings', "Ratings successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
@@ -95,7 +95,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductRatings();
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
 
@@ -110,7 +110,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
             ';
             $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
-            if(empty($rating['articleID'])) {
+            if (empty($rating['articleID'])) {
                 continue;
             }
 
@@ -121,13 +121,16 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 AND `name` LIKE ?
                 AND `email`=?
             ';
-            $ratingID = Shopware()->Db()->fetchOne($sql, array(
-                $rating['articleID'],
-                $rating['name'],
-                !empty($rating['email']) ? $rating['email'] : 'NOW()'
-            ));
+            $ratingID = Shopware()->Db()->fetchOne(
+                $sql,
+                array(
+                    $rating['articleID'],
+                    $rating['name'],
+                    !empty($rating['email']) ? $rating['email'] : 'NOW()'
+                )
+            );
 
-            if(!empty($ratingID)) {
+            if (!empty($ratingID)) {
                 continue;
             }
 
@@ -136,13 +139,12 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 'name' => !empty($rating['name']) ? $rating['name'] : '',
                 'headline' => !empty($rating['title']) ? $rating['title'] : '',
                 'comment' => !empty($rating['comment']) ? $rating['comment'] : '',
-                'points' =>  isset($rating['rating']) ? (float) $rating['rating'] : 5,
+                'points' => isset($rating['rating']) ? (float) $rating['rating'] : 5,
                 'datum' => isset($rating['date']) ? $rating['date'] : new Zend_Db_Expr('NOW()'),
                 'active' => isset($rating['active']) ? $rating['active'] : 1,
                 'email' => !empty($rating['email']) ? $rating['email'] : '',
             );
             Shopware()->Db()->insert('s_articles_vote', $data);
-
         }
 
         return $this->getProgress()->done();

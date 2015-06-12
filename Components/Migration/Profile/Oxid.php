@@ -33,148 +33,160 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 {
     /**
      * Database prefix
+     *
      * @var string
      */
-	protected $db_prefix = 'ox';
+    protected $db_prefix = 'ox';
 
-	/**
-	 * Returns a select for a rough estimation for the total number of entities
-	 *
-	 * @param $for
-	 * @return string
-	 */
-	public function getEstimationSelect($for)
-	{
-		switch ($for) {
-			case 'properties':
-				return "
+    /**
+     * Returns a select for a rough estimation for the total number of entities
+     *
+     * @param $for
+     * @return string
+     */
+    public function getEstimationSelect($for)
+    {
+        switch ($for) {
+            case 'properties':
+                return "
 					SELECT COUNT(*)
 					FROM {$this->quoteTable('object2attribute', o2a)}
 					INNER JOIN {$this->quoteTable('articles', a)}
 					ON a.OXID = o2a.OXOBJECTID
 				";
-				break;
-			default:
-				return 'SELECT 0;';
-		}
-	}
+                break;
+            default:
+                return 'SELECT 0;';
+        }
+    }
 
     /**
-   	 * Returns the directory of the article images.
-   	 * @return string {String} | image path
-   	 */
-	public function getProductImagePath()
-	{
-		return 'out/pictures/master/product/';
-	}
+     * Returns the directory of the article images.
+     *
+     * @return string {String} | image path
+     */
+    public function getProductImagePath()
+    {
+        return 'out/pictures/master/product/';
+    }
 
     /**
-   	 * Returns the sql statement to select the config base path
-   	 * @return string {String} | sql for the config base path
-   	 */
-	public function getConfigSelect()
-	{
-		return "
+     * Returns the sql statement to select the config base path
+     *
+     * @return string {String} | sql for the config base path
+     */
+    public function getConfigSelect()
+    {
+        return "
 			SELECT `OXVARNAME` as name, DECODE(`OXVARVALUE`, 'fq45QS09_fqyx09239QQ') as value, `OXVARTYPE` as type
 			FROM {$this->quoteTable('config')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the shop system languages
-   	 * @return array {Array} | languages
-   	 */
-	public function getLanguages()
-	{
-		return $this->Config()->aLanguages;
-	}
+     * Returns the shop system languages
+     *
+     * @return array {Array} | languages
+     */
+    public function getLanguages()
+    {
+        return $this->Config()->aLanguages;
+    }
 
     /**
      * Returns the keys of the shop system languages
+     *
      * @return array
      */
-	public function getLanguageKeys()
-	{
-		$keys = array();
-		$params = $this->Config()->aLanguageParams;
-		foreach ($params as $id => $param) {
-			$keys[$param['baseId']] = $id;
-		}
-		return $keys;
-	}
+    public function getLanguageKeys()
+    {
+        $keys = array();
+        $params = $this->Config()->aLanguageParams;
+        foreach ($params as $id => $param) {
+            $keys[$param['baseId']] = $id;
+        }
 
-	/**
-	 * Returns the property options of the shop
-	 */
-	public function getPropertyOptionSelect()
-	{
-		return "
-			SELECT OXTITLE as name, OXTITLE as id FROM {$this->quoteTable('attribute')}
-		";
-	}
+        return $keys;
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system sub shops
-   	 * @return string {String} | sql for sub shops
-   	 */
-	public function getShopSelect()
-	{
-		return "
+     * Returns the property options of the shop
+     */
+    public function getPropertyOptionSelect()
+    {
+        return "
+			SELECT OXTITLE as name, OXTITLE as id FROM {$this->quoteTable('attribute')}
+		";
+    }
+
+    /**
+     * Returns the sql statement to select the shop system sub shops
+     *
+     * @return string {String} | sql for sub shops
+     */
+    public function getShopSelect()
+    {
+        return "
 			SELECT `OXID` as id, `OXNAME` as name, `OXURL` as url
 			FROM {$this->quoteTable('shops')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system price groups
-   	 * @return string {String} | sql for price groups
-   	 */
-	public function getPriceGroupSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system price groups
+     *
+     * @return string {String} | sql for price groups
+     */
+    public function getPriceGroupSelect()
+    {
+        return "
 			SELECT `OXID` as id, `OXTITLE` as name
 			FROM {$this->quoteTable('groups')}
 			WHERE `OXID` LIKE 'oxidprice%'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system payments
-   	 * @return string {String} | sql for the payments
-   	 */
-	public function getPaymentMeanSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system payments
+     *
+     * @return string {String} | sql for the payments
+     */
+    public function getPaymentMeanSelect()
+    {
+        return "
 			SELECT `OXID` , `OXDESC`
 			FROM {$this->quoteTable('payments')}
 		";
-	}
+    }
 
     /**
-   	 * Returns an array of the order states mapping, with keys and descriptions
-   	 * @return array {Array} | order states: key - description
-   	 */
-	public function getOrderStatus()
-	{
-		$status = array();
-		$keys = array_keys($this->Config()->aOrderfolder);
-		$values = array(
-			'ORDERFOLDER_NEW'                               => 'Neu',
-			'ORDERFOLDER_FINISHED'                          => 'Bearbeitet',
-			'ORDERFOLDER_PROBLEMS'                          => 'Probleme'
-		);
-		foreach ($keys as $key) {
-			$status[$key] = isset($values[$key]) ? $values[$key] : $key;
-		}
-		return $status;
-	}
+     * Returns an array of the order states mapping, with keys and descriptions
+     *
+     * @return array {Array} | order states: key - description
+     */
+    public function getOrderStatus()
+    {
+        $status = array();
+        $keys = array_keys($this->Config()->aOrderfolder);
+        $values = array(
+            'ORDERFOLDER_NEW' => 'Neu',
+            'ORDERFOLDER_FINISHED' => 'Bearbeitet',
+            'ORDERFOLDER_PROBLEMS' => 'Probleme'
+        );
+        foreach ($keys as $key) {
+            $status[$key] = isset($values[$key]) ? $values[$key] : $key;
+        }
+
+        return $status;
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getCustomerSelect()
-	{
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getCustomerSelect()
+    {
 
         /**
          * Intentionally do not join last orders shipping address in order to get customers shipping address
@@ -221,16 +233,17 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
 		";
-	}
+    }
 
-	/**
-	 * Returns the sql statement to select articles with
+    /**
+     * Returns the sql statement to select articles with
+     *
      * @param $id int Id of the product to query
-	 * @return string
-	 */
-	public function getProductPropertiesSelect($id)
-	{
-		return "
+     * @return string
+     */
+    public function getProductPropertiesSelect($id)
+    {
+        return "
 			SELECT
 				p.OXID				as productID,
 				''					as 'group',
@@ -247,29 +260,31 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			WHERE p.OXID = '{$id}'
 		";
-	}
+    }
 
     /**
      * Select all products ifs of products with properties
+     *
      * @return string
      */
     public function getProductsWithPropertiesSelect()
-	{
-		return "
+    {
+        return "
 			SELECT a.OXID as productID
 			FROM {$this->quoteTable('articles', a)}
 			INNER JOIN {$this->quoteTable('object2attribute', o2a)}
 			ON a.OXID = o2a.OXOBJECTID
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system articles
-   	 * @return string {String} | sql for the articles
-   	 */
-	public function getProductSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system articles
+     *
+     * @return string {String} | sql for the articles
+     */
+    public function getProductSelect()
+    {
+        return "
                 SELECT
 				a.OXID 				as `productID`,
 				a.OXPARENTID 		as `parentID`,
@@ -327,15 +342,16 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			-- Make sure to no import children products before the parent was imported
 			ORDER BY `parentID`
         ";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article prices
-   	 * @return string {String} | sql for the article prices
-   	 */
-	public function getProductPriceSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        return "
 
 			SELECT
 				`OXID` as productID,
@@ -346,7 +362,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('articles')}
 			WHERE `OXPRICEA`!=0
 		 UNION ALL
-			SELECT 
+			SELECT
 				`OXID` as productID,
 				1 as `from`,
 				`OXPRICEB` as `price`,
@@ -355,7 +371,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('articles')}
 			WHERE `OXPRICEB`!=0
 		UNION ALL
-			SELECT 
+			SELECT
 				`OXID` as productID,
 				1 as `from`,
 				`OXPRICEC` as `price`,
@@ -373,38 +389,41 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			FROM {$this->quoteTable('price2article')}
 			ORDER BY productID, `from`
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article image allocation
-   	 * @return string {String} | sql for the article image allocation
-   	 */
-	public function getProductImageSelect()
-	{
-		$sql = array();
-		for ($i=1;$i<=12;$i++) {
-			$sql[] = "
+     * Returns the sql statement to select the shop system article image allocation
+     *
+     * @return string {String} | sql for the article image allocation
+     */
+    public function getProductImageSelect()
+    {
+        $sql = array();
+        for ($i = 1; $i <= 12; $i++) {
+            $sql[] = "
 				SELECT OXID as `productID`, CONCAT('$i/', OXPIC$i) as `image`, $i as `position`, IF($i=1, 1, 0) as `main`
 				FROM {$this->quoteTable('articles', 'a')}
 				WHERE OXPIC$i NOT IN ('', 'nopic.jpg')
 				AND OXPARENTID=''
 			";
-		}
-		return implode('UNION ALL', $sql);
-	}
+        }
+
+        return implode('UNION ALL', $sql);
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article translations
-   	 * @return string {String} | sql for the article translations
-   	 */
-	public function getProductTranslationSelect()
-	{
-		$keys = $this->getLanguageKeys();
-		foreach ($keys as $key=>$languageID) {
-			if(empty($key)) {
-				continue;
-			}
-			$sql[] = "
+     * Returns the sql statement to select the shop system article translations
+     *
+     * @return string {String} | sql for the article translations
+     */
+    public function getProductTranslationSelect()
+    {
+        $keys = $this->getLanguageKeys();
+        foreach ($keys as $key => $languageID) {
+            if (empty($key)) {
+                continue;
+            }
+            $sql[] = "
 				SELECT
 					a.OXID 					as productID,
 					{$this->Db()->quote($languageID)} as languageID,
@@ -421,17 +440,19 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				LEFT JOIN {$this->quoteTable('artextends', 'e')}
 				ON e.OXID=a.OXID
 			";
-		}
-		return '('.implode(') UNION ALL (', $sql).')';
-	}
+        }
+
+        return '(' . implode(') UNION ALL (', $sql) . ')';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article category allocation
-   	 * @return string {String} | sql for the article category allocation
-   	 */
-	public function getProductCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article category allocation
+     *
+     * @return string {String} | sql for the article category allocation
+     */
+    public function getProductCategorySelect()
+    {
+        return "
 			SELECT
 			    a.OXOBJECTID AS productID,
 			    a.OXCATNID AS categoryID
@@ -448,7 +469,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			ORDER BY a.OXID
 		";
-	}
+    }
 
     /**
      * Returns the Root-id for the categories
@@ -457,25 +478,29 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
     {
         try {
             $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
+
             return $this->db()->fetchOne($sql);
         } catch (Exception $e) {
             $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = 'oxbaseshop'";
+
             return $this->db()->fetchOne($sql);
         }
     }
 
     /**
-   	 * Returns the sql statement to select the shop system categories.
-   	 * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
-   	 * @return string {String} | sql for the categories
-   	 */
-	public function getCategorySelect()
-	{
+     * Returns the sql statement to select the shop system categories.
+     * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
+     *
+     * @return string {String} | sql for the categories
+     */
+    public function getCategorySelect()
+    {
         $baseShopId = $this->getBaseShopId();
 
-		$keys = $this->getLanguageKeys();
-		$sql = array("
-			SELECT 
+        $keys = $this->getLanguageKeys();
+        $sql = array(
+            "
+			SELECT
 				c.OXID as categoryID,
 				(CASE WHEN c.OXLEFT = 1 THEN '' ELSE c.OXPARENTID END) as parentID,
 				{$this->Db()->quote($keys[0])} as languageID,
@@ -494,13 +519,14 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
             LEFT JOIN {$this->quoteTable('object2seodata', 's')}
             ON s.OXOBJECTID = c.OXID
 			WHERE c.OXSHOPID='{$baseShopId}'
-		");
-		foreach ($keys as $key=>$languageID) {
-			if(empty($key)) {
-				continue;
-			}
-			$sql[] = "
-				SELECT 
+		"
+        );
+        foreach ($keys as $key => $languageID) {
+            if (empty($key)) {
+                continue;
+            }
+            $sql[] = "
+				SELECT
 					c.OXID as categoryID,
 					(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
 					{$this->Db()->quote($languageID)} as languageID,
@@ -520,17 +546,19 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
                 ON s.OXOBJECTID = OXID
 				WHERE c.OXSHOPID='{$baseShopId}'
 			";
-		}
-		return '('.implode(') UNION ALL (', $sql).') ORDER BY catLeft';
-	}
+        }
+
+        return '(' . implode(') UNION ALL (', $sql) . ') ORDER BY catLeft';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article ratings
-   	 * @return string {String} | sql for the article ratings
-   	 */
-	public function getProductRatingSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article ratings
+     *
+     * @return string {String} | sql for the article ratings
+     */
+    public function getProductRatingSelect()
+    {
+        return "
 			SELECT
 			    COALESCE(a.OXPARENTID, r.OXOBJECTID)  as `productID`,
 				r.`OXUSERID` as `customerID`,
@@ -552,15 +580,16 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 
 			WHERE `OXTYPE`='oxarticle'
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getOrderSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getOrderSelect()
+    {
+        return "
 			SELECT
 				o.`OXID`									as orderID,
 				`OXSHOPID`									as subshopID,
@@ -606,10 +635,10 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				-- `OXARTVAT1`,
 				-- `OXARTVATPRICE1`,
 				-- `OXARTVAT2`,
-				-- `OXARTVATPRICE2`,					
+				-- `OXARTVATPRICE2`,
 				-- `OXWRAPCOST`,
 				-- `OXWRAPVAT`,
-				-- `OXVOUCHERDISCOUNT`,	
+				-- `OXVOUCHERDISCOUNT`,
 				-- `OXDISCOUNT`,
 				
 				`OXTRACKCODE`								as trackingID,
@@ -628,16 +657,16 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=o.OXBILLCOUNTRYID
 			LEFT JOIN {$this->quoteTable('country', 'sc')} ON sc.OXID=o.OXDELCOUNTRYID
 		";
-	}
-
+    }
 
     /**
      * Returns the sql statement to select all shop system order details
+     *
      * @return string {String} | sql for order details
      */
-	public function getOrderDetailSelect()
-	{
-		return "
+    public function getOrderDetailSelect()
+    {
+        return "
 			SELECT
 			
 				OXORDERID as orderID,
@@ -652,10 +681,11 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
 				
 			FROM {$this->quoteTable('orderarticles')}
 		";
-	}
+    }
 
     /**
      * Returns the sql statement to select all article downloads
+     *
      * @return string
      */
     public function getDownloadSelect()
@@ -713,5 +743,4 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
             INNER JOIN {$this->quoteTable('order')} o ON of.OXORDERID = o.OXID
         ";
     }
-
 }

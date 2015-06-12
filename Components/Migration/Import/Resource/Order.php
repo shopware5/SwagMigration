@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -76,13 +76,13 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedOrders', "Orders successfully imported!");
     }
-
 
     /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
@@ -114,7 +114,6 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
         }
     }
 
-
     /**
      * This function import all orders from the source profile database into the shopware database.
      *
@@ -125,35 +124,33 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryOrders($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
-
-
-            if(isset($order['languageID']) && isset($this->Request()->language[$order['languageID']])) {
+            if (isset($order['languageID']) && isset($this->Request()->language[$order['languageID']])) {
                 $order['languageID'] = $this->Request()->language[$order['languageID']];
             }
-            if(isset($order['subshopID']) && isset($this->Request()->shop[$order['subshopID']])) {
+            if (isset($order['subshopID']) && isset($this->Request()->shop[$order['subshopID']])) {
                 $order['subshopID'] = $this->Request()->shop[$order['subshopID']];
             }
-            if(isset($order['statusID']) && isset($this->Request()->order_status[$order['statusID']])) {
+            if (isset($order['statusID']) && isset($this->Request()->order_status[$order['statusID']])) {
                 $order['statusID'] = $this->Request()->order_status[$order['statusID']];
             }
-            if(isset($order['paymentID']) && isset($this->Request()->payment_mean[$order['paymentID']])) {
+            if (isset($order['paymentID']) && isset($this->Request()->payment_mean[$order['paymentID']])) {
                 $order['paymentID'] = $this->Request()->payment_mean[$order['paymentID']];
-            }else {
+            } else {
                 $order['paymentID'] = Shopware()->Config()->Paymentdefault;
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_CUSTOMER, $order['customerID']));
+            $order['userID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_CUSTOMER, $order['customerID']));
 
             $order['sourceID'] = $order['orderID'];
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
 
             $data = array(
                 'ordernumber' => $order['ordernumber'],
@@ -168,7 +165,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'paymentID' => (int) $order['paymentID'],
                 'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
                 'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
-                'net' => !empty($order['tax_free'])||!empty($order['net']) ? 1 : 0,
+                'net' => !empty($order['tax_free']) || !empty($order['net']) ? 1 : 0,
                 'taxfree' => !empty($order['tax_free']) ? 1 : 0,
                 'referer' => isset($order['referer']) ? $order['referer'] : '',
                 'cleareddate' => isset($order['cleared_date']) ? $order['cleared_date'] : null,
@@ -181,14 +178,14 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'remote_addr' => isset($order['remote_addr']) ? $order['remote_addr'] : '',
             );
 
-            if($data['cleareddate'] === '0000-00-00 00:00:00') {
+            if ($data['cleareddate'] === '0000-00-00 00:00:00') {
                 $data['cleareddate'] = null;
             }
 
-            if(!empty($order['orderID'])) {
-                Shopware()->Db()->update('s_order', $data, array('id=?'=>$order['orderID']));
+            if (!empty($order['orderID'])) {
+                Shopware()->Db()->update('s_order', $data, array('id=?' => $order['orderID']));
                 $sql = 'DELETE FROM `s_order_details` WHERE `orderID`=?';
-                Shopware()->Db()->query($sql , array($order['orderID']));
+                Shopware()->Db()->query($sql, array($order['orderID']));
             } else {
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
@@ -200,18 +197,18 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
             }
 
-            if(!empty($order['billing_countryiso'])) {
+            if (!empty($order['billing_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $order['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($order['billing_countryiso']));
+                $order['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($order['billing_countryiso']));
             }
-            if(isset($order['shipping_countryiso'])) {
+            if (isset($order['shipping_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql , array($order['shipping_countryiso']));
+                $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($order['shipping_countryiso']));
             }
 
 
             $data_attributes = array(
-                'orderID'    => $order['orderID'],
+                'orderID' => $order['orderID'],
                 'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
                 'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
                 'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
@@ -241,37 +238,49 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             $data_shipping = array(
                 'orderID' => $order['orderID'],
                 'userID' => $order['userID'],
-                'company' => !empty($order['shipping_lastname']) ?  $order['shipping_company'] : $data_billing['company'],
-                'department' => !empty($order['shipping_lastname'])&&!empty($order['shipping_department']) ? $order['shipping_department'] : $data_billing['department'],
-                'salutation' => !empty($order['shipping_lastname'])&&!empty($order['shipping_salutation']) ? $order['shipping_salutation'] : $data_billing['salutation'],
+                'company' => !empty($order['shipping_lastname']) ? $order['shipping_company'] : $data_billing['company'],
+                'department' => !empty($order['shipping_lastname']) && !empty($order['shipping_department']) ? $order['shipping_department'] : $data_billing['department'],
+                'salutation' => !empty($order['shipping_lastname']) && !empty($order['shipping_salutation']) ? $order['shipping_salutation'] : $data_billing['salutation'],
                 'firstname' => !empty($order['shipping_lastname']) ? $order['shipping_firstname'] : $data_billing['firstname'],
                 'lastname' => !empty($order['shipping_lastname']) ? $order['shipping_lastname'] : $data_billing['lastname'],
                 'street' => !empty($order['shipping_lastname']) ? $order['shipping_street'] : $data_billing['street'],
                 'zipcode' => !empty($order['shipping_lastname']) ? $order['shipping_zipcode'] : $data_billing['zipcode'],
                 'city' => !empty($order['shipping_lastname']) ? $order['shipping_city'] : $data_billing['city'],
-                'countryID' => !empty($order['shipping_lastname'])&&!empty($order['shipping_countryID']) ? $order['shipping_countryID'] : $data_billing['countryID'],
+                'countryID' => !empty($order['shipping_lastname']) && !empty($order['shipping_countryID']) ? $order['shipping_countryID'] : $data_billing['countryID'],
             );
 
             if (version_compare(Shopware::VERSION, '5.0', '=<')) {
                 $data_billing['streetnumber'] = !empty($order['billing_streetnumber']) ? $order['billing_streetnumber'] : '';
-                $data_shipping['streetnumber'] = !empty($order['shipping_lastname'])&&!empty($order['shipping_streetnumber']) ? $order['shipping_streetnumber'] : $data_billing['streetnumber'];
+                $data_shipping['streetnumber'] = !empty($order['shipping_lastname']) && !empty($order['shipping_streetnumber']) ? $order['shipping_streetnumber'] : $data_billing['streetnumber'];
             }
 
-            foreach($data_billing as $key => $attribute) {
-                if($attribute === null) {
+            foreach ($data_billing as $key => $attribute) {
+                if ($attribute === null) {
                     $data_billing[$key] = '';
                 }
             }
-            foreach($data_shipping as $key => $attribute) {
-                if($attribute === null) {
+            foreach ($data_shipping as $key => $attribute) {
+                if ($attribute === null) {
                     $data_shipping[$key] = '';
                 }
             }
 
-            if(empty($order['insert'])) {
-                Shopware()->Db()->update('s_order_billingaddress', $data_billing, array('orderID=?'=>$order['orderID']));
-                Shopware()->Db()->update('s_order_shippingaddress', $data_shipping, array('orderID=?'=>$order['orderID']));
-                Shopware()->Db()->update('s_order_attributes', $data_attributes, array('orderID=?'=>$order['orderID']));
+            if (empty($order['insert'])) {
+                Shopware()->Db()->update(
+                    's_order_billingaddress',
+                    $data_billing,
+                    array('orderID=?' => $order['orderID'])
+                );
+                Shopware()->Db()->update(
+                    's_order_shippingaddress',
+                    $data_shipping,
+                    array('orderID=?' => $order['orderID'])
+                );
+                Shopware()->Db()->update(
+                    's_order_attributes',
+                    $data_attributes,
+                    array('orderID=?' => $order['orderID'])
+                );
             } else {
                 Shopware()->Db()->insert('s_order_billingaddress', $data_billing);
                 Shopware()->Db()->insert('s_order_shippingaddress', $data_shipping);
@@ -287,6 +296,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
         // Force import of order details in the next step
         $this->getProgress()->addRequestParam('import_order_details', true);
+
         return $this->getProgress()->done();
     }
 
@@ -300,7 +310,8 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
         $offset = $this->getProgress()->getOffset();
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
-        $numberSnippet = $this->getNameSpace()->get('numberNotValid',
+        $numberSnippet = $this->getNameSpace()->get(
+            'numberNotValid',
             "The product number '%s' is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
             * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
@@ -308,13 +319,14 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             You can force the migration to continue. But be aware that this will: <br>
             * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
             * Will not allow you to modify and save articles having an invalid ordernumber <br>
-            ");
+            "
+        );
 
         $result = $this->Source()->queryOrderDetails($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $taskStartTime = $this->initTaskTimer();
 
         while ($order = $result->fetch()) {
             // Check the ordernumber
@@ -322,18 +334,22 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             if (!isset($number)) {
                 $number = '';
             }
-            if ($numberValidationMode !== 'ignore' &&
-                (empty($number) || strlen($number) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $number)))
-            {
+            if ($numberValidationMode !== 'ignore'
+                && (empty($number) || strlen($number) > 30
+                || preg_match('/[^a-zA-Z0-9-_. ]/', $number))
+            ) {
                 switch ($numberValidationMode) {
                     case 'complain':
-                        echo Zend_Json::encode(array(
-                            'message'=>sprintf($numberSnippet, $number),
-                            'success'=>false,
-                            'import_products'=>null,
-                            'offset'=>0,
-                            'progress'=>-1
-                        ));
+                        echo Zend_Json::encode(
+                            array(
+                                'message' => sprintf($numberSnippet, $number),
+                                'success' => false,
+                                'import_products' => null,
+                                'offset' => 0,
+                                'progress' => -1
+                            )
+                        );
+
                         return;
                         break;
                     case 'make_valid':
@@ -344,7 +360,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql , array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
 
             $sql = '
                 SELECT ad.articleID
@@ -357,21 +373,21 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             //TaxRate
-            if(!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
-                if(isset($this->Request()->tax_rate[$order['taxID']])) {
+            if (!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
+                if (isset($this->Request()->tax_rate[$order['taxID']])) {
                     $order['taxID'] = $this->Request()->tax_rate[$order['taxID']];
                 } else {
                     unset($order['taxID']);
                 }
             }
-            if(!empty($order['tax']) && empty($order['taxID'])) {
+            if (!empty($order['tax']) && empty($order['taxID'])) {
                 $sql = 'SELECT `id` FROM `s_core_tax` WHERE `tax`=?';
-                $order['taxID'] = Shopware()->Db()->fetchOne($sql , array($order['tax']));
+                $order['taxID'] = Shopware()->Db()->fetchOne($sql, array($order['tax']));
             }
 
-            if(!empty($order['articleID']) && empty($order['taxID'])) {
+            if (!empty($order['articleID']) && empty($order['taxID'])) {
                 $sql = 'SELECT `taxID` FROM `s_articles` WHERE `id`=?';
-                $order['taxID'] = Shopware()->Db()->fetchOne($sql , array($order['articleID']));
+                $order['taxID'] = Shopware()->Db()->fetchOne($sql, array($order['articleID']));
             }
 
             $data = array(
@@ -381,13 +397,13 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'ordernumber' => !empty($order['ordernumber']) ? $order['ordernumber'] : '',
                 'name' => $order['name'],
                 'price' => $order['price'],
-                'taxID' =>  !empty($order['taxID']) ? $order['taxID'] : 0,
-                'quantity' =>  !empty($order['quantity']) ? $order['quantity'] : 1,
-                'modus' =>  !empty($order['modus']) ? $order['modus'] : 0
+                'taxID' => !empty($order['taxID']) ? $order['taxID'] : 0,
+                'quantity' => !empty($order['quantity']) ? $order['quantity'] : 1,
+                'modus' => !empty($order['modus']) ? $order['modus'] : 0
             );
 
-            foreach($data as $key => $attribute) {
-                if($attribute === null) {
+            foreach ($data as $key => $attribute) {
+                if ($attribute === null) {
                     $data[$key] = '';
                 }
             }
@@ -395,7 +411,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             Shopware()->Db()->insert('s_order_details', $data);
 
             $data_attributes = array(
-                'detailID'    => Shopware()->Db()->lastInsertId(),
+                'detailID' => Shopware()->Db()->lastInsertId(),
                 'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
                 'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
                 'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,

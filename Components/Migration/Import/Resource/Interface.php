@@ -25,6 +25,7 @@
 /**
  * Basic interface for the import classes
  * Class Shopware_Components_Migration_Import_Resource_Interface
+ *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
@@ -33,12 +34,14 @@ interface Shopware_Components_Migration_Import_Resource_Interface
 {
     /**
      * The generic error message of an import
+     *
      * @return string
      */
     public function getDefaultErrorMessage();
 
     /**
      * The progress message of your import. For progress info check out the $progress parameter
+     *
      * @param $progress
      * @return string
      */
@@ -46,6 +49,7 @@ interface Shopware_Components_Migration_Import_Resource_Interface
 
     /**
      * Done message of your importer
+     *
      * @return string
      */
     public function getDoneMessage();
@@ -72,5 +76,4 @@ interface Shopware_Components_Migration_Import_Resource_Interface
      * @return Shopware_Components_Migration_Import_Progress
      */
     public function run();
-
 }

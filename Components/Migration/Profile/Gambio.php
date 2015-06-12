@@ -33,9 +33,10 @@ class Shopware_Components_Migration_Profile_Gambio extends Shopware_Components_M
 {
     /**
      * Prefix of each database tables
+     *
      * @var string
      */
-	protected $db_prefix = '';
+    protected $db_prefix = '';
 
     /**
      *

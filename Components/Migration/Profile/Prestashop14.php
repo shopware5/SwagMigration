@@ -33,125 +33,135 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 {
     /**
      * Database prefix
+     *
      * @var string
      */
     protected $db_prefix = 'ps_';
 
     /**
-   	 * Returns the directory of the article images.
-   	 * @return string {String} | image path
-   	 */
-	public function getProductImagePath()
-	{
-		return 'img/p/';
-	}
+     * Returns the directory of the article images.
+     *
+     * @return string {String} | image path
+     */
+    public function getProductImagePath()
+    {
+        return 'img/p/';
+    }
 
     /**
-   	 * Returns the sql statement to select default shop system language
-   	 * @return string {String} | sql for default language
-   	 */
-	public function getDefaultLanguageSelect()
-	{
-		return "SELECT `id_lang` FROM {$this->quoteTable('lang')} WHERE active=1 ORDER BY id_lang ASC";
-	}
+     * Returns the sql statement to select default shop system language
+     *
+     * @return string {String} | sql for default language
+     */
+    public function getDefaultLanguageSelect()
+    {
+        return "SELECT `id_lang` FROM {$this->quoteTable('lang')} WHERE active=1 ORDER BY id_lang ASC";
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system languages
-   	 * @return string {String} | sql for languages
-   	 */
-	public function getLanguageSelect()
-	{
+     * Returns the sql statement to select the shop system languages
+     *
+     * @return string {String} | sql for languages
+     */
+    public function getLanguageSelect()
+    {
         return "SELECT `id_lang` as id, name as name FROM {$this->quoteTable('lang')}";
-
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system sub shops
-   	 * @return string {String} | sql for sub shops
-   	 */
-	public function getShopSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system sub shops
+     *
+     * @return string {String} | sql for sub shops
+     */
+    public function getShopSelect()
+    {
+        return "
 			SELECT 1 as id, 'Default' as name
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer groups
-   	 * @return string {String} | sql for customer groups
-   	 */
-	public function getCustomerGroupSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer groups
+     *
+     * @return string {String} | sql for customer groups
+     */
+    public function getCustomerGroupSelect()
+    {
+        return "
 			SELECT g.id_group as id, gl.name as name
 			FROM {$this->quoteTable('group', 'g')}
 			LEFT JOIN {$this->quoteTable('group_lang', 'gl')} ON g.id_group=gl.id_group
 			WHERE gl.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system payments
-   	 * @return string {String} | sql for the payments
-   	 */
-	public function getPaymentMeanSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system payments
+     *
+     * @return string {String} | sql for the payments
+     */
+    public function getPaymentMeanSelect()
+    {
+        return "
 			SELECT o.module as id, o.module as name
 			FROM {$this->quoteTable('orders', 'o')}
 			GROUP BY o.module
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system order states
-   	 * @return string {String} | sql for the order states
-   	 */
-	public function getOrderStatusSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system order states
+     *
+     * @return string {String} | sql for the order states
+     */
+    public function getOrderStatusSelect()
+    {
+        return "
 			SELECT `id_order_state` as id, `name` as name
 			FROM {$this->quoteTable('order_state_lang')}
 			WHERE `id_lang`={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system tax rates
-   	 * @return string {String} | sql for the tax rates
-   	 */
-	public function getTaxRateSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system tax rates
+     *
+     * @return string {String} | sql for the tax rates
+     */
+    public function getTaxRateSelect()
+    {
+        return "
 			SELECT `id_tax` as id, `rate` as name
 			FROM {$this->quoteTable('tax')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article attributes
-   	 * @return string {String} | sql for the article attributes
-   	 */
-	public function getAttributeSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article attributes
+     *
+     * @return string {String} | sql for the article attributes
+     */
+    public function getAttributeSelect()
+    {
+        return "
             SELECT
             id_attribute_group as id, name as name
 			FROM {$this->quoteTable('attribute_group_lang')}
             WHERE id_lang={$this->Db()->quote($this->getDefaultLanguage())}
             GROUP BY id_attribute_group
 		";
-	}
+    }
 
     /**
      * Get productIds for all products with attributes
+     *
      * @return string
      */
     public function getAttributedProductsSelect()
     {
         return "
             SELECT
-            DISTINCT p.id_product as productID
+            DISTINCT p.id_product AS productID
 
             FROM ps_product p
 
@@ -164,12 +174,12 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 
     /**
      * Select attributes for a given article
+     *
      * @param $id
      * @return string
      */
     public function getProductAttributesSelect($id)
     {
-
         return "
             SELECT
             agl.public_name             as group_name,
@@ -206,11 +216,12 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
     }
 
     /**
-   	 * Returns the sql statement to select the shop system articles
-   	 * @return string {String} | sql for the articles
-   	 */
-	public function getProductSelect()
-	{
+     * Returns the sql statement to select the shop system articles
+     *
+     * @return string {String} | sql for the articles
+     */
+    public function getProductSelect()
+    {
         $taxSelect = "
             IFNULL(
                 (SELECT tr.id_tax FROM {$this->quoteTable('tax_rule', 'tr')}  WHERE id_tax_rule=1 LIMIT 1),
@@ -218,7 +229,7 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
             ) as taxID,
         ";
 
-		return "
+        return "
 			SELECT
 				a.id_product							as productID,
 
@@ -260,25 +271,26 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 			ON d.id_product=a.id_product
             AND d.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article prices
-   	 * @return string {String} | sql for the article prices
-   	 */
-	public function getProductPriceSelect()
-	{
-		$sql = "
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        $sql = "
 			SELECT `id_group`
 			FROM {$this->quoteTable('group')}
 		";
-		$price_groups = $this->db->fetchCol($sql);
+        $price_groups = $this->db->fetchCol($sql);
 
-		$sql = array();
+        $sql = array();
 
-		if(!empty($price_groups)) {
-			foreach ($price_groups as $price_group) {
-				$sql[] = "
+        if (!empty($price_groups)) {
+            foreach ($price_groups as $price_group) {
+                $sql[] = "
 					SELECT
                         a.wholesale_price                       as baseprice,
 						pr.id_product as productID,
@@ -293,19 +305,20 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 					WHERE `id_group`=$price_group || `id_group`=0
 					ORDER BY id_product, `from`
 				";
-			}
-		}
+            }
+        }
 
-		return '('.implode(') UNION ALL (', $sql).')';
-	}
+        return '(' . implode(') UNION ALL (', $sql) . ')';
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article image allocation
-   	 * @return string {String} | sql for the article image allocation
-   	 */
-	public function getProductImageSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article image allocation
+     *
+     * @return string {String} | sql for the article image allocation
+     */
+    public function getProductImageSelect()
+    {
+        return "
 				SELECT
 				    `id_product` as productID,
 				    CONCAT(id_product, '-', id_image, '.jpg') as image,
@@ -313,15 +326,16 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 				    position as position
 				FROM {$this->quoteTable('image')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article translations
-   	 * @return string {String} | sql for the article translations
-   	 */
-	public function getProductTranslationSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article translations
+     *
+     * @return string {String} | sql for the article translations
+     */
+    public function getProductTranslationSelect()
+    {
+        return "
 			SELECT
 				d.id_product 					as productID,
 				d.id_lang 			    		as languageID,
@@ -335,27 +349,29 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 			FROM {$this->quoteTable('product_lang', 'd')}
 			WHERE `id_lang`!={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article relations
-   	 * @return string {String} | sql for the article relations
-   	 */
-	public function getProductRelationSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article relations
+     *
+     * @return string {String} | sql for the article relations
+     */
+    public function getProductRelationSelect()
+    {
+        return "
 			SELECT `products_id` as productID, `xsell_id` as relatedID, `products_xsell_grp_name_id` as groupID
 			FROM {$this->quoteTable('products_xsell')}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getCustomerSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getCustomerSelect()
+    {
+        return "
 			SELECT
 				u.id_customer 										as customerID,
 				u.id_customer 										as customernumber,
@@ -418,28 +434,30 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 
 			WHERE c.id_lang={$this->Db()->quote($this->getDefaultLanguage())}
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article category allocation
-   	 * @return string {String} | sql for the article category allocation
-   	 */
-	public function getProductCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article category allocation
+     *
+     * @return string {String} | sql for the article category allocation
+     */
+    public function getProductCategorySelect()
+    {
+        return "
 			SELECT `id_product` as productID, `id_category` as categoryID
 			FROM {$this->quoteTable('category_product')}
 			ORDER BY `id_product`
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system categories
-   	 * @return string {String} | sql for the categories
-   	 */
-	public function getCategorySelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system categories
+     *
+     * @return string {String} | sql for the categories
+     */
+    public function getCategorySelect()
+    {
+        return "
 			SELECT
 				c.id_category as categoryID,
 				IF(c.id_parent=1, '', c.id_parent) as parentID,
@@ -463,15 +481,16 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
             ORDER BY c.id_parent ASC
 
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system article ratings
-   	 * @return string {String} | sql for the article ratings
-   	 */
-	public function getProductRatingSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system article ratings
+     *
+     * @return string {String} | sql for the article ratings
+     */
+    public function getProductRatingSelect()
+    {
+        return "
 			SELECT
 			    r.`id_product` as `productID`,
 				r.`id_customer` as `customerID`,
@@ -487,15 +506,16 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
 			LEFT JOIN {$this->quoteTable('customer', 'c')}
 			ON r.id_customer=c.id_customer
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select the shop system customer
-   	 * @return string {String} | sql for the customer data
-   	 */
-	public function getOrderSelect()
-	{
-		return "
+     * Returns the sql statement to select the shop system customer
+     *
+     * @return string {String} | sql for the customer data
+     */
+    public function getOrderSelect()
+    {
+        return "
 			SELECT
 				o.`id_order`									as orderID,
 				o.`id_order`									as ordernumber,
@@ -587,15 +607,16 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
             GROUP BY o.id_order
 
 		";
-	}
+    }
 
     /**
-   	 * Returns the sql statement to select all shop system order details
-   	 * @return string {String} | sql for order details
-   	 */
-	public function getOrderDetailSelect()
-	{
-		return "
+     * Returns the sql statement to select all shop system order details
+     *
+     * @return string {String} | sql for order details
+     */
+    public function getOrderDetailSelect()
+    {
+        return "
 			SELECT
 				od.`id_order` as orderID,
 				od.`product_id` as productID,
@@ -618,5 +639,5 @@ class Shopware_Components_Migration_Profile_Prestashop14 extends Shopware_Compon
             LEFT JOIN {$this->quoteTable('product', 'p')}
             ON p.id_product=od.product_id
 		";
-	}
+    }
 }

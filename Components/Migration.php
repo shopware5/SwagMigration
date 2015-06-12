@@ -47,15 +47,17 @@ class Shopware_Components_Migration extends Enlight_Class
 
     /**
      * Namespace for the profiles
+     *
      * @var string
      */
-    static protected $profileNamespace = 'Shopware_Components_Migration_Profile';
+    protected static $profileNamespace = 'Shopware_Components_Migration_Profile';
 
     /**
      * Namespace for the import resources
+     *
      * @var string
      */
-    static protected $resourceNamespace = 'Shopware_Components_Migration_Import_Resource';
+    protected static $resourceNamespace = 'Shopware_Components_Migration_Import_Resource';
 
     /**
      * For the generation of the profile is a factory used, because of the profile type is not known until runtime.
@@ -65,16 +67,16 @@ class Shopware_Components_Migration extends Enlight_Class
      * @param array $config
      * @return Enlight_Class
      */
-	public static function profileFactory($profile, $config = array())
-	{
-		$profileNamespace = empty($config['profileNamespace']) ? self::$profileNamespace : $config['profileNamespace'];
-		$profileName = $profileNamespace . '_';
-		$profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
-				
-		$migrationAdapter = Enlight_Class::Instance($profileName, array($config));
+    public static function profileFactory($profile, $config = array())
+    {
+        $profileNamespace = empty($config['profileNamespace']) ? self::$profileNamespace : $config['profileNamespace'];
+        $profileName = $profileNamespace . '_';
+        $profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
 
-		return $migrationAdapter;
-	}
+        $migrationAdapter = Enlight_Class::Instance($profileName, array($config));
+
+        return $migrationAdapter;
+    }
 
 
     /**
@@ -91,13 +93,16 @@ class Shopware_Components_Migration extends Enlight_Class
     {
         /** @var $import Shopware_Components_Migration_Import_Resource_Abstract */
         $className = self::$resourceNamespace . '_' . $name;
-        $import = Enlight_Class::Instance($className, array(
-            $progress,
-            $source, $target, $request
-        ));
+        $import = Enlight_Class::Instance(
+            $className,
+            array(
+                $progress,
+                $source,
+                $target,
+                $request
+            )
+        );
 
         return $import;
     }
-
-
 }

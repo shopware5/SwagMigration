@@ -33,7 +33,6 @@
  */
 class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
@@ -42,9 +41,9 @@ class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Sho
     public function getCurrentProgressMessage($progress)
     {
         return sprintf(
-                $this->getNameSpace()->get('progressDownload', "%s out of %s ESD Orders imported"),
-                $this->getProgress()->getOffset(),
-                $this->getProgress()->getCount()
+            $this->getNameSpace()->get('progressDownload', "%s out of %s ESD Orders imported"),
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
         );
     }
 
@@ -63,21 +62,23 @@ class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Sho
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryEsdOrder();
-        $count  = $result->rowCount() + $offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
 
         while ($order = $result->fetch()) {
             $orderNumber = $order['ordernumber'];
-            $filename    = $order['filename'];
-            $orderDate   = $order['orderdate'];
+            $filename = $order['filename'];
+            $orderDate = $order['orderdate'];
 
             // get sw orderId, userId, orderDetailsId
-            list($orderId, $userId, $orderDetailsId) = Shopware()->Db()->fetchRow("SELECT o.id, o.userID, od.id FROM s_order o INNER JOIN s_order_details od ON o.id = od.orderID WHERE o.ordernumber = ?",
-                    array(
-                            $orderNumber
-                    ),
-                    ZEND_Db::FETCH_NUM);
+            list($orderId, $userId, $orderDetailsId) = Shopware()->Db()->fetchRow(
+                "SELECT o.id, o.userID, od.id FROM s_order o INNER JOIN s_order_details od ON o.id = od.orderID WHERE o.ordernumber = ?",
+                array(
+                    $orderNumber
+                ),
+                ZEND_Db::FETCH_NUM
+            );
 
             // no userId was found -> skip this ESD order
             if (empty($userId)) {
@@ -89,27 +90,34 @@ class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Sho
                 return $this->getProgress();
             }
 
-            $esdId = Shopware()->Db()->fetchOne("SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1", array($filename));
+            $esdId = Shopware()->Db()->fetchOne(
+                "SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1",
+                array($filename)
+            );
 
             // Insert into esd orders
-            Shopware()->Db()->query("INSERT INTO s_order_esd (serialID, esdID, userID, orderID, orderdetailsID, datum) VALUES (?,?,?,?,?,?)", array(
+            Shopware()->Db()->query(
+                "INSERT INTO s_order_esd (serialID, esdID, userID, orderID, orderdetailsID, datum) VALUES (?,?,?,?,?,?)",
+                array(
                     0,  // we don't support serial numbers yet
                     $esdId,
                     $userId,
                     $orderId,
                     $orderDetailsId,
                     $orderDate
-            ));
-
-			// Mark this order as ESD order
-            Shopware()->Db()->query(
-		            "UPDATE s_order_details SET esdarticle = 1, ordernumber = ?, price = 1, releasedate = ? WHERE orderID = ?",
-		            array( $orderNumber, $orderDate, $orderId )
+                )
             );
 
-	        // this query actually enables the ESD Downloads to be downloadable in the frontend - set the payment-status (cleared) to 12 (completely paid)
-            Shopware()->Db()->query("UPDATE s_order SET cleared = 12 WHERE ordernumber = ?",
-		            array( $orderNumber )
+            // Mark this order as ESD order
+            Shopware()->Db()->query(
+                "UPDATE s_order_details SET esdarticle = 1, ordernumber = ?, price = 1, releasedate = ? WHERE orderID = ?",
+                array($orderNumber, $orderDate, $orderId)
+            );
+
+            // this query actually enables the ESD Downloads to be downloadable in the frontend - set the payment-status (cleared) to 12 (completely paid)
+            Shopware()->Db()->query(
+                "UPDATE s_order SET cleared = 12 WHERE ordernumber = ?",
+                array($orderNumber)
             );
         }
 

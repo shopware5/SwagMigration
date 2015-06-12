@@ -33,7 +33,6 @@ use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
  */
 class Shopware_Components_Migration_PasswordEncoder_Md5Reversed implements PasswordEncoderInterface
 {
-
     /**
      * @return string
      */

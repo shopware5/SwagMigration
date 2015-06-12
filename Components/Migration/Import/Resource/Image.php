@@ -33,9 +33,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Components_Migration_Import_Resource_Abstract
 {
-
     /**
      * Returns the default error message for this import class
+     *
      * @return mixed
      */
     public function getDefaultErrorMessage()
@@ -61,6 +61,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
 
     /**
      * Returns the default 'all done' message
+     *
      * @return mixed
      */
     public function getDoneMessage()
@@ -94,17 +95,16 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductImages($offset);
-        $count = $result->rowCount()+$offset;
+        $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime  = $this->initTaskTimer();
+        $taskStartTime = $this->initTaskTimer();
         $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
 
         while ($image = $result->fetch()) {
-
-            $image['link'] = $image_path.$image['image'];
+            $image['link'] = $image_path . $image['image'];
             if (!isset($image['name'])) {
-                $image['name'] = pathinfo(basename($image['image']),  PATHINFO_FILENAME);
+                $image['name'] = pathinfo(basename($image['image']), PATHINFO_FILENAME);
             }
             $image['name'] = $this->removeSpecialCharacters($image['name']);
 
@@ -128,7 +128,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
             ';
             $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
-            if(!empty($product_data)) {
+            if (!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {
                     if ($this->imageAlreadyImported($product_data['articleID'], $image['link'])) {
                         $offset++;
@@ -136,11 +136,11 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                     }
                 }
 
-                if(!empty($image['main']) && $product_data['kind']==1) {
-                    Shopware()->Api()->Import()->sDeleteArticleImages(array('articleID'=>$product_data['articleID']));
+                if (!empty($image['main']) && $product_data['kind'] == 1) {
+                    Shopware()->Api()->Import()->sDeleteArticleImages(array('articleID' => $product_data['articleID']));
                 }
                 $image['articleID'] = $product_data['articleID'];
-                if($product_data['kind']==2) {
+                if ($product_data['kind'] == 2) {
                     $image['relations'] = $product_data['ordernumber'];
                 }
                 $image['articleimagesID'] = Shopware()->Api()->Import()->sArticleImage($image);
@@ -168,6 +168,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
         $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
         $name = preg_replace('#-{2,}#', '-', $name);
         $name = trim($name, '-');
+
         return mb_substr($name, 0, 180);
     }
 
@@ -183,7 +184,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
         // Get a proper image name (without path and extension)
         $info = pathinfo($image);
         $extension = $info['extension'];
-        $name = basename($image, '.'.$extension);
+        $name = basename($image, '.' . $extension);
 
         // Find images with the same articleId and image name
         $sql = '
@@ -203,5 +204,4 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
 
         return false;
     }
-
 }
