@@ -7,7 +7,7 @@
     <ul style="padding-bottom:8px;color:999;font-style:italic;">
         <li>OXID eShop 4.4.5 bis 4.9.4</li>
         <li>Magento 1.4.2 bis 1.9.1</li>
-        <li>xt:Commerce VEYTON 4.0</li>
+        <li>xt:Commerce VEYTON 4.0 bis 4.1</li>
         <li>xt:Commerce 3.0.4</li>
         <li>Gambio GX 2.0.10</li>
         <li>PrestaShop 1.6.14</li>
