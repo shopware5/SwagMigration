@@ -22,6 +22,8 @@
  * our trademarks remain entirely with us.
  */
 
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
 /**
  * Shopware SwagMigration Components - Price
  *
@@ -107,7 +109,10 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($price = $result->fetch()) {
             if (!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
@@ -165,7 +170,7 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
                     }
                 }
 
-                $price['articlepricesID'] = Shopware()->Api()->Import()->sArticlePrice($price);
+                $price['articlepricesID'] = $import->articlePrice($price);
             }
 
 
