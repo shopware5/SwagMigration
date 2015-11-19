@@ -57,7 +57,7 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
      */
     public function getDefaultLanguageSelect()
     {
-        return 'SELECT `id` FROM `core_shops` WHERE `default` = 1';
+        return 'SELECT `id` FROM `s_core_shops` WHERE `default` = 1';
     }
 
     /**

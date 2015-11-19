@@ -180,6 +180,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function subscribeEvents()
     {
+        $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onStartDispatch');
+
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_SwagMigration',
             'onGetControllerPath'
@@ -195,6 +197,22 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             'onPostDispatch',
             110
         );
+    }
+
+    public function onStartDispatch(Enlight_Event_EventArgs $args)
+    {
+        $subscribers = array(
+            new \Shopware\SwagMigration\Subscriber\Resources(),
+        );
+
+        foreach ($subscribers as $subscriber) {
+            $this->Application()->Events()->addSubscriber($subscriber);
+        }
+    }
+
+    public function afterInit()
+    {
+        $this->Application()->Loader()->registerNamespace('Shopware\SwagMigration', $this->Path());
     }
 
     /**

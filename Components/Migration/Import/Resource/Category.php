@@ -22,6 +22,8 @@
  * our trademarks remain entirely with us.
  */
 
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
 /**
  * Shopware SwagMigration Components - Category
  *
@@ -33,6 +35,22 @@
  */
 class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Components_Migration_Import_Resource_Abstract
 {
+    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    private $db = null;
+
+    /**
+     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @throws Exception
+     */
+    public function getDb()
+    {
+        if ($this->db === null) {
+            $this->db = Shopware()->Container()->get('db');
+        }
+
+        return $this->db;
+    }
+
     /**
      * Returns the default error message for this import class
      *
@@ -103,7 +121,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target));
+        $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target));
     }
 
     /**
@@ -118,7 +136,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             return false;
         }
 
-        return Shopware()->Db()->fetchOne(
+        return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
             array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id)
         );
@@ -136,7 +154,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             return false;
         }
 
-        return Shopware()->Db()->fetchOne(
+        return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             array(
                 Shopware_Components_Migration::MAPPING_CATEGORY_TARGET,
@@ -153,7 +171,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function deleteCategoryTarget($id)
     {
         $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
-        Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET));
+        $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET));
     }
 
     /**
@@ -200,7 +218,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
 
         // Cleanup previous category imports
         if (!$skip && $offset === 0) {
-            Shopware()->Db()->query(
+            $this->getDb()->query(
                 "DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
                 array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, 2)
             );
@@ -250,15 +268,18 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 && !empty($this->Request()->language[$category['languageID']])
             ) {
                 $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `locale_id`=?';
-                $category['parent'] = Shopware()->Db()->fetchOne($sql, array($this->Request()->language[$category['languageID']]));
+                $category['parent'] = $this->getDb()->fetchOne($sql, array($this->Request()->language[$category['languageID']]));
             }
 
             try {
-                $category['targetID'] = Shopware()->Api()->Import()->sCategory($category);
+                /* @var Import $import */
+                $import = Shopware()->Container()->get('swagmigration.import');
+                $category['targetID'] = $import->category($category);
+
                 $this->setCategoryTarget($category['categoryID'], $category['targetID']);
                 // if meta_title isset update the Category
                 if (!empty($category['meta_title'])) {
-                    Shopware()->Db()->update(
+                    $this->getDb()->update(
                         's_categories',
                         array('meta_title' => $category['meta_title']),
                         array('id=?' => $category['targetID'])
@@ -277,7 +298,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
+            $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
@@ -304,7 +325,10 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($productCategory = $result->fetch()) {
             if ($this->newRequestNeeded()) {
@@ -315,12 +339,10 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             $sql = '
                 SELECT ad.articleID
                 FROM s_plugin_migrations pm
-                JOIN s_articles_details ad
-                ON ad.id=pm.targetID
-                WHERE `sourceID`=?
-                AND `typeID`=?
+                JOIN s_articles_details ad ON ad.id = pm.targetID
+                WHERE sourceID = ? AND typeID = ?
             ';
-            $article = Shopware()->Db()->fetchOne($sql, array($productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $article = $this->getDb()->fetchOne($sql, array($productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
 
             if (empty($article)) {
                 continue;
@@ -332,7 +354,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 WHERE `typeID`=? AND (`sourceID`=? OR `sourceID` LIKE ?)
             ';
             // Also take language categories into account
-            $categories = Shopware()->Db()->fetchCol(
+            $categories = $this->getDb()->fetchCol(
                 $sql,
                 array(
                     Shopware_Components_Migration::MAPPING_CATEGORY,
@@ -346,7 +368,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             }
 
             foreach ($categories as $category) {
-                Shopware()->Api()->Import()->sArticleCategory($article, $category, false);
+                $import->articleCategory($article, $category);
             }
         }
 

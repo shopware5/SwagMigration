@@ -22,6 +22,8 @@
  * our trademarks remain entirely with us.
  */
 
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
 /**
  * Shopware SwagMigration Components - Customer
  *
@@ -102,6 +104,9 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
 
         $this->initTaskTimer();
 
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
+
         while ($customer = $result->fetch()) {
             if (isset($customer['customergroupID'])
                 && isset($this->Request()->customer_group[$customer['customergroupID']])
@@ -172,7 +177,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                 $customer_shipping = array();
             }
 
-            $customer_result = Shopware()->Api()->Import()->sCustomer($customer);
+            $customer_result = $import->customer($customer);
 
             if (!empty($customer_result)) {
                 $customer = array_merge($customer, $customer_result);

@@ -22,6 +22,8 @@
  * our trademarks remain entirely with us.
  */
 
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
 /**
  * Shopware SwagMigration Components - Image
  *
@@ -98,8 +100,11 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
         $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($image = $result->fetch()) {
             $image['link'] = $image_path . $image['image'];
@@ -137,13 +142,13 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 }
 
                 if (!empty($image['main']) && $product_data['kind'] == 1) {
-                    Shopware()->Api()->Import()->sDeleteArticleImages(array('articleID' => $product_data['articleID']));
+                    $import->deleteArticleImages($product_data['articleID']);
                 }
                 $image['articleID'] = $product_data['articleID'];
                 if ($product_data['kind'] == 2) {
                     $image['relations'] = $product_data['ordernumber'];
                 }
-                $image['articleimagesID'] = Shopware()->Api()->Import()->sArticleImage($image);
+                $image['articleimagesID'] = $import->articleImage($image);
             }
 
             $this->increaseProgress();
