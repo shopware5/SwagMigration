@@ -57,7 +57,7 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
      */
     public function getDefaultLanguageSelect()
     {
-        return 'SELECT `isocode` FROM `s_core_multilanguage` WHERE `default` =1';
+        return 'SELECT `id` FROM `core_shops` WHERE `default` = 1';
     }
 
     /**
@@ -68,8 +68,8 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     public function getShopSelect()
     {
         return "
-			SELECT `id`, `name`, `domainaliase` as domain
-			FROM {$this->quoteTable('core_multilanguage')}
+			SELECT `id`, `name`, `host` as domain
+			FROM {$this->quoteTable('core_shops')}
 		";
     }
 
@@ -81,15 +81,8 @@ class Shopware_Components_Migration_Profile_Shopware extends Shopware_Components
     public function getLanguageSelect()
     {
         return "
-			SELECT `isocode` as `id`, `name`
-			FROM {$this->quoteTable('core_multilanguage')}
-			WHERE `default`=1
-			
-			UNION ALL
-			
-			SELECT `isocode` as `id`, `name`
-			FROM {$this->quoteTable('core_multilanguage')}
-			WHERE `skipbackend`=0
+			SELECT `id`, `name`
+			FROM {$this->quoteTable('core_shops')}
 		";
     }
 
