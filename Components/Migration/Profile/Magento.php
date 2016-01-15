@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -146,12 +146,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getOrderStatus()
     {
-        return array(
+        return [
             'pending' => 'Pending',
             'holded' => 'On Hold',
             'processing' => 'Processing',
             'complete' => 'Complete'
-        );
+        ];
     }
 
     /**
@@ -336,7 +336,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getProductSelect()
     {
-        $attributes = array(
+        $attributes = [
             'description',
             'name',
             'short_description',
@@ -347,7 +347,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             'tax_class_id',
             'meta_keyword',
             'special_price'
-        );
+        ];
 
         $custom_select = '';
         foreach ($this->getAttributes() as $attributeID => $attribute) {
@@ -414,12 +414,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getProductTranslationSelect()
     {
-        $attributes = array(
+        $attributes = [
             'description',
             'name',
             'short_description',
             'meta_keyword',
-        );
+        ];
 
         $custom_select = '';
         foreach ($this->getAttributes() as $attributeID => $attribute) {
@@ -516,7 +516,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getCategorySelect()
     {
-        $sql = array();
+        $sql = [];
         foreach ($this->getShops() as $shopID => $shop) {
             $sql[] = "
 				SELECT
@@ -577,7 +577,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
      */
     public function getCustomerSelect()
     {
-        $attributes = array(
+        $attributes = [
             'gender',
             'firstname',
             'middlename',
@@ -588,8 +588,8 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             'taxvat',
             'default_billing',
             'default_shipping'
-        );
-        $addressAttributes = array(
+        ];
+        $addressAttributes = [
             //'firstname', 'middlename', 'lastname', 'company', 'region',
             'city',
             'country_id',
@@ -597,7 +597,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
             'street',
             'telephone',
             'fax'
-        );
+        ];
 
         return "
 			SELECT
@@ -782,13 +782,13 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
         } else {
             $sql .= 'ORDER BY `required` DESC, `name`';
         }
-        $attribute_fields = $this->Db()->fetchAssoc($sql, array($type));
+        $attribute_fields = $this->Db()->fetchAssoc($sql, [$type]);
 
         if (empty($attributes)) {
             $attributes = array_keys($attribute_fields);
         }
 
-        $select_fields = array();
+        $select_fields = [];
         $join_fields = '';
 
         // Do not use quoteTable for aliases!

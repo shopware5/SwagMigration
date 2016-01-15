@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -122,7 +122,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, [$image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -132,7 +132,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, [$image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {
@@ -201,7 +201,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
 		';
         $numOfImages = Shopware()->Db()->fetchOne(
             $sql,
-            array($articleId, $name)
+            [$articleId, $name]
         );
 
         if ((int) $numOfImages > 0) {

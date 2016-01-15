@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -142,7 +142,7 @@ class Shopware_Components_Migration_Cleanup
     public function removeMigrationMappingsByType($type)
     {
         $sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
-        Shopware()->Db()->query($sql, array($type));
+        Shopware()->Db()->query($sql, [$type]);
     }
 
     /**

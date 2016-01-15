@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -121,7 +121,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target));
+        $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target]);
     }
 
     /**
@@ -138,7 +138,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
 
         return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
-            array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id)
+            [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id]
         );
     }
 
@@ -156,10 +156,10 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
 
         return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
-            array(
+            [
                 Shopware_Components_Migration::MAPPING_CATEGORY_TARGET,
                 $id . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
-            )
+            ]
         );
     }
 
@@ -171,7 +171,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function deleteCategoryTarget($id)
     {
         $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
-        $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET));
+        $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET]);
     }
 
     /**
@@ -220,7 +220,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         if (!$skip && $offset === 0) {
             $this->getDb()->query(
                 "DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
-                array(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, 2)
+                [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, 2]
             );
         }
 
@@ -268,7 +268,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 && !empty($this->Request()->language[$category['languageID']])
             ) {
                 $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `locale_id`=?';
-                $category['parent'] = $this->getDb()->fetchOne($sql, array($this->Request()->language[$category['languageID']]));
+                $category['parent'] = $this->getDb()->fetchOne($sql, [$this->Request()->language[$category['languageID']]]);
             }
 
             try {
@@ -281,8 +281,8 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 if (!empty($category['meta_title'])) {
                     $this->getDb()->update(
                         's_categories',
-                        array('meta_title' => $category['meta_title']),
-                        array('id=?' => $category['targetID'])
+                        ['meta_title' => $category['meta_title']],
+                        ['id=?' => $category['targetID']]
                     );
                 }
             } catch (Exception $e) {
@@ -298,7 +298,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            $this->getDb()->query($sql, array(Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']));
+            $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']]);
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
@@ -342,7 +342,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 JOIN s_articles_details ad ON ad.id = pm.targetID
                 WHERE sourceID = ? AND typeID = ?
             ';
-            $article = $this->getDb()->fetchOne($sql, array($productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $article = $this->getDb()->fetchOne($sql, [$productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (empty($article)) {
                 continue;
@@ -356,11 +356,11 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             // Also take language categories into account
             $categories = $this->getDb()->fetchCol(
                 $sql,
-                array(
+                [
                     Shopware_Components_Migration::MAPPING_CATEGORY,
                     $productCategory['categoryID'],
                     $productCategory['categoryID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
-                )
+                ]
             );
 
             if (empty($categories)) {

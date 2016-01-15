@@ -1,24 +1,53 @@
 <?php
+/**
+ * Shopware 5
+ * Copyright (c) shopware AG
+ *
+ * According to our dual licensing model, this program can be used either
+ * under the terms of the GNU Affero General Public License, version 3,
+ * or under a proprietary license.
+ *
+ * The texts of the GNU Affero General Public License with an additional
+ * permission and of our proprietary license can be found at and
+ * in the LICENSE file you have received along with this program.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the program under the AGPLv3 does not imply a
+ * trademark license. Therefore any rights, title and interest in
+ * our trademarks remain entirely with us.
+ */
 
 namespace Shopware\SwagMigration\Components\DbServices;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+
 class DeleteService
 {
-    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    /** @var PDOConnection $db */
     private $db = null;
 
-    public function __construct()
+    /**
+     * DeleteService constructor.
+     *
+     * @param PDOConnection $db
+     */
+    public function __construct(PDOConnection $db)
     {
-        $this->db = Shopware()->Container()->get('db');
+        $this->db = $db;
     }
 
     /**
      * @return bool
-     * @throws \Zend_Db_Adapter_Exception
      */
     public function deleteAllCategories()
     {
-        $sql = 'SELECT category_id FROM s_core_shops';
+        $sql = 'SELECT category_id
+                FROM s_core_shops';
         $shopCategoriesIds = $this->db->fetchCol($sql);
 
         //don't delete shop's categories
@@ -26,7 +55,9 @@ class DeleteService
             $sql = 'TRUNCATE s_categories';
         } else {
             $ids = 'id != ' . implode(' AND id != ', $shopCategoriesIds);
-            $sql = 'DELETE FROM s_categories WHERE parent IS NOT NULL AND ' . $ids;
+            $sql = 'DELETE FROM s_categories
+                    WHERE parent IS NOT NULL
+                      AND ' . $ids;
         }
 
         if ($this->db->exec($sql) === false) {
@@ -39,7 +70,8 @@ class DeleteService
             return false;
         }
 
-        $sql = 'SELECT MAX(category_id) FROM s_core_shops';
+        $sql = 'SELECT MAX(category_id)
+                FROM s_core_shops';
         $lastCategoryId = $this->db->fetchOne($sql);
         $auto_increment = empty($lastCategoryId) ? 2 : $lastCategoryId + 1;
 

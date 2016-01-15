@@ -1,6 +1,6 @@
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -23,15 +23,9 @@
  * @category   Shopware
  * @package    SwagMigration
  * @subpackage Controller
- * @copyright  Copyright (c) 2012, shopware AG (http://www.shopware.de)
- * @version    $Id$
- * @author     Daniel Nögel
- * @author     $Author$
+ * @copyright  Copyright (c) 2012, shopware AG (http://www.shopware.com)
  */
 
-/**
- *
- */
 //{namespace name=backend/swag_migration/main}
 //{block name="backend/swag_migration/controller/wizard"}
 Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {

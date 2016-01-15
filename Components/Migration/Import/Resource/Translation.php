@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -109,7 +109,6 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
         $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($translation = $result->fetch()) {
-
             //Attribute
             if (!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source => $target) {
@@ -134,7 +133,7 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, [$translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (!empty($product_data)) {
                 $translation['articletranslationsID'] = $import->translation(

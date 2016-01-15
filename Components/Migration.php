@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -67,13 +67,13 @@ class Shopware_Components_Migration extends Enlight_Class
      * @param array $config
      * @return Enlight_Class
      */
-    public static function profileFactory($profile, $config = array())
+    public static function profileFactory($profile, $config = [])
     {
         $profileNamespace = empty($config['profileNamespace']) ? self::$profileNamespace : $config['profileNamespace'];
         $profileName = $profileNamespace . '_';
         $profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
 
-        $migrationAdapter = Enlight_Class::Instance($profileName, array($config));
+        $migrationAdapter = Enlight_Class::Instance($profileName, [$config]);
 
         return $migrationAdapter;
     }
@@ -95,12 +95,12 @@ class Shopware_Components_Migration extends Enlight_Class
         $className = self::$resourceNamespace . '_' . $name;
         $import = Enlight_Class::Instance(
             $className,
-            array(
+            [
                 $progress,
                 $source,
                 $target,
                 $request
-            )
+            ]
         );
 
         return $import;

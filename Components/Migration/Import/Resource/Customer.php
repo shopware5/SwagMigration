@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -126,11 +126,11 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
             }
             if (!empty($customer['billing_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($customer['billing_countryiso']));
+                $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['billing_countryiso']]);
             }
             if (isset($customer['shipping_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($customer['shipping_countryiso']));
+                $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['shipping_countryiso']]);
             }
 
             if (!isset($customer['paymentID'])) {
@@ -144,7 +144,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
             // If language is not set, read language from subshop
             if (empty($customer['language']) && !empty($customer['subshopID'])) {
                 $sql = 'SELECT `locale_id` FROM s_core_shops WHERE id=?';
-                $languageId = (int) Shopware()->Db()->fetchOne($sql, array($customer['subshopID']));
+                $languageId = (int) Shopware()->Db()->fetchOne($sql, [$customer['subshopID']]);
                 if (!empty($languageId)) {
                     $customer['language'] = $languageId;
                 }
@@ -157,7 +157,7 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
             }
 
             if (!empty($customer['shipping_company']) || !empty($customer['shipping_firstname']) || !empty($customer['shipping_lastname'])) {
-                $customer_shipping = array(
+                $customer_shipping = [
                     'company' => !empty($customer['shipping_company']) ? $customer['shipping_company'] : '',
                     'department' => !empty($customer['shipping_department']) ? $customer['shipping_department'] : '',
                     'salutation' => !empty($customer['shipping_salutation']) ? $customer['shipping_salutation'] : '',
@@ -167,14 +167,14 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                     'zipcode' => !empty($customer['shipping_zipcode']) ? $customer['shipping_zipcode'] : '',
                     'city' => !empty($customer['shipping_city']) ? $customer['shipping_city'] : '',
                     'countryID' => !empty($customer['shipping_countryID']) ? $customer['shipping_countryID'] : 0,
-                );
+                ];
                 $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
 
                 if (!$this->isShopwareFive()) {
                     $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
                 }
             } else {
-                $customer_shipping = array();
+                $customer_shipping = [];
             }
 
             $customer_result = $import->customer($customer);
@@ -198,11 +198,11 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
                 ';
                 Shopware()->Db()->query(
                     $sql,
-                    array(
+                    [
                         Shopware_Components_Migration::MAPPING_CUSTOMER,
                         $customer['customerID'],
                         $customer['userID']
-                    )
+                    ]
                 );
             }
             $this->increaseProgress();
@@ -223,13 +223,13 @@ class Shopware_Components_Migration_Import_Resource_Customer extends Shopware_Co
      */
     public function importCustomerDebit($customer)
     {
-        $fields = array(
+        $fields = [
             'account' => false,
             'bankcode' => false,
             'bankholder' => false,
             'bankname' => false,
             'userID' => false
-        );
+        ];
 
         // Iterate the array, remove unneeded fields and check if the required fields exist
         foreach ($customer as $key => $value) {

@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -143,11 +143,11 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
             ";
             $price_config = Shopware()->Db()->fetchRow(
                 $sql,
-                array(
+                [
                     $price['pricegroup'],
                     $price['productID'],
                     Shopware_Components_Migration::MAPPING_ARTICLE
-                )
+                ]
             );
             if (!empty($price_config)) {
                 $price = array_merge($price, $price_config);

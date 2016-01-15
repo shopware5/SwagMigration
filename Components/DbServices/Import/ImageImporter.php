@@ -1,36 +1,68 @@
 <?php
+/**
+ * Shopware 5
+ * Copyright (c) shopware AG
+ *
+ * According to our dual licensing model, this program can be used either
+ * under the terms of the GNU Affero General Public License, version 3,
+ * or under a proprietary license.
+ *
+ * The texts of the GNU Affero General Public License with an additional
+ * permission and of our proprietary license can be found at and
+ * in the LICENSE file you have received along with this program.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the program under the AGPLv3 does not imply a
+ * trademark license. Therefore any rights, title and interest in
+ * our trademarks remain entirely with us.
+ */
 
 namespace Shopware\SwagMigration\Components\DbServices\Import;
 
-use \Shopware\Models\Media\Media;
-use \Shopware\Models\Article\Image;
-use \Shopware\Models\Article\Article;
-use \Shopware\Components\Model\ModelManager;
-use \Symfony\Component\HttpFoundation\File\File;
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+use Shopware\Components\Logger;
+use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Media\Media;
+use Shopware\Models\Article\Article;
+use Shopware\Models\Article\Image;
+use Shopware\Models\Article\Repository as ArticleRepository;
+use Symfony\Component\HttpFoundation\File\File;
 
 class ImageImporter
 {
-    /* @var \Shopware\Models\Article\Repository */
+    /* @var ArticleRepository $articleRepository */
     private $articleRepository = null;
 
-    /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    /* @var PDOConnection $db */
     private $db = null;
 
-    /* @var ModelManager */
+    /* @var ModelManager $em */
     private $em = null;
 
-    /* @var \Shopware\Components\Logger */
+    /* @var Logger $logger */
     private $logger;
 
-    public function __construct(\Enlight_Components_Db_Adapter_Pdo_Mysql $db, ModelManager $em)
+    /**
+     * ImageImporter constructor.
+     *
+     * @param PDOConnection $db
+     * @param ModelManager $em
+     * @param Logger $logger
+     */
+    public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
         $this->em = $em;
         $this->db = $db;
-        $this->logger = Shopware()->PluginLogger();
+        $this->logger = $logger;
     }
 
     /**
-     * @return \Shopware\Models\Article\Repository
+     * @return ArticleRepository
      */
     private function getArticleRepository()
     {
@@ -41,14 +73,20 @@ class ImageImporter
         return $this->articleRepository;
     }
 
-    public function importArticleImage($image)
+    /**
+     * @param array $image
+     * @return int
+     */
+    public function importArticleImage(array $image)
     {
-        if (empty($image) || !is_array($image))
+        if (empty($image) || !is_array($image)) {
             return false;
+        }
 
         $image = $this->prepareImageData($image);
-        if (empty($image['articleID']) || (empty($image['image']) && empty($image['name'])))
+        if (empty($image['articleID']) || (empty($image['image']) && empty($image['name']))) {
             return false;
+        }
 
         $image['main'] = $this->setMain($image['main'], $image['articleID']);
 
@@ -57,8 +95,9 @@ class ImageImporter
         }
 
         $uploadFile = $this->copyImage($image['image'], $image['name']);
-        if ($uploadFile === false)
+        if ($uploadFile === false) {
             return false;
+        }
 
         $media = new Media();
         $file = new File($uploadFile);
@@ -71,11 +110,12 @@ class ImageImporter
         $media->setCreated(new \DateTime());
         $media->setFile($file);
 
-        /* @var \Shopware\Models\Article\Repository $articleRepository */
+        /* @var ArticleRepository $articleRepository */
         $articleRepository = $this->getArticleRepository();
         $article = $articleRepository->find((int) $image['articleID']);
         if (!$article instanceof Article) {
             $this->logger->error("Article '{$image['articleID']}' not found!");
+
             return false;
         }
 
@@ -83,7 +123,6 @@ class ImageImporter
         /* @var \Shopware\Models\Media\Album $album */
         $album = $this->em->find('Shopware\Models\Media\Album', $image['albumID']);
         $media->setAlbum($album);
-
 
         $articleImage = new Image();
         list($width, $height) = getimagesize($uploadFile);
@@ -112,20 +151,24 @@ class ImageImporter
      * @param array $image
      * @return array
      */
-    private function prepareImageData($image)
+    private function prepareImageData(array $image)
     {
-        if (isset($image['link']))
+        if (isset($image['link'])) {
             $image['image'] = $image['link'];
-        if (isset($image['articleID']))
+        }
+        if (isset($image['articleID'])) {
             $image['articleID'] = intval($image['articleID']);
-        if (empty($image['description']))
+        }
+        if (empty($image['description'])) {
             $image['description'] = '';
-        if (empty($image['relations']))
+        }
+        if (empty($image['relations'])) {
             $image['relations'] = '';
+        }
 
         $image['albumID'] = isset($image['albumID']) ? (int) $image['albumID'] : -1;
         $image['position'] = !empty($image['position']) ? intval($image['position']) : 0;
-        $image['name'] = empty($image['name']) ? md5(uniqid(mt_rand(), true)) : pathinfo($image['name'],  PATHINFO_FILENAME);
+        $image['name'] = empty($image['name']) ? md5(uniqid(mt_rand(), true)) : pathinfo($image['name'], PATHINFO_FILENAME);
 
         return $image;
     }
@@ -144,11 +187,16 @@ class ImageImporter
         }
 
         if (empty($main)) {
-            $sql = "SELECT id FROM s_articles_img WHERE articleID = $articleId AND main = 1";
+            $sql = "SELECT id
+                    FROM s_articles_img
+                    WHERE articleID = $articleId
+                      AND main = 1";
             $imageId = $this->db->fetchOne($sql);
             $main = empty($imageId) ? 1 : 2;
         } elseif ($main == 1) {
-            $sql = "UPDATE s_articles_img SET main = 2 WHERE articleID = $articleId";
+            $sql = "UPDATE s_articles_img
+                    SET main = 2
+                    WHERE articleID = $articleId";
             $this->db->query($sql);
         }
 
@@ -167,17 +215,19 @@ class ImageImporter
             $uploadFile = $uploadDir . $name;
             if (!copy($image, $uploadFile)) {
                 $this->logger->error("Copying image from '$image' to '$uploadFile' did not work!");
+
                 return false;
             }
 
             if (getimagesize($uploadFile) === false) {
                 unlink($uploadFile);
                 $this->logger->error("The file '$uploadFile' is not a valid image!");
+
                 return false;
             }
         } else {
-            foreach (array('.png', '.gif', '.jpg') as $extension) {
-                if (file_exists($uploadDir . $name .  $extension)) {
+            foreach (['.png', '.gif', '.jpg'] as $extension) {
+                if (file_exists($uploadDir . $name . $extension)) {
                     $uploadFile = $uploadDir . $name . $extension;
                     break;
                 }
@@ -185,6 +235,7 @@ class ImageImporter
 
             if (empty($uploadFile)) {
                 $this->logger->error("Image source '$uploadFile' not found!");
+
                 return false;
             }
         }

@@ -1,10 +1,37 @@
 <?php
+/**
+ * Shopware 5
+ * Copyright (c) shopware AG
+ *
+ * According to our dual licensing model, this program can be used either
+ * under the terms of the GNU Affero General Public License, version 3,
+ * or under a proprietary license.
+ *
+ * The texts of the GNU Affero General Public License with an additional
+ * permission and of our proprietary license can be found at and
+ * in the LICENSE file you have received along with this program.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the program under the AGPLv3 does not imply a
+ * trademark license. Therefore any rights, title and interest in
+ * our trademarks remain entirely with us.
+ */
 
 namespace Shopware\SwagMigration\Components\DbServices\Import;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Config as Config;
+
 class CustomerImporter
 {
-    private $customerFields = array(
+    /** @var array $customerFields */
+    private $customerFields = [
         'email',
         'active',
         'accountmode',
@@ -19,9 +46,10 @@ class CustomerImporter
         'subshopID',
         'referer',
         'encoder'
-    );
+    ];
 
-    private $billingFields = array(
+    /** @var array $billingFields */
+    private $billingFields = [
         'userID' => 'userID',
         'company' => 'billing_company',
         'department' => 'billing_department',
@@ -37,9 +65,10 @@ class CustomerImporter
         'countryID' => 'billing_countryID',
         'ustid' => 'ustid',
         'birthday' => 'birthday'
-    );
+    ];
 
-    private $billingAttributeFields = array(
+    /** @var array $billingAttributeFields */
+    private $billingAttributeFields = [
         'billingID' => 'billingaddressID',
         'text1' => 'billing_text1',
         'text2' => 'billing_text2',
@@ -47,9 +76,10 @@ class CustomerImporter
         'text4' => 'billing_text4',
         'text5' => 'billing_text5',
         'text6' => 'billing_text6'
-    );
+    ];
 
-    private $shippingFields = array(
+    /** @var array $shippingFields */
+    private $shippingFields = [
         'userID' => 'userID',
         'company' => 'shipping_company',
         'department' => 'shipping_department',
@@ -60,9 +90,10 @@ class CustomerImporter
         'zipcode' => 'shipping_zipcode',
         'city' => 'shipping_city',
         'countryID' => 'shipping_countryID'
-    );
+    ];
 
-    private $shippingAttributeFields = array(
+    /** @var array $shippingAttributeFields */
+    private $shippingAttributeFields = [
         'billingID' => 'billingaddressID',
         'text1' => 'shipping_text1',
         'text2' => 'shipping_text2',
@@ -70,72 +101,107 @@ class CustomerImporter
         'text4' => 'shipping_text4',
         'text5' => 'shipping_text5',
         'text6' => 'shipping_text6'
-    );
+    ];
 
-    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    /** @var PDOConnection $db */
     private $db = null;
 
-    /** @var Shopware\Components\Model\ModelManager */
+    /** @var ModelManager $em */
     private $em = null;
 
-    /** @var \Shopware_Components_Config */
+    /** @var Config $config */
     private $config = null;
 
-    public function __construct(\Enlight_Components_Db_Adapter_Pdo_Mysql $db, \Shopware\Components\Model\ModelManager $em)
+    /**
+     * CustomerImporter constructor.
+     *
+     * @param PDOConnection $db
+     * @param ModelManager $em
+     * @param Config $config
+     */
+    public function __construct(PDOConnection $db, ModelManager $em, Config $config)
     {
-        $this->config = Shopware()->Config();
         $this->db = $db;
         $this->em = $em;
+        $this->config = $config;
     }
 
     /**
      * @param array $customer
      * @return bool|array
      */
-    public function import($customer)
+    public function import(array $customer)
     {
         $customer = $this->prepareCustomerData($customer);
-        if (empty($customer['userID']) && empty($customer['email']))
+        if (empty($customer['userID']) && empty($customer['email'])) {
             return false;
+        }
 
         if (empty($customer['userID']) && !empty($customer['email'])) {
             $customer['userID'] = $this->findExistingEntry('s_user', "email = {$customer['email']}");
         }
         $customer = $this->createOrUpdateCustomer($customer);
-        if ($customer === false)
+        if ($customer === false) {
             return false;
+        }
 
         $customer = $this->prepareBillingData($customer);
-        $customer['billingaddressID'] = $this->findExistingEntry('s_user_billingaddress', "userID = {$customer['userID']}");
+        $billingAddressId = $this->findExistingEntry('s_user_billingaddress', "userID = {$customer['userID']}");
+        $customer['billingaddressID'] = $billingAddressId;
         $customer = $this->createOrUpdate($customer, 's_user_billingaddress', 'billingaddressID', $this->billingFields);
-        if ($customer === false)
+        if ($customer === false) {
             return false;
+        }
 
-        $billingAttributeId = $this->findExistingEntry('s_user_billingaddress_attributes', "billingID = {$customer['billingaddressID']}");
-        $customer = $this->createOrUpdate($customer, 's_user_billingaddress_attributes', $billingAttributeId, $this->billingAttributeFields);
-        if ($customer === false)
+        $billingAttributeId = $this->findExistingEntry(
+            's_user_billingaddress_attributes',
+            "billingID = {$customer['billingaddressID']}"
+        );
+        $customer = $this->createOrUpdate(
+            $customer,
+            's_user_billingaddress_attributes',
+            $billingAttributeId,
+            $this->billingAttributeFields
+        );
+        if ($customer === false) {
             return false;
+        }
 
-        if (!empty($customer['shipping_company']) ||
-            !empty($customer['shipping_firstname']) ||
-            !empty($customer['shipping_lastname'])
+        if (!empty($customer['shipping_company'])
+            || !empty($customer['shipping_firstname'])
+            || !empty($customer['shipping_lastname'])
         ) {
             $customer = $this->prepareShippingData($customer);
-            $customer['shippingaddressID'] = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
-            $customer = $this->createOrUpdate($customer, 's_user_shippingaddress', 'shippingaddressID', $this->shippingFields);
-            if ($customer === false)
+            $shippingAddressId = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
+            $customer['shippingaddressID'] = $shippingAddressId;
+            $customer = $this->createOrUpdate(
+                $customer,
+                's_user_shippingaddress',
+                'shippingaddressID',
+                $this->shippingFields
+            );
+            if ($customer === false) {
                 return false;
+            }
 
-            $shippingAttributeId = $this->findExistingEntry('s_user_shippingaddress_attributes', "shippingID = {$customer['shippingaddressID']}");
-            $customer = $this->createOrUpdate($customer, 's_user_shippingaddress_attributes', $shippingAttributeId, $this->shippingAttributeFields);
-            if ($customer === false)
+            $shippingAttributeId = $this->findExistingEntry(
+                's_user_shippingaddress_attributes',
+                "shippingID = {$customer['shippingaddressID']}"
+            );
+            $customer = $this->createOrUpdate(
+                $customer,
+                's_user_shippingaddress_attributes',
+                $shippingAttributeId,
+                $this->shippingAttributeFields
+            );
+            if ($customer === false) {
                 return false;
-        } elseif (
-            isset($customer['shipping_company']) ||
-            isset($customer['shipping_firstname']) ||
-            isset($customer['shipping_lastname'])
+            }
+        } elseif (isset($customer['shipping_company'])
+            || isset($customer['shipping_firstname'])
+            || isset($customer['shipping_lastname'])
         ) {
-            $sql = 'DELETE FROM s_user_shippingaddress WHERE userID = ' . $customer['userID'];
+            $sql = 'DELETE FROM S_USER_SHIPPINGADDRESS WHERE USERID = ' . $customer['userID'];
             $this->db->query($sql);
         }
 
@@ -143,57 +209,74 @@ class CustomerImporter
 
         $customer = $this->newsletterSubscribe($customer);
 
-        return array(
-            'userID'=> $customer['userID'],
-            'customernumber'=> $customer['customernumber'],
+        return [
+            'userID' => $customer['userID'],
+            'customernumber' => $customer['customernumber'],
             'password' => $customer['password'],
             'billingaddressID' => $customer['billingaddressID'],
             'shippingaddressID' => $customer['shippingaddressID'],
-        );
+        ];
     }
 
     /**
      * @param array $customer
      * @return array
      */
-    private function prepareCustomerData($customer)
+    private function prepareCustomerData(array $customer)
     {
-        if (isset($customer['password']))
+        if (isset($customer['password'])) {
             $customer['password'] = trim($customer['password'], '\r\n');
-        if (empty($customer['md5_password']) && !empty($customer['password']))
+        }
+        if (empty($customer['md5_password']) && !empty($customer['password'])) {
             $customer['md5_password'] = md5($customer['password']);
-        if (isset($customer['md5_password']))
+        }
+        if (isset($customer['md5_password'])) {
             $customer['md5_password'] = $this->db->quote($customer['md5_password']);
-        if (isset($customer['encoder']))
+        }
+        if (isset($customer['encoder'])) {
             $customer['encoder'] = $this->db->quote($customer['encoder']);
-        if (isset($customer['email']))
+        }
+        if (isset($customer['email'])) {
             $customer['email'] = empty($customer['email']) ? $customer['email'] : $this->db->quote(trim($customer['email']));
-        if (isset($customer['language']))
+        }
+        if (isset($customer['language'])) {
             $customer['language'] = $this->db->quote((string) $customer['language']);
-        if (isset($customer['referer']))
+        }
+        if (isset($customer['referer'])) {
             $customer['referer'] = $this->db->quote((string) $customer['referer']);
-        if (isset($customer['accountmode']))
+        }
+        if (isset($customer['accountmode'])) {
             $customer['accountmode'] = empty($customer['accountmode']) ? 0 : 1;
-        if (isset($customer['newsletter']))
+        }
+        if (isset($customer['newsletter'])) {
             $customer['newsletter'] = empty($customer['newsletter']) ? 0 : 1;
-        if (isset($customer['paymentID']))
+        }
+        if (isset($customer['paymentID'])) {
             $customer['paymentID'] = intval($customer['paymentID']);
-        if (isset($customer['paymentpreset']))
+        }
+        if (isset($customer['paymentpreset'])) {
             $customer['paymentpreset'] = intval($customer['paymentpreset']);
-        if (isset($customer['subshopID']))
+        }
+        if (isset($customer['subshopID'])) {
             $customer['subshopID '] = intval($customer['subshopID']);
-        if (isset($customer['userID']))
+        }
+        if (isset($customer['userID'])) {
             $customer['userID'] = intval($customer['userID']);
-        if (isset($customer['validation']))
+        }
+        if (isset($customer['validation'])) {
             $customer['validation'] = $this->db->quote((string) $customer['validation']);
-        else
+        } else {
             $customer['validation'] = $this->db->quote('');
-        if (isset($customer['active']))
+        }
+        if (isset($customer['active'])) {
             $customer['active'] = empty($customer['active']) ? 0 : 1;
-        else
+        } else {
             $customer['active'] = 1;
+        }
 
-        $customer['customergroup'] = empty($customer['customergroup']) ? $this->db->quote('EK') : $this->db->quote((string) $customer['customergroup']);
+        $customer['customergroup'] = empty($customer['customergroup']) ? $this->db->quote('EK') : $this->db->quote(
+            (string) $customer['customergroup']
+        );
         $customer['firstlogin'] = empty($customer['firstlogin']) ? 'CURDATE()' : $this->toDate($customer['firstlogin']);
         $customer['lastlogin'] = empty($article['lastlogin']) ? 'NOW()' : $this->toTimeStamp($customer['lastlogin']);
 
@@ -217,13 +300,13 @@ class CustomerImporter
      * @param array $customer
      * @return bool|array
      */
-    private function createOrUpdateCustomer($customer)
+    private function createOrUpdateCustomer(array $customer)
     {
         if (empty($customer['userID'])) {
             list($customer['password'], $customer['md5_password']) = $this->setNewPassword($customer['password'], $customer['md5_password']);
 
-            $insertFields = array();
-            $insertValues = array();
+            $insertFields = [];
+            $insertValues = [];
             foreach ($this->customerFields as $field) {
                 if (isset($customer[$field])) {
                     $insertFields[] = $field;
@@ -233,31 +316,31 @@ class CustomerImporter
             $insertFields[] = 'password';
             $insertValues[] = $customer['md5_password'];
 
-            $sql = '
-                INSERT INTO s_user (' . implode(', ', $insertFields) . ')
-                VALUES (' . implode(', ', $insertValues) . ')
-            ';
+            $sql = 'INSERT INTO S_USER (' . implode(', ', $insertFields) . ')
+                    VALUES (' . implode(', ', $insertValues) . ')';
             $result = $this->db->query($sql);
-            if ($result === false)
+            if ($result === false) {
                 return false;
+            }
 
             $customer['userID'] = (int) $this->db->lastInsertId();
         } else {
-            $updateData = array();
+            $updateData = [];
             foreach ($this->customerFields as $field) {
                 if (isset($customer[$field])) {
                     $updateData[] = $field . '=' . $customer[$field];
                 }
             }
 
-            if (isset($customer['md5_password']))
+            if (isset($customer['md5_password'])) {
                 $updateData[] = 'password=' . $customer['md5_password'];
+            }
 
             if (!empty($updateData)) {
                 $updateData = implode(', ', $updateData);
-                $sql = "
-                    UPDATE s_user SET $updateData WHERE id = {$customer['userID']}
-                ";
+                $sql = "UPDATE s_user
+                        SET $updateData
+                        WHERE id = {$customer['userID']}";
                 $this->db->query($sql);
             }
         }
@@ -283,45 +366,60 @@ class CustomerImporter
             $md5Password = $this->db->quote(md5($newPassword));
         }
 
-        return array($password, $md5Password);
+        return [$password, $md5Password];
     }
 
     /**
      * @param array $customer
      * @return array
      */
-    private function prepareBillingData($customer)
+    private function prepareBillingData(array $customer)
     {
-        if (isset($customer['billing_company']))
+        if (isset($customer['billing_company'])) {
             $customer['billing_company'] = $this->db->quote((string) $customer['billing_company']);
-        if (isset($customer['billing_department']))
+        }
+        if (isset($customer['billing_department'])) {
             $customer['billing_department'] = $this->db->quote((string) $customer['billing_department']);
-        if (isset($customer['billing_salutation']))
+        }
+        if (isset($customer['billing_salutation'])) {
             $customer['billing_salutation'] = $this->db->quote((string) $customer['billing_salutation']);
-        if (isset($customer['billing_firstname']))
+        }
+        if (isset($customer['billing_firstname'])) {
             $customer['billing_firstname'] = $this->db->quote((string) $customer['billing_firstname']);
-        if (isset($customer['billing_lastname']))
+        }
+        if (isset($customer['billing_lastname'])) {
             $customer['billing_lastname'] = $this->db->quote((string) $customer['billing_lastname']);
-        if (isset($customer['billing_street']))
+        }
+        if (isset($customer['billing_street'])) {
             $customer['billing_street'] = $this->db->quote((string) $customer['billing_street']);
-        if (isset($customer['billing_zipcode']))
+        }
+        if (isset($customer['billing_zipcode'])) {
             $customer['billing_zipcode'] = $this->db->quote((string) $customer['billing_zipcode']);
-        if (isset($customer['billing_city']))
+        }
+        if (isset($customer['billing_city'])) {
             $customer['billing_city'] = $this->db->quote((string) $customer['billing_city']);
-        if (isset($customer['phone']))
+        }
+        if (isset($customer['phone'])) {
             $customer['phone'] = $this->db->quote((string) $customer['phone']);
-        if (isset($customer['fax']))
+        }
+        if (isset($customer['fax'])) {
             $customer['fax'] = $this->db->quote((string) $customer['fax']);
-        if (isset($customer['ustid']))
+        }
+        if (isset($customer['ustid'])) {
             $customer['ustid'] = $this->db->quote((string) $customer['ustid']);
-        if (isset($customer['billing_countryID']))
+        }
+        if (isset($customer['billing_countryID'])) {
             $customer['billing_countryID'] = intval($customer['billing_countryID']);
-        if (isset($customer['customernumber']))
+        }
+        if (isset($customer['customernumber'])) {
             $customer['customernumber'] = $this->db->quote((string) $customer['customernumber']);
-        if (isset($customer['birthday']))
+        }
+        if (isset($customer['birthday'])) {
             $customer['birthday'] = $this->toDate($customer['birthday']);
-        if (empty($customer['billing_countryID']) && !empty($customer['billing_countryiso']))
-            $customer['billing_countryID'] = (int) $this->getCountryID(array('iso' => $customer['billing_countryiso']));
+        }
+        if (empty($customer['billing_countryID']) && !empty($customer['billing_countryiso'])) {
+            $customer['billing_countryID'] = (int) $this->getCountryID(['iso' => $customer['billing_countryiso']]);
+        }
 
         // billing address attributes
         for ($i = 1; $i < 7; $i++) {
@@ -341,16 +439,15 @@ class CustomerImporter
      */
     private function getCountryID($countryIso)
     {
-        if (empty($countryIso))
+        if (empty($countryIso)) {
             return false;
+        }
 
         $countryIso = $this->db->quote(trim((string) $countryIso));
 
-        $sql = "
-            SELECT id
-            FROM s_core_countries
-            WHERE countryiso = $countryIso
-        ";
+        $sql = "SELECT id
+                FROM s_core_countries
+                WHERE countryiso = $countryIso";
         $result = $this->db->fetchOne($sql);
 
         return $result;
@@ -363,30 +460,29 @@ class CustomerImporter
      * @param array $dbFields
      * @return bool|array
      */
-    private function createOrUpdate($customer, $table, $key, $dbFields)
+    private function createOrUpdate(array $customer, $table, $key, array $dbFields)
     {
         $id = is_numeric($key) ? $key : $customer[$key];
         if (empty($id)) {
-            $insertFields = array();
-            $insertValues = array();
+            $insertFields = [];
+            $insertValues = [];
             foreach ($dbFields as $dbField => $field) {
                 if (isset($customer[$field])) {
                     $insertFields[] = $dbField;
                     $insertValues[] = $customer[$field];
                 }
             }
-            $sql = "
-                INSERT INTO $table (" . implode(', ', $insertFields) . ")
-                VALUES (" . implode(', ', $insertValues) . ")
-            ";
+            $sql = "INSERT INTO $table (" . implode(', ', $insertFields) . ")
+                    VALUES (" . implode(', ', $insertValues) . ")";
 
             $result = $this->db->query($sql);
-            if ($result === false)
+            if ($result === false) {
                 return false;
+            }
 
             $customer[$key] = (int) $this->db->lastInsertId();
         } else {
-            $updateData = array();
+            $updateData = [];
             foreach ($dbFields as $dbField => $field) {
                 if (isset($customer[$field])) {
                     $updateData[] = $dbField . '=' . $customer[$field];
@@ -411,28 +507,38 @@ class CustomerImporter
      * @param array $customer
      * @return array
      */
-    private function prepareShippingData($customer)
+    private function prepareShippingData(array $customer)
     {
-        if (isset($customer['shipping_company']))
+        if (isset($customer['shipping_company'])) {
             $customer['shipping_company'] = $this->db->quote((string) $customer['shipping_company']);
-        if (isset($customer['shipping_department']))
+        }
+        if (isset($customer['shipping_department'])) {
             $customer['shipping_department'] = $this->db->quote((string) $customer['shipping_department']);
-        if (isset($customer['shipping_salutation']))
+        }
+        if (isset($customer['shipping_salutation'])) {
             $customer['shipping_salutation'] = $this->db->quote((string) $customer['shipping_salutation']);
-        if (isset($customer['shipping_firstname']))
+        }
+        if (isset($customer['shipping_firstname'])) {
             $customer['shipping_firstname'] = $this->db->quote((string) $customer['shipping_firstname']);
-        if (isset($customer['shipping_lastname']))
+        }
+        if (isset($customer['shipping_lastname'])) {
             $customer['shipping_lastname'] = $this->db->quote((string) $customer['shipping_lastname']);
-        if (isset($customer['shipping_street']))
+        }
+        if (isset($customer['shipping_street'])) {
             $customer['shipping_street'] = $this->db->quote((string) $customer['shipping_street']);
-        if (isset($customer['shipping_zipcode']))
+        }
+        if (isset($customer['shipping_zipcode'])) {
             $customer['shipping_zipcode'] = $this->db->quote((string) $customer['shipping_zipcode']);
-        if (isset($customer['shipping_city']))
+        }
+        if (isset($customer['shipping_city'])) {
             $customer['shipping_city'] = $this->db->quote((string) $customer['shipping_city']);
-        if (isset($customer['shipping_countryID']))
+        }
+        if (isset($customer['shipping_countryID'])) {
             $customer['shipping_countryID'] = intval($customer['shipping_countryID']);
-        if (empty($customer['shipping_countryID']) && !empty($customer['shipping_countryiso']))
+        }
+        if (empty($customer['shipping_countryID']) && !empty($customer['shipping_countryiso'])) {
             $customer['shipping_countryID'] = (int) $this->getCountryID($customer['shipping_countryiso']);
+        }
 
         // shipping address attributes
         for ($i = 1; $i < 7; $i++) {
@@ -450,15 +556,20 @@ class CustomerImporter
      */
     private function getCustomerNumber($userId)
     {
-        $customerNumber = $this->db->fetchOne('SELECT customernumber FROM s_user_billingaddress WHERE userID = ' . $userId);
+        $sql = 'SELECT CUSTOMERNUMBER
+                FROM S_USER_BILLINGADDRESS
+                WHERE USERID = ' . $userId;
+        $customerNumber = $this->db->fetchOne($sql);
         if ($this->config->get('sSHOPWAREMANAGEDCUSTOMERNUMBERS') && empty($customerNumber)) {
-            $sql = "
-              UPDATE s_order_number n, s_user_billingaddress b
-              SET n.number = n.number + 1, b.customernumber = n.number + 1
-              WHERE n.name = 'user' AND b.userID = ?
-            ";
-            $this->db->query($sql, array($userId));
-            $customerNumber = $this->db->fetchOne('SELECT customernumber FROM s_user_billingaddress WHERE userID = ' . $userId);
+            $sql = "UPDATE S_ORDER_NUMBER N, S_USER_BILLINGADDRESS B
+                    SET N.NUMBER = N.NUMBER + 1, B.CUSTOMERNUMBER = N.NUMBER + 1
+                    WHERE N.NAME = 'user'
+                      AND B.USERID = ?";
+            $this->db->query($sql, [$userId]);
+            $sql = 'SELECT CUSTOMERNUMBER
+                    FROM S_USER_BILLINGADDRESS
+                    WHERE USERID = ' . $userId;
+            $customerNumber = $this->db->fetchOne($sql);
         }
 
         return $customerNumber;
@@ -468,22 +579,26 @@ class CustomerImporter
      * @param array $customer
      * @return array
      */
-    private function newsletterSubscribe($customer)
+    private function newsletterSubscribe(array $customer)
     {
         if (!isset($customer['newsletter'])) {
             return $customer;
         }
 
         if (empty($customer['newsletter'])) {
-            $sql = 'DELETE FROM s_campaigns_mailaddresses WHERE email = ' . $customer['email'];
+            $sql = 'DELETE FROM S_CAMPAIGNS_MAILADDRESSES
+                    WHERE EMAIL = ' . $customer['email'];
             $this->db->query($sql);
         } else {
             $customer['newslettergroupID'] = $this->getNewsletterGroupId($customer['newslettergroupID']);
 
-            $sql = 'SELECT id FROM s_campaigns_mailaddresses WHERE email = ' . $customer['email'];
+            $sql = 'SELECT ID
+                    FROM S_CAMPAIGNS_MAILADDRESSES
+                    WHERE EMAIL = ' . $customer['email'];
             $result = $this->db->fetchOne($sql);
             if (empty($result)) {
-                $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email) VALUES (1, {$customer['newslettergroupID']}, {$customer['email']});";
+                $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
+                        VALUES (1, {$customer['newslettergroupID']}, {$customer['email']});";
                 $this->db->query($sql);
             }
         }
@@ -510,8 +625,8 @@ class CustomerImporter
     /**
      * Returns database timestamp
      *
-     * @param unknown_type $timestamp
-     * @return unknown
+     * @param string $timestamp
+     * @return string
      */
     private function toDate($timestamp)
     {
@@ -519,14 +634,15 @@ class CustomerImporter
             return 'null';
         }
         $date = new \Zend_Date($timestamp);
+
         return $this->db->quote($date->toString('Y-m-d', 'php'));
     }
 
     /**
      * Returns database timestamp
      *
-     * @param unknown_type $timestamp
-     * @return unknown
+     * @param string $timestamp
+     * @return string
      */
     private function toTimeStamp($timestamp)
     {
@@ -534,6 +650,7 @@ class CustomerImporter
             return 'null';
         }
         $date = new \Zend_Date($timestamp);
+
         return $this->db->quote($date->toString('Y-m-d H:i:s', 'php'));
     }
 }

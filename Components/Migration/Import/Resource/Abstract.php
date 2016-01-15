@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -285,7 +285,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         // Look up the id in the database - perhaps we've already created a valid number:
         $number = Shopware()->Db()->fetchOne(
             'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            array(Shopware_Components_Migration::MAPPING_VALID_NUMBER, $id)
+            [Shopware_Components_Migration::MAPPING_VALID_NUMBER, $id]
         );
 
         if ($number) {
@@ -299,16 +299,16 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
 
         // Increase - save
         $sql = "UPDATE s_order_number SET number = ? WHERE name = ?";
-        Shopware()->Db()->query($sql, array(++$number, 'articleordernumber'));
+        Shopware()->Db()->query($sql, [++$number, 'articleordernumber']);
 
         // Save mapping
         Shopware()->Db()->insert(
             's_plugin_migrations',
-            array(
+            [
                 'typeID' => Shopware_Components_Migration::MAPPING_VALID_NUMBER,
                 'sourceID' => $id,
                 'targetID' => $number
-            )
+            ]
         );
 
         return 'sw-' . $number;
@@ -334,6 +334,6 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
             AND `typeID`=?
         ';
 
-        return Shopware()->Db()->fetchOne($sql, array($productId, Shopware_Components_Migration::MAPPING_ARTICLE));
+        return Shopware()->Db()->fetchOne($sql, [$productId, Shopware_Components_Migration::MAPPING_ARTICLE]);
     }
 }

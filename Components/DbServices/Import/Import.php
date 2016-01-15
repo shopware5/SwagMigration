@@ -1,37 +1,82 @@
 <?php
+/**
+ * Shopware 5
+ * Copyright (c) shopware AG
+ *
+ * According to our dual licensing model, this program can be used either
+ * under the terms of the GNU Affero General Public License, version 3,
+ * or under a proprietary license.
+ *
+ * The texts of the GNU Affero General Public License with an additional
+ * permission and of our proprietary license can be found at and
+ * in the LICENSE file you have received along with this program.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the program under the AGPLv3 does not imply a
+ * trademark license. Therefore any rights, title and interest in
+ * our trademarks remain entirely with us.
+ */
 
 namespace Shopware\SwagMigration\Components\DbServices\Import;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+use Shopware\Components\Logger;
+use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Config as Config;
+use Symfony\Component\DependencyInjection\Container;
+
 class Import
 {
-    /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    /** @var Container $container */
+    private $container;
+
+    /* @var PDOConnection $db */
     private $db = null;
 
-    /* @var \Shopware\Components\Model\ModelManager */
+    /* @var ModelManager $em */
     private $em = null;
 
-    /* @var ArticleImporter */
+    /** @var Logger $logger */
+    private $logger;
+
+    /** @var Config $config */
+    private $config;
+
+    /* @var ArticleImporter $articleImporter */
     private $articleImporter = null;
 
-    /* @var CategoryImporter */
+    /* @var CategoryImporter $categoryImporter */
     private $categoryImporter = null;
 
-    /* @var CustomerImporter */
+    /* @var CustomerImporter $customerImporter */
     private $customerImporter = null;
 
-    /* @var ImageImporter */
+    /* @var ImageImporter $imageImporter */
     private $imageImporter = null;
 
-    /* @var PriceImporter */
+    /* @var PriceImporter $priceImporter */
     private $priceImporter = null;
 
-    /* @var TranslationImporter */
+    /* @var TranslationImporter $translationImporter */
     private $translationImporter = null;
 
-    public function __construct()
+    /**
+     * Import constructor.
+     *
+     * @param Container $container
+     */
+    public function __construct(Container $container)
     {
-        $this->db = Shopware()->Container()->get('db');
-        $this->em = Shopware()->Container()->get('models');
+        $this->container = $container;
+        $this->db = $this->container->get('db');
+        $this->em = $this->container->get('models');
+        $this->logger = $this->container->get('pluginlogger');
+        $this->config = $this->container->get('config');
     }
 
     /**
@@ -40,7 +85,7 @@ class Import
     private function getArticleImporter()
     {
         if ($this->articleImporter === null) {
-            $this->articleImporter = new ArticleImporter($this->db, $this->em);
+            $this->articleImporter = new ArticleImporter($this->db, $this->em, $this->logger);
         }
 
         return $this->articleImporter;
@@ -52,7 +97,7 @@ class Import
     private function getCategoryImporter()
     {
         if ($this->categoryImporter === null) {
-            $this->categoryImporter = new CategoryImporter($this->db, $this->em);
+            $this->categoryImporter = new CategoryImporter($this->db, $this->em, $this->logger);
         }
 
         return $this->categoryImporter;
@@ -64,7 +109,7 @@ class Import
     private function getCustomerImporter()
     {
         if ($this->customerImporter === null) {
-            $this->customerImporter = new CustomerImporter($this->db, $this->em);
+            $this->customerImporter = new CustomerImporter($this->db, $this->em, $this->config);
         }
 
         return $this->customerImporter;
@@ -76,7 +121,7 @@ class Import
     private function getImageImporter()
     {
         if ($this->imageImporter === null) {
-            $this->imageImporter = new ImageImporter($this->db, $this->em);
+            $this->imageImporter = new ImageImporter($this->db, $this->em, $this->logger);
         }
 
         return $this->imageImporter;
@@ -146,7 +191,7 @@ class Import
      *
      * @param array $article
      */
-    public function setArticleConfigurationData($article)
+    public function setArticleConfigurationData(array $article)
     {
         $this->getArticleImporter()->setConfiguratorData($article);
     }
@@ -155,7 +200,7 @@ class Import
      * @param array $article
      * @return bool|string
      */
-    public function setArticlePriceData($article)
+    public function setArticlePriceData(array $article)
     {
         $articlePricesId = $this->getArticleImporter()->setPriceData($article);
 
@@ -165,7 +210,7 @@ class Import
     /**
      * @param array $article
      */
-    public function deleteArticleLinks($article)
+    public function deleteArticleLinks(array $article)
     {
         $this->getArticleImporter()->deleteArticleLinks($article);
     }
@@ -174,7 +219,7 @@ class Import
      * @param array $linkData
      * @return bool|string
      */
-    public function addArticleLink($linkData)
+    public function addArticleLink(array $linkData)
     {
         $linkId = $this->getArticleImporter()->addArticleLink($linkData);
 
@@ -195,7 +240,7 @@ class Import
      * @param array $customer
      * @return array
      */
-    public function customer($customer)
+    public function customer(array $customer)
     {
         $customerData = $this->getCustomerImporter()->import($customer);
 
@@ -206,7 +251,7 @@ class Import
      * @param array $image
      * @return int
      */
-    public function articleImage($image)
+    public function articleImage(array $image)
     {
         $imageId = $this->getImageImporter()->importArticleImage($image);
 
@@ -217,14 +262,21 @@ class Import
      * @param array $price
      * @return bool|int
      */
-    public function articlePrice($price)
+    public function articlePrice(array $price)
     {
         $priceId = $this->getPriceImporter()->importArticlePrice($price);
 
         return $priceId;
     }
 
-    public function translation($type, $objectKey, $language, $translation)
+    /**
+     * @param string $type
+     * @param string $objectKey
+     * @param string $language
+     * @param array $translation
+     * @return bool|int
+     */
+    public function translation($type, $objectKey, $language, array $translation)
     {
         $translationId = $this->getTranslationImporter()->import($type, $objectKey, $language, $translation);
 

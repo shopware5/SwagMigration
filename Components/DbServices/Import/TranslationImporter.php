@@ -1,13 +1,42 @@
 <?php
+/**
+ * Shopware 5
+ * Copyright (c) shopware AG
+ *
+ * According to our dual licensing model, this program can be used either
+ * under the terms of the GNU Affero General Public License, version 3,
+ * or under a proprietary license.
+ *
+ * The texts of the GNU Affero General Public License with an additional
+ * permission and of our proprietary license can be found at and
+ * in the LICENSE file you have received along with this program.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Affero General Public License for more details.
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the program under the AGPLv3 does not imply a
+ * trademark license. Therefore any rights, title and interest in
+ * our trademarks remain entirely with us.
+ */
 
 namespace Shopware\SwagMigration\Components\DbServices\Import;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+
 class TranslationImporter
 {
-    /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    /* @var PDOConnection $db */
     private $db = null;
 
-    public function __construct(\Enlight_Components_Db_Adapter_Pdo_Mysql $db)
+    /**
+     * TranslationImporter constructor.
+     *
+     * @param PDOConnection $db
+     */
+    public function __construct(PDOConnection $db)
     {
         $this->db = $db;
     }
@@ -19,18 +48,21 @@ class TranslationImporter
      * @param array $objectData
      * @return bool|int
      */
-    public function import($objectType, $objectKey, $objectLanguage, $objectData)
+    public function import($objectType, $objectKey, $objectLanguage, array $objectData)
     {
-        if (empty($objectType) || empty($objectKey) || empty($objectLanguage))
+        if (empty($objectType) || empty($objectKey) || empty($objectLanguage)) {
             return false;
+        }
 
-        if (empty($objectData))
+        if (empty($objectData)) {
             return $this->deleteTranslation($objectType, $objectKey, $objectLanguage);
+        }
 
         $objectData = $this->prepareTranslationData($objectData, $objectType, $objectLanguage);
 
-        if (empty($objectData))
+        if (empty($objectData)) {
             return $this->deleteTranslation($objectType, $objectKey, $objectLanguage);
+        }
 
         $objectType = $this->db->quote((string) $objectType);
         $objectKey = $this->db->quote((string) $objectKey);
@@ -57,7 +89,8 @@ class TranslationImporter
             $objectType = $this->db->quote($objectType);
         }
 
-        $sql = 'DELETE FROM s_core_translations WHERE objecttype IN (' . $objectType . ')';
+        $sql = 'DELETE FROM S_CORE_TRANSLATIONS
+                WHERE OBJECTTYPE IN (' . $objectType . ')';
         if (!empty($objectKey)) {
             $objectKey = $this->db->quote($objectKey);
             $sql .= ' AND objectkey IN (' . $objectKey . ')';
@@ -76,9 +109,9 @@ class TranslationImporter
      * @param string $objectLanguage
      * @return array
      */
-    private function prepareTranslationData($objectData, $objectType, $objectLanguage)
+    private function prepareTranslationData(array $objectData, $objectType, $objectLanguage)
     {
-        $map = array('txtzusatztxt' => 'additionaltext');
+        $map = ['txtzusatztxt' => 'additionaltext'];
         if ($objectType == 'article') {
             $map['txtArtikel'] = 'name';
             $map['txtshortdescription'] = 'description';
@@ -86,7 +119,7 @@ class TranslationImporter
             $map['txtkeywords'] = 'keywords';
         }
 
-        $data = array();
+        $data = [];
         foreach ($map as $key => $name) {
             if (!empty($objectData[$key])) {
                 $data[$key] = $objectData[$key];
@@ -125,7 +158,11 @@ class TranslationImporter
      */
     private function findExistingEntry($objectType, $objectKey, $objectLanguage)
     {
-        $sql = "SELECT id FROM s_core_translations WHERE objecttype = $objectType AND objectkey = $objectKey AND objectlanguage = $objectLanguage";
+        $sql = "SELECT id
+                FROM s_core_translations
+                WHERE objecttype = {$objectType}
+                  AND objectkey = {$objectKey}
+                  AND objectlanguage = {$objectLanguage}";
 
         return (int) $this->db->fetchOne($sql);
     }
@@ -141,10 +178,8 @@ class TranslationImporter
     private function createOrUpdate($id, $objectType, $objectData, $objectKey, $objectLanguage)
     {
         if (empty($id)) {
-            $sql = "
-                INSERT INTO s_core_translations (objecttype, objectdata, objectkey, objectlanguage)
-                VALUES ($objectType, $objectData, $objectKey, $objectLanguage)
-            ";
+            $sql = "INSERT INTO s_core_translations (objecttype, objectdata, objectkey, objectlanguage)
+                    VALUES ({$objectType}, {$objectData}, {$objectKey}, {$objectLanguage})";
             $result = $this->db->query($sql);
             if (empty($result)) {
                 return false;
@@ -152,7 +187,9 @@ class TranslationImporter
                 return (int) $this->db->lastInsertId();
             }
         } else {
-            $sql = "UPDATE s_core_translations SET	objectdata = $objectData WHERE id = $id";
+            $sql = "UPDATE s_core_translations
+                    SET	objectdata = {$objectData}
+                    WHERE id = {$id}";
             $result = $this->db->query($sql);
             if (empty($result)) {
                 return false;

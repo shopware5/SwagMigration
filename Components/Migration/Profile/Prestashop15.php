@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -293,7 +293,7 @@ class Shopware_Components_Migration_Profile_Prestashop15 extends Shopware_Compon
 		";
         $price_groups = $this->db->fetchCol($sql);
 
-        $sql = array();
+        $sql = [];
 
         if (!empty($price_groups)) {
             foreach ($price_groups as $price_group) {

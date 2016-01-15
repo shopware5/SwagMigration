@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -146,13 +146,13 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             }
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['userID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_CUSTOMER, $order['customerID']));
+            $order['userID'] = Shopware()->Db()->fetchOne($sql, [Shopware_Components_Migration::MAPPING_CUSTOMER, $order['customerID']]);
 
             $order['sourceID'] = $order['orderID'];
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql, [Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']]);
 
-            $data = array(
+            $data = [
                 'ordernumber' => $order['ordernumber'],
                 'invoice_amount' => !empty($order['invoice_amount']) ? $order['invoice_amount'] : 0,
                 'invoice_amount_net' => !empty($order['invoice_amount_net']) ? $order['invoice_amount_net'] : 0,
@@ -176,16 +176,16 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'currencyFactor' => !empty($order['currency_factor']) ? $order['currency_factor'] : 1,
                 'subshopID' => isset($order['subshopID']) ? $order['subshopID'] : 0,
                 'remote_addr' => isset($order['remote_addr']) ? $order['remote_addr'] : '',
-            );
+            ];
 
             if ($data['cleareddate'] === '0000-00-00 00:00:00') {
                 $data['cleareddate'] = null;
             }
 
             if (!empty($order['orderID'])) {
-                Shopware()->Db()->update('s_order', $data, array('id=?' => $order['orderID']));
+                Shopware()->Db()->update('s_order', $data, ['id=?' => $order['orderID']]);
                 $sql = 'DELETE FROM `s_order_details` WHERE `orderID`=?';
-                Shopware()->Db()->query($sql, array($order['orderID']));
+                Shopware()->Db()->query($sql, [$order['orderID']]);
             } else {
                 $order['insert'] = Shopware()->Db()->insert('s_order', $data);
                 $order['orderID'] = Shopware()->Db()->lastInsertId();
@@ -194,20 +194,20 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 	            VALUES (?, ?, ?)
 	            ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
 	            ';
-                Shopware()->Db()->query($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['sourceID'], $order['orderID']));
+                Shopware()->Db()->query($sql, [Shopware_Components_Migration::MAPPING_ORDER, $order['sourceID'], $order['orderID']]);
             }
 
             if (!empty($order['billing_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $order['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($order['billing_countryiso']));
+                $order['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$order['billing_countryiso']]);
             }
             if (isset($order['shipping_countryiso'])) {
                 $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, array($order['shipping_countryiso']));
+                $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$order['shipping_countryiso']]);
             }
 
 
-            $data_attributes = array(
+            $data_attributes = [
                 'orderID' => $order['orderID'],
                 'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
                 'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
@@ -215,9 +215,9 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
                 'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
                 'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
-            );
+            ];
 
-            $data_billing = array(
+            $data_billing = [
                 'userID' => $order['userID'],
                 'orderID' => $order['orderID'],
                 'company' => !empty($order['billing_company']) ? $order['billing_company'] : '',
@@ -233,9 +233,9 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'fax' => !empty($order['fax']) ? $order['fax'] : '',
                 'countryID' => !empty($order['billing_countryID']) ? $order['billing_countryID'] : 0,
                 'ustid' => !empty($order['billing_ustid']) ? $order['billing_ustid'] : '',
-            );
+            ];
 
-            $data_shipping = array(
+            $data_shipping = [
                 'orderID' => $order['orderID'],
                 'userID' => $order['userID'],
                 'company' => !empty($order['shipping_lastname']) ? $order['shipping_company'] : $data_billing['company'],
@@ -247,7 +247,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'zipcode' => !empty($order['shipping_lastname']) ? $order['shipping_zipcode'] : $data_billing['zipcode'],
                 'city' => !empty($order['shipping_lastname']) ? $order['shipping_city'] : $data_billing['city'],
                 'countryID' => !empty($order['shipping_lastname']) && !empty($order['shipping_countryID']) ? $order['shipping_countryID'] : $data_billing['countryID'],
-            );
+            ];
 
             if (version_compare(Shopware::VERSION, '5.0', '=<')) {
                 $data_billing['streetnumber'] = !empty($order['billing_streetnumber']) ? $order['billing_streetnumber'] : '';
@@ -269,17 +269,17 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 Shopware()->Db()->update(
                     's_order_billingaddress',
                     $data_billing,
-                    array('orderID=?' => $order['orderID'])
+                    ['orderID=?' => $order['orderID']]
                 );
                 Shopware()->Db()->update(
                     's_order_shippingaddress',
                     $data_shipping,
-                    array('orderID=?' => $order['orderID'])
+                    ['orderID=?' => $order['orderID']]
                 );
                 Shopware()->Db()->update(
                     's_order_attributes',
                     $data_attributes,
-                    array('orderID=?' => $order['orderID'])
+                    ['orderID=?' => $order['orderID']]
                 );
             } else {
                 Shopware()->Db()->insert('s_order_billingaddress', $data_billing);
@@ -351,13 +351,13 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 switch ($numberValidationMode) {
                     case 'complain':
                         echo Zend_Json::encode(
-                            array(
+                            [
                                 'message' => sprintf($numberSnippet, $number),
                                 'success' => false,
                                 'import_products' => null,
                                 'offset' => 0,
                                 'progress' => -1
-                            )
+                            ]
                         );
 
                         return;
@@ -370,7 +370,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
 
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-            $order['orderID'] = Shopware()->Db()->fetchOne($sql, array(Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']));
+            $order['orderID'] = Shopware()->Db()->fetchOne($sql, [Shopware_Components_Migration::MAPPING_ORDER, $order['orderID']]);
 
             $sql = '
                 SELECT ad.articleID
@@ -380,7 +380,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, array($order['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, [$order['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             //TaxRate
             if (!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
@@ -392,15 +392,15 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             }
             if (!empty($order['tax']) && empty($order['taxID'])) {
                 $sql = 'SELECT `id` FROM `s_core_tax` WHERE `tax`=?';
-                $order['taxID'] = Shopware()->Db()->fetchOne($sql, array($order['tax']));
+                $order['taxID'] = Shopware()->Db()->fetchOne($sql, [$order['tax']]);
             }
 
             if (!empty($order['articleID']) && empty($order['taxID'])) {
                 $sql = 'SELECT `taxID` FROM `s_articles` WHERE `id`=?';
-                $order['taxID'] = Shopware()->Db()->fetchOne($sql, array($order['articleID']));
+                $order['taxID'] = Shopware()->Db()->fetchOne($sql, [$order['articleID']]);
             }
 
-            $data = array(
+            $data = [
                 'orderID' => $order['orderID'],
                 'articleID' => isset($order['articleID']) ? (int) $order['articleID'] : 0,
                 'articleordernumber' => $order['article_ordernumber'],
@@ -410,7 +410,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'taxID' => !empty($order['taxID']) ? $order['taxID'] : 0,
                 'quantity' => !empty($order['quantity']) ? $order['quantity'] : 1,
                 'modus' => !empty($order['modus']) ? $order['modus'] : 0
-            );
+            ];
 
             foreach ($data as $key => $attribute) {
                 if ($attribute === null) {
@@ -420,7 +420,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
 
             Shopware()->Db()->insert('s_order_details', $data);
 
-            $data_attributes = array(
+            $data_attributes = [
                 'detailID' => Shopware()->Db()->lastInsertId(),
                 'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
                 'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
@@ -428,7 +428,7 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
                 'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
                 'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
                 'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
-            );
+            ];
             Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
 
             $this->increaseProgress();
