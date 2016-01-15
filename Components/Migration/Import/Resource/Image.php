@@ -108,6 +108,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
 
         while ($image = $result->fetch()) {
             $image['link'] = $image_path . $image['image'];
+            
             if (!isset($image['name'])) {
                 $image['name'] = pathinfo(basename($image['image']), PATHINFO_FILENAME);
             }

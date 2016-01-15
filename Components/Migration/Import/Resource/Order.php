@@ -334,6 +334,16 @@ class Shopware_Components_Migration_Import_Resource_Order extends Shopware_Compo
             if (!isset($number)) {
                 $number = '';
             }
+
+            if (empty($number)) {
+                Shopware()->PluginLogger()->error("Order '{$order['orderID']}' was not imported because the Article Ordernumber was emtpy.");
+                continue;
+            }
+
+            if (strpos($number, "#")) {
+                $number = str_replace('#', '', $number);
+            }
+
             if ($numberValidationMode !== 'ignore'
                 && (empty($number) || strlen($number) > 30
                 || preg_match('/[^a-zA-Z0-9-_. ]/', $number))

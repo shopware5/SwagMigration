@@ -52,6 +52,10 @@ class ImageImporter
 
         $image['main'] = $this->setMain($image['main'], $image['articleID']);
 
+        if (!strpos($image["image"], "http://") && !strpos($image["image"], "https://")) {
+            $image["image"] = "http://" . $image["image"];
+        }
+
         $uploadFile = $this->copyImage($image['image'], $image['name']);
         if ($uploadFile === false)
             return false;
