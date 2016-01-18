@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
+
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
 
 /**
  * Shopware SwagMigration Components - Image
@@ -98,11 +100,15 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
         $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($image = $result->fetch()) {
             $image['link'] = $image_path . $image['image'];
+            
             if (!isset($image['name'])) {
                 $image['name'] = pathinfo(basename($image['image']), PATHINFO_FILENAME);
             }
@@ -116,7 +122,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $image['articleID'] = Shopware()->Db()->fetchOne($sql, [$image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -126,7 +132,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, [$image['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {
@@ -137,13 +143,13 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
                 }
 
                 if (!empty($image['main']) && $product_data['kind'] == 1) {
-                    Shopware()->Api()->Import()->sDeleteArticleImages(array('articleID' => $product_data['articleID']));
+                    $import->deleteArticleImages($product_data['articleID']);
                 }
                 $image['articleID'] = $product_data['articleID'];
                 if ($product_data['kind'] == 2) {
                     $image['relations'] = $product_data['ordernumber'];
                 }
-                $image['articleimagesID'] = Shopware()->Api()->Import()->sArticleImage($image);
+                $image['articleimagesID'] = $import->articleImage($image);
             }
 
             $this->increaseProgress();
@@ -195,7 +201,7 @@ class Shopware_Components_Migration_Import_Resource_Image extends Shopware_Compo
 		';
         $numOfImages = Shopware()->Db()->fetchOne(
             $sql,
-            array($articleId, $name)
+            [$articleId, $name]
         );
 
         if ((int) $numOfImages > 0) {

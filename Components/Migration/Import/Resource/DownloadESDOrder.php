@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -74,9 +74,9 @@ class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Sho
             // get sw orderId, userId, orderDetailsId
             list($orderId, $userId, $orderDetailsId) = Shopware()->Db()->fetchRow(
                 "SELECT o.id, o.userID, od.id FROM s_order o INNER JOIN s_order_details od ON o.id = od.orderID WHERE o.ordernumber = ?",
-                array(
+                [
                     $orderNumber
-                ),
+                ],
                 ZEND_Db::FETCH_NUM
             );
 
@@ -92,32 +92,32 @@ class Shopware_Components_Migration_Import_Resource_DownloadESDOrder extends Sho
 
             $esdId = Shopware()->Db()->fetchOne(
                 "SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1",
-                array($filename)
+                [$filename]
             );
 
             // Insert into esd orders
             Shopware()->Db()->query(
                 "INSERT INTO s_order_esd (serialID, esdID, userID, orderID, orderdetailsID, datum) VALUES (?,?,?,?,?,?)",
-                array(
+                [
                     0,  // we don't support serial numbers yet
                     $esdId,
                     $userId,
                     $orderId,
                     $orderDetailsId,
                     $orderDate
-                )
+                ]
             );
 
             // Mark this order as ESD order
             Shopware()->Db()->query(
                 "UPDATE s_order_details SET esdarticle = 1, ordernumber = ?, price = 1, releasedate = ? WHERE orderID = ?",
-                array($orderNumber, $orderDate, $orderId)
+                [$orderNumber, $orderDate, $orderId]
             );
 
             // this query actually enables the ESD Downloads to be downloadable in the frontend - set the payment-status (cleared) to 12 (completely paid)
             Shopware()->Db()->query(
                 "UPDATE s_order SET cleared = 12 WHERE ordernumber = ?",
-                array($orderNumber)
+                [$orderNumber]
             );
         }
 

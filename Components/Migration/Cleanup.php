@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
+
+use Shopware\SwagMigration\Components\DbServices\DeleteService;
 
 /**
  * Helper to clean up the target shop
@@ -49,6 +51,9 @@ class Shopware_Components_Migration_Cleanup
      */
     public function cleanUpByArray($data)
     {
+        /* @var DeleteService $deleteService */
+        $deleteService = Shopware()->Container()->get('swagmigration.deleteService');
+
         foreach ($data as $key => $value) {
             switch ($key) {
                 case 'clear_customers':
@@ -74,7 +79,7 @@ class Shopware_Components_Migration_Cleanup
                     }
                     break;
                 case 'clear_categories':
-                    Shopware()->Api()->Import()->sDeleteAllCategories();
+                    $deleteService->deleteAllCategories();
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY);
                     $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET);
                     try {
@@ -137,7 +142,7 @@ class Shopware_Components_Migration_Cleanup
     public function removeMigrationMappingsByType($type)
     {
         $sql = 'DELETE FROM s_plugin_migrations WHERE typeID = ?';
-        Shopware()->Db()->query($sql, array($type));
+        Shopware()->Db()->query($sql, [$type]);
     }
 
     /**

@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -136,8 +136,8 @@ class Shopware_Components_Migration_Import_Resource_Configurator extends Shopwar
             // Get all attributes of the current product
             $result = $this->Source()->queryProductAttributes($id);
 
-            $options = array();
-            $groups = array();
+            $options = [];
+            $groups = [];
             // iterate all attributes
             while ($attribute = $result->fetch()) {
                 $group = $attribute['group_name'];

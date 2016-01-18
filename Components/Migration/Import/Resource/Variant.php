@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -122,11 +122,11 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
 
             $groups = $this->getConfiguratorGroups($productId);
 
-            $params = array(
+            $params = [
                 'articleId' => $productId,
                 'groups' => $groups
 
-            );
+            ];
 
             $this->increaseProgress();
 
@@ -154,7 +154,7 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
     {
         // get configurator groups for the given product
         $builder = Shopware()->Models()->createQueryBuilder();
-        $builder->select(array('PARTIAL article.{id}', 'configuratorSet', 'groups'))
+        $builder->select(['PARTIAL article.{id}', 'configuratorSet', 'groups'])
                 ->from('Shopware\Models\Article\Article', 'article')
                 ->innerJoin('article.configuratorSet', 'configuratorSet')
                 ->leftJoin('configuratorSet.groups', 'groups')
@@ -179,14 +179,14 @@ class Shopware_Components_Migration_Import_Resource_Variant extends Shopware_Com
 	     ON options.id = relations.option_id
 
 	     WHERE sets.id = ?";
-        $results = Shopware()->Db()->fetchAll($sql, array($configuratorArray['id']));
+        $results = Shopware()->Db()->fetchAll($sql, [$configuratorArray['id']]);
 
         // Sort the options by group
-        $optionsByGroups = array();
+        $optionsByGroups = [];
         foreach ($results as $option) {
             $groupId = $option['group_id'];
             if (!isset($optionsByGroups[$groupId])) {
-                $optionsByGroups[$groupId] = array();
+                $optionsByGroups[$groupId] = [];
             }
             $optionsByGroups[$groupId][] = $option;
         }

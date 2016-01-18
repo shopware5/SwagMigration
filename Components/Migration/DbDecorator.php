@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -45,7 +45,7 @@ class Shopware_Components_Migration_DbDecorator
      *
      * @var array
      */
-    protected $logable = array(
+    protected $logable = [
         'fetchOne',
         'fetchCol',
         'fetchPairs',
@@ -54,7 +54,7 @@ class Shopware_Components_Migration_DbDecorator
         'fetchAssoc',
         'query',
         'execute'
-    );
+    ];
 
     /**
      * Constructor: Set the decorated class as $this->instance
@@ -89,7 +89,7 @@ class Shopware_Components_Migration_DbDecorator
         }
 
         // Determine longest row
-        $length = array();
+        $length = [];
         foreach ($rows as $r) {
             foreach ($r as $c => $column) {
                 $length[$c] = strlen($column) > $length[$c] ? strlen($column) : $length[$c];
@@ -97,7 +97,7 @@ class Shopware_Components_Migration_DbDecorator
         }
 
         // format the rows
-        $result = array();
+        $result = [];
         foreach ($rows as &$row) {
             foreach ($row as $c => &$column) {
                 $column = sprintf("%-{$length[$c]}s", $column);
@@ -125,7 +125,7 @@ class Shopware_Components_Migration_DbDecorator
 
         // Run the actual query and measure the time
         $start = microtime();
-        $result = call_user_func_array(array($this->instance, $method), $args);
+        $result = call_user_func_array([$this->instance, $method], $args);
         $duration = microtime() - $start;
 
         // Print footer (explain, duration, separator)

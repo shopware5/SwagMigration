@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -22,29 +22,35 @@
  * our trademarks remain entirely with us.
  */
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
+use Shopware\SwagMigration\Subscriber\Resources;
+
 /**
  * Shopware SwagMigration Plugin - Bootstrap
  *
  * @category  Shopware
  * @package   Shopware\Plugins\SwagMigration
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
+ * @copyright Copyright (c), shopware AG (http://www.shopware.com)
  */
 class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
+    /** @var PDOConnection $db */
+    private $db;
+
     /**
      * Install method of the plugin. Register the migration controller, create the backend menu item and creates the
      * plugin database table.
      *
-     * @return bool
+     * @return array
      */
     public function install()
     {
+        $this->checkVersion('5.0.0');
         $this->subscribeEvents();
-        $this->checkVersion('4.3.0');
 
-        $parent = $this->Menu()->findOneBy(array('label' => 'Inhalte'));
-        $item = $this->createMenuItem(
-            array(
+        $parent = $this->Menu()->findOneBy(['label' => 'Inhalte']);
+        $this->createMenuItem(
+            [
                 'label' => 'Shop-Migration',
                 'class' => 'sprite-database-import',
                 'active' => 1,
@@ -52,11 +58,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
                 'position' => 0,
                 'controller' => 'SwagMigration',
                 'action' => 'Index'
-            )
+            ]
         );
-
-        $this->Menu()->addItem($item);
-        $this->Menu()->save();
 
         $sql = '
 			CREATE TABLE IF NOT EXISTS `s_plugin_migrations` (
@@ -66,22 +69,22 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 			  `targetID` INT(11) UNSIGNED NOT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `typeID` (`typeID`,`sourceID`)
-			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;
-		';
-        Shopware()->Db()->query($sql);
+			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;';
+        $this->db->query($sql);
 
         $this->createForm();
 
-        return array(
-            'success' => true,
-            'invalidateCache' => array('backend')
-        );
+        return ['success' => true, 'invalidateCache' => ['backend']];
     }
 
+    /**
+     * @param string $version
+     * @throws Exception
+     */
     public function checkVersion($version)
     {
-        if (!$this->assertVersionGreaterThen($version)) {
-            throw new \Exception('This plugin requires Shopware ' . $version . ' or a later version');
+        if (!$this->assertMinimumVersion($version)) {
+            throw new Exception('This plugin requires Shopware ' . $version . ' or a later version');
         }
     }
 
@@ -89,12 +92,12 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * Update the plugin to the current version
      *
      * @param string $version
-     * @return array|bool
+     * @return array
      */
     public function update($version)
     {
+        $this->checkVersion('5.0.0');
         $this->subscribeEvents();
-
 
         // Create form
         $this->createForm();
@@ -127,14 +130,12 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
 		-- Replace the old index
 		ALTER TABLE  `s_plugin_migrations` DROP INDEX  `typeID` ,
-		ADD UNIQUE  `typeID` (  `typeID` ,  `sourceID` );
-		';
+		ADD UNIQUE  `typeID` (  `typeID` ,  `sourceID` );';
 
         try {
-            Shopware()->Db()->query($sql);
+            $this->db->query($sql);
         } catch (\Exception $e) {
-            // The above statement is just a cleanup statement, so errors should not
-            // cancel the whole update process
+            // The above statement is just a cleanup statement, so errors should not cancel the whole update process
         }
 
         // Make sure that s_order_number is valid
@@ -148,9 +149,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             (20001, 'articleordernumber', 'Artikelbestellnummer  '),
             (20000, 'sSERVICE1', 'Service - 1'),
             (20000, 'sSERVICE2', 'Service - 2'),
-            (210, 'blogordernumber', 'Blog - ID');
-        ";
-        Shopware()->Db()->query($sql);
+            (210, 'blogordernumber', 'Blog - ID');";
+        $this->db->query($sql);
 
         //Fix snippet
         $oldSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
@@ -170,7 +170,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             * Artikel mit ungültigen Nummern werden Sie später nur ändern und speichern können, wenn Sie dabei die Nummer anpassen<br>
         ";
         $sql = "UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?";
-        Shopware()->Db()->query($sql, array($newSnippet, 'numberNotValid', $oldSnippet));
+        $this->db->query($sql, [$newSnippet, 'numberNotValid', $oldSnippet]);
 
         return true;
     }
@@ -180,21 +180,39 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function subscribeEvents()
     {
+        $this->subscribeEvent('Enlight_Controller_Front_DispatchLoopStartup', 'onStartDispatch');
+
         $this->subscribeEvent(
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_SwagMigration',
             'onGetControllerPath'
         );
 
-        $this->subscribeEvent(
-            'Shopware_Components_Password_Manager_AddEncoder',
-            'onAddPasswordEncoder'
-        );
+        $this->subscribeEvent('Shopware_Components_Password_Manager_AddEncoder', 'onAddPasswordEncoder');
 
-        $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch',
-            'onPostDispatch',
-            110
-        );
+        $this->subscribeEvent('Enlight_Controller_Action_PostDispatch', 'onPostDispatch', 110);
+    }
+
+    /**
+     * add migration services
+     */
+    public function onStartDispatch()
+    {
+        $container = Shopware()->Container();
+        $subscribers = [new Resources($container)];
+
+        foreach ($subscribers as $subscriber) {
+            $this->get('events')->addSubscriber($subscriber);
+        }
+    }
+
+    /**
+     * register namespace
+     * initialise database connection
+     */
+    public function afterInit()
+    {
+        $this->get('loader')->registerNamespace('Shopware\SwagMigration', $this->Path());
+        $this->db = $this->get('db');
     }
 
     /**
@@ -207,12 +225,23 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $form->setElement(
             'boolean',
             'debugMigration',
-            array(
+            [
                 'description' => 'Soll eine Debug-Ausgabe geschrieben werden? Achtung! Kann die Geschwindigkeit des Imports negativ beeinflussen.',
                 'label' => 'Debug-Ausgabe',
                 'value' => false,
-            )
+            ]
         );
+
+        $translation = [
+            'en_GB' => [
+                'debugMigration' => [
+                    'label' => 'Debug output',
+                    'description' => 'Should a debug output be written? Attention! Could reduce the import speed.',
+                ]
+            ]
+        ];
+
+        $this->addFormTranslations($translation);
     }
 
     /**
@@ -220,12 +249,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     protected function registerMyTemplateDir()
     {
-        $this->Application()->Snippets()->addConfigDir(
-            $this->Path() . 'Snippets/'
-        );
-        $this->Application()->Template()->addTemplateDir(
-            $this->Path() . 'Views/'
-        );
+        $this->get('snippets')->addConfigDir($this->Path() . 'Snippets/');
+        $this->get('template')->addTemplateDir($this->Path() . 'Views/');
     }
 
     /**
@@ -236,7 +261,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function onAddPasswordEncoder(\Enlight_Event_EventArgs $args)
     {
-        Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__) . '/Components/');
+        $this->get('loader')->registerNamespace('Shopware_Components', dirname(__FILE__) . '/Components/');
 
         $hashes = $args->getReturn();
 
@@ -247,10 +272,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
     /**
      * Register template dir on time
-     *
-     * @param Enlight_Event_EventArgs $args
      */
-    public function onPostDispatch(Enlight_Event_EventArgs $args)
+    public function onPostDispatch()
     {
         $this->registerMyTemplateDir();
     }
@@ -262,10 +285,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function uninstall()
     {
-        $sql = '
-			DROP TABLE IF EXISTS `s_plugin_migrations`;
-		';
-        Shopware()->Db()->query($sql);
+        $sql = 'DROP TABLE IF EXISTS `s_plugin_migrations`;';
+        $this->db->query($sql);
 
         return parent::uninstall();
     }
@@ -273,11 +294,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     /**
      * Backend controller path event. Returns the path of the backend migration controller.
      *
-     * @static
-     * @param Enlight_Event_EventArgs $args
      * @return string
      */
-    public function onGetControllerPath(Enlight_Event_EventArgs $args)
+    public function onGetControllerPath()
     {
         $this->registerMyTemplateDir();
 
@@ -294,54 +313,15 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function getInfo()
     {
-        return array(
+        return [
             'version' => $this->getVersion(),
             'label' => $this->getLabel(),
             'author' => 'shopware AG',
             'description' => file_get_contents($this->Path() . 'info.txt'),
-            'support' => 'http://www.forum.shopware.de',
-            'changes' => array(
-                '1.3.1' => array(
-                    'releasedate' => '2010-01-18',
-                    'lines' => array(
-                        'Solves some problems of gambio profile'
-                    )
-                ),
-                '1.3.2' => array(
-                    'releasedate' => '2010-01-20',
-                    'lines' => array(
-                        'Some bug fixes in customer import'
-                    )
-                ),
-                '1.3.3' => array(
-                    'releasedate' => '2010-01-21',
-                    'lines' => array(
-                        'Add fix for errors of long description'
-                    )
-                ),
-                '1.3.4' => array(
-                    'releasedate' => '2010-01-24',
-                    'lines' => array(
-                        'Add better handling for category import',
-                        'Improved support for large databases'
-                    )
-                ),
-                '1.3.5' => array(
-                    'releasedate' => '2010-01-25',
-                    'lines' => array(
-                        'Fix the problem of long category text',
-                        'Fix the problem if the country is not available'
-                    )
-                ),
-                '2.0.0' => array(
-                    'releasedate' => '2012-11-10',
-                    'lines' => array(
-                        'Prepared for Shopware 4'
-                    )
-                )
-            ),
-            'revision' => '7'
-        );
+            'support' => 'http://forum.shopware.com/',
+            'link' => 'http://forum.shopware.com/',
+            'copyright' => 'shopware AG',
+        ];
     }
 
     /**

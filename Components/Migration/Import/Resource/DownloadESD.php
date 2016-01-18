@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -98,7 +98,7 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
             // get article_detail information
             list($articleDetailsId, $articleId) = Shopware()->Db()->fetchRow(
                 "SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?",
-                array($orderNumber),
+                [$orderNumber],
                 ZEND_Db::FETCH_NUM
             );
 
@@ -115,7 +115,7 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
             // check if we already have the current esd file associated: if the query for s_articles_esd.id is successful then skip
             $existingId = Shopware()->Db()->fetchOne(
                 "SELECT id FROM s_articles_esd WHERE articleID = ? AND file = ?",
-                array($articleId, $filename)
+                [$articleId, $filename]
             );
 
             if ($existingId) {
@@ -125,7 +125,7 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
             // Add actual download to s_articles_esd
             Shopware()->Db()->query(
                 "INSERT INTO s_articles_esd (articleID, articledetailsID, file, datum) VALUES (?,?,?,?)",
-                array($articleId, $articleDetailsId, $filename, $datum)
+                [$articleId, $articleDetailsId, $filename, $datum]
             );
         }
 

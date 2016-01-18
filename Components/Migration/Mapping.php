@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -89,57 +89,57 @@ class Shopware_Components_Migration_Mapping
      */
     public function getMappingLeft()
     {
-        $rows = array();
+        $rows = [];
 
         $target = $this->setAliases($this->Target()->getShops());
         $shops = $this->mapArrays($this->Source()->getShops(), $target);
         foreach ($shops as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'shop',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"],
                 'required' => true
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getLanguages());
         $languages = $this->mapArrays($this->Source()->getLanguages(), $target);
         foreach ($languages as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'language',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"],
                 'required' => true
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getCustomerGroups());
         $customerGroups = $this->mapArrays($this->Source()->getCustomerGroups(), $target);
         foreach ($customerGroups as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'customer_group',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"],
                 'required' => true
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getPriceGroups());
         $priceGroups = $this->mapArrays($this->Source()->getPriceGroups(), $target);
         foreach ($priceGroups as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'price_group',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         return $rows;
@@ -152,79 +152,79 @@ class Shopware_Components_Migration_Mapping
      */
     public function getMappingRight()
     {
-        $rows = array();
+        $rows = [];
 
         $target = $this->setAliases($this->Target()->getPaymentMeans());
         $paymentMeans = $this->mapArrays($this->Source()->getPaymentMeans(), $target);
         foreach ($paymentMeans as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'payment_mean',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getOrderStatus());
         $orderStatus = $this->mapArrays($this->Source()->getOrderStatus(), $target);
         foreach ($orderStatus as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'order_status',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getTaxRates());
         $taxRates = $this->mapArrays($this->Source()->getTaxRates(), $target);
         foreach ($taxRates as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'tax_rate',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getAttributes());
         $attributes = $this->mapArrays($this->Source()->getAttributes(), $target);
         foreach ($attributes as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'attribute',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         $target = $this->setAliases($this->Target()->getProperties());
         $attributes = $this->mapArrays($this->Source()->getProperties(), $target);
         foreach ($attributes as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'property_options',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         $target = $this->setAliases(sort($this->Target()->getConfiguratorOptions()));
         $attributes = $this->mapArrays($this->Source()->getConfiguratorOptions(), $target);
         ksort($attributes);
         foreach ($attributes as $id => $name) {
-            $rows[] = array(
+            $rows[] = [
                 'internalId' => $id,
                 'name' => $name["value"],
                 'group' => 'configurator_mapping',
                 'mapping_name' => $name["mapping"],
                 'mapping' => $name["mapping_value"]
-            );
+            ];
         }
 
         return $rows;
@@ -274,17 +274,17 @@ class Shopware_Components_Migration_Mapping
         }
 
         // The id is not needed later - it just may not collide with any other id
-        $rows = array(
-            array(
+        $rows = [
+            [
                 'id' => $this->namespace->get('pleaseSelect', 'Please select'),
                 'name' => $this->namespace->get('pleaseSelect', 'Please select')
-            )
-        );
+            ]
+        ];
 
 
         if (!empty($values)) {
             foreach ($values as $key => $value) {
-                $rows[] = array('id' => $key, 'name' => $value);
+                $rows[] = ['id' => $key, 'name' => $value];
             }
         }
 
@@ -299,15 +299,15 @@ class Shopware_Components_Migration_Mapping
      */
     public function setAliases($array)
     {
-        $aliasList = array(
+        $aliasList = [
             //Languages - Shops
-            array("deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"),
-            array("englisch", "english", "default english"),
-            array("französisch", "french"),
+            ["deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"],
+            ["englisch", "english", "default english"],
+            ["französisch", "french"],
             //Payments
-            array("vorkasse", "vorauskasse", "prepayment", "in advance"),
+            ["vorkasse", "vorauskasse", "prepayment", "in advance"],
             //order states
-            array(
+            [
                 "in bearbeitung(wartet)",
                 "in bearbeitung",
                 "wird bearbeitet",
@@ -315,25 +315,25 @@ class Shopware_Components_Migration_Mapping
                 "in progress",
                 "in process",
                 "processing"
-            ),
-            array("offen", "open", "opened"),
-            array("komplett abgeschlossen", "abgeschlossen", "completed", "fully completed", "finish", "finished"),
-            array("teilweise abgeschlossen", "partially completed", "partially finished"),
-            array("storniert / abgelehnt", "storniert", "abgelehnt", "canceled", "declined", "rejected", "denied"),
-            array("zur lieferung bereit", "lieferbereit", "ready for delivery", "ready for deliver", "ready to ship"),
-            array(
+            ],
+            ["offen", "open", "opened"],
+            ["komplett abgeschlossen", "abgeschlossen", "completed", "fully completed", "finish", "finished"],
+            ["teilweise abgeschlossen", "partially completed", "partially finished"],
+            ["storniert / abgelehnt", "storniert", "abgelehnt", "canceled", "declined", "rejected", "denied"],
+            ["zur lieferung bereit", "lieferbereit", "ready for delivery", "ready for deliver", "ready to ship"],
+            [
                 "klärung notwendig",
                 "klärung",
                 "mehr informationen notwendig",
                 "clarification needed",
                 "declaration needed",
                 "more information needed"
-            ),
-            array("abgebrochen", "canceled", "aborted"),
+            ],
+            ["abgebrochen", "canceled", "aborted"],
             //taxes
-            array("Standardsatz", "standard tax rate", "19%", "19 %"),
-            array("ermäßigter Steuersatz", "reduced tax rate", "7%", "7 %")
-        );
+            ["Standardsatz", "standard tax rate", "19%", "19 %"],
+            ["ermäßigter Steuersatz", "reduced tax rate", "7%", "7 %"]
+        ];
 
         foreach ($array as &$element) {
             $temp = $element;
@@ -359,7 +359,7 @@ class Shopware_Components_Migration_Mapping
     private function mapArrays($sourceArray, $targetArray)
     {
         foreach ($sourceArray as &$source) {
-            $source = array("value" => $source, "mapping" => '', "mapping_value" => '');
+            $source = ["value" => $source, "mapping" => '', "mapping_value" => ''];
             foreach ($targetArray as $key => $target) {
                 if (is_array($target)) {
                     foreach ($target as $alias) {

@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -119,7 +119,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
             // Get product's properties
             $property_result = $this->Source()->queryProductProperties($product['productID']);
-            $options = array();
+            $options = [];
             $groupName = '';
 
             // Build nested array of properties
@@ -142,20 +142,20 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
                 // Create new element or extend existing
                 if (!array_key_exists($property['option'], $options)) {
-                    $options[$property['option']] = array('name' => $property['option'], values => array(array('value' => $property['value'])));
+                    $options[$property['option']] = ['name' => $property['option'], values => [['value' => $property['value']]]];
                 } else {
-                    array_push($options[$property['option']]['values'], array('value' => $property['value']));
+                    array_push($options[$property['option']]['values'], ['value' => $property['value']]);
                 }
             }
 
             if (!empty($groupName)) {
-                $data = array(
+                $data = [
                     'productID' => $productId,
-                    'group' => array(
+                    'group' => [
                         'name' => $groupName,
                         'options' => $options
-                    )
-                );
+                    ]
+                ];
 
                 // Actually import the properties
                 $this->importProductProperty($data);
@@ -213,10 +213,10 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
          */
         if (isset($group['id'])) {
             $sql = "SELECT `id` FROM `s_filter` WHERE `id` = ?";
-            $groupId = Shopware()->Db()->fetchOne($sql, array($group['id']));
+            $groupId = Shopware()->Db()->fetchOne($sql, [$group['id']]);
         } elseif (isset($group['name'])) {
             $sql = "SELECT `id` FROM `s_filter` WHERE `name` = ?";
-            $groupId = Shopware()->Db()->fetchOne($sql, array($group['name']));
+            $groupId = Shopware()->Db()->fetchOne($sql, [$group['name']]);
         } else {
             error_log("no group info passed");
 
@@ -225,7 +225,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
         if (false == $groupId && isset($group['name'])) {
             $sql = 'INSERT INTO `s_filter` (`name`, `position`, `comparable`, `sortmode`) VALUES(?, ?, ?, ?)';
-            Shopware()->Db()->query($sql, array($group['name'], $group['position'], $group['comparable'], $group['sortmode']));
+            Shopware()->Db()->query($sql, [$group['name'], $group['position'], $group['comparable'], $group['sortmode']]);
             $groupId = Shopware()->Db()->lastInsertId();
         }
 
@@ -248,7 +248,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 					FROM `s_filter_options` o
 					WHERE o.`id` = ?
 				";
-                $optionId = Shopware()->Db()->fetchOne($sql, array($option['id']));
+                $optionId = Shopware()->Db()->fetchOne($sql, [$option['id']]);
             } elseif (isset($option['name'])) {
                 // First try to get option by name with associated group
                 $sql = "
@@ -259,7 +259,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 					AND r.optionID = o.id
 					WHERE o.`name` = ?
 					";
-                $optionId = Shopware()->Db()->fetchOne($sql, array($groupId, $option['name']));
+                $optionId = Shopware()->Db()->fetchOne($sql, [$groupId, $option['name']]);
 
                 // Then try to find option by name ignoring associated groups
                 if (false === $optionId) {
@@ -269,14 +269,14 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 						WHERE o.`name` = ?
 						LIMIT 1
 						";
-                    $optionId = Shopware()->Db()->fetchOne($sql, array($option['name']));
+                    $optionId = Shopware()->Db()->fetchOne($sql, [$option['name']]);
                 }
             }
 
             // Create option
             if (false == $optionId && isset($option['name'])) {
                 $sql = 'INSERT INTO `s_filter_options` (`name`, `filterable`, `default`) VALUES(?, ?, ?)';
-                Shopware()->Db()->query($sql, array($option['name'], $option['filterable'], $option['default']));
+                Shopware()->Db()->query($sql, [$option['name'], $option['filterable'], $option['default']]);
                 $optionId = Shopware()->Db()->lastInsertId();
             }
 
@@ -288,7 +288,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
             // Make sure that the group-option relations are set
             $sql = 'INSERT IGNORE INTO `s_filter_relations` (`groupID`, `optionID`) VALUES (?, ?)';
-            Shopware()->Db()->query($sql, array($groupId, $optionId));
+            Shopware()->Db()->query($sql, [$groupId, $optionId]);
 
 
             foreach ($option['values'] as &$value) {
@@ -301,7 +301,7 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 						FROM `s_filter_values` v
 						WHERE v.`id` = ?
 					";
-                    $valueId = Shopware()->Db()->fetchOne($sql, array($value['id']));
+                    $valueId = Shopware()->Db()->fetchOne($sql, [$value['id']]);
                 } elseif (isset($value['value'])) {
                     // Try to get value by value with associated option
                     $sql = "
@@ -310,13 +310,13 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 						WHERE v.`value` = ?
 						AND v.`optionID` = ?
 						";
-                    $valueId = Shopware()->Db()->fetchOne($sql, array($value['value'], $optionId));
+                    $valueId = Shopware()->Db()->fetchOne($sql, [$value['value'], $optionId]);
                 }
 
                 // Create option
                 if (false == $valueId && isset($value['value'])) {
                     $sql = 'INSERT INTO `s_filter_values` (`value`, `optionId`, `position`) VALUES(?, ?, ?)';
-                    Shopware()->Db()->query($sql, array($value['value'], $optionId, $value['position']));
+                    Shopware()->Db()->query($sql, [$value['value'], $optionId, $value['position']]);
                     $valueId = Shopware()->Db()->lastInsertId();
                 }
 
@@ -328,11 +328,11 @@ class Shopware_Components_Migration_Import_Resource_Property extends Shopware_Co
 
                 // Finally assign filter values to article
                 $sql = 'INSERT IGNORE INTO `s_filter_articles` (`articleID`, `valueID`) VALUES (?, ?)';
-                Shopware()->Db()->query($sql, array($productId, $valueId));
+                Shopware()->Db()->query($sql, [$productId, $valueId]);
             }
         }
 
         // Set filter group for the given article
-        Shopware()->Db()->query('UPDATE s_articles SET filtergroupID = ? WHERE id = ?', array($groupId, $productId));
+        Shopware()->Db()->query('UPDATE s_articles SET filtergroupID = ? WHERE id = ?', [$groupId, $productId]);
     }
 }

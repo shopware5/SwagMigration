@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -79,7 +79,7 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
      *
      * @var array
      */
-    protected $requestParams = array();
+    protected $requestParams = [];
     /**
      * Progress status
      *
@@ -101,14 +101,14 @@ class Shopware_Components_Migration_Import_Progress extends Enlight_Class
         // If $this->progress was set, use that value, else use the calculated value
         $progress = $this->getProgress() === null ? $this->getCalculatedProgress() : $this->getProgress();
 
-        $output = array(
+        $output = [
             'message' => $this->getMessage(),
             'success' => $this->getSuccess(),
             'offset' => $this->getOffset(),
             'progress' => $progress,
             'estimated' => $this->getEstimation(),
             'task_start_time' => $this->getStartTime()
-        );
+        ];
 
 
         foreach ($this->getRequestParams() as $key => $value) {

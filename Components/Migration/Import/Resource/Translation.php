@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
+
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
 
 /**
  * Shopware SwagMigration Components - Translation
@@ -101,10 +103,12 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($translation = $result->fetch()) {
-
             //Attribute
             if (!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source => $target) {
@@ -129,10 +133,10 @@ class Shopware_Components_Migration_Import_Resource_Translation extends Shopware
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, array($translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $product_data = Shopware()->Db()->fetchRow($sql, [$translation['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (!empty($product_data)) {
-                $translation['articletranslationsID'] = Shopware()->Api()->Import()->sTranslation(
+                $translation['articletranslationsID'] = $import->translation(
                     $product_data['kind'] == 1 ? 'article' : 'variant',
                     $product_data['kind'] == 1 ? $product_data['articleID'] : $product_data['articledetailsID'],
                     $translation['languageID'],

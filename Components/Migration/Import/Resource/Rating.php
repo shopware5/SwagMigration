@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -108,7 +108,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, array($rating['productID'], Shopware_Components_Migration::MAPPING_ARTICLE));
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, [$rating['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
 
             if (empty($rating['articleID'])) {
                 continue;
@@ -123,18 +123,18 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
             ';
             $ratingID = Shopware()->Db()->fetchOne(
                 $sql,
-                array(
+                [
                     $rating['articleID'],
                     $rating['name'],
                     !empty($rating['email']) ? $rating['email'] : 'NOW()'
-                )
+                ]
             );
 
             if (!empty($ratingID)) {
                 continue;
             }
 
-            $data = array(
+            $data = [
                 'articleID' => $rating['articleID'],
                 'name' => !empty($rating['name']) ? $rating['name'] : '',
                 'headline' => !empty($rating['title']) ? $rating['title'] : '',
@@ -143,7 +143,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 'datum' => isset($rating['date']) ? $rating['date'] : new Zend_Db_Expr('NOW()'),
                 'active' => isset($rating['active']) ? $rating['active'] : 1,
                 'email' => !empty($rating['email']) ? $rating['email'] : '',
-            );
+            ];
             Shopware()->Db()->insert('s_articles_vote', $data);
         }
 

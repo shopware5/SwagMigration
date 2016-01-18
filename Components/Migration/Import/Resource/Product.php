@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -22,6 +22,8 @@
  * our trademarks remain entirely with us.
  */
 
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
 /**
  * Shopware SwagMigration Components - Product
  *
@@ -33,6 +35,9 @@
  */
 class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Components_Migration_Import_Resource_Abstract
 {
+    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
+    private $db = null;
+
     /**
      * Returns the default error message for this import class
      *
@@ -70,6 +75,19 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
     }
 
     /**
+     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @throws Exception
+     */
+    public function getDb()
+    {
+        if ($this->db === null) {
+            $this->db = Shopware()->Container()->get('db');
+        }
+
+        return $this->db;
+    }
+
+    /**
      * Main run method of each import adapter. The run method will query the source profile, iterate
      * the results and prepare the data for import via the old Shopware API.
      *
@@ -94,15 +112,22 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
     {
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
-        $import = Shopware()->Api()->Import();
+        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
+        $db = $this->getDb();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         $offset = $this->getProgress()->getOffset();
-        $result = $this->Source()->queryProducts($offset);
-        $this->getProgress()->setCount($result->rowCount() + $offset);
+        $products = $this->Source()->queryProducts($offset);
+        $this->getProgress()->setCount($products->rowCount() + $offset);
 
         $this->initTaskTimer();
 
-        $configurator_mapping = $this->Request()->configurator_mapping;
+        $configuratorMapping = $this->Request()->get('configurator_mapping');
+        $attributes = $this->Request()->get('attribute');
+        $taxRate = $this->Request()->get('tax_rate');
+        $supplier = $this->Request()->get('supplier');
 
         $numberSnippet = $this->getNameSpace()->get(
             'numberNotValid',
@@ -116,8 +141,9 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
             "
         );
 
-        while ($product = $result->fetch()) {
+        while ($product = $products->fetch()) {
             $existingOrderNumber = true;
+
             // Select additional data for the article if needed
             $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
             if (!empty($additionalProductInfo)) {
@@ -129,19 +155,15 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
             // try to get it from the initial mapping
             if (!empty($product['additionaltext']) && empty($product['variant_group_names'])) {
                 $additional = ucwords(strtolower($product['additionaltext']));
-                if (isset($configurator_mapping[$additional])) {
-                    $product['variant_group_names'] = $configurator_mapping[$additional];
+                if (isset($configuratorMapping[$additional])) {
+                    $product['variant_group_names'] = $configuratorMapping[$additional];
                 }
             }
 
             // Check the ordernumber
-            $number = $product['ordernumber'];
-            if (!isset($number)) {
-                $number = '';
-            }
+            $number = isset($product['ordernumber']) ?: '';
             if ($numberValidationMode !== 'ignore'
-                && (empty($number) || strlen($number) > 30
-                || preg_match('/[^a-zA-Z0-9-_. ]/', $number))
+                && (empty($number) || strlen($number) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $number))
             ) {
                 switch ($numberValidationMode) {
                     case 'complain':
@@ -154,40 +176,43 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 }
             }
 
-
             //Attribute
-            if (!empty($this->Request()->attribute)) {
-                foreach ($this->Request()->attribute as $source => $target) {
+            if (!empty($attributes)) {
+                foreach ($attributes as $source => $target) {
                     if (!empty($target) && isset($product[$source])) {
                         $product[$target] = $product[$source];
                         unset($product[$source]);
                     }
                 }
             }
+
             //TaxRate
-            if (!empty($this->Request()->tax_rate) && isset($product['taxID'])) {
-                if (isset($this->Request()->tax_rate[$product['taxID']])) {
-                    $product['taxID'] = $this->Request()->tax_rate[$product['taxID']];
+            if (!empty($taxRate) && isset($product['taxID'])) {
+                if (isset($taxRate[$product['taxID']])) {
+                    $product['taxID'] = $taxRate[$product['taxID']];
                 } else {
                     unset($product['taxID']);
                 }
             }
+
             //Supplier
             if (empty($product['supplierID']) && empty($product['supplier'])) {
-                $product['supplier'] = $this->Request()->supplier;
+                $product['supplier'] = $supplier;
             }
+
             //Parent
             if (!empty($product['parentID'])) {
                 $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
-                $product['maindetailsID'] = Shopware()->Db()->fetchOne(
+                $product['maindetailsID'] = $db->fetchOne(
                     $sql,
-                    array(
+                    [
                         Shopware_Components_Migration::MAPPING_ARTICLE,
                         $product['parentID']
-                    )
+                    ]
                 );
             }
 
+            //Long Description
             if (isset($product['description_long'])) {
                 $product_description = $product['description_long'];
                 unset($product['description_long']);
@@ -195,12 +220,13 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 $product_description = null;
             }
 
+            //Description
             if (isset($product['description'])) {
                 $product['description'] = strip_tags($product['description']);
             }
 
             //Article
-            $product_result = $import->sArticle($product);
+            $product_result = $import->article($product);
             if (!empty($product_result)) {
                 $product = array_merge($product, $product_result);
                 /**
@@ -212,7 +238,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 if ($product['maindetailsID']) {
                     // Get options of the old main detail
                     $sql = 'SELECT id FROM s_article_configurator_option_relations WHERE article_id = ?';
-                    $hasOptions = Shopware()->Db()->fetchOne($sql, array($product['maindetailsID']));
+                    $hasOptions = $db->fetchOne($sql, [$product['maindetailsID']]);
 
                     // If non is available remove the odl detail and set the new one as main detail
                     if (!$hasOptions) {
@@ -228,7 +254,7 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 // generated for the master article of master/child article architectures
                 if (isset($product['masterWithAttributes']) && $product['masterWithAttributes'] == 1 && !empty($product['additionaltext'])) {
                     $product['maindetailsID'] = $product['articledetailsID'];
-                    $import->sArticleLegacyVariant($product);
+                    $import->setArticleConfigurationData($product);
                 }
 
                 // Meta-title... if is import the meta-title set them
@@ -238,14 +264,15 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
 
                 if ($product['kind'] == 1 && $product_description !== null) {
                     if ($metaTitle) {
-                        $array = array('description_long' => $product_description, 'metaTitle' => $metaTitle);
+                        $array = ['description_long' => $product_description, 'metaTitle' => $metaTitle];
                     } else {
-                        $array = array('description_long' => $product_description);
+                        $array = ['description_long' => $product_description];
                     }
-                    Shopware()->Db()->update(
+
+                    $db->update(
                         's_articles',
                         $array,
-                        array('id=?' => $product_result['articleID'])
+                        ['id=?' => $product_result['articleID']]
                     );
                 }
 
@@ -260,18 +287,19 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                     }
                 }
                 if (isset($product['price'])) {
-                    $product['articlepricesID'] = $import->sArticlePrice($product);
+                    $product['articlepricesID'] = $import->setArticlePriceData($product);
                 }
+
                 //Link
                 if (isset($product['link'])) {
-                    $import->sDeleteArticleLinks($product);
+                    $import->deleteArticleLinks($product);
                     if (!empty($product['link'])) {
-                        $product['articlelinkID'] = $import->sArticleLink(
-                            array(
+                        $product['articlelinkID'] = $import->addArticleLink(
+                            [
                                 'articleID' => $product['articleID'],
                                 'link' => $product['link'],
                                 'description' => empty($product['link_description']) ? $product['link'] : $product['link_description']
-                            )
+                            ]
                         );
                     }
                 }
@@ -279,21 +307,20 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
                 //If we create valid order number don't insert it again.
                 if ($existingOrderNumber) {
                     $sql = '
-                    INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
-                    VALUES (?, ?, ?)
-                    ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
-                ';
-                    Shopware()->Db()->query(
+                        INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
+                        VALUES (?, ?, ?)
+                        ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
+                    ';
+                    $db->query(
                         $sql,
-                        array(
+                        [
                             Shopware_Components_Migration::MAPPING_ARTICLE,
                             $product['productID'],
                             $product['articledetailsID']
-                        )
+                        ]
                     );
                 }
             }
-
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
@@ -314,32 +341,23 @@ class Shopware_Components_Migration_Import_Resource_Product extends Shopware_Com
      */
     public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
     {
+        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
+        $db = $this->getDb();
+
         // Delete old main detail
         $sql = 'DELETE FROM s_articles_details WHERE id = ?';
-        Shopware()->Db()->query(
-            $sql,
-            array($oldMainDetail)
-        );
+        $db->query($sql, [$oldMainDetail]);
 
         // Set the new mainDetail for the article
         $sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
-        Shopware()->Db()->query(
-            $sql,
-            array($newMainDetail, $articleId)
-        );
+        $db->query($sql, [$newMainDetail, $articleId]);
 
         // Update kind of the new main detail
-        $sql = 'UPDATE s_articles_details SET kind=1 WHERE id = ?';
-        Shopware()->Db()->query(
-            $sql,
-            array($newMainDetail)
-        );
+        $sql = 'UPDATE s_articles_details SET kind = 1 WHERE id = ?';
+        $db->query($sql, [$newMainDetail]);
 
         // Update mapping so that references to the old dummy article point to this article
         $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
-        Shopware()->Db()->query(
-            $sql,
-            array($newMainDetail, Shopware_Components_Migration::MAPPING_ARTICLE, $oldMainDetail)
-        );
+        $db->query($sql, [$newMainDetail, Shopware_Components_Migration::MAPPING_ARTICLE, $oldMainDetail]);
     }
 }

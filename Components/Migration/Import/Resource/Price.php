@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -21,6 +21,8 @@
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
  */
+
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
 
 /**
  * Shopware SwagMigration Components - Price
@@ -107,7 +109,10 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $taskStartTime = $this->initTaskTimer();
+        $this->initTaskTimer();
+
+        /* @var Import $import */
+        $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($price = $result->fetch()) {
             if (!empty($this->Request()->price_group) && !empty($price['pricegroup'])) {
@@ -138,11 +143,11 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
             ";
             $price_config = Shopware()->Db()->fetchRow(
                 $sql,
-                array(
+                [
                     $price['pricegroup'],
                     $price['productID'],
                     Shopware_Components_Migration::MAPPING_ARTICLE
-                )
+                ]
             );
             if (!empty($price_config)) {
                 $price = array_merge($price, $price_config);
@@ -165,7 +170,7 @@ class Shopware_Components_Migration_Import_Resource_Price extends Shopware_Compo
                     }
                 }
 
-                $price['articlepricesID'] = Shopware()->Api()->Import()->sArticlePrice($price);
+                $price['articlepricesID'] = $import->articlePrice($price);
             }
 
 

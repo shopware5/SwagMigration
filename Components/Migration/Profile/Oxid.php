@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -100,7 +100,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
      */
     public function getLanguageKeys()
     {
-        $keys = array();
+        $keys = [];
         $params = $this->Config()->aLanguageParams;
         foreach ($params as $id => $param) {
             $keys[$param['baseId']] = $id;
@@ -166,13 +166,13 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
      */
     public function getOrderStatus()
     {
-        $status = array();
+        $status = [];
         $keys = array_keys($this->Config()->aOrderfolder);
-        $values = array(
+        $values = [
             'ORDERFOLDER_NEW' => 'Neu',
             'ORDERFOLDER_FINISHED' => 'Bearbeitet',
             'ORDERFOLDER_PROBLEMS' => 'Probleme'
-        );
+        ];
         foreach ($keys as $key) {
             $status[$key] = isset($values[$key]) ? $values[$key] : $key;
         }
@@ -398,7 +398,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
      */
     public function getProductImageSelect()
     {
-        $sql = array();
+        $sql = [];
         for ($i = 1; $i <= 12; $i++) {
             $sql[] = "
 				SELECT OXID as `productID`, CONCAT('$i/', OXPIC$i) as `image`, $i as `position`, IF($i=1, 1, 0) as `main`
@@ -498,7 +498,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
         $baseShopId = $this->getBaseShopId();
 
         $keys = $this->getLanguageKeys();
-        $sql = array(
+        $sql = [
             "
 			SELECT
 				c.OXID as categoryID,
@@ -520,7 +520,7 @@ class Shopware_Components_Migration_Profile_Oxid extends Shopware_Components_Mig
             ON s.OXOBJECTID = c.OXID
 			WHERE c.OXSHOPID='{$baseShopId}'
 		"
-        );
+        ];
         foreach ($keys as $key => $languageID) {
             if (empty($key)) {
                 continue;

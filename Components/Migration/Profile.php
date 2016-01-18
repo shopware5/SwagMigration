@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -157,7 +157,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     public function Config()
     {
         if (!isset($this->config)) {
-            $config = array();
+            $config = [];
             $sql = $this->getConfigSelect();
             $rows = $this->db->fetchAll($sql);
             foreach ($rows as $row) {
@@ -349,7 +349,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
         }
         $result = $this->db->fetchCol($this->getConfiguratorOptionsSelect());
 
-        $output = array();
+        $output = [];
         foreach ($result as $value) {
             $value = ucwords(strtolower($value));
             $output[$value] = $value;

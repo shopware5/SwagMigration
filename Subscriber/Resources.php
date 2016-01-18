@@ -22,55 +22,52 @@
  * our trademarks remain entirely with us.
  */
 
-use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
+namespace Shopware\SwagMigration\Subscriber;
 
-/**
- * Password interface for md5 hashed with salt first
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
- * @copyright Copyright (c) 2013, shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_PasswordEncoder_Md5Reversed implements PasswordEncoderInterface
+use Enlight\Event\SubscriberInterface;
+use Shopware\Components\DependencyInjection\Container;
+use Shopware\SwagMigration\Components\DbServices\DeleteService;
+use Shopware\SwagMigration\Components\DbServices\Import\Import;
+
+class Resources implements SubscriberInterface
 {
+    /** @var Container $container*/
+    private $container;
+
     /**
-     * @return string
+     * Resources constructor.
+     *
+     * @param Container $container
      */
-    public function getName()
+    public function __construct(Container $container)
     {
-        return 'md5reversed';
+        $this->container = $container;
     }
 
     /**
-     * @param  string $password
-     * @param  string $hash
-     * @return bool
+     * @inheritdoc
      */
-    public function isPasswordValid($password, $hash)
+    public static function getSubscribedEvents()
     {
-        if (strpos($hash, ':') === false) {
-            return $hash == md5($password);
-        }
-        list($md5, $salt) = explode(':', $hash);
-
-        return $md5 == md5($salt . $password);
+        return [
+            'Enlight_Bootstrap_InitResource_swagmigration.import' => 'onInitImport',
+            'Enlight_Bootstrap_InitResource_swagmigration.deleteService' => 'onInitDeleteService',
+        ];
     }
 
     /**
-     * @param  string $password
-     * @return string
+     * @return Import
      */
-    public function encodePassword($password)
+    public function onInitImport()
     {
-        return md5($password);
+        return new Import($this->container);
     }
 
     /**
-     * @param  string $hash
-     * @return bool
+     * @return DeleteService
      */
-    public function isReencodeNeeded($hash)
+    public function onInitDeleteService()
     {
-        return false;
+        return new DeleteService($this->container->get('db'));
     }
 }

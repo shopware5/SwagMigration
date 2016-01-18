@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2013 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -62,6 +62,7 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         $offset = $this->getProgress()->getOffset();
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
+        /** @var Zend_Db_Statement_Interface $result */
         $result = $this->Source()->queryArticleDownload();
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
@@ -117,7 +118,10 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
             file_put_contents($localPath . str_replace("%20", " ", $path), $document);
 
             // Write entry to database
-            $getShopwareArticleId = Shopware()->Db()->fetchOne("SELECT articleID FROM s_articles_details WHERE ordernumber = ?", array($orderNumber));
+            $sql = "SELECT articleID
+                    FROM s_articles_details
+                    WHERE ordernumber = ?";
+            $getShopwareArticleId = Shopware()->Db()->fetchOne($sql, [$orderNumber]);
             if (empty($getShopwareArticleId)) {
                 //No article
                 continue;
@@ -131,7 +135,7 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
             // Add entry to s_articles_downloads
             Shopware()->Db()->query(
                 "INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)",
-                array($getShopwareArticleId, $description, "/files/downloads/" . $path, filesize($localPath . $path))
+                [$getShopwareArticleId, $description, "/files/downloads/" . $path, filesize($localPath . $path)]
             );
         }
 
