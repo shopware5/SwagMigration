@@ -201,7 +201,7 @@ class CustomerImporter
             || isset($customer['shipping_firstname'])
             || isset($customer['shipping_lastname'])
         ) {
-            $sql = 'DELETE FROM S_USER_SHIPPINGADDRESS WHERE USERID = ' . $customer['userID'];
+            $sql = 'DELETE FROM s_user_shippingaddress WHERE userID = ' . $customer['userID'];
             $this->db->query($sql);
         }
 
@@ -316,7 +316,7 @@ class CustomerImporter
             $insertFields[] = 'password';
             $insertValues[] = $customer['md5_password'];
 
-            $sql = 'INSERT INTO S_USER (' . implode(', ', $insertFields) . ')
+            $sql = 'INSERT INTO s_user (' . implode(', ', $insertFields) . ')
                     VALUES (' . implode(', ', $insertValues) . ')';
             $result = $this->db->query($sql);
             if ($result === false) {
@@ -556,19 +556,19 @@ class CustomerImporter
      */
     private function getCustomerNumber($userId)
     {
-        $sql = 'SELECT CUSTOMERNUMBER
-                FROM S_USER_BILLINGADDRESS
-                WHERE USERID = ' . $userId;
+        $sql = 'SELECT customernumber
+                FROM s_user_billingaddress
+                WHERE userID = ' . $userId;
         $customerNumber = $this->db->fetchOne($sql);
         if ($this->config->get('sSHOPWAREMANAGEDCUSTOMERNUMBERS') && empty($customerNumber)) {
-            $sql = "UPDATE S_ORDER_NUMBER N, S_USER_BILLINGADDRESS B
-                    SET N.NUMBER = N.NUMBER + 1, B.CUSTOMERNUMBER = N.NUMBER + 1
-                    WHERE N.NAME = 'user'
-                      AND B.USERID = ?";
+            $sql = "UPDATE s_order_number N, s_user_billingaddress B
+                    SET n.number = n.number + 1, b.customernumber = n.number + 1
+                    WHERE n.name = 'user'
+                      AND b.userID = ?";
             $this->db->query($sql, [$userId]);
-            $sql = 'SELECT CUSTOMERNUMBER
-                    FROM S_USER_BILLINGADDRESS
-                    WHERE USERID = ' . $userId;
+            $sql = 'SELECT customernumber
+                    FROM s_user_billingaddress
+                    WHERE userID = ' . $userId;
             $customerNumber = $this->db->fetchOne($sql);
         }
 
