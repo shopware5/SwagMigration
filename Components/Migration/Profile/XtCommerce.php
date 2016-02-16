@@ -1,43 +1,17 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - XtCommerce
- *
- *
- *
- *
- * WARNING: When changing this component also check gambio profile as this currently
- * extens from this XTC profile. Also some methods of the Veyton profile might extend from here
- *
- *
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Components_Migration_Profile
+namespace Shopware\SwagMigration\Components\Migration\Profile;
+
+use Shopware\SwagMigration\Components\Migration\Profile;
+use Exception;
+
+class XtCommerce extends Profile
 {
     /**
      * Returns the directory of the article images.
@@ -287,10 +261,10 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				a.products_tax_class_id					as taxID,
 				s.manufacturers_name					as supplier,
 				a.products_status						as active,
-				
+
 				a.products_fsk18						as fsk18,
 				a.products_ean							as ean,
-				
+
 				d.products_name 						as name,
 				d.products_description 					as description_long,
 				d.products_short_description 			as description,
@@ -405,7 +379,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
      * This function creates an database index on the orders table
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryCustomers($offset = 0)
     {
@@ -436,7 +410,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 			SELECT
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
-				
+
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms')		as billing_salutation,
 				a.entry_firstname									as billing_firstname,
 				a.entry_lastname 	 								as billing_lastname,
@@ -447,30 +421,30 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				a.entry_postcode 									as billing_zipcode,
 				a.entry_city	 									as billing_city,
 				c.countries_iso_code_2 								as billing_countryiso,
-				
+
 				u.customers_telephone 								as phone,
 				u.customers_fax 									as fax,
 				u.customers_email_address 							as email,
 				DATE(u.customers_dob)								as birthday,
 				u.customers_vat_id 									as ustid,
 				u.customers_newsletter								as newsletter,
-				
+
 				u.customers_password 								as md5_password,
-				
+
 				u.customers_status									as customergroupID,
-				
+
 				u.customers_date_added 								as firstlogin,
 				u.customers_date_added								as lastlogin,
 				1													as active,
 				1               									as subshopID
 
-				
+
 			FROM {$this->quoteTable('customers', 'u')}
-			
+
 			JOIN {$this->quoteTable('address_book', 'a')}
 			ON a.customers_id=u.customers_id
 			AND a.address_book_id=u.customers_default_address_id
-			
+
 			LEFT JOIN {$this->quoteTable('countries', 'c')}
 			ON c.countries_id=a.entry_country_id
 		";
@@ -538,10 +512,10 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				`reviews_text` as `comment`,
 				'' as `title`
 			FROM {$this->quoteTable('reviews', 'r')}
-			
+
 			LEFT JOIN {$this->quoteTable('reviews_description', 'd')}
 			ON d.reviews_id=r.reviews_id
-				
+
 			LEFT JOIN {$this->quoteTable('customers', 'c')}
 			ON r.customers_id=c.customers_id
 		";
@@ -560,7 +534,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				o.`orders_id`									as ordernumber,
 				u.`customers_id`								as customerID,
 				o.`customers_vat_id`							as ustid,
-				
+
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms')	as billing_salutation,
 				`billing_firstname`,
 				`billing_lastname`,
@@ -572,7 +546,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				`billing_city`,
 				`billing_postcode`								as billing_zipcode,
 				`billing_country_iso_code_2`					as billing_countryiso,
-						
+
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms') as shipping_salutation,
 				`delivery_firstname`							as shipping_firstname,
 				`delivery_lastname`								as shipping_lastname,
@@ -584,7 +558,7 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 				`delivery_city`									as shipping_city,
 				`delivery_postcode`								as shipping_zipcode,
 				`delivery_country_iso_code_2`					as shipping_countryiso,
-								
+
 				o.`customers_telephone`							as phone,
 				-- `billing_fax`								as fax,
 				`payment_method`									as paymentID,
@@ -630,15 +604,15 @@ class Shopware_Components_Migration_Profile_XtCommerce extends Shopware_Componen
 					WHERE `class`='ot_tax'
 					AND `orders_id`=o.`orders_id`
 				)												as invoice_amount_net
-				
+
 			FROM {$this->quoteTable('orders', 'o')}
-			
+
 			LEFT JOIN {$this->quoteTable('customers', 'u')}
 			ON u.customers_id=o.customers_id
 
             LEFT JOIN {$this->quoteTable('languages', 'l')}
 			ON l.directory=o.language
-			
+
 			LEFT JOIN {$this->quoteTable('address_book', 'a')}
 			ON a.customers_id=u.customers_id
 			AND a.address_book_id=u.customers_default_address_id

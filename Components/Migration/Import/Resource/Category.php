@@ -1,28 +1,17 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Shopware\SwagMigration\Components\Migration;
+use Exception;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 /**
  * Shopware SwagMigration Components - Category
@@ -33,7 +22,7 @@ use Shopware\SwagMigration\Components\DbServices\Import\Import;
  * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Components_Migration_Import_Resource_Abstract
+class Category extends AbstractResource
 {
     /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
     private $db = null;
@@ -75,7 +64,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
      * Returns the progress message for the current import step. A Progress-Object will be passed, so
      * you can get some context info for your snippet
      *
-     * @param Shopware_Components_Migration_Import_Progress $progress
+     * @param Progress $progress
      * @return string
      */
     public function getCurrentProgressMessage($progress)
@@ -121,7 +110,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
         ';
 
-        $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id, $target]);
+        $this->getDb()->query($sql, [Migration::MAPPING_CATEGORY_TARGET, $id, $target]);
     }
 
     /**
@@ -138,7 +127,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
 
         return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
-            [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, $id]
+            [Migration::MAPPING_CATEGORY_TARGET, $id]
         );
     }
 
@@ -157,8 +146,8 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         return $this->getDb()->fetchOne(
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             [
-                Shopware_Components_Migration::MAPPING_CATEGORY_TARGET,
-                $id . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                Migration::MAPPING_CATEGORY_TARGET,
+                $id . Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
             ]
         );
     }
@@ -171,7 +160,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     public function deleteCategoryTarget($id)
     {
         $sql = "DELETE FROM s_plugin_migrations WHERE typeID = ? AND sourceID = '{$id}'";
-        $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET]);
+        $this->getDb()->query($sql, [Migration::MAPPING_CATEGORY_TARGET]);
     }
 
     /**
@@ -181,7 +170,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
      * If you want to import multiple entities with one import-class, you might want to check for
      * $this->getInternalName() in order to distinct which (sub)entity you where called for.
      *
-     * The run method may only return instances of Shopware_Components_Migration_Import_Progress
+     * The run method may only return instances of Progress
      * The calling instance will use those progress object to communicate with the ExtJS backend.
      * If you want this to work properly, think of calling:
      * - $this->initTaskTimer() at the beginning of your run method
@@ -194,7 +183,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
      *
      * The category import adapter handles categories as well as article-category assignments.
      *
-     * @return Shopware_Components_Migration_Import_Progress
+     * @return Progress
      */
     public function run()
     {
@@ -208,7 +197,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     /**
      * Will import the actual categories
      *
-     * @return $this|Shopware_Components_Migration_Import_Progress
+     * @return $this|Progress
      */
     public function importCategories()
     {
@@ -220,7 +209,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         if (!$skip && $offset === 0) {
             $this->getDb()->query(
                 "DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
-                [Shopware_Components_Migration::MAPPING_CATEGORY_TARGET, 2]
+                [Migration::MAPPING_CATEGORY_TARGET, 2]
             );
         }
 
@@ -232,12 +221,12 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
         while (!$skip && $category = $categories->fetch()) {
             //check if the category split into the different translations
             if (!empty($category['languageID'])
-                && strpos($category['categoryID'], Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
+                && strpos($category['categoryID'], Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
             ) {
-                $category['categoryID'] = $category['categoryID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
+                $category['categoryID'] = $category['categoryID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
 
                 if (!empty($category['parentID'])) {
-                    $category['parentID'] = $category['parentID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
+                    $category['parentID'] = $category['parentID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
                 }
             }
 
@@ -298,7 +287,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
             ';
 
-            $this->getDb()->query($sql, [Shopware_Components_Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']]);
+            $this->getDb()->query($sql, [Migration::MAPPING_CATEGORY, $category['categoryID'], $category['targetID']]);
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {
@@ -314,7 +303,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
     /**
      * Will assign articles to categories
      *
-     * @return Shopware_Components_Migration_Import_Progress
+     * @return Progress
      */
     public function importArticleCategories()
     {
@@ -342,8 +331,7 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
                 JOIN s_articles_details ad ON ad.id = pm.targetID
                 WHERE sourceID = ? AND typeID = ?
             ';
-            $article = $this->getDb()->fetchOne($sql, [$productCategory['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
-
+            $article = $this->getDb()->fetchOne($sql, [$productCategory['productID'], Migration::MAPPING_ARTICLE]);
             if (empty($article)) {
                 continue;
             }
@@ -357,9 +345,9 @@ class Shopware_Components_Migration_Import_Resource_Category extends Shopware_Co
             $categories = $this->getDb()->fetchCol(
                 $sql,
                 [
-                    Shopware_Components_Migration::MAPPING_CATEGORY,
+                    Migration::MAPPING_CATEGORY,
                     $productCategory['categoryID'],
-                    $productCategory['categoryID'] . Shopware_Components_Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                    $productCategory['categoryID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
                 ]
             );
 

@@ -1,36 +1,16 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Basic interface for the import classes
- * Class Shopware_Components_Migration_Import_Resource_Interface
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-interface Shopware_Components_Migration_Import_Resource_Interface
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+
+interface ResourceInterface
 {
     /**
      * The generic error message of an import
@@ -61,7 +41,7 @@ interface Shopware_Components_Migration_Import_Resource_Interface
      * If you want to import multiple entities with one import-class, you might want to check for
      * $this->getInternalName() in order to distinct which (sub)entity you where called for.
      *
-     * The run method should only return instances of Shopware_Components_Migration_Import_Progress
+     * The run method should only return instances of Progress
      * The calling instance will use those progress object to communicate with the ExtJS backend.
      * If you want this to work properly, think of calling:
      * - $this->initTaskTimer() at the beginning of your run method
@@ -73,7 +53,7 @@ interface Shopware_Components_Migration_Import_Resource_Interface
      * - return $this->getProgress()->done() in order to mark the import as finished
      *
      *
-     * @return Shopware_Components_Migration_Import_Progress
+     * @return Progress
      */
     public function run();
 }

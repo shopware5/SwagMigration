@@ -1,37 +1,14 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Veyton
- *
- * Extends from XTC
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_Migration_Profile_XtCommerce
+namespace Shopware\SwagMigration\Components\Migration\Profile;
+
+class Veyton extends XtCommerce
 {
     /**
      * Prefix of each database tables
@@ -228,11 +205,11 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				d.products_keywords 					as keywords
 
 			FROM {$this->quoteTable('products', 'a')}
-			
+
 			LEFT JOIN {$this->quoteTable('manufacturers', 's')}
 			ON s.manufacturers_id=a.manufacturers_id
 
-			
+
 			LEFT JOIN {$this->quoteTable('products_description', 'd')}
 			ON d.products_id=a.products_id
 			AND d.language_code='de'
@@ -300,15 +277,15 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				md.media_name as description,
 				ml.sort_order as position,
 				IF(p.products_id, 1, 0) as main
-				
+
 			FROM {$this->quoteTable('media', 'm')}
-			
+
 			LEFT JOIN {$this->quoteTable('media_link', 'ml')}
 			ON ml.m_id=m.id
-			
+
 			LEFT JOIN {$this->quoteTable('products', 'p')}
 			ON p.products_image=m.file
-			
+
 			LEFT JOIN {$this->quoteTable('media_description', 'md')}
 			ON md.id=m.id
 			AND md.`language_code`='de'
@@ -366,7 +343,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 			SELECT
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
-				
+
 				IF(a.customers_gender IN ('m', 'Herr'), 'mr', 'ms')	as billing_salutation,
 				a.customers_firstname								as billing_firstname,
 				a.customers_lastname 								as billing_lastname,
@@ -378,22 +355,22 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				a.customers_city 									as billing_city,
 				a.customers_country_code 							as billing_countryiso,
 
-				
+
 				a.customers_phone 									as phone,
 				a.customers_fax 									as fax,
 				u.customers_email_address 							as email,
 				a.customers_dob 									as birthday,
 				u.customers_vat_id 									as ustid,
-				
+
 				u.customers_password 								as md5_password,
-				
+
 				u.shop_id											as subshopID,
 				u.customers_status									as customergroupID,
-				
+
 				u.date_added 										as firstlogin
 
 			FROM {$this->quoteTable('customers', 'u')}
-			
+
 			JOIN {$this->quoteTable('customers_addresses', 'a')}
 			ON a.customers_id=u.customers_id
 			AND a.address_class='default'
@@ -479,7 +456,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				o.`orders_id`								as ordernumber,
 				`customers_id`								as customerID,
 				`customers_vat_id`							as ustid,
-				
+
 				IF(`billing_gender` IN ('m','Herr'), 'mr', 'ms')
 															as billing_salutation,
 				`billing_firstname`,
@@ -492,7 +469,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				`billing_city`,
 				`billing_postcode`							as billing_zipcode,
 				`billing_country_code`						as billing_countryiso,
-						
+
 				IF(`delivery_gender` IN ('m','Herr'), 'mr', 'ms')
 															as shipping_salutation,
 				`delivery_firstname`						as shipping_firstname,
@@ -505,7 +482,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				`delivery_city`								as shipping_city,
 				`delivery_postcode`							as shipping_zipcode,
 				`delivery_country_code`						as shipping_countryiso,
-								
+
 				`billing_phone`								as phone,
 				`billing_fax`								as fax,
 				`payment_code`								as paymentID,
@@ -520,7 +497,7 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 				IF(o.`allow_tax`=1,0,1)						as tax_free,
 				`customers_ip`								as remote_addr,
 				`shop_id`									as subshopID,
-				
+
 				SUM(
 					ROUND(op.`products_price`*op.`products_quantity`, 2)
 				) + IFNULL(ROUND(`orders_total_price`*`orders_total_quantity`, 2), 0)
@@ -534,16 +511,16 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
 															as invoice_shipping_net,
 				ROUND(`orders_total_price`*(IF(ot.`allow_tax`=1,`orders_total_tax`,0)+100)/100, 2)
 															as invoice_shipping
-				
+
 			FROM {$this->quoteTable('orders', 'o')}
-			
+
 			LEFT JOIN {$this->quoteTable('orders_total', 'ot')}
 			ON ot.`orders_id`=o.`orders_id`
 			AND ot.`orders_total_key`='shipping'
-			
+
 			LEFT JOIN {$this->quoteTable('orders_products', 'op')}
 			ON op.`orders_id`=o.`orders_id`
-			
+
 			GROUP BY o.`orders_id`
 		";
     }
@@ -557,17 +534,17 @@ class Shopware_Components_Migration_Profile_Veyton extends Shopware_Components_M
     {
         return "
 			SELECT
-			
+
 				orders_id as orderID,
 				products_id  as productID,
-				
+
 				IF(products_model <> '', products_model, products_id) as article_ordernumber,
 				products_name as name,
 				ROUND(`products_price`*(IF(`allow_tax`=1,`products_tax`,0)+100)/100,2) as price,
 				products_quantity as quantity,
 				products_tax_class as taxID,
 				0 as modus
-				
+
 			FROM {$this->quoteTable('orders_products')}
 		";
     }

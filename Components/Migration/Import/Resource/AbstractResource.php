@@ -1,42 +1,19 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Abstract
- *
- * Abstract base class for all the import resources. Holds some convenience methods like initTaskTimer(),
- * newRequestNeeded() or increaseProgress() which make implementing imports somewhat easier.
- *
- * In order to add a new import, extend from this class, implement the Shopware_Components_Migration_Import_Resource_Interface
- * interface and add your logic to the run() method. How to implement multi request capability is described in the
- * docs of the run()-method in Shopware_Components_Migration_Import_Resource_Interface.
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-abstract class Shopware_Components_Migration_Import_Resource_Abstract extends Enlight_Class implements Shopware_Components_Migration_Import_Resource_Interface
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Enlight_Class;
+use Shopware\SwagMigration\Components\Migration;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use Shopware\SwagMigration\Components\Migration\Profile;
+
+abstract class AbstractResource extends Enlight_Class implements ResourceInterface
 {
     /**
      * Internal name of the import step used by the controller
@@ -48,7 +25,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * References the progress object
      *
-     * @var Shopware_Components_Migration_Import_Progress
+     * @var Progress
      */
     protected $progress;
 
@@ -76,23 +53,23 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * Source-Object
      *
-     * @var Shopware_Components_Migration_Profile
+     * @var Profile
      */
     protected $source;
 
     /**
      * Target-Object
      *
-     * @var Shopware_Components_Migration_Profile
+     * @var Profile
      */
     protected $target;
 
     /**
      * Constructor
      *
-     * @param Shopware_Components_Migration_Import_Progress $progress
-     * @param Shopware_Components_Migration_Profile $source
-     * @param Shopware_Components_Migration_Profile $target
+     * @param Progress $progress
+     * @param Profile $source
+     * @param Profile $target
      * @param $request
      */
     public function __construct($progress, $source, $target, $request)
@@ -165,7 +142,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * Return the progress instance of this class
      *
-     * @return Shopware_Components_Migration_Import_Progress
+     * @return Progress
      */
     public function getProgress()
     {
@@ -225,7 +202,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * Legacy getter for the source profile
      *
-     * @return Shopware_Components_Migration_Profile
+     * @return Profile
      */
     public function Source()
     {
@@ -235,7 +212,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
     /**
      * Legacy getter for the target profile
      *
-     * @return Shopware_Components_Migration_Profile
+     * @return Profile
      */
     public function Target()
     {
@@ -285,7 +262,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         // Look up the id in the database - perhaps we've already created a valid number:
         $number = Shopware()->Db()->fetchOne(
             'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            [Shopware_Components_Migration::MAPPING_VALID_NUMBER, $id]
+            [Migration::MAPPING_VALID_NUMBER, $id]
         );
 
         if ($number) {
@@ -305,7 +282,7 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
         Shopware()->Db()->insert(
             's_plugin_migrations',
             [
-                'typeID' => Shopware_Components_Migration::MAPPING_VALID_NUMBER,
+                'typeID' => Migration::MAPPING_VALID_NUMBER,
                 'sourceID' => $id,
                 'targetID' => $number
             ]
@@ -334,6 +311,6 @@ abstract class Shopware_Components_Migration_Import_Resource_Abstract extends En
             AND `typeID`=?
         ';
 
-        return Shopware()->Db()->fetchOne($sql, [$productId, Shopware_Components_Migration::MAPPING_ARTICLE]);
+        return Shopware()->Db()->fetchOne($sql, [$productId, Migration::MAPPING_ARTICLE]);
     }
 }

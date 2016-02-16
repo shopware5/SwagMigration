@@ -1,39 +1,25 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
+namespace Shopware\SwagMigration\Components\Migration;
+
+use Shopware\SwagMigration\Components\Migration;
+use Exception;
 use Shopware\SwagMigration\Components\DbServices\DeleteService;
 
 /**
  * Helper to clean up the target shop
  *
- * Class Shopware_Components_Migration_Cleanup
- *
  * @category  Shopware
  * @package Shopware\Plugins\SwagMigration\Components\Migration
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
-class Shopware_Components_Migration_Cleanup
+class Cleanup
 {
     /**
      * Constructor: Disable foreign key checks
@@ -58,20 +44,20 @@ class Shopware_Components_Migration_Cleanup
             switch ($key) {
                 case 'clear_customers':
                     $this->sDeleteAllCustomers();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CUSTOMER);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_CUSTOMER);
                     break;
                 case 'clear_orders':
                     $this->sDeleteAllCustomers();
                     $this->sDeleteAllOrders();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CUSTOMER);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ORDER);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_CUSTOMER);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_ORDER);
                     break;
                 case 'clear_votes':
                     Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
                     break;
                 case 'clear_articles':
                     $this->sDeleteAllArticles();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_ARTICLE);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_ARTICLE);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_seo;');
                     } catch (Exception $e) {
@@ -80,8 +66,8 @@ class Shopware_Components_Migration_Cleanup
                     break;
                 case 'clear_categories':
                     $deleteService->deleteAllCategories();
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY);
-                    $this->removeMigrationMappingsByType(Shopware_Components_Migration::MAPPING_CATEGORY_TARGET);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_CATEGORY);
+                    $this->removeMigrationMappingsByType(Migration::MAPPING_CATEGORY_TARGET);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
                     } catch (Exception $e) {

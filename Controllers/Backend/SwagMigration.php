@@ -1,34 +1,18 @@
 <?php
-/**
- * Shopware 5
- * Copyright (c) shopware AG
- *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
- */
+use Shopware\SwagMigration\Components\Migration;
+use Shopware\SwagMigration\Components\Migration\Cleanup;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use Shopware\SwagMigration\Components\Migration\Import\Resource\AbstractResource;
+use Shopware\SwagMigration\Components\Migration\Mapping;
+use Shopware\SwagMigration\Components\Migration\Profile;
 
 /**
- * Shopware SwagMigration Plugin - Migration Backend Controller
+ * (c) shopware AG <info@shopware.com>
  *
- * @category  Shopware
- * @package   Shopware\Plugins\SwagMigration\Controllers\Backend
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
+
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
     /**
@@ -58,21 +42,21 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Source shop system profile
      *
-     * @var Shopware_Components_Migration_Profile
+     * @var Profile
      */
     protected $source;
 
     /**
      * Target shop system profile
      *
-     * @var Shopware_Components_Migration_Profile
+     * @var Profile
      */
     protected $target;
 
     /**
      * Mapping helper
      *
-     * @var Shopware_Components_Migration_Mapping
+     * @var Mapping
      */
     protected $mapping;
 
@@ -124,7 +108,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setMaxExecutionTime();
 
-        Shopware()->Loader()->registerNamespace('Shopware_Components', dirname(__FILE__) . '/../../Components/');
         $this->View()->addTemplateDir(dirname(__FILE__) . "/../../Views/");
         parent::init();
     }
@@ -164,18 +147,18 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $config['dbname'] = $query['database'];
         }
 
-        return Shopware_Components_Migration::profileFactory($query['profile'], $config);
+        return Migration::profileFactory($query['profile'], $config);
     }
 
     /**
      * Returns an instance of the migration mapping helper
      *
-     * @return Shopware_Components_Migration_Mapping
+     * @return Mapping
      */
     public function Mapping()
     {
         if (!isset($this->mapping)) {
-            $this->mapping = new Shopware_Components_Migration_Mapping(
+            $this->mapping = new Mapping(
                 $this->Source(),
                 $this->Target(),
                 $this->getNamespace()
@@ -188,7 +171,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Getter function of the source profile
      *
-     * @return Shopware_Components_Migration_Profile
+     * @return Profile
      */
     public function Source()
     {
@@ -208,13 +191,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $config = (array) Shopware()->getOption('db');
 
-        return Shopware_Components_Migration::profileFactory('Shopware', $config);
+        return Migration::profileFactory('Shopware', $config);
     }
 
     /**
      * Getter method of the target profile. If the profile is not set, the controller initial the profile first.
      *
-     * @return Shopware_Components_Migration_Profile
+     * @return Profile
      */
     public function Target()
     {
@@ -263,7 +246,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $this->setRenderer(false);
         $data = $this->Request()->getParams();
 
-        $cleanup = new Shopware_Components_Migration_Cleanup();
+        $cleanup = new Cleanup();
         $cleanup->cleanUpByArray($data);
 
         echo Zend_Json::encode(['success' => true]);
@@ -385,7 +368,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function finishImport()
     {
-        $cleanup = new Shopware_Components_Migration_Cleanup();
+        $cleanup = new Cleanup();
         $cleanup->clearMigrationMappings();
 
         echo Zend_Json::encode(
@@ -430,18 +413,18 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * Will also inject the dependencies needed and return the created object
      *
      * @param $importType string The import resource to create
-     * @return Shopware_Components_Migration_Import_Resource_Abstract
+     * @return AbstractResource
      */
     public function initImport($importType)
     {
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
         $name = $this->imports[$importType];
 
-        /** @var $progress Shopware_Components_Migration_Import_Progress */
-        $progress = new Shopware_Components_Migration_Import_Progress();
+        /** @var $progress Progress */
+        $progress = new Progress();
         $progress->setOffset($offset);
 
-        $import = Shopware_Components_Migration::resourceFactory(
+        $import = Migration::resourceFactory(
             $name,
             $progress,
             $this->Source(),
