@@ -13,12 +13,18 @@ use ZEND_Db;
 
 class DownloadESDOrder extends AbstractResource
 {
+    /**
+     * @inheritdoc
+     */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
     }
 
-    public function getCurrentProgressMessage($progress)
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressDownload', "%s out of %s ESD Orders imported"),
@@ -27,15 +33,18 @@ class DownloadESDOrder extends AbstractResource
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedDownload', "ESD Orders successfully imported!");
     }
 
     /**
-     * run() method of the import adapter for ESD orders
+     * import adapter for ESD orders
      *
-     * @return $this|Progress
+     * @inheritdoc
      */
     public function run()
     {

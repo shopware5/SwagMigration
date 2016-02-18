@@ -13,12 +13,18 @@ use ZEND_Db;
 
 class DownloadESD extends AbstractResource
 {
+    /**
+     * @inheritdoc
+     */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
     }
 
-    public function getCurrentProgressMessage($progress)
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressDownload', "%s out of %s ESD downloads imported"),
@@ -27,15 +33,18 @@ class DownloadESD extends AbstractResource
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedDownload', "ESD Downloads successfully imported!");
     }
 
     /**
-     * run() method of the import adapter for ESD Downloads
+     * import adapter for ESD Downloads
      *
-     * @return $this|Progress
+     * @inheritdoc
      */
     public function run()
     {
@@ -115,7 +124,7 @@ class DownloadESD extends AbstractResource
     /**
      * Return the response code for a given url
      *
-     * @param $url
+     * @param string $url
      * @return string
      */
     private function get_http_response_code($url)

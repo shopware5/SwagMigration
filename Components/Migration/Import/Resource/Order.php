@@ -17,9 +17,7 @@ use Zend_Json;
 class Order extends AbstractResource
 {
     /**
-     * Returns the default error message for this import class
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getDefaultErrorMessage()
     {
@@ -34,13 +32,9 @@ class Order extends AbstractResource
     }
 
     /**
-     * Returns the progress message for the current import step. A Progress-Object will be passed, so
-     * you can get some context info for your snippet
-     *
-     * @param Progress $progress
-     * @return string
+     * @inheritdoc
      */
-    public function getCurrentProgressMessage($progress)
+    public function getCurrentProgressMessage(Progress $progress)
     {
         if ($this->getInternalName() == 'import_orders') {
             return sprintf(
@@ -58,9 +52,7 @@ class Order extends AbstractResource
     }
 
     /**
-     * Returns the default 'all done' message
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getDoneMessage()
     {
@@ -68,25 +60,7 @@ class Order extends AbstractResource
     }
 
     /**
-     * Main run method of each import adapter. The run method will query the source profile, iterate
-     * the results and prepare the data for import via the old Shopware API.
-     *
-     * If you want to import multiple entities with one import-class, you might want to check for
-     * $this->getInternalName() in order to distinct which (sub)entity you where called for.
-     *
-     * The run method may only return instances of Progress
-     * The calling instance will use those progress object to communicate with the ExtJS backend.
-     * If you want this to work properly, think of calling:
-     * - $this->initTaskTimer() at the beginning of your run method
-     * - $this->getProgress()->setCount(222) to set the total number of data
-     * - $this->increaseProgress() to increase the offset/progress
-     * - $this->getProgress()->getOffset() to get the current progress' offset
-     * - return $this->getProgress()->error("Message") in order to stop with an error message
-     * - return $this->getProgress() in order to be called again with the current offset
-     * - return $this->getProgress()->done() in order to mark the import as finished
-     *
-     *
-     * @return Progress
+     * @inheritdoc
      */
     public function run()
     {

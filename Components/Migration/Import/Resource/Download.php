@@ -12,12 +12,18 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 class Download extends AbstractResource
 {
+    /**
+     * @inheritdoc
+     */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
     }
 
-    public function getCurrentProgressMessage($progress)
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressDownload', "%s out of %s downloads imported"),
@@ -26,15 +32,18 @@ class Download extends AbstractResource
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedDownload', "Downloads successfully imported!");
     }
 
     /**
-     * run() method of the import adapter for downloads (article attached)
+     * import adapter for downloads (article attached)
      *
-     * @return $this|Progress
+     * @inheritdoc
      */
     public function run()
     {

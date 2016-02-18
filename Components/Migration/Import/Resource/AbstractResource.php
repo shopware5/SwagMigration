@@ -79,6 +79,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         $this->source = $source;
         $this->requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
         $this->request = $request;
+        parent::__construct();
     }
 
     /**

@@ -13,19 +13,20 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
 interface ResourceInterface
 {
     /**
-     * The generic error message of an import
+     * Returns the default error message for this import class
      *
      * @return string
      */
     public function getDefaultErrorMessage();
 
     /**
-     * The progress message of your import. For progress info check out the $progress parameter
+     * Returns the progress message for the current import step
+     * a Progress object will be passed, so you can get some context info for your snippet
      *
-     * @param $progress
+     * @param Progress $progress
      * @return string
      */
-    public function getCurrentProgressMessage($progress);
+    public function getCurrentProgressMessage(Progress $progress);
 
     /**
      * Done message of your importer
@@ -51,7 +52,6 @@ interface ResourceInterface
      * - return $this->getProgress()->error("Message") in order to stop with an error message
      * - return $this->getProgress() in order to be called again with the current offset
      * - return $this->getProgress()->done() in order to mark the import as finished
-     *
      *
      * @return Progress
      */
