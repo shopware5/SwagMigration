@@ -586,15 +586,15 @@ class CustomerImporter
         }
 
         if (empty($customer['newsletter'])) {
-            $sql = 'DELETE FROM S_CAMPAIGNS_MAILADDRESSES
-                    WHERE EMAIL = ' . $customer['email'];
+            $sql = 'DELETE FROM s_campaigns_mailaddresses
+                    WHERE email = ' . $customer['email'];
             $this->db->query($sql);
         } else {
             $customer['newslettergroupID'] = $this->getNewsletterGroupId($customer['newslettergroupID']);
 
-            $sql = 'SELECT ID
-                    FROM S_CAMPAIGNS_MAILADDRESSES
-                    WHERE EMAIL = ' . $customer['email'];
+            $sql = 'SELECT id
+                    FROM s_campaigns_mailaddresses
+                    WHERE email = ' . $customer['email'];
             $result = $this->db->fetchOne($sql);
             if (empty($result)) {
                 $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
