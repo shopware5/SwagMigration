@@ -1,44 +1,23 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Profile
- *
- * Base profile which all other profiles extend from. Basically offers a generic interface to the source profiles
- * and checks if there is a method which returns a SQL query for the requested data. If so, in most cases the
- * query will be executed and the query object will be returned. In some cases the result will directly be returned.
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-abstract class Shopware_Components_Migration_Profile extends Enlight_Class
+namespace Shopware\SwagMigration\Components\Migration;
+
+use Enlight_Class;
+use Enlight_Components_Db;
+use ArrayObject;
+
+abstract class Profile extends Enlight_Class
 {
     /**
      * Global variable for the database object
      *
-     * @var \Enlight_Components_Db.factory|?
+     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
      */
     protected $db;
 
@@ -87,7 +66,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     public function __construct($config)
     {
         if (Shopware()->Plugins()->Backend()->SwagMigration()->Config()->debugMigration) {
-            $this->db = new Shopware_Components_Migration_DbDecorator(Enlight_Components_Db::factory($this->db_adapter, $config));
+            $this->db = new DbDecorator(Enlight_Components_Db::factory($this->db_adapter, $config));
         } else {
             $this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
         }
@@ -142,7 +121,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
     /**
      * Returns the database object
      *
-     * @return Zend_Db_Adapter_Abstract
+     * @return \Zend_Db_Adapter_Abstract
      */
     public function Db()
     {
@@ -472,7 +451,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Query products which have properties
      *
      * @param $offset
-     * @return mixed
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductsWithProperties($offset)
     {
@@ -491,7 +470,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Queries the properties for a given product id
      *
      * @param $id
-     * @return mixed
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductProperties($id)
     {
@@ -507,7 +486,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile category select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryCategories($offset = 0)
     {
@@ -523,7 +502,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product category allocation select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductCategories($offset = 0)
     {
@@ -539,11 +518,12 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProducts($offset = 0)
     {
         $sql = $this->getProductSelect();
+
         if (!empty($offset)) {
             $sql = $this->limit($sql, null, $offset);
         }
@@ -555,7 +535,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product price select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductPrices($offset = 0)
     {
@@ -571,7 +551,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile customer select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryCustomers($offset = 0)
     {
@@ -587,7 +567,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product image select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductImages($offset = 0)
     {
@@ -603,7 +583,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product translation select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductTranslations($offset = 0)
     {
@@ -619,7 +599,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile product rating select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryProductRatings($offset = 0)
     {
@@ -635,7 +615,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile order select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryOrders($offset = 0)
     {
@@ -651,7 +631,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile order detail select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryOrderDetails($offset = 0)
     {
@@ -667,7 +647,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
      * Executes the profile ESD order select statement with the given offset
      *
      * @param int $offset
-     * @return Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface
      */
     public function queryEsdOrder($offset = 0)
     {
@@ -699,7 +679,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      *
-     * @return bool|string
+     * @return bool|\Zend_Db_Statement_Interface
      */
     public function queryArticleDownload()
     {
@@ -713,7 +693,7 @@ abstract class Shopware_Components_Migration_Profile extends Enlight_Class
 
     /**
      *
-     * @return bool|string
+     * @return false|\Zend_Db_Statement_Interface
      */
     public function queryArticleDownloadESD()
     {

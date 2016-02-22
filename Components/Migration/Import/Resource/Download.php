@@ -1,44 +1,29 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Download
- *
- * Downloads import adapter
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
- * @copyright Copyright (c), shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Components_Migration_Import_Resource_Abstract
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+
+class Download extends AbstractResource
 {
+    /**
+     * @inheritdoc
+     */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
     }
 
-    public function getCurrentProgressMessage($progress)
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressDownload', "%s out of %s downloads imported"),
@@ -47,22 +32,25 @@ class Shopware_Components_Migration_Import_Resource_Download extends Shopware_Co
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedDownload', "Downloads successfully imported!");
     }
 
     /**
-     * run() method of the import adapter for downloads (article attached)
+     * import adapter for downloads (article attached)
      *
-     * @return $this|\Shopware_Components_Migration_Import_Progress
+     * @inheritdoc
      */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
-        /** @var Zend_Db_Statement_Interface $result */
+        /** @var \Zend_Db_Statement_Interface $result */
         $result = $this->Source()->queryArticleDownload();
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);

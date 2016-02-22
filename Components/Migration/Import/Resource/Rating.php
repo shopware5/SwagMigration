@@ -1,42 +1,21 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Rating
- *
- * Rating import adapter
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Components_Migration_Import_Resource_Abstract
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Shopware\SwagMigration\Components\Migration;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use Zend_Db_Expr;
+
+class Rating extends AbstractResource
 {
     /**
-     * Returns the default error message for this import class
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getDefaultErrorMessage()
     {
@@ -44,13 +23,9 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
     }
 
     /**
-     * Returns the progress message for the current import step. A Progress-Object will be passed, so
-     * you can get some context info for your snippet
-     *
-     * @param Shopware_Components_Migration_Import_Progress $progress
-     * @return string
+     * @inheritdoc
      */
-    public function getCurrentProgressMessage($progress)
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressRatings', "%s out of %s ratings imported"),
@@ -60,9 +35,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
     }
 
     /**
-     * Returns the default 'all done' message
-     *
-     * @return mixed
+     * @inheritdoc
      */
     public function getDoneMessage()
     {
@@ -70,25 +43,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
     }
 
     /**
-     * Main run method of each import adapter. The run method will query the source profile, iterate
-     * the results and prepare the data for import via the old Shopware API.
-     *
-     * If you want to import multiple entities with one import-class, you might want to check for
-     * $this->getInternalName() in order to distinct which (sub)entity you where called for.
-     *
-     * The run method may only return instances of Shopware_Components_Migration_Import_Progress
-     * The calling instance will use those progress object to communicate with the ExtJS backend.
-     * If you want this to work properly, think of calling:
-     * - $this->initTaskTimer() at the beginning of your run method
-     * - $this->getProgress()->setCount(222) to set the total number of data
-     * - $this->increaseProgress() to increase the offset/progress
-     * - $this->getProgress()->getOffset() to get the current progress' offset
-     * - return $this->getProgress()->error("Message") in order to stop with an error message
-     * - return $this->getProgress() in order to be called again with the current offset
-     * - return $this->getProgress()->done() in order to mark the import as finished
-     *
-     *
-     * @return Shopware_Components_Migration_Import_Progress
+     * @inheritdoc
      */
     public function run()
     {
@@ -108,7 +63,7 @@ class Shopware_Components_Migration_Import_Resource_Rating extends Shopware_Comp
                 WHERE pm.`sourceID`=?
                 AND `typeID`=?
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, [$rating['productID'], Shopware_Components_Migration::MAPPING_ARTICLE]);
+            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, [$rating['productID'], Migration::MAPPING_ARTICLE]);
 
             if (empty($rating['articleID'])) {
                 continue;

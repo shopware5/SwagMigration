@@ -1,44 +1,30 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Download
- *
- * Downloads import adapter
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
- * @copyright Copyright (c), shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware_Components_Migration_Import_Resource_Abstract
+namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
+
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use ZEND_Db;
+
+class DownloadESD extends AbstractResource
 {
+    /**
+     * @inheritdoc
+     */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
     }
 
-    public function getCurrentProgressMessage($progress)
+    /**
+     * @inheritdoc
+     */
+    public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
             $this->getNameSpace()->get('progressDownload', "%s out of %s ESD downloads imported"),
@@ -47,15 +33,18 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
         );
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getDoneMessage()
     {
         return $this->getNameSpace()->get('importedDownload', "ESD Downloads successfully imported!");
     }
 
     /**
-     * run() method of the import adapter for ESD Downloads
+     * import adapter for ESD Downloads
      *
-     * @return $this|Shopware_Components_Migration_Import_Progress
+     * @inheritdoc
      */
     public function run()
     {
@@ -135,7 +124,7 @@ class Shopware_Components_Migration_Import_Resource_DownloadESD extends Shopware
     /**
      * Return the response code for a given url
      *
-     * @param $url
+     * @param string $url
      * @return string
      */
     private function get_http_response_code($url)

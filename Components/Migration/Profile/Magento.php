@@ -1,35 +1,17 @@
 <?php
 /**
- * Shopware 5
- * Copyright (c) shopware AG
+ * (c) shopware AG <info@shopware.com>
  *
- * According to our dual licensing model, this program can be used either
- * under the terms of the GNU Affero General Public License, version 3,
- * or under a proprietary license.
- *
- * The texts of the GNU Affero General Public License with an additional
- * permission and of our proprietary license can be found at and
- * in the LICENSE file you have received along with this program.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU Affero General Public License for more details.
- *
- * "Shopware" is a registered trademark of shopware AG.
- * The licensing of the program under the AGPLv3 does not imply a
- * trademark license. Therefore any rights, title and interest in
- * our trademarks remain entirely with us.
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 
-/**
- * Shopware SwagMigration Components - Magento
- *
- * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Profile
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
- */
-class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_Migration_Profile
+namespace Shopware\SwagMigration\Components\Migration\Profile;
+
+use Shopware\SwagMigration\Components\Migration\Profile;
+use Zend_Db_Expr;
+
+class Magento extends Profile
 {
     /**
      * Returns the directory of the article images.
@@ -358,7 +340,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
         $sql = "
 			SELECT
-				
+
 				catalog_product.entity_id						as productID,
 				catalog_product.sku								as ordernumber,
 				catalog_product.created_at						as added,
@@ -374,14 +356,14 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				cs.min_qty										as stockmin,
 				cs.min_sale_qty									as minpurchase,
 				cs.max_sale_qty									as maxpurchase,
-								
+
 				tax_class_id.value								as taxID,
 				cost.value										as baseprice,
 				IFNULL(special_price.value, price.value)		as price,
 				IF(special_price.value IS NULL, 0, price.value) as pseudoprice
 
 				$custom_select
-			
+
 			FROM {$this->quoteTable('catalog_product_entity')} catalog_product
 
 			-- Joins the attribute tables
@@ -429,23 +411,23 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
         }
         $sql = "
 			SELECT
-				
+
 				catalog_product.entity_id						as productID,
 				store.store_id									as languageID,
-				
+
 				name.value										as name,
 				NULL											as additionaltext,
 				description.value								as description_long,
 				short_description.value							as description,
 				meta_keyword.value								as keywords
-				
+
 				$custom_select
-			
+
 			FROM {$this->quoteTable('catalog_product_entity')} catalog_product
-			
+
 			INNER JOIN {$this->quoteTable('core_store')} store
 			ON store.store_id!=0
-			
+
 			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
 		";
 
@@ -601,7 +583,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 
         return "
 			SELECT
-				
+
 				customer.entity_id						as customerID,
 				customer.increment_id					as customernumber,
 				customer.email							as email,
@@ -610,7 +592,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				customer.updated_at						as lastlogin,
 				customer.is_active 						as active,
 				customer.group_id						as customergroupID,
-				
+
 				IF(gender.value=2, 'ms', 'mr')			as billing_salutation,
 				company.value 							as billing_company,
 				TRIM(CONCAT(firstname.value, ' ', IFNULL(middlename.value, '')))
@@ -621,7 +603,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				city.value								as billing_city,
 				country_id.value						as billing_countryiso,
 				postcode.value							as billing_zipcode,
-				
+
 				-- IF(gender.value, 'ms', 'mr')			as shipping_salutation,
 				-- `company`							as shipping_company,
 				-- `firstname`							as shipping_firstname,
@@ -631,7 +613,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				-- `city`								as shipping_city,
 				-- `country_id`							as shipping_countryiso,
 				-- `postcode`							as shipping_zipcode,
-				
+
 				telephone.value							as phone,
 				fax.value								as fax,
 				dob.value 								as birthday,
@@ -639,19 +621,19 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				'md5reversed'							as encoder,
 				taxvat.value 							as ustid,
 				IF(newsletter.subscriber_id, 1, 0)		as newsletter
-			
+
 			FROM {$this->quoteTable('customer_entity')} customer
-			
+
 			LEFT JOIN {$this->quoteTable('newsletter_subscriber')} newsletter
 			ON newsletter.customer_id=customer.entity_id
 			AND newsletter.subscriber_status=1
-			
+
 			{$this->createTableSelect('customer', $attributes)}
-			
+
 			LEFT JOIN {$this->quoteTable('customer_address_entity')} customer_address
 			ON customer_address.parent_id=customer.entity_id
 			AND customer_address.entity_id=default_billing.value
-			
+
 			{$this->createTableSelect('customer_address', $addressAttributes)}
 		";
     }
@@ -667,7 +649,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 			SELECT
 				o.`entity_id`								as orderID,
 				o.`increment_id`							as ordernumber,
-				
+
 				o.`store_id`								as subshopID,
 				o.`customer_id`								as customerID,
 				p.`method`									as paymentID,
@@ -676,14 +658,14 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				-- 											as trackingID,
 				-- 											as languageID,
 				-- 											as transactionID,
-				
+
 				o.`customer_note`							as customercomment,
 				o.`order_currency_code`						as currency,
 				o.`base_to_order_rate`						as currency_factor,
 				-- 											as cleared_date,
 				o.`remote_ip` 								as remote_addr,
 				o.`created_at`								as date,
-				
+
 				o.`customer_taxvat`							as ustid,
 				ba.`telephone`								as phone,
 				ba.`fax`									as fax,
@@ -698,7 +680,7 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				ba.`country_id`								as billing_countryiso,
 				ba.`postcode`								as billing_zipcode,
 				IF(o.`customer_gender`=2, 'ms', 'mr')		as billing_salutation,
-				
+
 				sa.`company`								as shipping_company,
 				sa.`firstname`								as shipping_firstname,
 				sa.`lastname` 								as shipping_lastname,
@@ -709,12 +691,12 @@ class Shopware_Components_Migration_Profile_Magento extends Shopware_Components_
 				sa.`country_id`								as shipping_countryiso,
 				sa.`postcode`								as shipping_zipcode,
 				IF(o.`customer_gender`=2, 'ms', 'mr')		as shipping_salutation,
-				
+
 				o.`grand_total`-o.`tax_amount`				as invoice_amount_net,
 				o.`grand_total`								as invoice_amount,
 				o.`shipping_incl_tax`						as invoice_shipping,
 				o.`shipping_amount`							as invoice_shipping_net
-				
+
 			FROM
 				{$this->quoteTable('sales_flat_quote')} q,
 				{$this->quoteTable('sales_flat_quote_payment')} p,
