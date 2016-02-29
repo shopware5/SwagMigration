@@ -74,10 +74,6 @@ class ImageImporter
 
         $image['main'] = $this->setMain($image['main'], $image['articleID']);
 
-        if (!strpos($image["image"], "http://") && !strpos($image["image"], "https://")) {
-            $image["image"] = "http://" . $image["image"];
-        }
-
         $uploadFile = $this->copyImage($image['image'], $image['name']);
         if ($uploadFile === false) {
             return false;
@@ -195,8 +191,16 @@ class ImageImporter
     private function copyImage($image, $name)
     {
         $uploadDir = Shopware()->DocPath('media_' . 'temp');
+        $ext = "";
         if (!empty($image)) {
-            $uploadFile = $uploadDir . $name;
+            foreach (['.png', '.gif', '.jpg'] as $extension) {
+                if(stristr($image, $extension) !== FALSE) {
+                    $ext = $extension;
+                    break;
+                }
+            }
+
+            $uploadFile = $uploadDir . $name . $ext;
             if (!copy($image, $uploadFile)) {
                 $this->logger->error("Copying image from '$image' to '$uploadFile' did not work!");
 

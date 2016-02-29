@@ -271,7 +271,7 @@ class Order extends AbstractResource
             'numberNotValid',
             "The product number '%s' is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
-            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.'<br>
             <br>
             You can force the migration to continue. But be aware that this will: <br>
             * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
@@ -302,8 +302,8 @@ class Order extends AbstractResource
             }
 
             if ($numberValidationMode !== 'ignore'
-                && (empty($number) || strlen($number) > 30
-                || preg_match('/[^a-zA-Z0-9-_. ]/', $number))
+                && (empty($number) || strlen($number) > 30 || strlen($number) < 4
+                || preg_match('/[^a-zA-Z0-9-_.]/', $number))
             ) {
                 switch ($numberValidationMode) {
                     case 'complain':
@@ -335,9 +335,16 @@ class Order extends AbstractResource
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=?
+                AND (`typeID`=? OR `typeID`=?)
             ';
-            $order['articleID'] = $this->Target()->Db()->fetchOne($sql, [$order['productID'], Migration::MAPPING_ARTICLE]);
+            $order['articleID'] = $this->Target()->Db()->fetchOne(
+                $sql,
+                [
+                    $order['productID'],
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
 
             //TaxRate
             if (!empty($this->Request()->tax_rate) && isset($order['taxID'])) {

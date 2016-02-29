@@ -92,10 +92,38 @@ class Translation extends AbstractResource
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
-                WHERE pm.`sourceID`=?
-                AND `typeID`=?
+                WHERE pm.`sourceID`= ?
+                AND (typeID = ? OR typeID = ?)
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, [$translation['productID'], Migration::MAPPING_ARTICLE]);
+
+            $product_data = Shopware()->Db()->fetchRow(
+                $sql,
+                [
+                    "'" . $translation['productID'] . "'",
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
+
+            if (empty($product_data)) {
+                $sql = '
+                    SELECT ad.articleID, ad.id AS articledetailsID, kind
+                    FROM s_plugin_migrations pm
+                    JOIN s_articles_details ad
+                    ON ad.id=pm.targetID
+                    WHERE pm.`sourceID` LIKE ?
+                    AND (typeID = ? OR typeID = ?)
+                ';
+
+                $product_data = Shopware()->Db()->fetchRow(
+                    $sql,
+                    [
+                        "'" . $translation['productID'] . "'",
+                        Migration::MAPPING_ARTICLE,
+                        Migration::MAPPING_VALID_NUMBER
+                    ]
+                );
+            }
 
             if (!empty($product_data)) {
                 $translation['articletranslationsID'] = $import->translation(

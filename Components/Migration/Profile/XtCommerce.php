@@ -352,10 +352,9 @@ class XtCommerce extends Profile
 				d.language_id 					as languageID,
 				d.products_name 				as name,
 				d.products_description 			as description_long,
-				d.products_short_description 	as description,
 				d.products_keywords 			as tags,
 				d.products_meta_title			as meta_title,
-				d.products_meta_description 	as meta_description,
+				d.products_meta_description 	as description,
 				d.products_meta_keywords		as keywords
 			FROM {$this->quoteTable('products_description', 'd')}
 			WHERE `language_id`!={$this->Db()->quote($this->getDefaultLanguage())}
@@ -485,9 +484,10 @@ class XtCommerce extends Profile
 				categories_description as cmstext,
 				categories_status as active
 			FROM
-				{$this->quoteTable('categories', 'co')},
+				{$this->quoteTable('categories', 'co')}
+            JOIN
 				{$this->quoteTable('categories_description', 'cd')}
-			WHERE co.categories_id=cd.categories_id
+			ON co.categories_id = cd.categories_id
 
 			ORDER BY parent_id
 		";

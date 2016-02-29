@@ -101,14 +101,15 @@ class Price extends AbstractResource
                 ON cg.mode=0
                 AND cg.groupkey=?
                 WHERE pm.sourceID=?
-                AND pm.typeID=?
+                AND (pm.typeID=? OR pm.typeID=?)
             ";
             $price_config = Shopware()->Db()->fetchRow(
                 $sql,
                 [
                     $price['pricegroup'],
                     $price['productID'],
-                    Migration::MAPPING_ARTICLE
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
                 ]
             );
             if (!empty($price_config)) {

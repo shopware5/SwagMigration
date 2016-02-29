@@ -10,7 +10,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 use Shopware\SwagMigration\Commands\MigrateCommand;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Md5Reversed;
+use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Sha512;
 use Shopware\SwagMigration\Subscriber\Resources;
+use Doctrine\DBAL\Connection;
+use Shopware\Components\Model\ModelManager;
 
 /**
  * Shopware SwagMigration Plugin - Bootstrap
@@ -27,6 +30,11 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     private $db;
 
     /**
+     * @var Connection $connection
+     */
+    private $connection;
+
+    /**
      * Install method of the plugin. Register the migration controller, create the backend menu item and creates the
      * plugin database table.
      *
@@ -34,7 +42,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        $this->checkVersion('5.0.0');
+        $this->checkVersion('5.1.0');
         $this->subscribeEvents();
 
         $parent = $this->Menu()->findOneBy(['label' => 'Inhalte']);
@@ -42,7 +50,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             [
                 'label' => 'Shop-Migration',
                 'class' => 'sprite-database-import',
-                'active' => 1,
+                'active' => 0,
                 'parent' => $parent,
                 'position' => 0,
                 'controller' => 'SwagMigration',
@@ -64,6 +72,26 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $this->createForm();
 
         return ['success' => true, 'invalidateCache' => ['backend']];
+    }
+
+    /**
+     * @return array
+     */
+    public function enable()
+    {
+        $this->connection->update('s_core_menu', ['active' => 1], ['name' => 'Shop-Migration']);
+
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend']];
+    }
+
+    /**
+     * @return array
+     */
+    public function disable()
+    {
+        $this->connection->update('s_core_menu', ['active' => 0], ['name' => 'Shop-Migration']);
+
+        return ['success' => true, 'invalidateCache' => ['frontend', 'backend']];
     }
 
     /**
@@ -152,7 +180,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         ";
         $newSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
             * höchstens 30 Zeichen lang sein<br>
-            * keine anderen Zeichen als : 'a-zA-Z0-9-_. ' und SPACE beinhalten<br>
+            * keine anderen Zeichen als : 'a-zA-Z0-9-_.'<br>
             <br>
             Sie können den Import dennoch erzwingen. Beachten Sie: <br>
             * Dabei werden zu lange Produkt-Nummern abgeschnitten. Dies kann zu 'Duplicate Key'-Fehlern führen<br>
@@ -202,6 +230,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     {
         /** @var Enlight_Loader $loader */
         $loader = $this->get('loader');
+
+        $this->connection = $this->get('dbal_connection');
 
         $loader->registerNamespace(
             'Shopware\SwagMigration',
@@ -260,6 +290,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $hashes = $args->getReturn();
 
         $hashes[] = new Md5Reversed();
+        $hashes[] = new Sha512();
 
         return $hashes;
     }
