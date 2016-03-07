@@ -545,7 +545,7 @@ class CustomerImporter
                 WHERE userID = ' . $userId;
         $customerNumber = $this->db->fetchOne($sql);
         if ($this->config->get('sSHOPWAREMANAGEDCUSTOMERNUMBERS') && empty($customerNumber)) {
-            $sql = "UPDATE s_order_number N, s_user_billingaddress B
+            $sql = "UPDATE s_order_number n, s_user_billingaddress b
                     SET n.number = n.number + 1, b.customernumber = n.number + 1
                     WHERE n.name = 'user'
                       AND b.userID = ?";
