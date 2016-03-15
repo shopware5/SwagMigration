@@ -198,8 +198,8 @@ class Oxid extends Profile
 				u.OXBIRTHDATE 								as birthday,
 				u.OXUSTID 									as ustid,
 
-				CONCAT(u.OXPASSWORD, ':', UNHEX(u.OXPASSSALT)) as md5_password,
-				'md5'										as encoder,
+				CONCAT(u.OXPASSWORD, ':', u.OXPASSSALT) as md5_password,
+				'sha512'								as encoder,
 
 				u.OXCREATE									as firstlogin,
 				u.OXSHOPID									as subshopID,
@@ -410,7 +410,6 @@ class Oxid extends Profile
 					a.OXID 					as productID,
 					{$this->Db()->quote($languageID)} as languageID,
 					a.OXTITLE_$key 			as name,
-					-- a.OXVARNAME_$key        as configuratorgroup,
 					a.OXVARSELECT_$key 		as additionaltext,
 					a.OXSHORTDESC_$key 		as description,
 					a.OXSEARCHKEYS_$key 	as keywords,

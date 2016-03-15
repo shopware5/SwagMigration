@@ -165,6 +165,7 @@ class TranslationImporter
             $sql = "INSERT INTO s_core_translations (objecttype, objectdata, objectkey, objectlanguage)
                     VALUES ({$objectType}, {$objectData}, {$objectKey}, {$objectLanguage})";
             $result = $this->db->query($sql);
+
             if (empty($result)) {
                 return false;
             } else {

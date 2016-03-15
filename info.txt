@@ -10,6 +10,6 @@
         <li>xt:Commerce VEYTON 4.0 bis 4.1</li>
         <li>xt:Commerce 3.0.4</li>
         <li>Gambio GX 2.0.10</li>
-        <li>PrestaShop 1.6.14</li>
+        <li>PrestaShop 1.6.1.4</li>
     </ul>
 </p>

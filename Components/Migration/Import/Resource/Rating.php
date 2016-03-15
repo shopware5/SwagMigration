@@ -61,9 +61,16 @@ class Rating extends AbstractResource
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=?
+                AND (`typeID`=? OR `typeID`=?)
             ';
-            $rating['articleID'] = Shopware()->Db()->fetchOne($sql, [$rating['productID'], Migration::MAPPING_ARTICLE]);
+            $rating['articleID'] = Shopware()->Db()->fetchOne(
+                $sql,
+                [
+                    $rating['productID'],
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
 
             if (empty($rating['articleID'])) {
                 continue;
@@ -76,12 +83,13 @@ class Rating extends AbstractResource
                 AND `name` LIKE ?
                 AND `email`=?
             ';
+
             $ratingID = Shopware()->Db()->fetchOne(
                 $sql,
                 [
                     $rating['articleID'],
                     $rating['name'],
-                    !empty($rating['email']) ? $rating['email'] : 'NOW()'
+                    !empty($rating['date']) ? $rating['date'] : 'NOW()'
                 ]
             );
 

@@ -187,7 +187,7 @@ class Veyton extends XtCommerce
 				    a.products_id
                 )                                       as ordernumber,
 				-- a.products_image						as image,
-				a.products_price						as price,
+				a.products_price						as net_price,
 				a.date_available						as releasedate,
 				a.date_added							as added,
 				-- a.last_modified 						as changed,
@@ -492,7 +492,7 @@ class Veyton extends XtCommerce
 				`language_code`								as languageID,
 				`comments`									as customercomment,
 				`date_purchased`							as date,
-				`orders_status`								as status,
+				`orders_status`								as statusID,
 				-- `orders_date_finished`,
 				IF(o.`allow_tax`=1,0,1)						as tax_free,
 				`customers_ip`								as remote_addr,

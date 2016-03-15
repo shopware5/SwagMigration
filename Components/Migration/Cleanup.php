@@ -115,7 +115,7 @@ class Cleanup
     public function clearMigrationMappings()
     {
         $sql = '
-            TRUNCATE TABLE `s_plugin_migrations`;
+            TRUNCATE `s_plugin_migrations`;
         ';
         Shopware()->Db()->query($sql);
     }
@@ -137,6 +137,7 @@ class Cleanup
     public function sDeleteAllArticles()
     {
         $sql = "
+            SET foreign_key_checks = 0;
 			TRUNCATE s_articles;
 			TRUNCATE s_filter_articles;
 			TRUNCATE s_articles_attributes;
@@ -162,7 +163,6 @@ class Cleanup
 			TRUNCATE s_article_configurator_groups;
 			TRUNCATE s_article_configurator_options;
 			TRUNCATE s_article_configurator_option_relations;
-			TRUNCATE s_article_configurator_price_surcharges;
 			TRUNCATE s_article_configurator_price_variations;
 			TRUNCATE s_article_configurator_set_group_relations;
 			TRUNCATE s_article_configurator_set_option_relations;
@@ -173,6 +173,7 @@ class Cleanup
 			TRUNCATE s_article_configurator_templates;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_article_img_mappings;
+            SET foreign_key_checks = 1;
         ";
 
         Shopware()->Db()->query($sql);
@@ -201,22 +202,24 @@ class Cleanup
     public function sDeleteAllOrders()
     {
         $sql = "
-        TRUNCATE s_order;
-        TRUNCATE s_order_attributes;
-        TRUNCATE s_order_basket;
-        TRUNCATE s_order_basket_attributes;
-        TRUNCATE s_order_billingaddress;
-        TRUNCATE s_order_billingaddress_attributes;
-        TRUNCATE s_order_comparisons;
-        TRUNCATE s_order_details;
-        TRUNCATE s_order_details_attributes;
-        TRUNCATE s_order_shippingaddress;
-        TRUNCATE s_order_shippingaddress_attributes;
-        TRUNCATE s_order_documents;
-        TRUNCATE s_order_documents_attributes;
-        TRUNCATE s_order_esd;
-        TRUNCATE s_order_history;
-        TRUNCATE s_order_notes;
+            SET foreign_key_checks = 0;
+            TRUNCATE s_order;
+            TRUNCATE s_order_attributes;
+            TRUNCATE s_order_basket;
+            TRUNCATE s_order_basket_attributes;
+            TRUNCATE s_order_billingaddress;
+            TRUNCATE s_order_billingaddress_attributes;
+            TRUNCATE s_order_comparisons;
+            TRUNCATE s_order_details;
+            TRUNCATE s_order_details_attributes;
+            TRUNCATE s_order_shippingaddress;
+            TRUNCATE s_order_shippingaddress_attributes;
+            TRUNCATE s_order_documents;
+            TRUNCATE s_order_documents_attributes;
+            TRUNCATE s_order_esd;
+            TRUNCATE s_order_history;
+            TRUNCATE s_order_notes;
+            SET foreign_key_checks = 1;
         ";
 
         Shopware()->Db()->query($sql);
@@ -228,14 +231,16 @@ class Cleanup
     public function sDeleteAllCustomers()
     {
         $sql = "
-	       TRUNCATE s_user;
-	       TRUNCATE s_user_attributes;
-	       TRUNCATE s_user_billingaddress;
-	       TRUNCATE s_user_billingaddress_attributes;
-	       TRUNCATE s_user_shippingaddress;
-	       TRUNCATE s_user_shippingaddress_attributes;
-	       TRUNCATE s_user_shippingaddress_attributes;
-	       TRUNCATE s_user_debit;
+            SET foreign_key_checks = 0;
+            TRUNCATE s_user;
+            TRUNCATE s_user_attributes;
+            TRUNCATE s_user_billingaddress;
+            TRUNCATE s_user_billingaddress_attributes;
+            TRUNCATE s_user_shippingaddress;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_debit;
+            SET foreign_key_checks = 1;
 	   ";
 
         Shopware()->Db()->query($sql);
@@ -247,12 +252,14 @@ class Cleanup
     public function sDeleteAllFilters()
     {
         $sql = '
+            SET foreign_key_checks = 0;
 			TRUNCATE s_filter;
 			TRUNCATE s_filter_articles;
 			TRUNCATE s_filter_attributes;
 			TRUNCATE s_filter_options;
 			TRUNCATE s_filter_relations;
 			TRUNCATE s_filter_values;
+            SET foreign_key_checks = 1;
 		';
 
         Shopware()->Db()->query($sql);
@@ -265,11 +272,13 @@ class Cleanup
     public function clearImages()
     {
         $sql = '
+            SET foreign_key_checks = 0;
 			TRUNCATE s_articles_img;
 			TRUNCATE s_articles_img_attributes;
 			TRUNCATE s_article_img_mappings;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_media;
+            SET foreign_key_checks = 1;
 		';
         Shopware()->Db()->query($sql);
 

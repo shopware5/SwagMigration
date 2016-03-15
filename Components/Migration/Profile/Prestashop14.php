@@ -219,7 +219,7 @@ class Prestashop14 extends Profile
                 -- a.products_shippingtime					as shippingtime,
 				if(a.reference='', CONCAT('sw', a.id_product), a.reference)						as ordernumber,
 				-- a.products_image						as image,
-				a.price         						as net_price,
+				a.products_price    						as net_price,
 				a.wholesale_price                       as baseprice,
 
 				a.date_add          					as added,
@@ -238,9 +238,8 @@ class Prestashop14 extends Profile
 
 				d.name                                  as name,
 				d.description        					as description_long,
-				d.description_short          			as description,
 				d.meta_title        					as meta_title,
-				d.meta_description           			as meta_description,
+				d.meta_description           			as description,
 				d.meta_keywords          				as keywords
 
 			FROM {$this->quoteTable('product', 'a')}
@@ -323,10 +322,9 @@ class Prestashop14 extends Profile
 				d.name 		        	    	as name,
 				d.description 			        as description_long,
 				d.description_short 	        as description,
-				'' 			                    as tags,
 				d.meta_title			        as meta_title,
 				d.meta_description 	            as meta_description,
-				d.meta_keywords		            as keywords
+				d.meta_keywords		            as meta_keywords
 			FROM {$this->quoteTable('product_lang', 'd')}
 			WHERE `id_lang`!={$this->Db()->quote($this->getDefaultLanguage())}
 		";
@@ -498,12 +496,11 @@ class Prestashop14 extends Profile
     {
         return "
 			SELECT
-				o.`id_order`									as orderID,
-				o.`id_order`									as ordernumber,
-				u.`id_customer`								as customerID,
-				aBilling.`vat_number`							as ustid,
-				1                                              as subshopID,
-
+				o.`id_order`									    as orderID,
+				o.`id_order`									    as ordernumber,
+				u.`id_customer`								        as customerID,
+				aBilling.`vat_number`							    as ustid,
+				1                                                   as subshopID,
 
 				IF(u.id_gender=1, 'mr', 'ms')   	                as billing_salutation,
 				u.firstname                                         as billing_firstname,
@@ -516,7 +513,6 @@ class Prestashop14 extends Profile
 				aBilling.city	 								    as billing_city,
 				cBilling.iso_code           						as billing_countryiso,
 
-
 				IF(u.id_gender=1, 'mr', 'ms')		                as shipping_salutation,
 				u.firstname                                         as shipping_firstname,
 				u.lastname       	 								as shipping_lastname,
@@ -528,13 +524,13 @@ class Prestashop14 extends Profile
 				aShipping.city	 								    as shipping_city,
 				cShipping.iso_code           						as shipping_countryiso,
 
-				aBilling.`phone`							    as phone,
-				`module`									    as paymentID,
-				`id_carrier`								    as dispatchID,
-				c.`iso_code`										    as currency,
-				o.`conversion_rate`								as currency_factor,
-				o.`id_lang`								        as languageID,
-				GROUP_CONCAT(cm.`message`)                      as customercomment,
+				aBilling.`phone`							        as phone,
+				`module`									        as paymentID,
+				`id_carrier`								        as dispatchID,
+				c.`iso_code`										as currency,
+				o.`conversion_rate`								    as currency_factor,
+				o.`id_lang`								            as languageID,
+				GROUP_CONCAT(cm.`message`)                          as customercomment,
 				o.`date_add`								        as date,
 				-- Need a subselect to get the current order status
 				-- Removing this might have a positive performance impact
@@ -544,7 +540,7 @@ class Prestashop14 extends Profile
 				    WHERE history.id_order = o.id_order
 				    ORDER BY id_order_history DESC
 				    LIMIT 1
-                )									            as status,
+                )									            as statusID,
 				-- `orders_date_finished`,
 				-- IF(o.`allow_tax`=1,0,1)						as tax_free,
 				-- o.`customers_ip`								as remote_addr,

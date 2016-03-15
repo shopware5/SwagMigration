@@ -82,9 +82,16 @@ class Image extends AbstractResource
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=?
+                AND (`typeID`=? OR `typeID`=?)
             ';
-            $image['articleID'] = Shopware()->Db()->fetchOne($sql, [$image['productID'], Migration::MAPPING_ARTICLE]);
+            $image['articleID'] = Shopware()->Db()->fetchOne(
+                $sql,
+                [
+                    $image['productID'],
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
 
             $sql = '
                 SELECT ad.articleID, ad.ordernumber, ad.kind
@@ -92,9 +99,16 @@ class Image extends AbstractResource
                 JOIN s_articles_details ad
                 ON ad.id=pm.targetID
                 WHERE pm.`sourceID`=?
-                AND `typeID`=?
+                AND (`typeID`=? OR `typeID`=?)
             ';
-            $product_data = Shopware()->Db()->fetchRow($sql, [$image['productID'], Migration::MAPPING_ARTICLE]);
+            $product_data = Shopware()->Db()->fetchRow(
+                $sql,
+                [
+                    $image['productID'],
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
 
             if (!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {

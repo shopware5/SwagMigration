@@ -47,10 +47,10 @@ class DeleteService
         if ($this->db->exec($sql) === false) {
             return false;
         }
-        if ($this->db->exec('TRUNCATE s_articles_categories') === false) {
+        if ($this->db->exec('SET foreign_key_checks = 0;TRUNCATE s_articles_categories;SET foreign_key_checks = 1;') === false) {
             return false;
         }
-        if ($this->db->exec('TRUNCATE s_emarketing_banners') === false) {
+        if ($this->db->exec('SET foreign_key_checks = 0;TRUNCATE s_emarketing_banners;SET foreign_key_checks = 1;') === false) {
             return false;
         }
 

@@ -27,6 +27,9 @@ class Category extends AbstractResource
     /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
     private $db = null;
 
+    /** @var array */
+    private $unmapped = array();
+
     /**
      * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
      * @throws Exception
@@ -139,7 +142,7 @@ class Category extends AbstractResource
             "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
             [
                 Migration::MAPPING_CATEGORY_TARGET,
-                $id . Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                '%' . $id . '%'
             ]
         );
     }
@@ -206,6 +209,7 @@ class Category extends AbstractResource
             }
 
             $target_parent = $this->getCategoryTarget($category['parentID']);
+
             // More generous approach - will ignore languageIDs
             if (empty($target_parent) && !empty($category['parentID'])) {
                 $target_parent = $this->getCategoryTargetLike($category['parentID']);
@@ -222,8 +226,8 @@ class Category extends AbstractResource
                     $category['parent'] = $target_parent;
                 } else {
                     if (empty($target_parent)) {
-                        error_log("Parent category not found: {$category['parentID']}. Will not create '{$category['description']}'");
-                        $this->increaseProgress();
+                        Shopware()->PluginLogger()->error("Order '{$category['description']}' was not imported because the parent category was not found. The plugin tries to create it later.");
+                        $this->unmapped[] = $category;
                         continue;
                     }
                 }
@@ -231,7 +235,7 @@ class Category extends AbstractResource
                 && !empty($this->Request()->language)
                 && !empty($this->Request()->language[$category['languageID']])
             ) {
-                $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `locale_id`=?';
+                $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `id`=?';
                 $category['parent'] = $this->getDb()->fetchOne($sql, [$this->Request()->language[$category['languageID']]]);
             }
 
@@ -250,9 +254,9 @@ class Category extends AbstractResource
                     );
                 }
             } catch (Exception $e) {
-                echo "<pre>";
-                print_r($e);
-                echo "</pre>";
+                var_dump($e->getMessage());
+                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                $this->increaseProgress();
                 exit();
             }
 
@@ -270,7 +274,15 @@ class Category extends AbstractResource
             }
         }
 
+        if (count($this->unmapped) > 0) {
+            $this->importCategoriesWithoutParents();
+            if ($this->newRequestNeeded()) {
+                return $this->getProgress();
+            }
+        }
+
         $this->getProgress()->addRequestParam('import_article_categories', 1);
+        $this->unmapped = [];
 
         return $this->getProgress()->done();
     }
@@ -304,9 +316,18 @@ class Category extends AbstractResource
                 SELECT ad.articleID
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad ON ad.id = pm.targetID
-                WHERE sourceID = ? AND typeID = ?
+                WHERE sourceID = ? AND (typeID = ? OR typeID = ?)
             ';
-            $article = $this->getDb()->fetchOne($sql, [$productCategory['productID'], Migration::MAPPING_ARTICLE]);
+
+            $article = $this->getDb()->fetchOne(
+                $sql,
+                [
+                    $productCategory['productID'],
+                    Migration::MAPPING_ARTICLE,
+                    Migration::MAPPING_VALID_NUMBER
+                ]
+            );
+
             if (empty($article)) {
                 continue;
             }
@@ -336,5 +357,61 @@ class Category extends AbstractResource
         }
 
         $this->getProgress()->done();
+    }
+
+    /**
+     *
+     * If there were unmapped categories because the parent does not exist at the time,
+     * they were imported here in a second step.
+     *
+     * @return bool
+     */
+    private function importCategoriesWithoutParents()
+    {
+        foreach ($this->unmapped as $key => $category) {
+            $target_parent = $this->getCategoryTarget($category['parentID']);
+
+            // More generous approach - will ignore languageIDs
+            if (empty($target_parent) && !empty($category['parentID'])) {
+                $target_parent = $this->getCategoryTargetLike($category['parentID']);
+            }
+
+            if (false !== $target_parent) {
+                $category['parent'] = $target_parent;
+            } else {
+                continue;
+            }
+
+            try {
+                /* @var Import $import */
+                $import = Shopware()->Container()->get('swagmigration.import');
+                $category['targetID'] = $import->category($category);
+
+                $this->setCategoryTarget($category['categoryID'], $category['targetID']);
+                // if meta_title isset update the Category
+                if (!empty($category['meta_title'])) {
+                    $this->getDb()->update(
+                        's_categories',
+                        ['meta_title' => $category['meta_title']],
+                        ['id=?' => $category['targetID']]
+                    );
+                }
+                unset($this->unmapped[$key]);
+            } catch (Exception $e) {
+                var_dump($e->getMessage());
+                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                $this->increaseProgress();
+                exit();
+            }
+        }
+
+        if (count($this->unmapped) > 0) {
+            $this->importCategoriesWithoutParents();
+            if ($this->newRequestNeeded()) {
+                return $this->getProgress();
+            }
+        } else {
+            return true;
+        }
     }
 }

@@ -96,7 +96,7 @@ class Product extends AbstractResource
             'numberNotValid',
             "The product number %s is not valid. A valid product number must:<br>
             * not be longer than 40 chars<br>
-            * not contain other chars than: 'a-zA-Z0-9-_.' and SPACE<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.'<br>
             <br>
             You can force the migration to continue. But be aware that this will: <br>
             * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
@@ -106,6 +106,7 @@ class Product extends AbstractResource
 
         while ($product = $products->fetch()) {
             $existingOrderNumber = true;
+            $numberWasGenerated = false;
 
             // Select additional data for the article if needed
             $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
@@ -124,9 +125,9 @@ class Product extends AbstractResource
             }
 
             // Check the ordernumber
-            $number = isset($product['ordernumber']) ?: '';
+            $number = isset($product['ordernumber']) ? $product['ordernumber'] : '';
             if ($numberValidationMode !== 'ignore'
-                && (empty($number) || strlen($number) > 30 || preg_match('/[^a-zA-Z0-9-_. ]/', $number))
+                && (empty($number) || strlen($number) > 30 || strlen($number) < 4 || preg_match('/[^a-zA-Z0-9-_.]/', $number))
             ) {
                 switch ($numberValidationMode) {
                     case 'complain':
@@ -134,6 +135,7 @@ class Product extends AbstractResource
                         break;
                     case 'make_valid':
                         $product['ordernumber'] = $this->makeInvalidNumberValid($number, $product['productID']);
+                        $numberWasGenerated = true;
                         $existingOrderNumber = false;
                         break;
                 }
@@ -213,6 +215,11 @@ class Product extends AbstractResource
                     }
                 }
 
+                if ($numberWasGenerated === true) {
+                    $sql = "UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ?";
+                    $db->query($sql, [$product['articledetailsID'], str_replace(Shopware()->Config()->backendAutoOrderNumberPrefix, "", $product['ordernumber'])]);
+                }
+
                 // In some cases we need to make sure, that the article configurator is
                 // generated for the master article of master/child article architectures
                 if (isset($product['masterWithAttributes']) && $product['masterWithAttributes'] == 1 && !empty($product['additionaltext'])) {
@@ -221,12 +228,13 @@ class Product extends AbstractResource
                 }
 
                 // Meta-title... if is import the meta-title set them
+                $metaTitle = "";
                 if (!empty($product['meta_title'])) {
                     $metaTitle = $product['meta_title'];
                 }
 
                 if ($product['kind'] == 1 && $product_description !== null) {
-                    if ($metaTitle) {
+                    if ($metaTitle !== "") {
                         $array = ['description_long' => $product_description, 'metaTitle' => $metaTitle];
                     } else {
                         $array = ['description_long' => $product_description];
@@ -320,7 +328,7 @@ class Product extends AbstractResource
         $db->query($sql, [$newMainDetail]);
 
         // Update mapping so that references to the old dummy article point to this article
-        $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE typeID = ? AND targetID = ?';
-        $db->query($sql, [$newMainDetail, Migration::MAPPING_ARTICLE, $oldMainDetail]);
+        $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ? AND (typeID = ? OR typeID = ?)';
+        $db->query($sql, [$newMainDetail, $oldMainDetail, Migration::MAPPING_ARTICLE, Migration::MAPPING_VALID_NUMBER]);
     }
 }

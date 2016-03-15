@@ -267,7 +267,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         );
 
         if ($number) {
-            return 'sw-' . $number;
+            return Shopware()->Config()->backendAutoOrderNumberPrefix . $number;
         }
 
         // Get number
@@ -289,9 +289,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
             ]
         );
 
-        return 'sw-' . $number;
-
-//        return "sw-".md5($id);
+        return Shopware()->Config()->backendAutoOrderNumberPrefix . $number;
     }
 
     /**
@@ -309,9 +307,16 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
             LEFT JOIN s_articles_details ad
                 ON ad.id = pm.targetID
             WHERE pm.`sourceID`=?
-            AND `typeID`=?
+            AND (`typeID`=? OR `typeID`=?)
         ';
 
-        return Shopware()->Db()->fetchOne($sql, [$productId, Migration::MAPPING_ARTICLE]);
+        return Shopware()->Db()->fetchOne(
+            $sql,
+            [
+                $productId,
+                Migration::MAPPING_ARTICLE,
+                Migration::MAPPING_VALID_NUMBER
+            ]
+        );
     }
 }

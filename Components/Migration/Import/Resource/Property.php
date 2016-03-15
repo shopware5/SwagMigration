@@ -183,7 +183,7 @@ class Property extends AbstractResource
         }
 
         if (false === $groupId) {
-            error_log("no group not found");
+            error_log("no group found");
 
             return false;
         }

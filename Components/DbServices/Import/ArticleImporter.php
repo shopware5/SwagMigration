@@ -135,11 +135,25 @@ class ArticleImporter
      */
     public function import(array $article)
     {
-        // OrderNumber is required
+        // OrderNumber is required. Create a new one if its empty
         if (empty($article['ordernumber'])) {
-            $this->logger->error("Ordernumber is required!");
+            $prefix = Shopware()->Config()->backendAutoOrderNumberPrefix;
 
-            return false;
+            $sql = "SELECT number FROM s_order_number WHERE name = 'articleordernumber'";
+            $number = Shopware()->Db()->fetchOne($sql);
+
+            if (!empty($number)) {
+                do {
+                    $number++;
+
+                    $sql = "SELECT id FROM s_articles_details WHERE ordernumber LIKE ?";
+                    $hit = Shopware()->Db()->fetchOne($sql, $prefix . $number);
+                } while ($hit);
+            }
+
+            $article['ordernumber'] = $prefix . $number;
+
+            $this->logger->warning("Order number was not given! The System created a new one!");
         }
 
         $article = $this->prepareArticleData($article);
@@ -1323,7 +1337,11 @@ class ArticleImporter
      */
     private function toFloat($value)
     {
-        return floatval(str_replace(",", ".", $value));
+        if (gettype($value) === "float") {
+            return $value;
+        } else {
+            return floatval(str_replace(",", ".", $value));
+        }
     }
 
     /**

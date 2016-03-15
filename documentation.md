@@ -23,7 +23,7 @@ Zur Zeit unterstützt das Tool:
 * xt:Commerce Veyton 4.0 bis 4.1
 * Gambio GX bis 2.0.10
 * xtModified & xt:Commerce bis 3.04
-* Prestashop bis 1.6.14
+* Prestashop bis 1.6.1.4
 
 Mit der Veröffentlichung des Migrations-Tools unter MIT soll die Möglichkeit geschaffen werden, Änderungen aus der Community schneller in das Tool zurück fließen zu lassen. Außerdem soll es erleichtert werden, das Tool um eigene Profile zu erweitern, um auch Shopsysteme anzubinden, für die es bisher keinen Migrationsweg gibt.
 
