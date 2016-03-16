@@ -557,7 +557,7 @@ class Prestashop15 extends Profile
 				o.`id_lang`								        as languageID,
 				GROUP_CONCAT(cm.`message`)                      as customercomment,
 				o.`date_add`								        as date,
-				`current_state`									as status,
+				`current_state`									as statusID,
 				-- `orders_date_finished`,
 				-- IF(o.`allow_tax`=1,0,1)						as tax_free,
 				-- o.`customers_ip`								as remote_addr,
