@@ -19,7 +19,7 @@ Das Shopware Migrations-Tool dient dazu, Artikel, Kunden und Bestellungen aus fr
 Zur Zeit unterstützt das Tool:
 
 * Oxid bis 4.9.7
-* Magento 1.4.2 bis 1.9.1
+* Magento 1.4.2 bis 1.9.2.4
 * xt:Commerce Veyton 4.0 bis 4.1
 * Gambio GX bis 2.0.10
 * xtModified & xt:Commerce bis 3.04
