@@ -173,7 +173,6 @@ class Cleanup
 			TRUNCATE s_article_configurator_templates;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_article_img_mappings;
-            SET foreign_key_checks = 1;
         ";
 
         Shopware()->Db()->query($sql);
@@ -219,7 +218,6 @@ class Cleanup
             TRUNCATE s_order_esd;
             TRUNCATE s_order_history;
             TRUNCATE s_order_notes;
-            SET foreign_key_checks = 1;
         ";
 
         Shopware()->Db()->query($sql);
@@ -240,7 +238,6 @@ class Cleanup
             TRUNCATE s_user_shippingaddress_attributes;
             TRUNCATE s_user_shippingaddress_attributes;
             TRUNCATE s_user_debit;
-            SET foreign_key_checks = 1;
 	   ";
 
         Shopware()->Db()->query($sql);
@@ -259,7 +256,6 @@ class Cleanup
 			TRUNCATE s_filter_options;
 			TRUNCATE s_filter_relations;
 			TRUNCATE s_filter_values;
-            SET foreign_key_checks = 1;
 		';
 
         Shopware()->Db()->query($sql);
@@ -278,7 +274,6 @@ class Cleanup
 			TRUNCATE s_article_img_mappings;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_media;
-            SET foreign_key_checks = 1;
 		';
         Shopware()->Db()->query($sql);
 

@@ -86,6 +86,9 @@ class Translation extends AbstractResource
                 $translation['languageID'] = $this->Request()->language[$translation['languageID']];
             }
 
+            //prevent productId from being double
+            $translation['productID'] = "'" . $translation['productID'] . "'";
+
             //get the product data
             $sql = '
                 SELECT ad.articleID, ad.id AS articledetailsID, kind
@@ -99,13 +102,13 @@ class Translation extends AbstractResource
             $product_data = Shopware()->Db()->fetchRow(
                 $sql,
                 [
-                    "'" . $translation['productID'] . "'",
+                    $translation['productID'],
                     Migration::MAPPING_ARTICLE,
                     Migration::MAPPING_VALID_NUMBER
                 ]
             );
 
-            if (empty($product_data)) {
+            if (empty($product_data) || $product_data === false) {
                 $sql = '
                     SELECT ad.articleID, ad.id AS articledetailsID, kind
                     FROM s_plugin_migrations pm
@@ -118,7 +121,7 @@ class Translation extends AbstractResource
                 $product_data = Shopware()->Db()->fetchRow(
                     $sql,
                     [
-                        "'" . $translation['productID'] . "'",
+                        $translation['productID'],
                         Migration::MAPPING_ARTICLE,
                         Migration::MAPPING_VALID_NUMBER
                     ]
