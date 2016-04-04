@@ -21,7 +21,7 @@ Zur Zeit unterstützt das Tool:
 * Oxid bis 4.9.7
 * Magento 1.4.2 bis 1.9.2.4
 * xt:Commerce Veyton 4.0 bis 4.1
-* Gambio GX bis 2.0.10
+* Gambio GX bis 2.2.3.0
 * xtModified & xt:Commerce bis 3.04
 * Prestashop bis 1.6.1.4
 
