@@ -87,7 +87,9 @@ class Translation extends AbstractResource
             }
 
             //prevent productId from being double
-            $translation['productID'] = "'" . $translation['productID'] . "'";
+            if (stristr($translation["productID"], "e")) {
+                $translation['productID'] = "'" . $translation['productID'] . "'";
+            }
 
             //get the product data
             $sql = '
