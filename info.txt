@@ -9,7 +9,7 @@
         <li>Magento 1.4.2 bis 1.9.2.4</li>
         <li>xt:Commerce VEYTON 4.0 bis 4.1</li>
         <li>xt:Commerce 3.0.4</li>
-        <li>Gambio GX bis 2.2.3.0</li>
+        <li>Gambio GX bis 2.4.3.1</li>
         <li>PrestaShop 1.6.1.4</li>
     </ul>
 </p>
