@@ -11,5 +11,6 @@
         <li>xt:Commerce 3.0.4</li>
         <li>Gambio GX bis 2.7.2.0</li>
         <li>PrestaShop 1.6.1.4</li>
+        <li>WooCommerce 2.5.5</li>
     </ul>
 </p>

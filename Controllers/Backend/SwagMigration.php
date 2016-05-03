@@ -268,6 +268,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ['id' => 'Xt Commerce', 'name' => $this->getNamespace()->get('profile-xt')],
             ['id' => 'Prestashop15', 'name' => $this->getNamespace()->get('profile-presta')],
             ['id' => 'Prestashop14', 'name' => $this->getNamespace()->get('profile-presta-old')],
+            ['id' => 'WooCommerce', 'name' => $this->getNamespace()->get('profile-woo')],
         ];
         echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
     }
@@ -335,14 +336,20 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function checkFormAction()
     {
+       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $this->setRenderer(false);
 
         try {
-            $shops = $this->Source()->getShops();
-            $languages = $this->Source()->getLanguages();
-            //$image_path = rtrim($this->Request()->basepath.$this->Source()->getProductImagePath(), '/').'/';
-            //$client = new Zend_Http_Client($image_path);
-            echo Zend_Json::encode(['success' => true]);
+            if ($call["profile"] == "WooCommerce") {
+                $shops = $this->Source()->getNormalizedShops();
+                $languages = $this->Source()->getNormalizedLanguages();
+            } else {
+                $shops = $this->Source()->getShops();
+                $languages = $this->Source()->getLanguages();
+                //$image_path = rtrim($this->Request()->basepath.$this->Source()->getProductImagePath(), '/').'/';
+                //$client = new Zend_Http_Client($image_path);
+                echo Zend_Json::encode(['success' => true]);
+            }
         } catch (Zend_Db_Statement_Exception $e) {
             switch ($e->getCode()) {
                 case 42:

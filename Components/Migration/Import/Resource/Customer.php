@@ -12,6 +12,7 @@ use Shopware\SwagMigration\Components\Migration;
 use Shopware;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
 /**
  * Shopware SwagMigration Components - Customer
@@ -57,6 +58,7 @@ class Customer extends AbstractResource
      */
     public function run()
     {
+       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $salt = $this->Request()->salt;
@@ -70,112 +72,133 @@ class Customer extends AbstractResource
         /* @var Import $import */
         $import = Shopware()->Container()->get('swagmigration.import');
 
-        while ($customer = $result->fetch()) {
-            if (isset($customer['customergroupID'])
-                && isset($this->Request()->customer_group[$customer['customergroupID']])
-            ) {
-                $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
+        if ($call["profile"] != "WooCommerce") {
+            while ($customer = $result->fetch()) {
+                $this->migrateCustomer($customer, $import, $salt);
             }
-            unset($customer['customergroupID']);
-            if (isset($customer['subshopID']) && isset($this->Request()->shop[$customer['subshopID']])) {
-                $customer['subshopID'] = $this->Request()->shop[$customer['subshopID']];
-            } else {
-                unset($customer['subshopID']);
-            }
-            if (isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
-                $customer['language'] = $this->Request()->language[$customer['language']];
-            } else {
-                unset($customer['language']);
-            }
-            if (!empty($customer['billing_countryiso'])) {
-                $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['billing_countryiso']]);
-            }
-            if (isset($customer['shipping_countryiso'])) {
-                $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
-                $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['shipping_countryiso']]);
-            }
+        } elseif ($call["profile"] == "WooCommerce") {
+            $normalizer = new WooCommerce();
+            $normalizedCustomers = $normalizer->normalizeCustomers($result->fetchAll());
 
-            if (!isset($customer['paymentID'])) {
-                $customer['paymentID'] = Shopware()->Config()->Paymentdefault;
-            }
-
-            if (!empty($customer['md5_password']) && !empty($salt)) {
-                $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
-            }
-
-            // If language is not set, read language from subshop
-            if (empty($customer['language']) && !empty($customer['subshopID'])) {
-                $sql = 'SELECT `locale_id` FROM s_core_shops WHERE id=?';
-                $languageId = (int) Shopware()->Db()->fetchOne($sql, [$customer['subshopID']]);
-                if (!empty($languageId)) {
-                    $customer['language'] = $languageId;
-                }
-            }
-
-            if ($this->isShopwareFive()) {
-                if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
-                    $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
-                }
-            }
-
-            if (!empty($customer['shipping_company']) || !empty($customer['shipping_firstname']) || !empty($customer['shipping_lastname'])) {
-                $customer_shipping = [
-                    'company' => !empty($customer['shipping_company']) ? $customer['shipping_company'] : '',
-                    'department' => !empty($customer['shipping_department']) ? $customer['shipping_department'] : '',
-                    'salutation' => !empty($customer['shipping_salutation']) ? $customer['shipping_salutation'] : '',
-                    'firstname' => !empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : '',
-                    'lastname' => !empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : '',
-                    'street' => !empty($customer['shipping_street']) ? $customer['shipping_street'] : '',
-                    'zipcode' => !empty($customer['shipping_zipcode']) ? $customer['shipping_zipcode'] : '',
-                    'city' => !empty($customer['shipping_city']) ? $customer['shipping_city'] : '',
-                    'countryID' => !empty($customer['shipping_countryID']) ? $customer['shipping_countryID'] : 0,
-                ];
-                $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
-
-                if (!$this->isShopwareFive()) {
-                    $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
-                }
-            } else {
-                $customer_shipping = [];
-            }
-
-            $customer_result = $import->customer($customer);
-
-            if (!empty($customer_result)) {
-                $customer = array_merge($customer, $customer_result);
-
-                if (!empty($customer_shipping)) {
-                    $customer_shipping['userID'] = $customer['userID'];
-                    Shopware()->Db()->insert('s_user_shippingaddress', $customer_shipping);
-                }
-
-                if (!empty($customer['account'])) {
-                    $this->importCustomerDebit($customer);
-                }
-
-                $sql = '
-                    INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
-                    VALUES (?, ?, ?)
-                    ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
-                ';
-                Shopware()->Db()->query(
-                    $sql,
-                    [
-                        Migration::MAPPING_CUSTOMER,
-                        $customer['customerID'],
-                        $customer['userID']
-                    ]
-                );
-            }
-            $this->increaseProgress();
-
-            if ($this->newRequestNeeded()) {
-                return $this->getProgress();
+            foreach ($normalizedCustomers as $customer) {
+                $this->migrateCustomer($customer, $import, $salt);
             }
         }
 
         return $this->getProgress()->done();
+    }
+
+    /**
+     * @param $customer
+     * @param $import
+     * @param $salt
+     * @return Progress
+     * @throws \Zend_Db_Adapter_Exception
+     */
+    private function migrateCustomer($customer, $import, $salt)
+    {
+        if (isset($customer['customergroupID'])
+            && isset($this->Request()->customer_group[$customer['customergroupID']])
+        ) {
+            $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
+        }
+        unset($customer['customergroupID']);
+        if (isset($customer['subshopID']) && isset($this->Request()->shop[$customer['subshopID']])) {
+            $customer['subshopID'] = $this->Request()->shop[$customer['subshopID']];
+        } else {
+            unset($customer['subshopID']);
+        }
+        if (isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
+            $customer['language'] = $this->Request()->language[$customer['language']];
+        } else {
+            unset($customer['language']);
+        }
+        if (!empty($customer['billing_countryiso'])) {
+            $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
+            $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['billing_countryiso']]);
+        }
+        if (isset($customer['shipping_countryiso'])) {
+            $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
+            $customer['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['shipping_countryiso']]);
+        }
+
+        if (!isset($customer['paymentID'])) {
+            $customer['paymentID'] = Shopware()->Config()->Paymentdefault;
+        }
+
+        if (!empty($customer['md5_password']) && !empty($salt)) {
+            $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
+        }
+
+        // If language is not set, read language from subshop
+        if (empty($customer['language']) && !empty($customer['subshopID'])) {
+            $sql = 'SELECT `locale_id` FROM s_core_shops WHERE id=?';
+            $languageId = (int) Shopware()->Db()->fetchOne($sql, [$customer['subshopID']]);
+            if (!empty($languageId)) {
+                $customer['language'] = $languageId;
+            }
+        }
+
+        if ($this->isShopwareFive()) {
+            if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
+                $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
+            }
+        }
+
+        if (!empty($customer['shipping_company']) || !empty($customer['shipping_firstname']) || !empty($customer['shipping_lastname'])) {
+            $customer_shipping = [
+                'company' => !empty($customer['shipping_company']) ? $customer['shipping_company'] : '',
+                'department' => !empty($customer['shipping_department']) ? $customer['shipping_department'] : '',
+                'salutation' => !empty($customer['shipping_salutation']) ? $customer['shipping_salutation'] : '',
+                'firstname' => !empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : '',
+                'lastname' => !empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : '',
+                'street' => !empty($customer['shipping_street']) ? $customer['shipping_street'] : '',
+                'zipcode' => !empty($customer['shipping_zipcode']) ? $customer['shipping_zipcode'] : '',
+                'city' => !empty($customer['shipping_city']) ? $customer['shipping_city'] : '',
+                'countryID' => !empty($customer['shipping_countryID']) ? $customer['shipping_countryID'] : 0,
+            ];
+            $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
+
+            if (!$this->isShopwareFive()) {
+                $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
+            }
+        } else {
+            $customer_shipping = [];
+        }
+
+        $customer_result = $import->customer($customer);
+
+        if (!empty($customer_result)) {
+            $customer = array_merge($customer, $customer_result);
+
+            if (!empty($customer_shipping)) {
+                $customer_shipping['userID'] = $customer['userID'];
+                Shopware()->Db()->insert('s_user_shippingaddress', $customer_shipping);
+            }
+
+            if (!empty($customer['account'])) {
+                $this->importCustomerDebit($customer);
+            }
+
+            $sql = '
+                    INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)
+                    VALUES (?, ?, ?)
+                    ON DUPLICATE KEY UPDATE `targetID`=VALUES(`targetID`);
+                ';
+            Shopware()->Db()->query(
+                $sql,
+                [
+                    Migration::MAPPING_CUSTOMER,
+                    $customer['customerID'],
+                    $customer['userID']
+                ]
+            );
+        }
+        $this->increaseProgress();
+
+        if ($this->newRequestNeeded()) {
+            return $this->getProgress();
+        }
     }
 
     /**

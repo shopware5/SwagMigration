@@ -9,6 +9,7 @@
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
+use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
 class Variant extends AbstractResource
 {
@@ -49,6 +50,7 @@ class Variant extends AbstractResource
     public function run()
     {
         $offsetProduct = $this->getProgress()->getOffset();
+       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
 
         // Get products with attributes
         $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
@@ -63,37 +65,50 @@ class Variant extends AbstractResource
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
-        // iter products
-        while ($product = $products_result->fetch()) {
-            $id = $product['productID'];
-
-            // continue if product was not imported before
-            $productId = $this->getBaseArticleInfo($id);
-            if (false === $productId) {
-                continue;
+        if ($call["profile"] != "WooCommerce") {
+            while ($product = $products_result->fetch()) {
+                $this->migrateVariant($product);
             }
+        } elseif ($call["profile"] == "WooCommerce") {
+            $normalizer = new WooCommerce();
+            $normalizedVariants = $normalizer->normalizeVariants($products_result->fetchAll());
 
-            $groups = $this->getConfiguratorGroups($productId);
-
-            $params = [
-                'articleId' => $productId,
-                'groups' => $groups
-
-            ];
-
-            $this->increaseProgress();
-
-            // Return the groups
-            // The ExtJS frontend will care of the generation by triggering
-            // the default article controller
-
-            $this->getProgress()->addRequestParam('params', $params);
-            $this->getProgress()->addRequestParam('create_variants', true);
-
-            return $this->getProgress();
+            foreach ($normalizedVariants as $product) {
+                $this->migrateVariant($product);
+            }
         }
 
         echo $this->getProgress()->done();
+    }
+
+    private function migrateVariant($product)
+    {
+        $id = $product['productID'];
+
+        // continue if product was not imported before
+        $productId = $this->getBaseArticleInfo($id);
+        if (false === $productId) {
+            return;
+        }
+
+        $groups = $this->getConfiguratorGroups($productId);
+
+        $params = [
+            'articleId' => $productId,
+            'groups' => $groups
+
+        ];
+
+        $this->increaseProgress();
+
+        // Return the groups
+        // The ExtJS frontend will care of the generation by triggering
+        // the default article controller
+
+        $this->getProgress()->addRequestParam('params', $params);
+        $this->getProgress()->addRequestParam('create_variants', true);
+
+        return $this->getProgress();
     }
 
     /**

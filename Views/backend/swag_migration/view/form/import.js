@@ -43,6 +43,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     saltInputNeeded: false,
 
     /**
+     * will be set to true if the current profile needs an additional salt to be entered by the user
+     */
+    showOnWoo: false,
+
+    /**
      * Will be set to true, if the migration plugin provides password encoder for the selected profile
      */
     showPasswordInfo: false,
@@ -162,11 +167,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         }, {
             fieldLabel: '{s name=importTranslations}Import translations{/s}',
             name: 'import_translations',
-            xtype: 'checkbox'
+            xtype: 'checkbox',
+            hidden: !me.showOnWoo,
+            checked: me.showOnWoo
         }, {
             fieldLabel: '{s name=importProperties}Import product properties{/s}',
             name: 'import_properties',
-            xtype: 'checkbox'
+            xtype: 'checkbox',
+            hidden: !me.showOnWoo,
+            checked: me.showOnWoo
         }, {
             fieldLabel: '{s name=importCategories}Import categories{/s}',
             name: 'import_categories',
@@ -180,7 +189,9 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         }, {
             fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
             name: 'import_prices',
-            xtype: 'checkbox'
+            xtype: 'checkbox',
+            hidden: !me.showOnWoo,
+            checked: me.showOnWoo
         }, {
             fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
             name: 'import_generate_variants',
@@ -432,6 +443,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             me.saltInput.hide();
             me.saltInput.allowBlank = true;
         }
+    },
+
+    setWooCommerceSettings: function(value) {
+        var me = this;
+
+        me.showOnWoo = value;
     },
 
     setImportAllowed: function(value) {
