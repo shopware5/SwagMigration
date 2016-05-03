@@ -11,6 +11,7 @@ namespace Shopware\SwagMigration\Components\Migration;
 use Enlight_Class;
 use Enlight_Components_Db;
 use ArrayObject;
+use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
 abstract class Profile extends Enlight_Class
 {
@@ -135,7 +136,7 @@ abstract class Profile extends Enlight_Class
      */
     public function Config()
     {
-        if (!isset($this->config)) {
+        if (!isset($this->config) && method_exists($this, 'getConfigSelect')) {
             $config = [];
             $sql = $this->getConfigSelect();
             $rows = $this->db->fetchAll($sql);
@@ -208,6 +209,21 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
+     * @return array|void
+     */
+    public function getNormalizedShops()
+    {
+        if (!method_exists($this, 'getShopSelect')) {
+            return;
+        }
+        $normalizer = new WooCommerce();
+
+        $shopSelect = $normalizer->normalizeShops($this->db->fetchAll($this->getShopSelect()));
+
+        return $shopSelect;
+    }
+
+    /**
      * This function returns the profile languages
      *
      * @return array
@@ -219,6 +235,21 @@ abstract class Profile extends Enlight_Class
         }
 
         return $this->db->fetchPairs($this->getLanguageSelect());
+    }
+
+    /**
+     * @return array|void
+     */
+    public function getNormalizedLanguages()
+    {
+        if (!method_exists($this, 'getLanguageSelect')) {
+            return;
+        }
+        $normalizer = new WooCommerce();
+
+        $langSelect = $normalizer->normalizeLanguages($this->db->fetchAll($this->getLanguageSelect()));
+
+        return $langSelect;
     }
 
 
@@ -641,6 +672,36 @@ abstract class Profile extends Enlight_Class
         }
 
         return $this->db->query($sql);
+    }
+
+    /**
+     * @param $order
+     * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
+     */
+    public function queryOrderDetailArticleNumber($order)
+    {
+        if (!method_exists($this, 'getArticleNumberSelect')) {
+            return;
+        }
+
+        $sql = $this->getArticleNumberSelect($order["productID"]);
+
+        return $this->db->query($sql);
+    }
+
+    /**
+     * @param $order
+     * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
+     */
+    public function queryOrderAmounts($order)
+    {
+        if (!method_exists($this, 'getOrderAmounts')) {
+            return;
+        }
+
+        $sql = $this->getOrderAmounts($order["orderID"]);
+
+        return  $this->db->query($sql);
     }
 
     /**

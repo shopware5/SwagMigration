@@ -179,6 +179,7 @@ class Category extends AbstractResource
      */
     public function importCategories()
     {
+       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $skip = false;
@@ -191,12 +192,24 @@ class Category extends AbstractResource
             );
         }
 
+        if ($call["profile"] == "WooCommerce") {
+            $locale = $this->Source()->getNormalizedLanguages();
+
+            $sql = 'SELECT id FROM s_core_locales WHERE locale = ?';
+            $languageId = $this->getDb()->fetchOne($sql, [$locale[0]]);
+        }
+
         $categories = $this->Source()->queryCategories($offset);
+
         $count = $categories->rowCount() + $offset;
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
         while (!$skip && $category = $categories->fetch()) {
+            if ($call["profile"] == "WooCommerce") {
+                $category["languageID"] = $languageId;
+            }
+
             //check if the category split into the different translations
             if (!empty($category['languageID'])
                 && strpos($category['categoryID'], Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
@@ -214,6 +227,7 @@ class Category extends AbstractResource
             if (empty($target_parent) && !empty($category['parentID'])) {
                 $target_parent = $this->getCategoryTargetLike($category['parentID']);
             }
+
             // Do not create empty categories
             if (empty($category['description'])) {
                 $this->increaseProgress();
@@ -237,6 +251,9 @@ class Category extends AbstractResource
             ) {
                 $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `id`=?';
                 $category['parent'] = $this->getDb()->fetchOne($sql, [$this->Request()->language[$category['languageID']]]);
+            } else {
+                $sql = 'SELECT `category_id` FROM `s_core_shops` WHERE `id`=?';
+                $category['parent'] = $this->getDb()->fetchOne($sql, [$category['languageID']]);
             }
 
             try {

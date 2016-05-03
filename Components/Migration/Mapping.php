@@ -102,6 +102,12 @@ class Mapping
 
         $target = $this->setAliases($this->Target()->getCustomerGroups());
         $customerGroups = $this->mapArrays($this->Source()->getCustomerGroups(), $target);
+        $wooCustomerGroups = unserialize(reset($customerGroups)["value"]);
+
+        if ($wooCustomerGroups != false) {
+            $customerGroups = $this->refactorSerializedArray($wooCustomerGroups);
+        }
+
         foreach ($customerGroups as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
@@ -115,6 +121,12 @@ class Mapping
 
         $target = $this->setAliases($this->Target()->getPriceGroups());
         $priceGroups = $this->mapArrays($this->Source()->getPriceGroups(), $target);
+        $wooPriceGroups = unserialize(reset($priceGroups)["value"]);
+
+        if ($wooPriceGroups != false) {
+            $priceGroups = $this->refactorSerializedArray($wooPriceGroups);
+        }
+
         foreach ($priceGroups as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
@@ -372,5 +384,25 @@ class Mapping
         }
 
         return $sourceArray;
+    }
+
+    /**
+     * This function returns an refactored unserialized array.
+     *
+     * @param $array
+     * @return array
+     */
+    private function refactorSerializedArray($array)
+    {
+        $refactoredArray = array();
+        foreach ($array as $value) {
+            $refactoredArray[] = array(
+                "value" => $value["name"],
+                "mapping" => "Bitte wählen",
+                "mapping_value" => "Bitte wählen"
+            );
+        }
+        return $refactoredArray;
+
     }
 }

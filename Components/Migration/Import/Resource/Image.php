@@ -56,6 +56,7 @@ class Image extends AbstractResource
      */
     public function run()
     {
+       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductImages($offset);
@@ -63,13 +64,20 @@ class Image extends AbstractResource
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
-        $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+
+        if ($call["profile"] != "WooCommerce") {
+            $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+        }
 
         /* @var Import $import */
         $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($image = $result->fetch()) {
-            $image['link'] = $image_path . $image['image'];
+            if ($call["profile"] != "WooCommerce") {
+                $image['link'] = $image_path . $image['image'];
+            } else {
+                $image['link'] = $image['image'];
+            }
 
             if (!isset($image['name'])) {
                 $image['name'] = pathinfo(basename($image['image']), PATHINFO_FILENAME);

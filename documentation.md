@@ -24,6 +24,7 @@ Zur Zeit unterstützt das Tool:
 * Gambio GX bis 2.7.2.0
 * xtModified & xt:Commerce bis 3.04
 * Prestashop bis 1.6.1.4
+* WooCommerce 2.5.5
 
 Mit der Veröffentlichung des Migrations-Tools unter MIT soll die Möglichkeit geschaffen werden, Änderungen aus der Community schneller in das Tool zurück fließen zu lassen. Außerdem soll es erleichtert werden, das Tool um eigene Profile zu erweitern, um auch Shopsysteme anzubinden, für die es bisher keinen Migrationsweg gibt.
 
