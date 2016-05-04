@@ -115,6 +115,8 @@ class Product extends AbstractResource
             }
         }
 
+        $this->getProgress()->addRequestParam('import_prices', true);
+
         return $this->getProgress()->done();
     }
 
