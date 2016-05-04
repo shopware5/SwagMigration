@@ -308,7 +308,7 @@ class XtCommerce extends Profile
 					SELECT
 						`products_id` as productID,
 						`quantity` as `from`,
-						`personal_offer` as `net_price`,
+						`personal_offer` as `price`,
 						'$price_group' as pricegroup
 					FROM {$this->quoteTable('personal_offers_by_customers_status_'.$price_group)}
 					WHERE `personal_offer`!=0

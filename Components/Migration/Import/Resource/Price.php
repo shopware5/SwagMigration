@@ -84,6 +84,7 @@ class Price extends AbstractResource
                     continue;
                 }
             }
+
             if (empty($price['pricegroup'])) {
                 $price['pricegroup'] = 'EK';
             }
@@ -112,6 +113,7 @@ class Price extends AbstractResource
                     Migration::MAPPING_VALID_NUMBER
                 ]
             );
+            
             if (!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if (isset($price['net_price'])) {
@@ -123,6 +125,7 @@ class Price extends AbstractResource
                         unset($price['net_price']);
                     }
                 }
+
                 if (isset($price['net_pseudoprice'])) {
                     if (empty($price['tax'])) {
                         $price['pseudoprice'] = $price['net_pseudoprice'];
