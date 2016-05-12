@@ -333,6 +333,11 @@ class Product extends AbstractResource
             }
         }
 
+        // WooCommerce has no pricegroups to migrate so skip this step
+        if ($call["profile"] !== "WooCommerce") {
+            $this->getProgress()->addRequestParam('import_prices', true);
+        }
+
         $this->increaseProgress();
         if ($this->newRequestNeeded()) {
             return $this->getProgress();
