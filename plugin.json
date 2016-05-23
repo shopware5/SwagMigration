@@ -9,10 +9,11 @@
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
 
-    "currentVersion": "2.4.0",
+    "currentVersion": "2.4.1",
 
     "changelog": {
         "de": {
+            "2.4.1": "PT-5440 - Feature: Update Magento bis Version 1.9.2.4; PT-5445 - Feature: Update Gambio bis Version 2.2.x; PT-5446 - Feature: Update Gambio bis Version 2.4.x; PT-5447 - Feature: Update Gambio bis Version 2.6.x; PT-5438 - Feature: Update Oxid bis Version 4.9.7; PT-5503 - Feature: Migration von WooCommerce 2.5.5;",
             "2.4.0": "PT-3764, PT-4165, PT-5120 - Feature: Shopware 5.1 Kompatibilität;",
             "2.3.1": "PT-3105 - Feature: Prozessanzeige beim Zurücksetzen des Shopware Shops implementiert; PT-3111 - Bugfix: Checkbox Abhängigkeiten beim Import von ESD Bestellungen; PT-3112 - Bugfix: Anzeige von Hilfstexten; PT-3129 - Bugfix: Fehler im Oxid-Profil; PT-3226 - Bugfix: Fehler im Magento-Profil; PT-3230 - Bugfix: Shopware 3.5.7 Profil entfernt;",
             "2.3.0": "PT-2920 - SW5 Kompatibilität; PT-2746 - Fix: SEO-Kategorien zurück setzen; PT-2749 - Verbesserung: Oxid ESD + Downloads;PT-2799 - Fix: Bestellnummern werden korrekt importiert; PT-3091 - Import von Metadaten bei Artikeln und Kategorien",
@@ -22,6 +23,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
+            "2.4.1": "PT-5440 - Feature: Update Magento up to version 1.9.2.4; PT-5445 - Feature: Update Gambio up to version 2.2.x; PT-5446 - Feature: Update Gambio up to version 2.4.x; PT-5447 - Feature: Update Gambio up to version 2.6.x; PT-5438 - Feature: Update Oxid up to version 4.9.7; PT-5503 - Feature: Migration of WooCommerce 2.5.5;",
             "2.4.0": "PT-3764, PT-4165, PT-5120 - Feature: Shopware 5.1 compatibility;",
             "2.3.1": "PT-3105 - Feature: process indicator when resetting the Shopware shop; PT-3111 - Bugfix: Checkbox dependency for import of ESD orders; PT-3112 - Bugfix: Displaying of help texts; PT-3129 - Bugfix: Error in Oxid profile; PT-3226 - Bugfix: Error i Magento profile; PT-3230 - Bugfix: Deleted Shopware 3.5.7 profile;",
             "2.3.0": "PT-2920 - SW5 compatibility; PT-2746 - Fix: Reset SEO categories; PT-2749 - Improvement: Oxid ESD + Downloads;PT-2799 - Fix: Import order numbers properly; PT-3091 - Import metadata for products and categories",
