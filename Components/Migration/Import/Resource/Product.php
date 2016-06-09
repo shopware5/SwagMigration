@@ -103,8 +103,10 @@ class Product extends AbstractResource
         $this->initTaskTimer();
 
         if ($call["profile"] !== "WooCommerce") {
-            while ($product = $products->fetchAll()) {
-                $this->migrateProduct($product[0], $numberValidationMode, $db, $import, $numberSnippet, $call);
+            $prodArr = $products->fetchAll();
+
+            foreach ($prodArr as $id => $product) {
+                $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
             }
         } elseif ($call["profile"] === "WooCommerce") {
             $normalizer = new WooCommerce();
