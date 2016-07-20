@@ -375,6 +375,9 @@ class Prestashop15 extends Profile
 				u.id_customer 										as customerID,
 				u.id_customer 										as customernumber,
 				u.id_shop                                           as subshopID,
+				IF(g.type=0, 'mr', 'ms')		                    as salutation,
+				u.firstname                                         as firstname,
+				u.lastname       	 								as lastname,
 
 				IF(g.type=0, 'mr', 'ms')		                    as billing_salutation,
 				u.firstname                                         as billing_firstname,
@@ -399,7 +402,6 @@ class Prestashop15 extends Profile
 				c2.iso_code                   						as shipping_countryiso,
 
 				a.phone 					            			as phone,
-				''               									as fax,
 				u.email                 							as email,
 				DATE(u.birthday)				    				as birthday,
 				a.vat_number     									as ustid,
@@ -416,14 +418,8 @@ class Prestashop15 extends Profile
 
 			FROM {$this->quoteTable('customer', 'u')}
 
-			-- Limit the number of joined addresses to one
 			LEFT JOIN {$this->quoteTable('address', 'a')}
-            ON a.id_address = (
-            	SELECT id_address
-            	FROM  {$this->quoteTable('address', 'a2')}
-            	WHERE a2.id_customer=u.id_customer
-            	LIMIT 1
-            )
+            ON a.id_customer = u.id_customer
 
 			LEFT JOIN {$this->quoteTable('gender', 'g')}
 			ON g.id_gender=u.id_gender

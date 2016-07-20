@@ -42,7 +42,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        $this->checkVersion('5.1.0');
+        $this->checkVersion('5.2.0');
         $this->subscribeEvents();
 
         $parent = $this->Menu()->findOneBy(['label' => 'Inhalte']);
@@ -113,7 +113,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function update($version)
     {
-        $this->checkVersion('5.0.0');
+        $this->checkVersion('5.2.0');
         $this->subscribeEvents();
 
         // Create form

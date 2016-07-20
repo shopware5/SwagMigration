@@ -577,8 +577,7 @@ class Magento17 extends Profile
             'country_id',
             'postcode',
             'street',
-            'telephone',
-            'fax'
+            'telephone'
         ];
 
         return "
@@ -615,7 +614,6 @@ class Magento17 extends Profile
 				-- `postcode`							as shipping_zipcode,
 
 				telephone.value							as phone,
-				fax.value								as fax,
 				dob.value 								as birthday,
 				password_hash.value 					as md5_password,
 				'md5reversed'							as encoder,
@@ -668,7 +666,6 @@ class Magento17 extends Profile
 
 				o.`customer_taxvat`							as ustid,
 				ba.`telephone`								as phone,
-				ba.`fax`									as fax,
 
 				ba.`company`								as billing_company,
 				ba.`firstname`								as billing_firstname,

@@ -229,7 +229,6 @@ class Order extends AbstractResource
             'zipcode' => !empty($order['billing_zipcode']) ? $order['billing_zipcode'] : '',
             'city' => !empty($order['billing_city']) ? $order['billing_city'] : '',
             'phone' => !empty($order['phone']) ? $order['phone'] : '',
-            'fax' => !empty($order['fax']) ? $order['fax'] : '',
             'countryID' => !empty($order['billing_countryID']) ? $order['billing_countryID'] : 0,
             'ustid' => !empty($order['billing_ustid']) ? $order['billing_ustid'] : '',
         ];

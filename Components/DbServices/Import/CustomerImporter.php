@@ -23,9 +23,14 @@ class CustomerImporter
         'firstlogin',
         'lastlogin',
         'newsletter',
+        'firstname',
+        'lastname',
+        'salutation',
         'validation',
         'customergroup',
         'paymentpreset',
+        'birthday' => 'birthday',
+        'customernumber' => 'customernumber',
         'language',
         'subshopID',
         'referer',
@@ -38,17 +43,41 @@ class CustomerImporter
         'company' => 'billing_company',
         'department' => 'billing_department',
         'salutation' => 'billing_salutation',
-        'customernumber' => 'customernumber',
         'firstname' => 'billing_firstname',
         'lastname' => 'billing_lastname',
         'street' => 'billing_street',
         'zipcode' => 'billing_zipcode',
         'city' => 'billing_city',
         'phone' => 'phone',
-        'fax' => 'fax',
         'countryID' => 'billing_countryID',
-        'ustid' => 'ustid',
-        'birthday' => 'birthday'
+        'ustid' => 'ustid'
+    ];
+
+    /** @var array $billingFields */
+    private $addressFields = [
+        'user_id' => 'user_id',
+        'company' => 'company',
+        'department' => 'department',
+        'salutation' => 'salutation',
+        'firstname' => 'firstname',
+        'lastname' => 'lastname',
+        'street' => 'street',
+        'zipcode' => 'zipcode',
+        'city' => 'city',
+        'phone' => 'phone',
+        'country_id' => 'country_id',
+        'ustid' => 'ustid'
+    ];
+
+    /** @var array $shippingAttributeFields */
+    private $addressAttributeFields = [
+        'address_id' => 'address_id',
+        'text1' => 'text1',
+        'text2' => 'text2',
+        'text3' => 'text3',
+        'text4' => 'text4',
+        'text5' => 'text5',
+        'text6' => 'text6'
     ];
 
     /** @var array $billingAttributeFields */
@@ -116,6 +145,8 @@ class CustomerImporter
      */
     public function import(array $customer)
     {
+        $customer["addresses"] = $this->getCustomerAddresses($customer);
+
         $customer = $this->prepareCustomerData($customer);
         if (empty($customer['userID']) && empty($customer['email'])) {
             return false;
@@ -127,6 +158,29 @@ class CustomerImporter
         $customer = $this->createOrUpdateCustomer($customer);
         if ($customer === false) {
             return false;
+        }
+
+        foreach ($customer["addresses"] as $address) {
+            $address = $this->prepareAddressData($address);
+            $addressId = $this->findExistingEntry('s_user_addresses', "user_id = {$customer['userID']}");
+            $address["address_id"] = $addressID;
+            $address["user_id"] = $customer['userID'];
+            $address = $this->createOrUpdate($address, 's_user_addresses', 'address_id', $this->addressFields);
+
+            if ($address === false) {
+                continue;
+            }
+
+            $addressAttributeId = $this->findExistingEntry(
+                's_user_addresses_attributes',
+                "address_id = {$address['address_id']}"
+            );
+            $address = $this->createOrUpdate(
+                $address,
+                's_user_addresses_attributes',
+                $addressAttributeId,
+                $this->addressAttributeFields
+            );
         }
 
         $customer = $this->prepareBillingData($customer);
@@ -208,6 +262,15 @@ class CustomerImporter
      */
     private function prepareCustomerData(array $customer)
     {
+        if (isset($customer['firstname'])) {
+            $customer['firstname'] = $this->db->quote((string) $customer['firstname']);
+        }
+        if (isset($customer['lastname'])) {
+            $customer['lastname'] = $this->db->quote((string) $customer['lastname']);
+        }
+        if (isset($customer['salutation'])) {
+            $customer['salutation'] = $this->db->quote((string) $customer['salutation']);
+        }
         if (isset($customer['password'])) {
             $customer['password'] = trim($customer['password'], '\r\n');
         }
@@ -257,12 +320,18 @@ class CustomerImporter
         } else {
             $customer['active'] = 1;
         }
+        if (isset($customer['birthday'])) {
+            $customer['birthday'] = $this->toDate($customer['birthday']);
+        }
+        if (isset($customer["billing_countryID"])) {
+            $customer["countryID"] = $customer["billing_countryID"];
+        }
 
         $customer['customergroup'] = empty($customer['customergroup']) ? $this->db->quote('EK') : $this->db->quote(
             (string) $customer['customergroup']
         );
-        $customer['firstlogin'] = empty($customer['firstlogin']) ? 'CURDATE()' : $this->toDate($customer['firstlogin']);
-        $customer['lastlogin'] = empty($article['lastlogin']) ? 'NOW()' : $this->toTimeStamp($customer['lastlogin']);
+        $customer['firstlogin'] = empty($customer['firstlogin']) ? $this->db->quote((string) date('Y-m-d')) : $this->toDate($customer['firstlogin']);
+        $customer['lastlogin'] = empty($article['lastlogin']) ? $this->db->quote((string) date('Y-m-d H:i:s')) : $this->toTimeStamp($customer['lastlogin']);
 
         return $customer;
     }
@@ -302,6 +371,7 @@ class CustomerImporter
 
             $sql = 'INSERT INTO s_user (' . implode(', ', $insertFields) . ')
                     VALUES (' . implode(', ', $insertValues) . ')';
+
             $result = $this->db->query($sql);
             if ($result === false) {
                 return false;
@@ -386,9 +456,6 @@ class CustomerImporter
         if (isset($customer['phone'])) {
             $customer['phone'] = $this->db->quote((string) $customer['phone']);
         }
-        if (isset($customer['fax'])) {
-            $customer['fax'] = $this->db->quote((string) $customer['fax']);
-        }
         if (isset($customer['ustid'])) {
             $customer['ustid'] = $this->db->quote((string) $customer['ustid']);
         }
@@ -456,6 +523,7 @@ class CustomerImporter
                     $insertValues[] = $customer[$field];
                 }
             }
+
             $sql = "INSERT INTO $table (" . implode(', ', $insertFields) . ")
                     VALUES (" . implode(', ', $insertValues) . ")";
 
@@ -535,24 +603,70 @@ class CustomerImporter
     }
 
     /**
+     * @param array $address
+     * @return array
+     */
+    private function prepareAddressData(array $address)
+    {
+        if (isset($address['company'])) {
+            $address['company'] = $this->db->quote((string) $address['company']);
+        }
+        if (isset($address['department'])) {
+            $address['department'] = $this->db->quote((string) $address['department']);
+        }
+        if (isset($address['salutation'])) {
+            $address['salutation'] = $this->db->quote((string) $address['salutation']);
+        }
+        if (isset($address['firstname'])) {
+            $address['firstname'] = $this->db->quote((string) $address['firstname']);
+        }
+        if (isset($address['lastname'])) {
+            $address['lastname'] = $this->db->quote((string) $address['lastname']);
+        }
+        if (isset($address['street'])) {
+            $address['street'] = $this->db->quote((string) $address['street']);
+        }
+        if (isset($address['zipcode'])) {
+            $address['zipcode'] = $this->db->quote((string) $address['zipcode']);
+        }
+        if (isset($address['city'])) {
+            $address['city'] = $this->db->quote((string) $address['city']);
+        }
+        if (isset($address['countryID'])) {
+            $address['country_id'] = (int) $this->getCountryID($address['countryID']);
+        } else {
+            $address['country_id'] = $this->getDefaultCountryId();
+        }
+
+        // shipping address attributes
+        for ($i = 1; $i < 7; $i++) {
+            if (isset($address["address_text$i"])) {
+                $address["address_text$i"] = $this->db->quote((string) $address["address_text$i"]);
+            }
+        }
+
+        return $address;
+    }
+
+    /**
      * @param int $userId
      * @return string
      */
     private function getCustomerNumber($userId)
     {
         $sql = 'SELECT customernumber
-                FROM s_user_billingaddress
-                WHERE userID = ' . $userId;
+                FROM s_user
+                WHERE id = ' . $userId;
         $customerNumber = $this->db->fetchOne($sql);
         if ($this->config->get('sSHOPWAREMANAGEDCUSTOMERNUMBERS') && empty($customerNumber)) {
-            $sql = "UPDATE s_order_number n, s_user_billingaddress b
+            $sql = "UPDATE s_order_number n, s_user b
                     SET n.number = n.number + 1, b.customernumber = n.number + 1
                     WHERE n.name = 'user'
-                      AND b.userID = ?";
+                      AND b.id = ?";
             $this->db->query($sql, [$userId]);
             $sql = 'SELECT customernumber
-                    FROM s_user_billingaddress
-                    WHERE userID = ' . $userId;
+                    FROM s_user
+                    WHERE id = ' . $userId;
             $customerNumber = $this->db->fetchOne($sql);
         }
 
@@ -636,5 +750,62 @@ class CustomerImporter
         $date = new \Zend_Date($timestamp);
 
         return $this->db->quote($date->toString('Y-m-d H:i:s', 'php'));
+    }
+
+    /**
+     * Helper function to build an array of all addresses, so they can be stored in the database.
+     *
+     * @param array $customer
+     * @return array
+     */
+    private function getCustomerAddresses(array $customer)
+    {
+        if (!isset($customer["country_id"])) {
+            $customer["country_id"] = $this->getDefaultCountryId();
+        }
+        $addresses = [];
+
+        $addresses[] = [
+            'userID' => $customer['userID'],
+            'company' => $customer['billing_company'],
+            'department' => $customer['billing_company'],
+            'salutation' => $customer['billing_company'],
+            'firstname' => $customer['billing_firstname'],
+            'lastname' => $customer['billing_lastname'],
+            'street' => $customer['billing_street'],
+            'zipcode' => $customer['billing_zipcode'],
+            'city' => $customer['billing_city'],
+            'country_id' => $customer["country_id"]
+        ];
+
+        if (!empty($customer['shipping_company'])
+            || !empty($customer['shipping_firstname'])
+            || !empty($customer['shipping_street'])
+            || !empty($customer['shipping_lastname'])) {
+            $addresses[] = [
+                'userID' => $customer['userID'],
+                'company' => $customer['shipping_company'],
+                'department' => $customer['shipping_company'],
+                'salutation' => $customer['shipping_company'],
+                'firstname' => $customer['shipping_firstname'],
+                'lastname' => $customer['shipping_lastname'],
+                'street' => $customer['shipping_street'],
+                'zipcode' => $customer['shipping_zipcode'],
+                'city' => $customer['shipping_city'],
+                'country_id' => $customer["country_id"]
+            ];
+        }
+
+        return $addresses;
+    }
+
+    /**
+     * Helper function to get a default country id in case that none is set.
+     *
+     * @return int
+     */
+    private function getDefaultCountryId()
+    {
+        return 2;
     }
 }

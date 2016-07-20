@@ -236,7 +236,8 @@ class Cleanup
             TRUNCATE s_user_billingaddress_attributes;
             TRUNCATE s_user_shippingaddress;
             TRUNCATE s_user_shippingaddress_attributes;
-            TRUNCATE s_user_shippingaddress_attributes;
+            TRUNCATE s_user_addresses;
+            TRUNCATE s_user_addresses_attributes;
             TRUNCATE s_user_debit;
 	   ";
 

@@ -409,6 +409,9 @@ class XtCommerce extends Profile
 			SELECT
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
+				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms')		as salutation,
+				a.entry_firstname									as firstname,
+				a.entry_lastname 	 								as lastname,
 
 				IF(a.entry_gender IN ('m', 'Herr'), 'mr', 'ms')		as billing_salutation,
 				a.entry_firstname									as billing_firstname,
@@ -422,7 +425,6 @@ class XtCommerce extends Profile
 				c.countries_iso_code_2 								as billing_countryiso,
 
 				u.customers_telephone 								as phone,
-				u.customers_fax 									as fax,
 				u.customers_email_address 							as email,
 				DATE(u.customers_dob)								as birthday,
 				u.customers_vat_id 									as ustid,
