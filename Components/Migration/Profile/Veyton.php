@@ -344,6 +344,10 @@ class Veyton extends XtCommerce
 				u.customers_id 										as customerID,
 				u.customers_id 										as customernumber,
 
+				IF(a.customers_gender IN ('m', 'Herr'), 'mr', 'ms')	as salutation,
+				a.customers_firstname								as firstname,
+				a.customers_lastname 								as lastname,
+
 				IF(a.customers_gender IN ('m', 'Herr'), 'mr', 'ms')	as billing_salutation,
 				a.customers_firstname								as billing_firstname,
 				a.customers_lastname 								as billing_lastname,
@@ -357,7 +361,6 @@ class Veyton extends XtCommerce
 
 
 				a.customers_phone 									as phone,
-				a.customers_fax 									as fax,
 				u.customers_email_address 							as email,
 				a.customers_dob 									as birthday,
 				u.customers_vat_id 									as ustid,

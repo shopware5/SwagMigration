@@ -12,6 +12,7 @@ use Enlight_Class;
 use Enlight_Components_Db;
 use ArrayObject;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
+use Shopware\Components\DependencyInjection\Bridge\Db;
 
 abstract class Profile extends Enlight_Class
 {
@@ -67,11 +68,12 @@ abstract class Profile extends Enlight_Class
     public function __construct($config)
     {
         if (Shopware()->Plugins()->Backend()->SwagMigration()->Config()->debugMigration) {
-            $this->db = new DbDecorator(Enlight_Components_Db::factory($this->db_adapter, $config));
+            $this->db = new DbDecorator(Db::createDbalConnection($config));
         } else {
-            $this->db = Enlight_Components_Db::factory($this->db_adapter, $config);
+            $this->db = Db::createDbalConnection($config);
         }
-        $this->db->getConnection();
+
+        $this->db = Db::createEnlightDbAdapter($this->db, $config);
         if (isset($config['prefix'])) {
             $this->db_prefix = $config['prefix'];
         }
@@ -110,6 +112,7 @@ abstract class Profile extends Enlight_Class
     public function getDatabases()
     {
         $databases = $this->db->fetchCol('SHOW DATABASES');
+
         foreach ($databases as $key => $database) {
             if ($database == 'information_schema') {
                 unset($databases[$key]);

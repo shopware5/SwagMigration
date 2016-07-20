@@ -577,8 +577,7 @@ class Magento extends Profile
             'country_id',
             'postcode',
             'street',
-            'telephone',
-            'fax'
+            'telephone'
         ];
 
         return "
@@ -592,6 +591,9 @@ class Magento extends Profile
 				customer.updated_at						as lastlogin,
 				customer.is_active 						as active,
 				customer.group_id						as customergroupID,
+				firstname.value                         as firstname,
+				lastname.value                          as lastname,
+				IF(gender.value=2, 'ms', 'mr')			as salutation,
 
 				IF(gender.value=2, 'ms', 'mr')			as billing_salutation,
 				company.value 							as billing_company,
@@ -601,7 +603,7 @@ class Magento extends Profile
 				street.value							as billing_street,
 				-- 										as billing_streetnumber,
 				city.value								as billing_city,
-				country_id.value						as billing_countryiso,
+				country_id.value						as billing_country,
 				postcode.value							as billing_zipcode,
 
 				-- IF(gender.value, 'ms', 'mr')			as shipping_salutation,
@@ -615,7 +617,6 @@ class Magento extends Profile
 				-- `postcode`							as shipping_zipcode,
 
 				telephone.value							as phone,
-				fax.value								as fax,
 				dob.value 								as birthday,
 				password_hash.value 					as md5_password,
 				'md5reversed'							as encoder,
@@ -668,7 +669,6 @@ class Magento extends Profile
 
 				o.`customer_taxvat`							as ustid,
 				ba.`telephone`								as phone,
-				ba.`fax`									as fax,
 
 				ba.`company`								as billing_company,
 				ba.`firstname`								as billing_firstname,

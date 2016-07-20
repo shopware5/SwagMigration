@@ -58,7 +58,7 @@ class Customer extends AbstractResource
      */
     public function run()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $salt = $this->Request()->salt;
@@ -139,10 +139,8 @@ class Customer extends AbstractResource
             }
         }
 
-        if ($this->isShopwareFive()) {
-            if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
-                $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
-            }
+        if (!empty($customer['billing_street']) && !empty($customer['billing_streetnumber'])) {
+            $customer['billing_street'] = $customer['billing_street'] . ' ' . $customer['billing_streetnumber'];
         }
 
         if (!empty($customer['shipping_company']) || !empty($customer['shipping_firstname']) || !empty($customer['shipping_lastname'])) {
@@ -159,9 +157,7 @@ class Customer extends AbstractResource
             ];
             $customer['shipping_company'] = $customer['shipping_firstname'] = $customer['shipping_lastname'] = '';
 
-            if (!$this->isShopwareFive()) {
-                $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
-            }
+            $customer['streetnumber'] = !empty($customer['shipping_streetnumber']) ? $customer['shipping_streetnumber'] : '';
         } else {
             $customer_shipping = [];
         }
@@ -233,19 +229,5 @@ class Customer extends AbstractResource
         Shopware()->Db()->insert('s_user_debit', $customer);
 
         return true;
-    }
-
-    /**
-     * Returns true if the current SW-Version is Shopware 5
-     *
-     * @return bool
-     */
-    private function isShopwareFive()
-    {
-        if (version_compare(Shopware::VERSION, '5.0.0', '>=') || Shopware::VERSION == '___VERSION___') {
-            return true;
-        }
-
-        return false;
     }
 }

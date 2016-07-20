@@ -119,7 +119,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function initSource()
     {
-        $config = (array) Shopware()->getOption('db');
+        $config = Shopware()->Container()->getParameter('shopware.db');
 
         // Setting the current shopware database as default will fail,
         // if the user wants to connect to a remote database. So the dbname
@@ -189,7 +189,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function initTarget()
     {
-        $config = (array) Shopware()->getOption('db');
+        $config = (array) Shopware()->Container()->getParameter('shopware.db');
 
         return Migration::profileFactory('Shopware', $config);
     }

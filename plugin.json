@@ -9,7 +9,7 @@
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
 
-    "currentVersion": "2.4.2",
+    "currentVersion": "2.5.0",
 
     "changelog": {
         "de": {
@@ -37,7 +37,7 @@
     },
 
     "compatibility": {
-        "minimumVersion": "5.1.0",
+        "minimumVersion": "5.2.0",
         "maximumVersion": null,
         "blacklist": [
         ]

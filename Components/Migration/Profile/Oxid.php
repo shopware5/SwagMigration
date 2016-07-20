@@ -179,6 +179,9 @@ class Oxid extends Profile
 			SELECT
 				u.OXID										as customerID,
 				u.OXCUSTNR 									as customernumber,
+				IF(u.OXSAL IN ('m','Herr','MR'), 'mr', 'ms') 	as salutation,
+				u.OXFNAME 									as firstname,
+				u.OXLNAME 									as lastname,
 
 				u.OXCOMPANY 								as billing_company,
 				'' 											as billing_department,
@@ -192,8 +195,19 @@ class Oxid extends Profile
 				bc.OXISOALPHA2								as billing_countryiso,
 				u.OXADDINFO 								as billing_text1,
 
+				a.OXCOMPANY 								as shipping_company,
+				'' 											as shipping_department,
+				IF(a.OXSAL IN ('m','Herr','MR'), 'mr', 'ms') 	as shipping_salutation,
+				a.OXFNAME 									as shipping_firstname,
+				a.OXLNAME 									as shipping_lastname,
+				a.OXSTREET 									as shipping_street,
+				a.OXSTREETNR 								as shipping_streetnumber,
+				a.OXZIP 									as shipping_zipcode,
+				a.OXCITY 									as shipping_city,
+				bc.OXISOALPHA2								as shipping_countryiso,
+				a.OXADDINFO 								as shipping_text1,
+
 				IF(u.OXFON='', u.OXMOBFON, u.OXFON) 		as phone,
-				u.OXFAX 									as fax,
 				u.OXUSERNAME 								as email,
 				u.OXBIRTHDATE 								as birthday,
 				u.OXUSTID 									as ustid,
@@ -212,6 +226,7 @@ class Oxid extends Profile
 			LEFT JOIN {$this->quoteTable('object2group', 'n')} ON n.OXOBJECTID=u.OXID AND n.OXGROUPSID='oxidnewsletter'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb')} ON gb.OXOBJECTID=u.OXID AND gb.OXGROUPSID='oxidblacklist'
 			LEFT JOIN {$this->quoteTable('object2group', 'gb2')} ON gb2.OXOBJECTID=u.OXID AND gb2.OXGROUPSID='oxidblocked'
+			LEFT JOIN {$this->quoteTable('address', 'a')} ON a.OXUSERID = u.OXID
 
 			LEFT JOIN {$this->quoteTable('country', 'bc')} ON bc.OXID=u.OXCOUNTRYID
 		";
