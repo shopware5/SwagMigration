@@ -48,7 +48,6 @@ class CustomerImporter
         'street' => 'billing_street',
         'zipcode' => 'billing_zipcode',
         'city' => 'billing_city',
-        'phone' => 'phone',
         'countryID' => 'billing_countryID',
         'ustid' => 'ustid'
     ];
@@ -107,7 +106,7 @@ class CustomerImporter
 
     /** @var array $shippingAttributeFields */
     private $shippingAttributeFields = [
-        'billingID' => 'billingaddressID',
+        'shippingID' => 'shippingaddressID',
         'text1' => 'shipping_text1',
         'text2' => 'shipping_text2',
         'text3' => 'shipping_text3',
@@ -145,25 +144,159 @@ class CustomerImporter
      */
     public function import(array $customer)
     {
+        $isCustomer = $this->doesEntryExist('`s_user`', "`email` LIKE '{$customer['email']}'");
+
         $customer["addresses"] = $this->getCustomerAddresses($customer);
 
-        $customer = $this->prepareCustomerData($customer);
-        if (empty($customer['userID']) && empty($customer['email'])) {
-            return false;
-        }
+        if (!$isCustomer) {
+            $customer = $this->prepareCustomerData($customer);
+            if (empty($customer['userID']) && empty($customer['email'])) {
+                return false;
+            }
 
-        if (empty($customer['userID']) && !empty($customer['email'])) {
-            $customer['userID'] = $this->findExistingEntry('s_user', "email = {$customer['email']}");
-        }
-        $customer = $this->createOrUpdateCustomer($customer);
-        if ($customer === false) {
-            return false;
+            if (empty($customer['userID']) && !empty($customer['email'])) {
+                $customer['userID'] = $this->findExistingEntry('`s_user`', "`email` LIKE {$customer['email']}");
+            }
+            $customer = $this->createOrUpdateCustomer($customer);
+            if ($customer === false) {
+                return false;
+            }
+
+            $customer = $this->prepareBillingData($customer);
+            $billingAddressId = $this->findExistingEntry('s_user_billingaddress', "userID = {$customer['userID']}");
+            $customer['billingaddressID'] = $billingAddressId;
+            $customer = $this->createOrUpdate($customer, 's_user_billingaddress', 'billingaddressID', $this->billingFields);
+            if ($customer === false) {
+                return false;
+            }
+
+            $billingAttributeId = $this->findExistingEntry(
+                's_user_billingaddress_attributes',
+                "billingID = {$customer['billingaddressID']}"
+            );
+            $customer = $this->createOrUpdate(
+                $customer,
+                's_user_billingaddress_attributes',
+                $billingAttributeId,
+                $this->billingAttributeFields
+            );
+            if ($customer === false) {
+                return false;
+            }
+
+            $this->setDefaultBillingAddress($customer);
+
+            if (!empty($customer['shipping_company'])
+                || !empty($customer['shipping_firstname'])
+                || !empty($customer['shipping_lastname'])
+            ) {
+                $customer = $this->prepareShippingData($customer);
+                $shippingAddressId = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
+                $customer['shippingaddressID'] = $shippingAddressId;
+                $customer = $this->createOrUpdate(
+                    $customer,
+                    's_user_shippingaddress',
+                    'shippingaddressID',
+                    $this->shippingFields
+                );
+                if ($customer === false) {
+                    return false;
+                }
+
+                $shippingAttributeId = $this->findExistingEntry(
+                    's_user_shippingaddress_attributes',
+                    "shippingID = {$customer['shippingaddressID']}"
+                );
+                $customer = $this->createOrUpdate(
+                    $customer,
+                    's_user_shippingaddress_attributes',
+                    $shippingAttributeId,
+                    $this->shippingAttributeFields
+                );
+                if ($customer === false) {
+                    return false;
+                }
+                $this->setDefaultShippingAddress($customer, "shippingaddressID");
+            } elseif (isset($customer['shipping_company'])
+                || isset($customer['shipping_firstname'])
+                || isset($customer['shipping_lastname'])
+            ) {
+                $customer = $this->prepareShippingData($customer);
+                $shippingAddressId = $this->doesEntryExist('s_user_shippingaddress', "userID = {$customer['userID']}");
+
+                if ($shippingAddressId) {
+                    $customer['shippingaddressID'] = $shippingAddressId;
+
+                    $billingFields = $this->billingFields;
+                    unset($billingFields["ustid"]);
+
+                    $customer = $this->createOrUpdate(
+                        $customer,
+                        's_user_shippingaddress',
+                        'shippingaddressID',
+                        $billingFields
+                    );
+                    if ($customer === false) {
+                        return false;
+                    }
+
+                    $shippingAttributeId = $this->findExistingEntry(
+                        's_user_shippingaddress_attributes',
+                        "shippingID = {$customer['shippingaddressID']}"
+                    );
+                    $customer = $this->createOrUpdate(
+                        $customer,
+                        's_user_shippingaddress_attributes',
+                        $shippingAttributeId,
+                        $this->shippingAttributeFields
+                    );
+                    if ($customer === false) {
+                        return false;
+                    }
+                } else {
+                    $shippingAddressId = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
+                    $customer['shippingaddressID'] = $shippingAddressId;
+                    $customer = $this->createOrUpdate(
+                        $customer,
+                        's_user_shippingaddress',
+                        'shippingaddressID',
+                        $this->shippingFields
+                    );
+                    if ($customer === false) {
+                        return false;
+                    }
+
+                    $shippingAttributeId = $this->findExistingEntry(
+                        's_user_shippingaddress_attributes',
+                        "shippingID = {$customer['shippingaddressID']}"
+                    );
+                    $customer['shippingAttributesID'] = $shippingAttributeId;
+                    $customer = $this->createOrUpdate(
+                        $customer,
+                        's_user_shippingaddress_attributes',
+                        'shippingAttributesID',
+                        $this->shippingAttributeFields
+                    );
+                    if ($customer === false) {
+                        return false;
+                    }
+                }
+
+                $this->setDefaultShippingAddress($customer, "shippingaddressID");
+            }
+
+            $customer['customernumber'] = $this->getCustomerNumber($customer['userID']);
+
+            $customer = $this->newsletterSubscribe($customer);
+        } else {
+            $customer['userID'] = $isCustomer;
+            $customer['customernumber'] = $this->getCustomerNumber($customer['userID']);
+
+            $customer = $this->newsletterSubscribe($customer);
         }
 
         foreach ($customer["addresses"] as $address) {
             $address = $this->prepareAddressData($address);
-            $addressId = $this->findExistingEntry('s_user_addresses', "user_id = {$customer['userID']}");
-            $address["address_id"] = $addressID;
             $address["user_id"] = $customer['userID'];
             $address = $this->createOrUpdate($address, 's_user_addresses', 'address_id', $this->addressFields);
 
@@ -175,77 +308,13 @@ class CustomerImporter
                 's_user_addresses_attributes',
                 "address_id = {$address['address_id']}"
             );
-            $address = $this->createOrUpdate(
+            $this->createOrUpdate(
                 $address,
                 's_user_addresses_attributes',
                 $addressAttributeId,
                 $this->addressAttributeFields
             );
         }
-
-        $customer = $this->prepareBillingData($customer);
-        $billingAddressId = $this->findExistingEntry('s_user_billingaddress', "userID = {$customer['userID']}");
-        $customer['billingaddressID'] = $billingAddressId;
-        $customer = $this->createOrUpdate($customer, 's_user_billingaddress', 'billingaddressID', $this->billingFields);
-        if ($customer === false) {
-            return false;
-        }
-
-        $billingAttributeId = $this->findExistingEntry(
-            's_user_billingaddress_attributes',
-            "billingID = {$customer['billingaddressID']}"
-        );
-        $customer = $this->createOrUpdate(
-            $customer,
-            's_user_billingaddress_attributes',
-            $billingAttributeId,
-            $this->billingAttributeFields
-        );
-        if ($customer === false) {
-            return false;
-        }
-
-        if (!empty($customer['shipping_company'])
-            || !empty($customer['shipping_firstname'])
-            || !empty($customer['shipping_lastname'])
-        ) {
-            $customer = $this->prepareShippingData($customer);
-            $shippingAddressId = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
-            $customer['shippingaddressID'] = $shippingAddressId;
-            $customer = $this->createOrUpdate(
-                $customer,
-                's_user_shippingaddress',
-                'shippingaddressID',
-                $this->shippingFields
-            );
-            if ($customer === false) {
-                return false;
-            }
-
-            $shippingAttributeId = $this->findExistingEntry(
-                's_user_shippingaddress_attributes',
-                "shippingID = {$customer['shippingaddressID']}"
-            );
-            $customer = $this->createOrUpdate(
-                $customer,
-                's_user_shippingaddress_attributes',
-                $shippingAttributeId,
-                $this->shippingAttributeFields
-            );
-            if ($customer === false) {
-                return false;
-            }
-        } elseif (isset($customer['shipping_company'])
-            || isset($customer['shipping_firstname'])
-            || isset($customer['shipping_lastname'])
-        ) {
-            $sql = 'DELETE FROM s_user_shippingaddress WHERE userID = ' . $customer['userID'];
-            $this->db->query($sql);
-        }
-
-        $customer['customernumber'] = $this->getCustomerNumber($customer['userID']);
-
-        $customer = $this->newsletterSubscribe($customer);
 
         return [
             'userID' => $customer['userID'],
@@ -345,6 +414,19 @@ class CustomerImporter
     {
         $sql = "SELECT id FROM $table WHERE $where";
         $id = (int) $this->db->fetchOne($sql);
+
+        return $id;
+    }
+
+    /**
+     * @param string $table
+     * @param string $where
+     * @return int
+     */
+    private function doesEntryExist($table, $where)
+    {
+        $sql = "SELECT id FROM $table WHERE $where";
+        $id = $this->db->fetchOne($sql);
 
         return $id;
     }
@@ -692,7 +774,7 @@ class CustomerImporter
 
             $sql = 'SELECT id
                     FROM s_campaigns_mailaddresses
-                    WHERE email = ' . $customer['email'];
+                    WHERE email = "' . $customer['email'] . '"';
             $result = $this->db->fetchOne($sql);
             if (empty($result)) {
                 $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
@@ -807,5 +889,24 @@ class CustomerImporter
     private function getDefaultCountryId()
     {
         return 2;
+    }
+
+    /**
+     * @param array $customer
+     */
+    private function setDefaultBillingAddress(array $customer)
+    {
+        $sql = "UPDATE s_user SET default_billing_address_id = ? WHERE id = ?;";
+        $this->db->query($sql, [$customer["billingaddressID"], $customer[0]]);
+    }
+
+    /**
+     * @param array $customer
+     * @param string $field
+     */
+    private function setDefaultShippingAddress(array $customer, $field)
+    {
+        $sql = "UPDATE s_user SET default_shipping_address_id = ? WHERE id = ?;";
+        $this->db->query($sql, [$customer[$field], $customer[0]]);
     }
 }

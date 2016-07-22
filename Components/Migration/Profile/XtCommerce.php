@@ -424,6 +424,16 @@ class XtCommerce extends Profile
 				a.entry_city	 									as billing_city,
 				c.countries_iso_code_2 								as billing_countryiso,
 
+				''                          			as shipping_salutation,
+				''							            as shipping_company,
+				''							            as shipping_firstname,
+				'' 							            as shipping_lastname,
+				'' 							            as shipping_street,
+				''  									as shipping_streetnumber,
+				''								        as shipping_city,
+				''							            as shipping_countryiso,
+				''							            as shipping_zipcode,
+
 				u.customers_telephone 								as phone,
 				u.customers_email_address 							as email,
 				DATE(u.customers_dob)								as birthday,

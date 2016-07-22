@@ -606,15 +606,15 @@ class Magento extends Profile
 				country_id.value						as billing_country,
 				postcode.value							as billing_zipcode,
 
-				-- IF(gender.value, 'ms', 'mr')			as shipping_salutation,
-				-- `company`							as shipping_company,
-				-- `firstname`							as shipping_firstname,
-				-- `lastname` 							as shipping_lastname,
-				-- `street` 							as shipping_street,
-				--  									as shipping_streetnumber,
-				-- `city`								as shipping_city,
-				-- `country_id`							as shipping_countryiso,
-				-- `postcode`							as shipping_zipcode,
+				''                          			as shipping_salutation,
+				''							            as shipping_company,
+				''							            as shipping_firstname,
+				'' 							            as shipping_lastname,
+				'' 							            as shipping_street,
+				''  									as shipping_streetnumber,
+				''								        as shipping_city,
+				''							            as shipping_countryiso,
+				''							            as shipping_zipcode,
 
 				telephone.value							as phone,
 				dob.value 								as birthday,
@@ -633,7 +633,6 @@ class Magento extends Profile
 
 			LEFT JOIN {$this->quoteTable('customer_address_entity')} customer_address
 			ON customer_address.parent_id=customer.entity_id
-			AND customer_address.entity_id=default_billing.value
 
 			{$this->createTableSelect('customer_address', $addressAttributes)}
 		";
@@ -800,6 +799,7 @@ class Magento extends Profile
                 }
             }
         }
+
         if (!$full_select) {
             return $join_fields;
         } else {
