@@ -591,6 +591,9 @@ class Magento17 extends Profile
 				customer.updated_at						as lastlogin,
 				customer.is_active 						as active,
 				customer.group_id						as customergroupID,
+				firstname.value                         as firstname,
+				lastname.value                          as lastname,
+				IF(gender.value=2, 'ms', 'mr')			as salutation,
 
 				IF(gender.value=2, 'ms', 'mr')			as billing_salutation,
 				company.value 							as billing_company,
@@ -600,18 +603,18 @@ class Magento17 extends Profile
 				street.value							as billing_street,
 				-- 										as billing_streetnumber,
 				city.value								as billing_city,
-				country_id.value						as billing_countryiso,
+				country_id.value						as billing_country,
 				postcode.value							as billing_zipcode,
 
-				-- IF(gender.value, 'ms', 'mr')			as shipping_salutation,
-				-- `company`							as shipping_company,
-				-- `firstname`							as shipping_firstname,
-				-- `lastname` 							as shipping_lastname,
-				-- `street` 							as shipping_street,
-				--  									as shipping_streetnumber,
-				-- `city`								as shipping_city,
-				-- `country_id`							as shipping_countryiso,
-				-- `postcode`							as shipping_zipcode,
+				''                          			as shipping_salutation,
+				''							            as shipping_company,
+				''							            as shipping_firstname,
+				'' 							            as shipping_lastname,
+				'' 							            as shipping_street,
+				''  									as shipping_streetnumber,
+				''								        as shipping_city,
+				''							            as shipping_countryiso,
+				''							            as shipping_zipcode,
 
 				telephone.value							as phone,
 				dob.value 								as birthday,
@@ -630,7 +633,6 @@ class Magento17 extends Profile
 
 			LEFT JOIN {$this->quoteTable('customer_address_entity')} customer_address
 			ON customer_address.parent_id=customer.entity_id
-			AND customer_address.entity_id=default_billing.value
 
 			{$this->createTableSelect('customer_address', $addressAttributes)}
 		";

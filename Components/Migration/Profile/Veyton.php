@@ -359,6 +359,15 @@ class Veyton extends XtCommerce
 				a.customers_city 									as billing_city,
 				a.customers_country_code 							as billing_countryiso,
 
+				''                          			as shipping_salutation,
+				''							            as shipping_company,
+				''							            as shipping_firstname,
+				'' 							            as shipping_lastname,
+				'' 							            as shipping_street,
+				''  									as shipping_streetnumber,
+				''								        as shipping_city,
+				''							            as shipping_countryiso,
+				''							            as shipping_zipcode,
 
 				a.customers_phone 									as phone,
 				u.customers_email_address 							as email,

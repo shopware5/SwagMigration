@@ -167,11 +167,6 @@ class Customer extends AbstractResource
         if (!empty($customer_result)) {
             $customer = array_merge($customer, $customer_result);
 
-            if (!empty($customer_shipping)) {
-                $customer_shipping['userID'] = $customer['userID'];
-                Shopware()->Db()->insert('s_user_shippingaddress', $customer_shipping);
-            }
-
             if (!empty($customer['account'])) {
                 $this->importCustomerDebit($customer);
             }
