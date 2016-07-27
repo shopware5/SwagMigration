@@ -767,7 +767,7 @@ class CustomerImporter
 
         if (empty($customer['newsletter'])) {
             $sql = 'DELETE FROM s_campaigns_mailaddresses
-                    WHERE email = ' . $customer['email'];
+                    WHERE email = "' . $customer['email'] . '"';
             $this->db->query($sql);
         } else {
             $customer['newslettergroupID'] = $this->getNewsletterGroupId($customer['newslettergroupID']);
