@@ -8,8 +8,9 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
+use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Configuration;
 use Enlight_Class;
-use Enlight_Components_Db;
 use ArrayObject;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 use Shopware\Components\DependencyInjection\Bridge\Db;
@@ -67,10 +68,13 @@ abstract class Profile extends Enlight_Class
      */
     public function __construct($config)
     {
+        parent::__construct();
+        $dbConnection = Db::createDbalConnection($config, new Configuration(), new EventManager(), null);
+
         if (Shopware()->Plugins()->Backend()->SwagMigration()->Config()->debugMigration) {
-            $this->db = new DbDecorator(Db::createDbalConnection($config));
+            $this->db = new DbDecorator($dbConnection);
         } else {
-            $this->db = Db::createDbalConnection($config);
+            $this->db = $dbConnection;
         }
 
         $this->db = Db::createEnlightDbAdapter($this->db, $config);
@@ -150,7 +154,7 @@ abstract class Profile extends Enlight_Class
                             if ($row['value'] == 'false') {
                                 $row['value'] = false;
                             } else {
-                                $row['value'] = (bool) $row['value'];
+                                $row['value'] = (bool)$row['value'];
                             }
                             break;
                         case 'aarr':
@@ -704,7 +708,7 @@ abstract class Profile extends Enlight_Class
 
         $sql = $this->getOrderAmounts($order["orderID"]);
 
-        return  $this->db->query($sql);
+        return $this->db->query($sql);
     }
 
     /**
