@@ -219,7 +219,7 @@ class Prestashop14 extends Profile
                 -- a.products_shippingtime					as shippingtime,
 				if(a.reference='', CONCAT('sw', a.id_product), a.reference)						as ordernumber,
 				-- a.products_image						as image,
-				a.products_price    						as net_price,
+				a.price    						        as net_price,
 				a.wholesale_price                       as baseprice,
 
 				a.date_add          					as added,
