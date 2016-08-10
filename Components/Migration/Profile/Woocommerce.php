@@ -377,6 +377,31 @@ class Woocommerce extends Profile
     }
 
     /**
+     * Returns the sql statement to select the shop system article prices
+     *
+     * @return string {String} | sql for the article prices
+     */
+    public function getProductPriceSelect()
+    {
+        return "
+			SELECT
+				p.`ID` as `productID`,
+
+				pm.`meta_key`      as `metaKey`,
+				pm.`meta_value`      as `metaValue`,
+				''                  as `pricegroup`
+
+			FROM {$this->quoteTable('posts')} p
+
+			JOIN {$this->quoteTable('postmeta')} pm
+			ON p.`ID` = pm.`post_id`
+
+			WHERE p.`post_type` = 'product'
+			AND pm.`meta_key` = '_price'
+		";
+    }
+
+    /**
      * @return string {String} | sql for the article variants
      */
     public function getAttributedProductsSelect()
