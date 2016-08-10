@@ -38,12 +38,20 @@ class WooCommerce
      * @var array
      */
     private $customerMapping = array(
+        "first_name" => "firstname",
+        "last_name" => "lastname",
         "billing_first_name" => "billing_firstname",
         "billing_last_name" => "billing_lastname",
         "billing_city" => "billing_city",
         "billing_postcode" => "billing_zipcode",
         "billing_country" => "billing_countryiso",
-        "billing_address_1" => "billing_street"
+        "billing_address_1" => "billing_street",
+        "shipping_first_name" => "shipping_firstname",
+        "shipping_last_name" => "shipping_lastname",
+        "shipping_city" => "shipping_city",
+        "shipping_postcode" => "shipping_zipcode",
+        "shipping_country" => "shipping_countryiso",
+        "shipping_address_1" => "shipping_street"
     );
 
     /**
@@ -197,6 +205,18 @@ class WooCommerce
             } else {
                 $normalizedCustomers[$customer["customerID"]][$this->mapArrayKey($customer["metaKey"], $this->customerMapping)] = $customer["metaValue"];
             }
+        }
+
+        foreach ($normalizedCustomers as $key => $customer) {
+            if ($customer["firstname"] == "") {
+                $normalizedCustomers[$key]["firstname"] = $customer["billing_firstname"];
+            }
+            if ($customer["lastname"] == "") {
+                $normalizedCustomers[$key]["lastname"] = $customer["billing_lastname"];
+            }
+            $normalizedCustomers[$key]["salutation"] = "mr";
+            $normalizedCustomers[$key]["shipping_salutation"] = "mr";
+            $normalizedCustomers[$key]["billing_salutation"] = "mr";
         }
 
         return $normalizedCustomers;
