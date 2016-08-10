@@ -253,11 +253,14 @@ class CustomerImporter
                 } else {
                     $shippingAddressId = $this->findExistingEntry('s_user_shippingaddress', "userID = {$customer['userID']}");
                     $customer['shippingaddressID'] = $shippingAddressId;
+
+                    $billingFields = $this->billingFields;
+                    unset($billingFields["ustid"]);
                     $customer = $this->createOrUpdate(
                         $customer,
                         's_user_shippingaddress',
                         'shippingaddressID',
-                        $this->shippingFields
+                        $billingFields
                     );
                     if ($customer === false) {
                         return false;
@@ -293,6 +296,10 @@ class CustomerImporter
         foreach ($customer["addresses"] as $address) {
             $address = $this->prepareAddressData($address);
             $address["user_id"] = $customer['userID'];
+            if ($address["salutation"] === null) {
+                $address["salutation"] = $customer["billing_salutation"];
+            }
+
             $address = $this->createOrUpdate($address, 's_user_addresses', 'address_id', $this->addressFields);
 
             if ($address === false) {
@@ -849,7 +856,7 @@ class CustomerImporter
             'userID' => $customer['userID'],
             'company' => $customer['billing_company'],
             'department' => $customer['billing_company'],
-            'salutation' => $customer['billing_company'],
+            'salutation' => $customer['billing_salutation'],
             'firstname' => $customer['billing_firstname'],
             'lastname' => $customer['billing_lastname'],
             'street' => $customer['billing_street'],
@@ -867,9 +874,9 @@ class CustomerImporter
                 'userID' => $customer['userID'],
                 'company' => $customer['shipping_company'],
                 'department' => $customer['shipping_company'],
-                'salutation' => $customer['shipping_company'],
-                'firstname' => $customer['shipping_firstname'],
-                'lastname' => $customer['shipping_lastname'],
+                'salutation' => $customer['shipping_salutation'],
+                'firstname' => (!empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer["firstname"]),
+                'lastname' => (!empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer["lastname"]),
                 'street' => $customer['shipping_street'],
                 'zipcode' => $customer['shipping_zipcode'],
                 'city' => $customer['shipping_city'],
