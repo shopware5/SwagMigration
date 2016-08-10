@@ -103,16 +103,16 @@ class Customer extends AbstractResource
             $customer['customergroup'] = $this->Request()->customer_group[$customer['customergroupID']];
         }
         unset($customer['customergroupID']);
+
+        $customer['subshopID'] = 1;
         if (isset($customer['subshopID']) && isset($this->Request()->shop[$customer['subshopID']])) {
             $customer['subshopID'] = $this->Request()->shop[$customer['subshopID']];
-        } else {
-            unset($customer['subshopID']);
         }
+        $customer['language'] = 1;
         if (isset($customer['language']) && isset($this->Request()->language[$customer['language']])) {
             $customer['language'] = $this->Request()->language[$customer['language']];
-        } else {
-            unset($customer['language']);
         }
+
         if (!empty($customer['billing_countryiso'])) {
             $sql = 'SELECT `id` FROM `s_core_countries` WHERE `countryiso` = ?';
             $customer['billing_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$customer['billing_countryiso']]);
