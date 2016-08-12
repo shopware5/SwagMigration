@@ -870,18 +870,21 @@ class CustomerImporter
             || !empty($customer['shipping_street'])
             || !empty($customer['shipping_lastname'])
         ) {
-            $addresses[] = [
-                'userID' => $customer['userID'],
-                'company' => $customer['shipping_company'],
-                'department' => $customer['shipping_company'],
-                'salutation' => $customer['shipping_salutation'],
-                'firstname' => (!empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer["firstname"]),
-                'lastname' => (!empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer["lastname"]),
-                'street' => $customer['shipping_street'],
-                'zipcode' => $customer['shipping_zipcode'],
-                'city' => $customer['shipping_city'],
-                'country_id' => $customer["country_id"]
-            ];
+            if ($customer['shipping_firstname'] == $customer['billing_firstname'] &&
+                $customer['shipping_lastname'] == $customer['billing_lastname']) {
+                $addresses[] = [
+                    'userID' => $customer['userID'],
+                    'company' => $customer['shipping_company'],
+                    'department' => $customer['shipping_company'],
+                    'salutation' => $customer['shipping_salutation'],
+                    'firstname' => (!empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer["firstname"]),
+                    'lastname' => (!empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer["lastname"]),
+                    'street' => $customer['shipping_street'],
+                    'zipcode' => $customer['shipping_zipcode'],
+                    'city' => $customer['shipping_city'],
+                    'country_id' => $customer["country_id"]
+                ];
+            }
         }
 
         return $addresses;

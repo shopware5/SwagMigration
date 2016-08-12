@@ -385,7 +385,6 @@ class Veyton extends XtCommerce
 
 			JOIN {$this->quoteTable('customers_addresses', 'a')}
 			ON a.customers_id=u.customers_id
-			AND a.address_class='default'
 		";
     }
 
