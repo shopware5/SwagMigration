@@ -405,7 +405,7 @@ class CustomerImporter
             (string)$customer['customergroup']
         );
         $customer['firstlogin'] = empty($customer['firstlogin']) ? $this->db->quote((string)date('Y-m-d')) : $this->toDate($customer['firstlogin']);
-        $customer['lastlogin'] = empty($article['lastlogin']) ? $this->db->quote((string)date('Y-m-d H:i:s')) : $this->toTimeStamp($customer['lastlogin']);
+        $customer['lastlogin'] = empty($customer['lastlogin']) ? $this->db->quote((string)date('Y-m-d H:i:s')) : $this->toTimeStamp($customer['lastlogin']);
 
         return $customer;
     }
