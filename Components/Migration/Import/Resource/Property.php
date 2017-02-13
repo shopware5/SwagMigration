@@ -140,7 +140,6 @@ class Property extends AbstractResource
      *                'name' => 'test',
      *                'id' => 3,
      *                'filterable' => true,
-     *                'default' => ''
      *                'values' => array(
      *                    array('position' => 3, 'value' => 'Mein Wert'),
      *                    array('position' => 3, 'value' => 'Mein Wert2')
@@ -193,7 +192,6 @@ class Property extends AbstractResource
          */
         foreach ($group['options'] as &$option) {
             $option['filterable'] = isset($group['filterable']) ? (int) $group['filterable'] : 1;
-            $option['default'] = isset($group['default']) ? $group['default'] : '';
 
             if (isset($option['id'])) {
                 $sql = "
@@ -228,8 +226,8 @@ class Property extends AbstractResource
 
             // Create option
             if (false == $optionId && isset($option['name'])) {
-                $sql = 'INSERT INTO `s_filter_options` (`name`, `filterable`, `default`) VALUES(?, ?, ?)';
-                Shopware()->Db()->query($sql, [$option['name'], $option['filterable'], $option['default']]);
+                $sql = 'INSERT INTO `s_filter_options` (`name`, `filterable`) VALUES(?, ?)';
+                Shopware()->Db()->query($sql, [$option['name'], $option['filterable']]);
                 $optionId = Shopware()->Db()->lastInsertId();
             }
 
