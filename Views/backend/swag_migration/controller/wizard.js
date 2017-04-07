@@ -135,11 +135,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                         } else {
                             activeCard.setImportAllowed(false);
                         }
-                        if ("WooCommerce" == profile) {
-                            activeCard.setWooCommerceSettings(true);
-                        } else {
-                            activeCard.setWooCommerceSettings(false);
-                        }
                         break;
                     case 2:
                         me.startImport();
