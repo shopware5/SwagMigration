@@ -58,6 +58,11 @@ class Rating extends AbstractResource
         if ($call["profile"] != "WooCommerce") {
             while ($rating = $result->fetch()) {
                 $this->migrateRating($rating);
+
+                $this->increaseProgress();
+                if ($this->newRequestNeeded()) {
+                    return $this->getProgress();
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();

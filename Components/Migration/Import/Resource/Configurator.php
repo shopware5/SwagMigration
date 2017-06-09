@@ -67,7 +67,10 @@ class Configurator extends AbstractResource
 
         if ($call["profile"] != "WooCommerce") {
             while ($product = $products_result->fetch()) {
-                $this->migrateConfigurator($product);
+                $progress = $this->migrateConfigurator($product);
+                if (isset($progress) && $progress) {
+                    return $progress;
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();

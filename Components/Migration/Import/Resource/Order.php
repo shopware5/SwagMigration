@@ -90,7 +90,10 @@ class Order extends AbstractResource
 
         if ($call["profile"] != "WooCommerce") {
             while ($order = $result->fetch()) {
-                $this->migrateOrder($order);
+                $progress = $this->migrateOrder($order);
+                if (isset($progress) && $progress) {
+                    return $progress;
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -164,6 +167,7 @@ class Order extends AbstractResource
             'paymentID' => (int) $order['paymentID'],
             'transactionID' => isset($order['transactionID']) ? $order['transactionID'] : '',
             'customercomment' => isset($order['customercomment']) ? $order['customercomment'] : '',
+            'internalcomment' => isset($order['internalcomment']) ? $order['internalcomment'] : '',
             'net' => !empty($order['tax_free']) || !empty($order['net']) ? 1 : 0,
             'taxfree' => !empty($order['tax_free']) ? 1 : 0,
             'referer' => isset($order['referer']) ? $order['referer'] : '',
@@ -323,7 +327,10 @@ class Order extends AbstractResource
 
         if ($call["profile"] != "WooCommerce") {
             while ($order = $result->fetch()) {
-                $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
+                $progress = $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
+                if (isset($progress) && $progress) {
+                    return $progress;
+                }
             }
         } elseif ($call["profile"] == "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -368,7 +375,7 @@ class Order extends AbstractResource
         }
 
         if ($numberValidationMode !== 'ignore'
-            && (empty($number) || strlen($number) > 30 || strlen($number) < 4
+            && (empty($number) || strlen($number) > 255 || strlen($number) < 4
                 || preg_match('/[^a-zA-Z0-9-_.]/', $number))
         ) {
             switch ($numberValidationMode) {

@@ -42,8 +42,8 @@ class Product extends AbstractResource
     {
         return sprintf(
             $this->getNameSpace()->get('progressProducts', "%s out of %s products imported"),
-            $progress->getOffset(),
-            $progress->getCount()
+            $this->getProgress()->getOffset(),
+            $this->getProgress()->getCount()
         );
     }
 
@@ -106,7 +106,10 @@ class Product extends AbstractResource
             $prodArr = $products->fetchAll();
 
             foreach ($prodArr as $id => $product) {
-                $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
+                $progress = $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
+                if (isset($progress) && $progress) {
+                    return $progress;
+                }
             }
         } elseif ($call["profile"] === "WooCommerce") {
             $normalizer = new WooCommerce();
@@ -168,7 +171,7 @@ class Product extends AbstractResource
         $number = isset($product['ordernumber']) ? $product['ordernumber'] : '';
 
         if ($numberValidationMode !== 'ignore'
-            && (empty($number) || strlen($number) > 30 || strlen($number) < 4 || preg_match('/[^a-zA-Z0-9-_.]/', $number))
+            && (empty($number) || strlen($number) > 255 || strlen($number) < 4 || preg_match('/[^a-zA-Z0-9-_.]/', $number))
         ) {
             switch ($numberValidationMode) {
                 case 'complain':

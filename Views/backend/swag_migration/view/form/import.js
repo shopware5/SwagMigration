@@ -153,7 +153,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
     getLeftItems: function() {
         var me = this,
-            items;
+            items = [];
 
         items = [{
             fieldLabel: '{s name=importProducts}Import products{/s}',
