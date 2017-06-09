@@ -109,6 +109,19 @@ class Magento extends Profile
     }
 
     /**
+     * Returns the sql statement to select the shop system customer groups
+     *
+     * @return string {String} | sql for price groups
+     */
+    public function getCustomerGroupSelect()
+    {
+        return "
+			SELECT `customer_group_id` as id, `customer_group_code` as name
+			FROM {$this->quoteTable('customer_group')}
+		";
+    }
+
+    /**
      * Returns the sql statement to select the shop system payments
      *
      * @return string {String} | sql for the payments
@@ -117,23 +130,21 @@ class Magento extends Profile
     {
         return "
 			SELECT `method` as id, `method` as name
-			FROM {$this->quoteTable('sales_flat_quote_payment')}
+			FROM {$this->quoteTable('sales_flat_order_payment')}
 		";
     }
 
     /**
-     * Returns an array of the order states mapping, with keys and descriptions
+     * Returns the sql statement to select the order states
      *
-     * @return array {Array} | order states: key - description
+     * @return string {String} | sql for the order states
      */
-    public function getOrderStatus()
+    public function getOrderStatusSelect()
     {
-        return [
-            'pending' => 'Pending',
-            'holded' => 'On Hold',
-            'processing' => 'Processing',
-            'complete' => 'Complete'
-        ];
+        return "
+			SELECT `status` as id, `label` as name
+			FROM {$this->quoteTable('sales_order_status')}
+		";
     }
 
     /**
@@ -255,6 +266,31 @@ class Magento extends Profile
 			AND (ea.is_user_defined=1 OR ea.attribute_code IN ('visibility', 'meta_description', 'meta_title', 'url_key'))
 			AND ea.attribute_code NOT IN ('cost', 'manufacturer')
 			ORDER BY `name`
+		";
+    }
+
+    /**
+     * Returns a query to select all available property options (for mapping)
+     *
+     * @return string
+     */
+    public function getConfiguratorOptionsSelect()
+    {
+        return "
+			SELECT
+
+				eav.attribute_code as 'name'
+
+			-- Attribute configuration
+			FROM {$this->quoteTable('catalog_eav_attribute')} eav_settings
+
+			-- Actual attributes
+            INNER JOIN {$this->quoteTable('eav_attribute')} eav
+            ON eav.attribute_id=eav_settings.attribute_id
+            AND eav.is_user_defined=1
+            AND eav.attribute_code NOT IN ('manufacturer')
+
+			WHERE  eav_settings.is_filterable = 2
 		";
     }
 
@@ -512,8 +548,9 @@ class Magento extends Profile
 					c.meta_description as metaDescription,
 					c.meta_title as cmsheadline,
                     c.meta_title as meta_title,
-					c.description as cmstext,
-					c.is_active as active
+					c.description as cmsText,
+					c.is_active as active,
+					IF(c.include_in_menu=1, 0, 1) as hideTop
 				FROM
 					{$this->quoteTable('core_store')} s,
 					{$this->quoteTable('core_store_group')} g,
@@ -660,6 +697,7 @@ class Magento extends Profile
 				-- 											as transactionID,
 
 				o.`customer_note`							as customercomment,
+				o.`customer_email`                          as internalcomment,
 				o.`order_currency_code`						as currency,
 				o.`base_to_order_rate`						as currency_factor,
 				-- 											as cleared_date,
@@ -697,8 +735,7 @@ class Magento extends Profile
 				o.`shipping_amount`							as invoice_shipping_net
 
 			FROM
-				{$this->quoteTable('sales_flat_quote')} q,
-				{$this->quoteTable('sales_flat_quote_payment')} p,
+			    {$this->quoteTable('sales_flat_order_payment')} p,
 				{$this->quoteTable('sales_flat_order', 'o')}
 			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} ba
 			ON ba.parent_id=o.entity_id
@@ -706,8 +743,7 @@ class Magento extends Profile
 			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} sa
 			ON sa.parent_id=o.entity_id
 			AND sa.address_type='shipping'
-			WHERE o.quote_id = q.entity_id
-			AND p.quote_id = q.entity_id
+			WHERE o.entity_id = p.parent_id
 		";
     }
 
@@ -729,6 +765,7 @@ class Magento extends Profile
 				tax_percent as tax,
 				0 as modus
 			FROM {$this->quoteTable('sales_flat_order_item')}
+			WHERE parent_item_id IS NULL
 		";
     }
 
