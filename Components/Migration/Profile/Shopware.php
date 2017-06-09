@@ -141,9 +141,9 @@ class Shopware extends Profile
     public function getAttributeSelect()
     {
         return "
-			SELECT `name` as id, `label` as name
-			FROM {$this->quoteTable('core_engine_elements')}
-			WHERE `name` LIKE '%attr%%'
+			SELECT `column_name` as id, `label` as name
+			FROM {$this->quoteTable('attribute_configuration')}
+			WHERE table_name = 's_articles_attributes'
 			UNION ALL
 			SELECT 'ean' as id, 'EAN' as name
 		";
