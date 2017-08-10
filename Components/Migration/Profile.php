@@ -10,6 +10,7 @@ namespace Shopware\SwagMigration\Components\Migration;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Driver\PDOMySql\Driver;
 use Enlight_Class;
 use ArrayObject;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
@@ -20,7 +21,7 @@ abstract class Profile extends Enlight_Class
     /**
      * Global variable for the database object
      *
-     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @var mixed
      */
     protected $db;
 
@@ -69,15 +70,18 @@ abstract class Profile extends Enlight_Class
     public function __construct($config)
     {
         parent::__construct();
+
         $dbConnection = Db::createDbalConnection($config, new Configuration(), new EventManager(), null);
 
         if (Shopware()->Plugins()->Backend()->SwagMigration()->Config()->debugMigration) {
-            $this->db = new DbDecorator($dbConnection);
+            $config['user'] = $config['username'];
+            $db = new DbDecorator($config, new Driver());
+            $db->setInstance($dbConnection);
         } else {
-            $this->db = $dbConnection;
+            $db = $dbConnection;
         }
 
-        $this->db = Db::createEnlightDbAdapter($this->db, $config);
+        $this->db = Db::createEnlightDbAdapter($db, $config);
         if (isset($config['prefix'])) {
             $this->db_prefix = $config['prefix'];
         }

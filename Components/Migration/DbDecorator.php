@@ -8,9 +8,10 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
+use Doctrine\DBAL\Connection;
 use Exception;
 
-class DbDecorator
+class DbDecorator extends Connection
 {
     /**
      * The decorated Zend_Db instance
@@ -35,12 +36,52 @@ class DbDecorator
         'execute'
     ];
 
+    public function fetchOne()
+    {
+        return $this->callMethod('fetchOne', func_get_args());
+    }
+
+    public function fetchCol()
+    {
+        return $this->callMethod('fetchCol', func_get_args());
+    }
+
+    public function fetchPairs()
+    {
+        return $this->callMethod('fetchPairs', func_get_args());
+    }
+
+    public function fetchRow()
+    {
+        return $this->callMethod('fetchRow', func_get_args());
+    }
+
+    public function fetchAll()
+    {
+        return $this->callMethod('fetchAll', func_get_args());
+    }
+
+    public function fetchAssoc()
+    {
+        return $this->callMethod('fetchAssoc', func_get_args());
+    }
+
+    public function query()
+    {
+        return $this->callMethod('query', func_get_args());
+    }
+
+    public function execute()
+    {
+        return $this->callMethod('execute', func_get_args());
+    }
+
     /**
      * Constructor: Set the decorated class as $this->instance
      *
      * @param $instance
      */
-    public function __construct($instance)
+    public function setInstance($instance)
     {
         $this->instance = $instance;
     }
@@ -95,7 +136,7 @@ class DbDecorator
      * @param $args
      * @return mixed
      */
-    public function __call($method, $args)
+    public function callMethod($method, $args)
     {
         // Print header
         if (in_array($method, $this->logable)) {
