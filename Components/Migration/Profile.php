@@ -8,12 +8,12 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
+use ArrayObject;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Enlight_Class;
-use ArrayObject;
-use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 use Shopware\Components\DependencyInjection\Bridge\Db;
+use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
 abstract class Profile extends Enlight_Class
 {
@@ -97,6 +97,7 @@ abstract class Profile extends Enlight_Class
      *
      * @param $table
      * @param null $alias
+     *
      * @return string
      */
     public function quoteTable($table, $alias = null)
@@ -154,7 +155,7 @@ abstract class Profile extends Enlight_Class
                             if ($row['value'] == 'false') {
                                 $row['value'] = false;
                             } else {
-                                $row['value'] = (bool)$row['value'];
+                                $row['value'] = (bool) $row['value'];
                             }
                             break;
                         case 'aarr':
@@ -179,6 +180,7 @@ abstract class Profile extends Enlight_Class
      * @param $sql
      * @param int $count
      * @param int $offset
+     *
      * @return string
      */
     public function limit($sql, $count = 0, $offset = 0)
@@ -258,7 +260,6 @@ abstract class Profile extends Enlight_Class
 
         return $langSelect;
     }
-
 
     /**
      * This function returns the profile default language
@@ -422,6 +423,7 @@ abstract class Profile extends Enlight_Class
      * be merged with the actual product
      *
      * @param $productId
+     *
      * @return mixed
      */
     public function getAdditionalProductInfo($productId)
@@ -437,6 +439,7 @@ abstract class Profile extends Enlight_Class
      * Returns the categories, selected by the profile sql
      *
      * @param $offset
+     *
      * @return array
      */
     public function getCategories($offset)
@@ -450,6 +453,7 @@ abstract class Profile extends Enlight_Class
      * Query products, which have attributes associated.
      *
      * @param int $offset
+     *
      * @return mixed
      */
     public function queryAttributedProducts($offset = 0)
@@ -470,6 +474,7 @@ abstract class Profile extends Enlight_Class
      *
      * @param $id
      * @param int $offset
+     *
      * @return mixed
      */
     public function queryProductAttributes($id, $offset = 0)
@@ -489,6 +494,7 @@ abstract class Profile extends Enlight_Class
      * Query products which have properties
      *
      * @param $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductsWithProperties($offset)
@@ -508,6 +514,7 @@ abstract class Profile extends Enlight_Class
      * Queries the properties for a given product id
      *
      * @param $id
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductProperties($id)
@@ -524,6 +531,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile category select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryCategories($offset = 0)
@@ -540,6 +548,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product category allocation select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductCategories($offset = 0)
@@ -556,6 +565,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProducts($offset = 0)
@@ -573,6 +583,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product price select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductPrices($offset = 0)
@@ -589,6 +600,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile customer select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryCustomers($offset = 0)
@@ -605,6 +617,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product image select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductImages($offset = 0)
@@ -621,6 +634,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product translation select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductTranslations($offset = 0)
@@ -637,6 +651,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile product rating select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryProductRatings($offset = 0)
@@ -653,6 +668,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile order select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryOrders($offset = 0)
@@ -669,6 +685,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile order detail select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryOrderDetails($offset = 0)
@@ -683,6 +700,7 @@ abstract class Profile extends Enlight_Class
 
     /**
      * @param $order
+     *
      * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
      */
     public function queryOrderDetailArticleNumber($order)
@@ -691,13 +709,14 @@ abstract class Profile extends Enlight_Class
             return;
         }
 
-        $sql = $this->getArticleNumberSelect($order["productID"]);
+        $sql = $this->getArticleNumberSelect($order['productID']);
 
         return $this->db->query($sql);
     }
 
     /**
      * @param $order
+     *
      * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
      */
     public function queryOrderAmounts($order)
@@ -706,7 +725,7 @@ abstract class Profile extends Enlight_Class
             return;
         }
 
-        $sql = $this->getOrderAmounts($order["orderID"]);
+        $sql = $this->getOrderAmounts($order['orderID']);
 
         return $this->db->query($sql);
     }
@@ -715,6 +734,7 @@ abstract class Profile extends Enlight_Class
      * Executes the profile ESD order select statement with the given offset
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryEsdOrder($offset = 0)
@@ -727,12 +747,12 @@ abstract class Profile extends Enlight_Class
         return $this->db->query($sql);
     }
 
-
     /**
      * Returns a rough estimation of number of entities to import
      * No need for correctness, only the estimated time depends on this
      *
      * @param $for
+     *
      * @return bool|string
      */
     public function getEstimation($for)
@@ -746,7 +766,6 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     *
      * @return bool|\Zend_Db_Statement_Interface
      */
     public function queryArticleDownload()
@@ -760,7 +779,6 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     *
      * @return false|\Zend_Db_Statement_Interface
      */
     public function queryArticleDownloadESD()

@@ -1,0 +1,225 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * .git/hooks/pre-commit
+ *
+ * This pre-commit hooks will check for PHP errors (lint), and make sure the
+ * code is PSR-2 compliant.
+ */
+class PreCommitChecks
+{
+    /**
+     * @var bool
+     */
+    private $error = false;
+
+    /**
+     * @return int
+     */
+    public function run()
+    {
+        $this->writeln();
+        $this->writeln('Checking commit requirements', 0);
+        $this->writeln();
+
+        if ($this->isRebase()) {
+            echo 'Not on branch' . PHP_EOL;
+
+            return (int) 0;
+        }
+
+        $this->runPhpLint($this->getCommittedFileList('php'));
+        $this->runPhpCsFixer($this->getCommittedFileList('php'));
+        $this->runEsLint($this->getCommittedFileList('js'));
+
+        if ($this->error) {
+            $this->writeln("If you are ABSOLUTELY sure your code is correct, you can use 'git commit --no-verify' to bypass this validation", 0);
+        }
+
+        exit((int) $this->error);
+    }
+
+    /**
+     * @param string $output
+     * @param int    $level
+     */
+    private function writeln($output = '', $level = 1)
+    {
+        $this->write($output, $level);
+        echo PHP_EOL;
+    }
+
+    /**
+     * @param string $output
+     * @param int    $level
+     */
+    private function write($output = '', $level = 1)
+    {
+        $spaces = $level * 3;
+
+        echo str_pad($output, strlen($output) + $spaces, ' ', STR_PAD_LEFT);
+    }
+
+    /**
+     * @return bool
+     */
+    private function isRebase()
+    {
+        $output = [];
+        exec('git symbolic-ref --short -q HEAD', $output);
+
+        return empty($output);
+    }
+
+    /**
+     * @param string $extension
+     * @return string[]
+     */
+    private function getCommittedFileList($extension = 'php')
+    {
+        exec("git diff --name-only --diff-filter=ACMRTUXB \"HEAD\" | grep -e '\." . $extension . "$'", $fileList);
+
+        return $fileList;
+    }
+
+    /**
+     * @param array $fileList
+     */
+    private function runPhpLint(array $fileList)
+    {
+        $this->writeln('# Checking php syntax');
+        $this->writeln('> php -l');
+
+        foreach ($fileList as $file) {
+            exec('php -l ' . escapeshellarg($file) . ' 2> /dev/null', $output, $return);
+            if ($return !== 0) {
+                $this->writeln('- ' . $output[1], 2);
+                $this->error = true;
+            }
+        }
+
+        $this->writeln();
+    }
+
+    /**
+     * @param array $fileList
+     */
+    private function runPhpCsFixer(array $fileList)
+    {
+        $this->writeln('# Checking php code style');
+        $this->writeln('> php-cs-fixer fix -v --no-ansi --dry-run');
+
+        if (!$this->isPHPCSFixerAvailable()) {
+            $this->error = true;
+            $this->writeln('- php-cs-fixer is NOT installed. Please install composer with dev dependencies.', 2);
+            $this->writeln();
+
+            return;
+        }
+
+        foreach ($fileList as $file) {
+            exec('./../../../../../../vendor/bin/php-cs-fixer fix -v --no-ansi --dry-run ' . escapeshellarg($file) . ' 2>&1', $output, $return);
+
+            if ($return !== 0) {
+                $this->writeln('- ' . preg_replace('#^(\s+)?\d\)\s#', '', $output[3]), 2);
+                $fixes[] = './../../../../../../vendor/bin/php-cs-fixer fix -v ' . escapeshellarg($file);
+                $this->error = true;
+            }
+        }
+
+        if (!empty($fixes)) {
+            $this->writeln();
+            $this->writeln('Help:', 2);
+            foreach ($fixes as $fix) {
+                $this->writeln($fix, 3);
+            }
+        }
+
+        $this->writeln();
+    }
+
+    /**
+     * @param array $fileList
+     */
+    private function runEsLint(array $fileList)
+    {
+        $this->writeln('# Checking javascript code style');
+        $this->writeln('> eslint.js --ignore-path .eslintignore');
+
+        if (!$this->isESLintAvailable()) {
+            $this->writeln('- eslint.js not found. Skipping javascript code style check.', 2);
+            $this->writeln();
+
+            return;
+        }
+
+        $this->checkESLint($fileList);
+
+        $this->writeln();
+    }
+
+    /**
+     * @return bool
+     */
+    private function isPHPCSFixerAvailable()
+    {
+        $output = [];
+        $return = 0;
+        exec('command -v ./../../../../../../vendor/bin/php-cs-fixer >/dev/null 2>&1', $output, $return);
+
+        return !(bool) $return;
+    }
+
+    /**
+     * @return bool
+     */
+    private function isESLintAvailable()
+    {
+        $output = [];
+        $return = 0;
+        exec('command -v ./../../../../../../themes/node_modules/eslint/bin/eslint.js >/dev/null 2>&1', $output, $return);
+
+        return !(bool) $return;
+    }
+
+    /**
+     * @param array $fileList
+     */
+    private function checkESLint(array $fileList = [])
+    {
+        $output = [];
+        $return = 0;
+        exec(
+            './../../../../../../themes/node_modules/eslint/bin/eslint.js ' .
+            '--ignore-path .eslintignore ' .
+            '-c ./../../../../../../themes/.eslintrc.js ' .
+            '--global "Ext" ' .
+            implode(' ', $fileList),
+            $output,
+            $return
+        );
+        $return = !(bool) $return;
+
+        if (!$return) {
+            $this->error = true;
+
+            foreach ($output as $line) {
+                $this->writeln($line, 2);
+            }
+
+            $this->writeln('Help:', 2);
+            $this->writeln(
+                './../../../../../../themes/node_modules/eslint/bin/eslint.js ' .
+                '--fix --ignore-path .eslintignore ' .
+                '-c ./../../../../../../themes/.eslintrc.js ' .
+                '--global "Ext" ' .
+                implode(' ', $fileList),
+                3
+            );
+        }
+    }
+}
+
+$checks = new PreCommitChecks();
+$checks->run();
