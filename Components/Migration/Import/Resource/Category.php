@@ -8,9 +8,9 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration;
 use Exception;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 /**
@@ -19,7 +19,7 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Category import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Category extends AbstractResource
@@ -28,11 +28,12 @@ class Category extends AbstractResource
     private $db = null;
 
     /** @var array */
-    private $unmapped = array();
+    private $unmapped = [];
 
     /**
-     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
      * @throws Exception
+     *
+     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
      */
     public function getDb()
     {
@@ -44,37 +45,37 @@ class Category extends AbstractResource
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         if ($this->getInternalName() == 'import_categories') {
             return $this->getNameSpace()->get(
                 'errorImportingCategories',
-                "An error occurred while importing categories"
+                'An error occurred while importing categories'
             );
         } elseif ($this->getInternalName() == 'import_article_categories') {
             return $this->getNameSpace()->get(
                 'errorImportingArticleCategories',
-                "An error assigning articles to categories"
+                'An error assigning articles to categories'
             );
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         if ($this->getInternalName() == 'import_categories') {
             return sprintf(
-                $this->getNameSpace()->get('progressCategories', "%s out of %s categories imported"),
+                $this->getNameSpace()->get('progressCategories', '%s out of %s categories imported'),
                 $progress->getOffset(),
                 $progress->getCount()
             );
         } elseif ($this->getInternalName() == 'import_article_categories') {
             return sprintf(
-                $this->getNameSpace()->get('progressArticleCategories', "%s out of %s articles assigned to categories"),
+                $this->getNameSpace()->get('progressArticleCategories', '%s out of %s articles assigned to categories'),
                 $progress->getOffset(),
                 $progress->getCount()
             );
@@ -82,11 +83,11 @@ class Category extends AbstractResource
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedCategories', "Categories successfully imported!");
+        return $this->getNameSpace()->get('importedCategories', 'Categories successfully imported!');
     }
 
     /**
@@ -112,6 +113,7 @@ class Category extends AbstractResource
      * Get a category target id
      *
      * @param $id
+     *
      * @return bool|string
      */
     public function getCategoryTarget($id)
@@ -121,7 +123,7 @@ class Category extends AbstractResource
         }
 
         return $this->getDb()->fetchOne(
-            "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?",
+            'SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID=?',
             [Migration::MAPPING_CATEGORY_TARGET, $id]
         );
     }
@@ -130,6 +132,7 @@ class Category extends AbstractResource
      * Get a category target id
      *
      * @param $id
+     *
      * @return bool|string
      */
     public function getCategoryTargetLike($id)
@@ -139,10 +142,10 @@ class Category extends AbstractResource
         }
 
         return $this->getDb()->fetchOne(
-            "SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?",
+            'SELECT `targetID` FROM `s_plugin_migrations` WHERE typeID=? AND sourceID LIKE ?',
             [
                 Migration::MAPPING_CATEGORY_TARGET,
-                '%' . $id . '%'
+                '%' . $id . '%',
             ]
         );
     }
@@ -161,7 +164,7 @@ class Category extends AbstractResource
     /**
      * The category import adapter handles categories as well as article-category assignments.
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -179,7 +182,7 @@ class Category extends AbstractResource
      */
     public function importCategories()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $skip = false;
@@ -187,12 +190,12 @@ class Category extends AbstractResource
         // Cleanup previous category imports
         if (!$skip && $offset === 0) {
             $this->getDb()->query(
-                "DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);",
+                'DELETE FROM s_plugin_migrations WHERE typeID IN (?, ?);',
                 [Migration::MAPPING_CATEGORY_TARGET, 2]
             );
         }
 
-        if ($call["profile"] == "WooCommerce") {
+        if ($call['profile'] == 'WooCommerce') {
             $locale = $this->Source()->getNormalizedLanguages();
 
             $sql = 'SELECT id FROM s_core_locales WHERE locale = ?';
@@ -201,13 +204,17 @@ class Category extends AbstractResource
 
         $categories = $this->Source()->queryCategories($offset);
 
+        if (empty($categories)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $categories->rowCount() + $offset;
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
         while (!$skip && $category = $categories->fetch()) {
-            if ($call["profile"] == "WooCommerce") {
-                $category["languageID"] = $languageId;
+            if ($call['profile'] == 'WooCommerce') {
+                $category['languageID'] = $languageId;
             }
 
             //check if the category split into the different translations
@@ -315,6 +322,10 @@ class Category extends AbstractResource
 
         $result = $this->Source()->queryProductCategories($offset);
 
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
@@ -341,7 +352,7 @@ class Category extends AbstractResource
                 [
                     $productCategory['productID'],
                     Migration::MAPPING_ARTICLE,
-                    Migration::MAPPING_VALID_NUMBER
+                    Migration::MAPPING_VALID_NUMBER,
                 ]
             );
 
@@ -360,7 +371,7 @@ class Category extends AbstractResource
                 [
                     Migration::MAPPING_CATEGORY,
                     $productCategory['categoryID'],
-                    $productCategory['categoryID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . '%'
+                    $productCategory['categoryID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . '%',
                 ]
             );
 
@@ -377,7 +388,6 @@ class Category extends AbstractResource
     }
 
     /**
-     *
      * If there were unmapped categories because the parent does not exist at the time,
      * they were imported here in a second step.
      *

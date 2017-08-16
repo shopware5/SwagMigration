@@ -14,46 +14,50 @@ use ZEND_Db;
 class DownloadESDOrder extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
+        return $this->getNameSpace()->get('errorImportingMedia', 'An error occurred while importing media');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressDownload', "%s out of %s ESD Orders imported"),
+            $this->getNameSpace()->get('progressDownload', '%s out of %s ESD Orders imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedDownload', "ESD Orders successfully imported!");
+        return $this->getNameSpace()->get('importedDownload', 'ESD Orders successfully imported!');
     }
 
     /**
      * import adapter for ESD orders
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryEsdOrder();
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
-
 
         while ($order = $result->fetch()) {
             $orderNumber = $order['ordernumber'];
@@ -62,9 +66,9 @@ class DownloadESDOrder extends AbstractResource
 
             // get sw orderId, userId, orderDetailsId
             list($orderId, $userId, $orderDetailsId) = Shopware()->Db()->fetchRow(
-                "SELECT o.id, o.userID, od.id FROM s_order o INNER JOIN s_order_details od ON o.id = od.orderID WHERE o.ordernumber = ?",
+                'SELECT o.id, o.userID, od.id FROM s_order o INNER JOIN s_order_details od ON o.id = od.orderID WHERE o.ordernumber = ?',
                 [
-                    $orderNumber
+                    $orderNumber,
                 ],
                 ZEND_Db::FETCH_NUM
             );
@@ -80,32 +84,32 @@ class DownloadESDOrder extends AbstractResource
             }
 
             $esdId = Shopware()->Db()->fetchOne(
-                "SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1",
+                'SELECT id FROM s_articles_esd WHERE file = ? LIMIT 1',
                 [$filename]
             );
 
             // Insert into esd orders
             Shopware()->Db()->query(
-                "INSERT INTO s_order_esd (serialID, esdID, userID, orderID, orderdetailsID, datum) VALUES (?,?,?,?,?,?)",
+                'INSERT INTO s_order_esd (serialID, esdID, userID, orderID, orderdetailsID, datum) VALUES (?,?,?,?,?,?)',
                 [
                     0,  // we don't support serial numbers yet
                     $esdId,
                     $userId,
                     $orderId,
                     $orderDetailsId,
-                    $orderDate
+                    $orderDate,
                 ]
             );
 
             // Mark this order as ESD order
             Shopware()->Db()->query(
-                "UPDATE s_order_details SET esdarticle = 1, ordernumber = ?, price = 1, releasedate = ? WHERE orderID = ?",
+                'UPDATE s_order_details SET esdarticle = 1, ordernumber = ?, price = 1, releasedate = ? WHERE orderID = ?',
                 [$orderNumber, $orderDate, $orderId]
             );
 
             // this query actually enables the ESD Downloads to be downloadable in the frontend - set the payment-status (cleared) to 12 (completely paid)
             Shopware()->Db()->query(
-                "UPDATE s_order SET cleared = 12 WHERE ordernumber = ?",
+                'UPDATE s_order SET cleared = 12 WHERE ordernumber = ?',
                 [$orderNumber]
             );
         }

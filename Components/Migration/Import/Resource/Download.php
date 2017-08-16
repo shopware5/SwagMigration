@@ -13,37 +13,37 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
 class Download extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
+        return $this->getNameSpace()->get('errorImportingMedia', 'An error occurred while importing media');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressDownload', "%s out of %s downloads imported"),
+            $this->getNameSpace()->get('progressDownload', '%s out of %s downloads imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedDownload', "Downloads successfully imported!");
+        return $this->getNameSpace()->get('importedDownload', 'Downloads successfully imported!');
     }
 
     /**
      * import adapter for downloads (article attached)
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -52,6 +52,11 @@ class Download extends AbstractResource
 
         /** @var \Zend_Db_Statement_Interface $result */
         $result = $this->Source()->queryArticleDownload();
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
@@ -77,7 +82,7 @@ class Download extends AbstractResource
 
             // Clear-Path
             $path = basename($path);
-            $path = str_replace(" ", "%20", $path);
+            $path = str_replace(' ', '%20', $path);
 
             $documentUrl = $remotePath . $path;
             $document = file_get_contents($documentUrl);
@@ -103,12 +108,12 @@ class Download extends AbstractResource
             if (strlen($document) == 0) {
                 continue;
             }
-            file_put_contents($localPath . str_replace("%20", " ", $path), $document);
+            file_put_contents($localPath . str_replace('%20', ' ', $path), $document);
 
             // Write entry to database
-            $sql = "SELECT articleID
+            $sql = 'SELECT articleID
                     FROM s_articles_details
-                    WHERE ordernumber = ?";
+                    WHERE ordernumber = ?';
             $getShopwareArticleId = Shopware()->Db()->fetchOne($sql, [$orderNumber]);
             if (empty($getShopwareArticleId)) {
                 //No article
@@ -122,8 +127,8 @@ class Download extends AbstractResource
 
             // Add entry to s_articles_downloads
             Shopware()->Db()->query(
-                "INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)",
-                [$getShopwareArticleId, $description, "/files/downloads/" . $path, filesize($localPath . $path)]
+                'INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)',
+                [$getShopwareArticleId, $description, '/files/downloads/' . $path, filesize($localPath . $path)]
             );
         }
 

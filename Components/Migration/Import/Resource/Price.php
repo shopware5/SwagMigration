@@ -8,8 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 /**
@@ -18,41 +18,41 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Price import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Price extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingPrices', "An error occurred while importing prices");
+        return $this->getNameSpace()->get('errorImportingPrices', 'An error occurred while importing prices');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressPrices', "%s out of %s prices imported"),
+            $this->getNameSpace()->get('progressPrices', '%s out of %s prices imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedPrices', "Prices successfully imported!");
+        return $this->getNameSpace()->get('importedPrices', 'Prices successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -68,6 +68,11 @@ class Price extends AbstractResource
         }
 
         $result = $this->Source()->queryProductPrices($offset);
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
@@ -89,7 +94,7 @@ class Price extends AbstractResource
                 $price['pricegroup'] = 'EK';
             }
 
-            $sql = "
+            $sql = '
                 SELECT ad.id AS articledetailsID, IF(cg.taxinput=1, t.tax, 0) AS tax
                 FROM s_plugin_migrations pm
                 JOIN s_articles_details ad
@@ -103,17 +108,17 @@ class Price extends AbstractResource
                 AND cg.groupkey=?
                 WHERE pm.sourceID=?
                 AND (pm.typeID=? OR pm.typeID=?)
-            ";
+            ';
             $price_config = Shopware()->Db()->fetchRow(
                 $sql,
                 [
                     $price['pricegroup'],
                     $price['productID'],
                     Migration::MAPPING_ARTICLE,
-                    Migration::MAPPING_VALID_NUMBER
+                    Migration::MAPPING_VALID_NUMBER,
                 ]
             );
-            
+
             if (!empty($price_config)) {
                 $price = array_merge($price, $price_config);
                 if (isset($price['net_price'])) {
@@ -138,7 +143,6 @@ class Price extends AbstractResource
 
                 $price['articlepricesID'] = $import->articlePrice($price);
             }
-
 
             $this->increaseProgress();
             if ($this->newRequestNeeded()) {

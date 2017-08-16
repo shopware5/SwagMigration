@@ -14,43 +14,48 @@ use ZEND_Db;
 class DownloadESD extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingMedia', "An error occurred while importing media");
+        return $this->getNameSpace()->get('errorImportingMedia', 'An error occurred while importing media');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressDownload', "%s out of %s ESD downloads imported"),
+            $this->getNameSpace()->get('progressDownload', '%s out of %s ESD downloads imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedDownload', "ESD Downloads successfully imported!");
+        return $this->getNameSpace()->get('importedDownload', 'ESD Downloads successfully imported!');
     }
 
     /**
      * import adapter for ESD Downloads
      *
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryArticleDownloadESD();
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
 
         $this->getProgress()->setCount($count);
@@ -60,7 +65,7 @@ class DownloadESD extends AbstractResource
 
         $downloadNotPossibleSnippet = $this->getNameSpace()->get(
             'downloadNotPossible',
-            "Download for ESD file %s was not succesful"
+            'Download for ESD file %s was not succesful'
         );
 
         while ($esdFile = $result->fetch()) {
@@ -86,7 +91,7 @@ class DownloadESD extends AbstractResource
 
             // get article_detail information
             list($articleDetailsId, $articleId) = Shopware()->Db()->fetchRow(
-                "SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?",
+                'SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?',
                 [$orderNumber],
                 ZEND_Db::FETCH_NUM
             );
@@ -103,7 +108,7 @@ class DownloadESD extends AbstractResource
 
             // check if we already have the current esd file associated: if the query for s_articles_esd.id is successful then skip
             $existingId = Shopware()->Db()->fetchOne(
-                "SELECT id FROM s_articles_esd WHERE articleID = ? AND file = ?",
+                'SELECT id FROM s_articles_esd WHERE articleID = ? AND file = ?',
                 [$articleId, $filename]
             );
 
@@ -113,7 +118,7 @@ class DownloadESD extends AbstractResource
 
             // Add actual download to s_articles_esd
             Shopware()->Db()->query(
-                "INSERT INTO s_articles_esd (articleID, articledetailsID, file, datum) VALUES (?,?,?,?)",
+                'INSERT INTO s_articles_esd (articleID, articledetailsID, file, datum) VALUES (?,?,?,?)',
                 [$articleId, $articleDetailsId, $filename, $datum]
             );
         }
@@ -125,6 +130,7 @@ class DownloadESD extends AbstractResource
      * Return the response code for a given url
      *
      * @param string $url
+     *
      * @return string
      */
     private function get_http_response_code($url)

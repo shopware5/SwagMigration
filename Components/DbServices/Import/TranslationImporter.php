@@ -29,7 +29,8 @@ class TranslationImporter
      * @param string $objectType
      * @param string $objectKey
      * @param string $objectLanguage
-     * @param array $objectData
+     * @param array  $objectData
+     *
      * @return bool|int
      */
     public function import($objectType, $objectKey, $objectLanguage, array $objectData)
@@ -63,15 +64,15 @@ class TranslationImporter
      * @param string $objectType
      * @param string $objectKey
      * @param string $objectLanguage
+     *
      * @return bool
      */
     private function deleteTranslation($objectType, $objectKey, $objectLanguage)
     {
         if (empty($objectType)) {
             return false;
-        } else {
-            $objectType = $this->db->quote($objectType);
         }
+        $objectType = $this->db->quote($objectType);
 
         $sql = 'DELETE FROM s_core_translations
                 WHERE objecttype IN (' . $objectType . ')';
@@ -88,9 +89,10 @@ class TranslationImporter
     }
 
     /**
-     * @param array $objectData
+     * @param array  $objectData
      * @param string $objectType
      * @param string $objectLanguage
+     *
      * @return array
      */
     private function prepareTranslationData(array $objectData, $objectType, $objectLanguage)
@@ -115,7 +117,7 @@ class TranslationImporter
         }
         unset($map);
 
-        for ($i = 1; $i <= 20; $i++) {
+        for ($i = 1; $i <= 20; ++$i) {
             if (!empty($objectData["attr{$i}_$objectLanguage"])) {
                 $data["attr$i"] = $objectData["attr{$i}_$objectLanguage"];
             } elseif (!empty($objectData["attr$i"])) {
@@ -138,61 +140,63 @@ class TranslationImporter
      * @param string $objectType
      * @param string $objectKey
      * @param string $objectLanguage
+     *
      * @return int
      */
     private function findExistingEntry($objectType, $objectKey, $objectLanguage)
     {
-        $sql = "SELECT id
+        $sql = 'SELECT id
                 FROM s_core_translations
-                WHERE objecttype = {$objectType}
-                  AND objectkey = {$objectKey}
-                  AND objectlanguage = {$objectLanguage}";
+                WHERE objecttype = ?
+                  AND objectkey = ?
+                  AND objectlanguage = ?';
 
-        return (int) $this->db->fetchOne($sql);
+        return (int) $this->db->fetchOne($sql, [$objectType, $objectKey, $objectLanguage]);
     }
 
     /**
-     * @param int $id
+     * @param int    $id
      * @param string $objectType
      * @param string $objectData
      * @param string $objectKey
      * @param string $objectLanguage
+     *
      * @return bool|int
      */
     private function createOrUpdate($id, $objectType, $objectData, $objectKey, $objectLanguage)
     {
         if (empty($id)) {
-            $sql = "INSERT INTO s_core_translations (objecttype, objectdata, objectkey, objectlanguage)
-                    VALUES ({$objectType}, {$objectData}, {$objectKey}, {$objectLanguage})";
-            $result = $this->db->query($sql);
+            $sql = 'INSERT INTO s_core_translations (objecttype, objectdata, objectkey, objectlanguage)
+                    VALUES (?,?,?,?)';
+            $result = $this->db->query($sql, [$objectType, $objectData, $objectKey, $objectLanguage]);
 
             if (empty($result)) {
                 return false;
-            } else {
-                return (int) $this->db->lastInsertId();
             }
-        } else {
-            $sql = "UPDATE s_core_translations
-                    SET	objectdata = {$objectData}
-                    WHERE id = {$id}";
-            $result = $this->db->query($sql);
-            if (empty($result)) {
-                return false;
-            } else {
-                return $id;
-            }
+
+            return (int) $this->db->lastInsertId();
         }
+        $sql = 'UPDATE s_core_translations
+                    SET	objectdata = ?
+                    WHERE id = ?';
+        $result = $this->db->query($sql, [$objectData, $id]);
+        if (empty($result)) {
+            return false;
+        }
+
+        return $id;
     }
 
     /**
      * @param string $value
+     *
      * @return string
      */
     private function toString($value)
     {
         $value = html_entity_decode($value);
         $value = preg_replace('!<[^>]*?>!', ' ', $value);
-        $value = str_replace(chr(0xa0), " ", $value);
+        $value = str_replace(chr(0xa0), ' ', $value);
         $value = preg_replace('/\s\s+/', ' ', $value);
         $value = htmlspecialchars($value);
         $value = trim($value);
