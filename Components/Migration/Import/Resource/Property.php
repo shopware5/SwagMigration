@@ -52,6 +52,7 @@ class Property extends AbstractResource
 
         // Get ids of products with properties
         $result = $this->Source()->queryProductsWithProperties($offset);
+
         if (!$result || $result->rowCount() === 0) {
             return $this->getProgress()->done();
         }

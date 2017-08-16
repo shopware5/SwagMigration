@@ -519,6 +519,10 @@ abstract class Profile extends Enlight_Class
      */
     public function queryProductProperties($id)
     {
+        if (!method_exists($this, 'getProductPropertiesSelect')) {
+            return;
+        }
+
         $sql = $this->getProductPropertiesSelect($id);
         if (!empty($offset)) {
             $sql = $this->limit($sql, null, $offset);
@@ -639,6 +643,10 @@ abstract class Profile extends Enlight_Class
      */
     public function queryProductTranslations($offset = 0)
     {
+        if (!method_exists($this, 'getProductTranslationSelect')) {
+            return;
+        }
+
         $sql = $this->getProductTranslationSelect();
         if (!empty($offset)) {
             $sql = $this->limit($sql, null, $offset);

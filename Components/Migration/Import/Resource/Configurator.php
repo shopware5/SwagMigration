@@ -15,43 +15,43 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 class Configurator extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get(
             'errorGeneratingVariantsFromAttributes',
-            "An error occurred while generating configuratos"
+            'An error occurred while generating configuratos'
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('configuratorProgress', "%s out of %s configurators imported"),
+            $this->getNameSpace()->get('configuratorProgress', '%s out of %s configurators imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('generatedConfigurators', "Configurators successfully generated!");
+        return $this->getNameSpace()->get('generatedConfigurators', 'Configurators successfully generated!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
 
         $products_result = $this->Source()->queryAttributedProducts($offset);
         if (empty($products_result)) {
@@ -65,11 +65,11 @@ class Configurator extends AbstractResource
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             while ($product = $products_result->fetch()) {
                 $this->migrateConfigurator($product);
             }
-        } elseif ($call["profile"] == "WooCommerce") {
+        } elseif ($call['profile'] == 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedVariants = $normalizer->normalizeVariants($products_result->fetchAll());
 
@@ -95,7 +95,7 @@ class Configurator extends AbstractResource
         }
 
         // Create configurator set for product
-        $configuratorSetName = "Generated Set - " . $id;
+        $configuratorSetName = 'Generated Set - ' . $id;
         $configuratorSetId = Shopware()->Db()->fetchOne(
             "
                 SELECT `id`
@@ -171,7 +171,7 @@ class Configurator extends AbstractResource
             Shopware()->Db()->query($sql);
 
             if ($price) {
-                if (version_compare(Shopware::VERSION, '5.0', '>=') || Shopware::VERSION == "___VERSION___") {
+                if (version_compare(Shopware::VERSION, '5.0', '>=') || Shopware::VERSION == '___VERSION___') {
                     $sql = "INSERT INTO `s_article_configurator_price_variations` (`configurator_set_id`, `options`, `variation`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
                 } elseif (version_compare(Shopware::VERSION, '4.4', '>=')) {
                     $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `options`, `surcharge`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";

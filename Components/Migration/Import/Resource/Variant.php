@@ -50,7 +50,7 @@ class Variant extends AbstractResource
     public function run()
     {
         $offsetProduct = $this->getProgress()->getOffset();
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
 
         // Get products with attributes
         $products_result = $this->Source()->queryAttributedProducts($offsetProduct);

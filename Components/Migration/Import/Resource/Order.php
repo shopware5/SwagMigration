@@ -8,44 +8,44 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
+use Shopware;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 use Zend_Db_Expr;
-use Shopware;
 use Zend_Json;
 
 class Order extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         if ($this->getInternalName() == 'import_orders') {
-            return $this->getNameSpace()->get('errorImportingOrders', "An error occurred while importing orders");
+            return $this->getNameSpace()->get('errorImportingOrders', 'An error occurred while importing orders');
         } elseif ($this->getInternalName() == 'import_order_details') {
             return $this->getNameSpace()->get(
                 'errorImportingOrderDetails',
-                "An error occurred while importing order details"
+                'An error occurred while importing order details'
             );
         }
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         if ($this->getInternalName() == 'import_orders') {
             return sprintf(
-                $this->getNameSpace()->get('progressOrders', "%s out of %s orders imported"),
+                $this->getNameSpace()->get('progressOrders', '%s out of %s orders imported'),
                 $this->getProgress()->getOffset(),
                 $this->getProgress()->getCount()
             );
         } elseif ($this->getInternalName() == 'import_order_details') {
             return sprintf(
-                $this->getNameSpace()->get('progressOrderDetails', "%s out of %s order details imported"),
+                $this->getNameSpace()->get('progressOrderDetails', '%s out of %s order details imported'),
                 $this->getProgress()->getOffset(),
                 $this->getProgress()->getCount()
             );
@@ -53,15 +53,15 @@ class Order extends AbstractResource
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedOrders', "Orders successfully imported!");
+        return $this->getNameSpace()->get('importedOrders', 'Orders successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -79,34 +79,39 @@ class Order extends AbstractResource
      */
     public function importOrders()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryOrders($offset);
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             while ($order = $result->fetch()) {
                 $this->migrateOrder($order);
             }
-        } elseif ($call["profile"] == "WooCommerce") {
+        } elseif ($call['profile'] == 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedOrders = $normalizer->normalizeOrders($result->fetchAll());
 
             foreach ($normalizedOrders as $order) {
                 $orderAmounts = $this->Source()->queryOrderAmounts($order)->fetchAll();
-                $order["invoice_amount"] = $orderAmounts[0]["invoice_amount"];
+                $order['invoice_amount'] = $orderAmounts[0]['invoice_amount'];
 
-                if (array_key_exists("orderTaxRate", $order)) {
-                    $order["invoice_amount"] = $order["invoice_amount"] + $order["orderTaxRate"];
+                if (array_key_exists('orderTaxRate', $order)) {
+                    $order['invoice_amount'] = $order['invoice_amount'] + $order['orderTaxRate'];
                 }
 
-                if (array_key_exists("invoice_shipping_net", $order)) {
-                    $order["invoice_shipping"] = $order["invoice_shipping_net"] + $order["shippingTax"];
-                    $order["invoice_amount"] = $order["invoice_amount"] + $order["invoice_shipping"];
+                if (array_key_exists('invoice_shipping_net', $order)) {
+                    $order['invoice_shipping'] = $order['invoice_shipping_net'] + $order['shippingTax'];
+                    $order['invoice_amount'] = $order['invoice_amount'] + $order['invoice_shipping'];
                 }
 
                 $this->migrateOrder($order);
@@ -120,12 +125,62 @@ class Order extends AbstractResource
     }
 
     /**
+     * This function imports all order details from the source profile into the showpare database
+     *
+     * @return $this|Progress
+     */
+    public function importOrderDetails()
+    {
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $offset = $this->getProgress()->getOffset();
+        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
+
+        $numberSnippet = $this->getNameSpace()->get(
+            'numberNotValid',
+            "The product number '%s' is not valid. A valid product number must:<br>
+            * not be longer than 40 chars<br>
+            * not contain other chars than: 'a-zA-Z0-9-_.'<br>
+            <br>
+            You can force the migration to continue. But be aware that this will: <br>
+            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
+            * Will not allow you to modify and save articles having an invalid ordernumber <br>
+            "
+        );
+
+        $result = $this->Source()->queryOrderDetails($offset);
+        $count = $result->rowCount() + $offset;
+        $this->getProgress()->setCount($count);
+
+        $this->initTaskTimer();
+
+        if ($call['profile'] != 'WooCommerce') {
+            while ($order = $result->fetch()) {
+                $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
+            }
+        } elseif ($call['profile'] == 'WooCommerce') {
+            $normalizer = new WooCommerce();
+            $normalizedOrderDetails = $normalizer->normalizeOrderDetails($result->fetchAll());
+
+            foreach ($normalizedOrderDetails as $order) {
+                $res = $this->Source()->queryOrderDetailArticleNumber($order)->fetch();
+                $order['article_ordernumber'] = $res['meta_value'];
+
+                $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
+            }
+        }
+
+        return $this->getProgress()->done();
+    }
+
+    /**
      * This Function does the real migration. It had to be outsourced because of the different
      * format types of some profiles.
      *
      * @param $order
-     * @return Progress
+     *
      * @throws \Zend_Db_Adapter_Exception
+     *
+     * @return Progress
      */
     private function migrateOrder($order)
     {
@@ -205,7 +260,6 @@ class Order extends AbstractResource
             $order['shipping_countryID'] = (int) Shopware()->Db()->fetchOne($sql, [$order['shipping_countryiso']]);
         }
 
-
         $data_attributes = [
             'orderID' => $order['orderID'],
             'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
@@ -213,7 +267,7 @@ class Order extends AbstractResource
             'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
             'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
             'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
-            'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
+            'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null,
         ];
 
         $data_billing = [
@@ -285,59 +339,10 @@ class Order extends AbstractResource
             Shopware()->Db()->insert('s_order_attributes', $data_attributes);
         }
 
-
         $this->increaseProgress();
         if ($this->newRequestNeeded()) {
             return $this->getProgress();
         }
-    }
-
-    /**
-     * This function imports all order details from the source profile into the showpare database
-     *
-     * @return $this|Progress
-     */
-    public function importOrderDetails()
-    {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
-        $offset = $this->getProgress()->getOffset();
-        $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
-
-        $numberSnippet = $this->getNameSpace()->get(
-            'numberNotValid',
-            "The product number '%s' is not valid. A valid product number must:<br>
-            * not be longer than 40 chars<br>
-            * not contain other chars than: 'a-zA-Z0-9-_.'<br>
-            <br>
-            You can force the migration to continue. But be aware that this will: <br>
-            * Truncate ordernumbers longer than 40 chars and therefore result in 'duplicate keys' exceptions <br>
-            * Will not allow you to modify and save articles having an invalid ordernumber <br>
-            "
-        );
-
-        $result = $this->Source()->queryOrderDetails($offset);
-        $count = $result->rowCount() + $offset;
-        $this->getProgress()->setCount($count);
-
-        $this->initTaskTimer();
-
-        if ($call["profile"] != "WooCommerce") {
-            while ($order = $result->fetch()) {
-                $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
-            }
-        } elseif ($call["profile"] == "WooCommerce") {
-            $normalizer = new WooCommerce();
-            $normalizedOrderDetails = $normalizer->normalizeOrderDetails($result->fetchAll());
-
-            foreach ($normalizedOrderDetails as $order) {
-                $res = $this->Source()->queryOrderDetailArticleNumber($order)->fetch();
-                $order["article_ordernumber"] = $res["meta_value"];
-
-                $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
-            }
-        }
-
-        return $this->getProgress()->done();
     }
 
     /**
@@ -347,8 +352,10 @@ class Order extends AbstractResource
      * @param $order
      * @param $numberValidationMode
      * @param $numberSnippet
-     * @return Progress
+     *
      * @throws \Zend_Db_Adapter_Exception
+     *
+     * @return Progress
      */
     private function migrateOrderDetail($order, $numberValidationMode, $numberSnippet)
     {
@@ -360,10 +367,11 @@ class Order extends AbstractResource
 
         if (empty($number)) {
             Shopware()->PluginLogger()->error("Order '{$order['orderID']}' was not imported because the Article Ordernumber was emtpy.");
+
             return;
         }
 
-        if (strpos($number, "#")) {
+        if (strpos($number, '#')) {
             $number = str_replace('#', '', $number);
         }
 
@@ -379,7 +387,7 @@ class Order extends AbstractResource
                             'success' => false,
                             'import_products' => null,
                             'offset' => 0,
-                            'progress' => -1
+                            'progress' => -1,
                         ]
                     );
 
@@ -390,7 +398,6 @@ class Order extends AbstractResource
                     break;
             }
         }
-
 
         $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
         $order['orderID'] = Shopware()->Db()->fetchOne($sql, [Migration::MAPPING_ORDER, $order['orderID']]);
@@ -408,7 +415,7 @@ class Order extends AbstractResource
             [
                 $order['productID'],
                 Migration::MAPPING_ARTICLE,
-                Migration::MAPPING_VALID_NUMBER
+                Migration::MAPPING_VALID_NUMBER,
             ]
         );
 
@@ -439,7 +446,7 @@ class Order extends AbstractResource
             'price' => $order['price'],
             'taxID' => !empty($order['taxID']) ? $order['taxID'] : 0,
             'quantity' => !empty($order['quantity']) ? $order['quantity'] : 1,
-            'modus' => !empty($order['modus']) ? $order['modus'] : 0
+            'modus' => !empty($order['modus']) ? $order['modus'] : 0,
         ];
 
         foreach ($data as $key => $attribute) {
@@ -457,7 +464,7 @@ class Order extends AbstractResource
             'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
             'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
             'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
-            'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null
+            'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null,
         ];
         Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
 

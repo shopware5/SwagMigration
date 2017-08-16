@@ -8,9 +8,9 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration;
 use Shopware;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
@@ -20,41 +20,41 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
  * Customer import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Customer extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingCustomers', "An error occurred while importing customers");
+        return $this->getNameSpace()->get('errorImportingCustomers', 'An error occurred while importing customers');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressCustomers', "%s out of %s customers imported"),
+            $this->getNameSpace()->get('progressCustomers', '%s out of %s customers imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedCustomers', "Customers successfully imported!");
+        return $this->getNameSpace()->get('importedCustomers', 'Customers successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -64,6 +64,11 @@ class Customer extends AbstractResource
         $salt = $this->Request()->salt;
 
         $result = $this->Source()->queryCustomers($offset);
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
@@ -72,11 +77,11 @@ class Customer extends AbstractResource
         /* @var Import $import */
         $import = Shopware()->Container()->get('swagmigration.import');
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             while ($customer = $result->fetch()) {
                 $this->migrateCustomer($customer, $import, $salt);
             }
-        } elseif ($call["profile"] == "WooCommerce") {
+        } elseif ($call['profile'] == 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedCustomers = $normalizer->normalizeCustomers($result->fetchAll());
 
@@ -89,11 +94,48 @@ class Customer extends AbstractResource
     }
 
     /**
+     * Import the customer debit
+     *
+     * @param array $customer
+     *
+     * @return bool
+     */
+    public function importCustomerDebit(array $customer)
+    {
+        $fields = [
+            'account' => false,
+            'bankcode' => false,
+            'bankholder' => false,
+            'bankname' => false,
+            'userID' => false,
+        ];
+
+        // Iterate the array, remove unneeded fields and check if the required fields exist
+        foreach ($customer as $key => $value) {
+            if (array_key_exists($key, $fields)) {
+                $fields[$key] = true;
+            } else {
+                unset($customer[$key]);
+            }
+        }
+        // Required field not found
+        if (in_array(false, $fields)) {
+            return false;
+        }
+
+        Shopware()->Db()->insert('s_user_debit', $customer);
+
+        return true;
+    }
+
+    /**
      * @param $customer
      * @param $import
      * @param $salt
-     * @return Progress
+     *
      * @throws \Zend_Db_Adapter_Exception
+     *
+     * @return Progress
      */
     private function migrateCustomer($customer, $import, $salt)
     {
@@ -127,7 +169,7 @@ class Customer extends AbstractResource
         }
 
         if (!empty($customer['md5_password']) && !empty($salt)) {
-            $customer['md5_password'] = $customer['md5_password'] . ":" . $salt;
+            $customer['md5_password'] = $customer['md5_password'] . ':' . $salt;
         }
 
         // If language is not set, read language from subshop
@@ -181,7 +223,7 @@ class Customer extends AbstractResource
                 [
                     Migration::MAPPING_CUSTOMER,
                     $customer['customerID'],
-                    $customer['userID']
+                    $customer['userID'],
                 ]
             );
         }
@@ -190,39 +232,5 @@ class Customer extends AbstractResource
         if ($this->newRequestNeeded()) {
             return $this->getProgress();
         }
-    }
-
-    /**
-     * Import the customer debit
-     *
-     * @param array $customer
-     * @return boolean
-     */
-    public function importCustomerDebit(array $customer)
-    {
-        $fields = [
-            'account' => false,
-            'bankcode' => false,
-            'bankholder' => false,
-            'bankname' => false,
-            'userID' => false
-        ];
-
-        // Iterate the array, remove unneeded fields and check if the required fields exist
-        foreach ($customer as $key => $value) {
-            if (array_key_exists($key, $fields)) {
-                $fields[$key] = true;
-            } else {
-                unset($customer[$key]);
-            }
-        }
-        // Required field not found
-        if (in_array(false, $fields)) {
-            return false;
-        }
-
-        Shopware()->Db()->insert('s_user_debit', $customer);
-
-        return true;
     }
 }

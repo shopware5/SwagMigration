@@ -8,9 +8,9 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration\Import\Progress;
-use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 /**
  * Shopware SwagMigration Components - Translation
@@ -18,50 +18,55 @@ use Shopware\SwagMigration\Components\DbServices\Import\Import;
  * Translation import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Translation extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get(
             'errorImportingTranslations',
-            "An error occurred while importing translations"
+            'An error occurred while importing translations'
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressTranslations', "%s out of %s translations imported"),
+            $this->getNameSpace()->get('progressTranslations', '%s out of %s translations imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedTranslations', "Translations successfully imported!");
+        return $this->getNameSpace()->get('importedTranslations', 'Translations successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductTranslations($offset);
+
+        if (!$result) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
@@ -87,7 +92,7 @@ class Translation extends AbstractResource
             }
 
             //prevent productId from being double
-            if (stristr($translation["productID"], "e")) {
+            if (stristr($translation['productID'], 'e')) {
                 $translation['productID'] = "'" . $translation['productID'] . "'";
             }
 
@@ -106,7 +111,7 @@ class Translation extends AbstractResource
                 [
                     $translation['productID'],
                     Migration::MAPPING_ARTICLE,
-                    Migration::MAPPING_VALID_NUMBER
+                    Migration::MAPPING_VALID_NUMBER,
                 ]
             );
 
@@ -125,7 +130,7 @@ class Translation extends AbstractResource
                     [
                         $translation['productID'],
                         Migration::MAPPING_ARTICLE,
-                        Migration::MAPPING_VALID_NUMBER
+                        Migration::MAPPING_VALID_NUMBER,
                     ]
                 );
             }

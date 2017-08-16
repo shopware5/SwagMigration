@@ -8,8 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
@@ -19,7 +19,7 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
  * Product import wrapper
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Product extends AbstractResource
@@ -28,36 +28,37 @@ class Product extends AbstractResource
     private $db = null;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingProducts', "An error occurred while importing products");
+        return $this->getNameSpace()->get('errorImportingProducts', 'An error occurred while importing products');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressProducts', "%s out of %s products imported"),
+            $this->getNameSpace()->get('progressProducts', '%s out of %s products imported'),
             $progress->getOffset(),
             $progress->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedProducts', "Products successfully imported!");
+        return $this->getNameSpace()->get('importedProducts', 'Products successfully imported!');
     }
 
     /**
-     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
      * @throws \Exception
+     *
+     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
      */
     public function getDb()
     {
@@ -69,7 +70,7 @@ class Product extends AbstractResource
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -102,15 +103,23 @@ class Product extends AbstractResource
 
         $this->initTaskTimer();
 
-        if ($call["profile"] !== "WooCommerce") {
+        if ($call['profile'] !== 'WooCommerce') {
             $prodArr = $products->fetchAll();
+
+            if (empty($prodArr)) {
+                return $this->getProgress()->done();
+            }
 
             foreach ($prodArr as $id => $product) {
                 $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
             }
-        } elseif ($call["profile"] === "WooCommerce") {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedProducts = $normalizer->normalizeProducts($products->fetchAll());
+
+            if (empty($normalizedProducts)) {
+                return $this->getProgress()->done();
+            }
 
             foreach ($normalizedProducts as $product) {
                 $this->migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call);
@@ -123,6 +132,36 @@ class Product extends AbstractResource
     }
 
     /**
+     * Helper function to remove an old article detail ans set another detail instead of it. Will also update
+     * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
+     *
+     * @param $oldMainDetail
+     * @param $newMainDetail
+     * @param $articleId
+     */
+    public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
+    {
+        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
+        $db = $this->getDb();
+
+        // Delete old main detail
+        $sql = 'DELETE FROM s_articles_details WHERE id = ?';
+        $db->query($sql, [$oldMainDetail]);
+
+        // Set the new mainDetail for the article
+        $sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
+        $db->query($sql, [$newMainDetail, $articleId]);
+
+        // Update kind of the new main detail
+        $sql = 'UPDATE s_articles_details SET kind = 1 WHERE id = ?';
+        $db->query($sql, [$newMainDetail]);
+
+        // Update mapping so that references to the old dummy article point to this article
+        $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ? AND (typeID = ? OR typeID = ?)';
+        $db->query($sql, [$newMainDetail, $oldMainDetail, Migration::MAPPING_ARTICLE, Migration::MAPPING_VALID_NUMBER]);
+    }
+
+    /**
      * This function migrates the product to Shopware. It has been excluded because the data coming from
      * different Systems made this necessary.
      *
@@ -132,11 +171,12 @@ class Product extends AbstractResource
      * @param $import
      * @param $numberSnippet
      * @param $call
+     *
      * @return Progress
      */
     private function migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call)
     {
-        if ($call["profile"] !== "WooCommerce") {
+        if ($call['profile'] !== 'WooCommerce') {
             $configuratorMapping = $this->Request()->get('configurator_mapping');
             $attributes = $this->Request()->get('attribute');
             $taxRate = $this->Request()->get('tax_rate');
@@ -213,7 +253,7 @@ class Product extends AbstractResource
                 $sql,
                 [
                     Migration::MAPPING_ARTICLE,
-                    $product['parentID']
+                    $product['parentID'],
                 ]
             );
         }
@@ -236,7 +276,7 @@ class Product extends AbstractResource
 
         if (!empty($product_result)) {
             $product = array_merge($product, $product_result);
-            /**
+            /*
              * Check if the parent article's detail has configurator options associated
              *
              * If this is not the case, it was a dummy master article in the source system and
@@ -258,8 +298,8 @@ class Product extends AbstractResource
             }
 
             if ($numberWasGenerated === true) {
-                $sql = "UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ?";
-                $db->query($sql, [$product['articledetailsID'], str_replace(Shopware()->Config()->backendAutoOrderNumberPrefix, "", $product['ordernumber'])]);
+                $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ?';
+                $db->query($sql, [$product['articledetailsID'], str_replace(Shopware()->Config()->backendAutoOrderNumberPrefix, '', $product['ordernumber'])]);
             }
 
             // In some cases we need to make sure, that the article configurator is
@@ -270,13 +310,13 @@ class Product extends AbstractResource
             }
 
             // Meta-title... if is import the meta-title set them
-            $metaTitle = "";
+            $metaTitle = '';
             if (!empty($product['meta_title'])) {
                 $metaTitle = $product['meta_title'];
             }
 
             if ($product['kind'] == 1 && $product_description !== null) {
-                if ($metaTitle !== "") {
+                if ($metaTitle !== '') {
                     $array = ['description_long' => $product_description, 'metaTitle' => $metaTitle];
                 } else {
                     $array = ['description_long' => $product_description];
@@ -311,7 +351,7 @@ class Product extends AbstractResource
                         [
                             'articleID' => $product['articleID'],
                             'link' => $product['link'],
-                            'description' => empty($product['link_description']) ? $product['link'] : $product['link_description']
+                            'description' => empty($product['link_description']) ? $product['link'] : $product['link_description'],
                         ]
                     );
                 }
@@ -329,14 +369,14 @@ class Product extends AbstractResource
                     [
                         Migration::MAPPING_ARTICLE,
                         $product['productID'],
-                        $product['articledetailsID']
+                        $product['articledetailsID'],
                     ]
                 );
             }
         }
 
         // WooCommerce has no pricegroups to migrate so skip this step
-        if ($call["profile"] !== "WooCommerce") {
+        if ($call['profile'] !== 'WooCommerce') {
             $this->getProgress()->addRequestParam('import_prices', true);
         }
 
@@ -344,35 +384,5 @@ class Product extends AbstractResource
         if ($this->newRequestNeeded()) {
             return $this->getProgress();
         }
-    }
-
-    /**
-     * Helper function to remove an old article detail ans set another detail instead of it. Will also update
-     * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
-     *
-     * @param $oldMainDetail
-     * @param $newMainDetail
-     * @param $articleId
-     */
-    public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
-    {
-        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
-        $db = $this->getDb();
-
-        // Delete old main detail
-        $sql = 'DELETE FROM s_articles_details WHERE id = ?';
-        $db->query($sql, [$oldMainDetail]);
-
-        // Set the new mainDetail for the article
-        $sql = 'UPDATE s_articles SET main_detail_id = ? WHERE id = ?';
-        $db->query($sql, [$newMainDetail, $articleId]);
-
-        // Update kind of the new main detail
-        $sql = 'UPDATE s_articles_details SET kind = 1 WHERE id = ?';
-        $db->query($sql, [$newMainDetail]);
-
-        // Update mapping so that references to the old dummy article point to this article
-        $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ? AND (typeID = ? OR typeID = ?)';
-        $db->query($sql, [$newMainDetail, $oldMainDetail, Migration::MAPPING_ARTICLE, Migration::MAPPING_VALID_NUMBER]);
     }
 }

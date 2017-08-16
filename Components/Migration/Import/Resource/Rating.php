@@ -10,56 +10,61 @@ namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
-use Zend_Db_Expr;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
+use Zend_Db_Expr;
 
 class Rating extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingRatings', "An error occurred while importing ratings");
+        return $this->getNameSpace()->get('errorImportingRatings', 'An error occurred while importing ratings');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressRatings', "%s out of %s ratings imported"),
+            $this->getNameSpace()->get('progressRatings', '%s out of %s ratings imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedRatings', "Ratings successfully imported!");
+        return $this->getNameSpace()->get('importedRatings', 'Ratings successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductRatings();
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             while ($rating = $result->fetch()) {
                 $this->migrateRating($rating);
             }
-        } elseif ($call["profile"] == "WooCommerce") {
+        } elseif ($call['profile'] == 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedRatings = $normalizer->normalizeRatings($result->fetchAll());
 
@@ -86,7 +91,7 @@ class Rating extends AbstractResource
             [
                 $rating['productID'],
                 Migration::MAPPING_ARTICLE,
-                Migration::MAPPING_VALID_NUMBER
+                Migration::MAPPING_VALID_NUMBER,
             ]
         );
 
@@ -107,7 +112,7 @@ class Rating extends AbstractResource
             [
                 $rating['articleID'],
                 $rating['name'],
-                !empty($rating['date']) ? $rating['date'] : 'NOW()'
+                !empty($rating['date']) ? $rating['date'] : 'NOW()',
             ]
         );
 

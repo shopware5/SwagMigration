@@ -8,8 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
+use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 
 /**
@@ -18,54 +18,59 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Image import adapter
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration\Import\Resource
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Image extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
-        return $this->getNameSpace()->get('errorImportingImages', "An error occurred while importing images");
+        return $this->getNameSpace()->get('errorImportingImages', 'An error occurred while importing images');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressImages', "%s out of %s images imported"),
+            $this->getNameSpace()->get('progressImages', '%s out of %s images imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importedImages', "Images successfully imported!");
+        return $this->getNameSpace()->get('importedImages', 'Images successfully imported!');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductImages($offset);
+
+        if (empty($result)) {
+            return $this->getProgress()->done();
+        }
+
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
         $this->initTaskTimer();
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
         }
 
@@ -73,7 +78,7 @@ class Image extends AbstractResource
         $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($image = $result->fetch()) {
-            if ($call["profile"] != "WooCommerce") {
+            if ($call['profile'] != 'WooCommerce') {
                 $image['link'] = $image_path . $image['image'];
             } else {
                 $image['link'] = $image['image'];
@@ -97,7 +102,7 @@ class Image extends AbstractResource
                 [
                     $image['productID'],
                     Migration::MAPPING_ARTICLE,
-                    Migration::MAPPING_VALID_NUMBER
+                    Migration::MAPPING_VALID_NUMBER,
                 ]
             );
 
@@ -114,14 +119,14 @@ class Image extends AbstractResource
                 [
                     $image['productID'],
                     Migration::MAPPING_ARTICLE,
-                    Migration::MAPPING_VALID_NUMBER
+                    Migration::MAPPING_VALID_NUMBER,
                 ]
             );
 
             if (!empty($product_data)) {
                 if ($this->Source()->checkForDuplicateImages()) {
                     if ($this->imageAlreadyImported($product_data['articleID'], $image['link'])) {
-                        $offset++;
+                        ++$offset;
                         continue;
                     }
                 }
@@ -146,28 +151,12 @@ class Image extends AbstractResource
     }
 
     /**
-     * Helper function to format image names the way the media resource expects it
-     *
-     * @param string $name
-     * @return string
-     */
-    private function removeSpecialCharacters($name)
-    {
-        $name = iconv('utf-8', 'ascii//translit', $name);
-        $name = strtolower($name);
-        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
-        $name = preg_replace('#-{2,}#', '-', $name);
-        $name = trim($name, '-');
-
-        return mb_substr($name, 0, 180);
-    }
-
-    /**
      * Helper function which tells, if a given image was already assigned to a given product
      *
      * @param $articleId
      * @param $image
-     * @return boolean
+     *
+     * @return bool
      */
     public function imageAlreadyImported($articleId, $image)
     {
@@ -193,5 +182,23 @@ class Image extends AbstractResource
         }
 
         return false;
+    }
+
+    /**
+     * Helper function to format image names the way the media resource expects it
+     *
+     * @param string $name
+     *
+     * @return string
+     */
+    private function removeSpecialCharacters($name)
+    {
+        $name = iconv('utf-8', 'ascii//translit', $name);
+        $name = strtolower($name);
+        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
+        $name = preg_replace('#-{2,}#', '-', $name);
+        $name = trim($name, '-');
+
+        return mb_substr($name, 0, 180);
     }
 }
