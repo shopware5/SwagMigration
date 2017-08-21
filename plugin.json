@@ -9,10 +9,11 @@
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
 
-    "currentVersion": "2.5.0",
+    "currentVersion": "2.5.1",
 
     "changelog": {
         "de": {
+            "2.5.1": "PT-7514 - Timeout erhöht; PT-7552 - Magento bis Version 1.9.3.4; PT-7512, PT-8269 - Shopware 5.3 und PHP7 Kompatibilität;",
             "2.5.0": "PT-5854, PT-6421, PT-6423 - Feature: Shopware 5.2 Kompatibilität;",
             "2.4.2": "PT-5920 - Bugfix: Artikelimport;",
             "2.4.1": "PT-5440 - Feature: Update Magento bis Version 1.9.2.4; PT-5445 - Feature: Update Gambio bis Version 2.2.x; PT-5446 - Feature: Update Gambio bis Version 2.4.x; PT-5447 - Feature: Update Gambio bis Version 2.6.x; PT-5438 - Feature: Update Oxid bis Version 4.9.7; PT-5503 - Feature: Migration von WooCommerce 2.5.5;",
@@ -25,6 +26,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
+            "2.5.1": "PT-7514 - Increase timeout; PT-7552 - Magento up to version 1.9.3.4; PT-7512, PT-8269 - Shopware 5.3 and PHP7 compatibility;",
             "2.5.0": "PT-5854, PT-6421, PT-6423 - Feature: Shopware 5.2 compatibility;",
             "2.4.2": "PT-5920 - Bugfix: Product import;",
             "2.4.1": "PT-5440 - Feature: Update Magento up to version 1.9.2.4; PT-5445 - Feature: Update Gambio up to version 2.2.x; PT-5446 - Feature: Update Gambio up to version 2.4.x; PT-5447 - Feature: Update Gambio up to version 2.6.x; PT-5438 - Feature: Update Oxid up to version 4.9.7; PT-5503 - Feature: Migration of WooCommerce 2.5.5;",
