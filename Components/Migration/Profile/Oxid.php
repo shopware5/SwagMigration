@@ -84,8 +84,12 @@ class Oxid extends Profile
     {
         $keys = [];
         $params = $this->Config()->aLanguageParams;
-        foreach ($params as $id => $param) {
-            $keys[$param['baseId']] = $id;
+        if (empty($params)) {
+            $keys = array_keys($this->getLanguages());
+        } else {
+            foreach ($params as $id => $param) {
+                $keys[$param['baseId']] = $id;
+            }
         }
 
         return $keys;
