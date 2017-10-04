@@ -782,9 +782,8 @@ class CustomerImporter
                     WHERE email = "' . $customer['email'] . '"';
             $result = $this->db->fetchOne($sql);
             if (empty($result)) {
-                $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
-                        VALUES (1, {$customer['newslettergroupID']}, {$customer['email']});";
-                $this->db->query($sql);
+                $sql = 'INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
+                VALUES (1, ' . $customer['newslettergroupID'] . ',"' . $customer['email'] . '");';
             }
         }
 
