@@ -784,6 +784,7 @@ class CustomerImporter
             if (empty($result)) {
                 $sql = 'INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
                 VALUES (1, ' . $customer['newslettergroupID'] . ',"' . $customer['email'] . '");';
+                $this->db->query($sql);
             }
         }
 
