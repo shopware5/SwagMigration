@@ -13,38 +13,38 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
 class Property extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get(
             'errorImportingProductProperties',
-            "An error occurred while importing product properties"
+            'An error occurred while importing product properties'
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('progressProductProperties', "%s out of %s product properties imported"),
+            $this->getNameSpace()->get('progressProductProperties', '%s out of %s product properties imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('importProductProperties', "Properties imported");
+        return $this->getNameSpace()->get('importProductProperties', 'Properties imported');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -107,8 +107,8 @@ class Property extends AbstractResource
                     'productID' => $productId,
                     'group' => [
                         'name' => $groupName,
-                        'options' => $options
-                    ]
+                        'options' => $options,
+                    ],
                 ];
 
                 // Actually import the properties
@@ -150,6 +150,7 @@ class Property extends AbstractResource
      *    )
      *
      * @param $data
+     *
      * @return bool
      */
     public function importProductProperty($data)
@@ -161,17 +162,17 @@ class Property extends AbstractResource
         $group['comparable'] = isset($group['comparable']) ? $group['comparable'] : false;
         $group['sortmode'] = isset($group['sortmode']) ? (int) $group['sortmode'] : 0;
 
-        /**
+        /*
          * Get existing group or create new one
          */
         if (isset($group['id'])) {
-            $sql = "SELECT `id` FROM `s_filter` WHERE `id` = ?";
+            $sql = 'SELECT `id` FROM `s_filter` WHERE `id` = ?';
             $groupId = Shopware()->Db()->fetchOne($sql, [$group['id']]);
         } elseif (isset($group['name'])) {
-            $sql = "SELECT `id` FROM `s_filter` WHERE `name` = ?";
+            $sql = 'SELECT `id` FROM `s_filter` WHERE `name` = ?';
             $groupId = Shopware()->Db()->fetchOne($sql, [$group['name']]);
         } else {
-            error_log("no group info passed");
+            error_log('no group info passed');
 
             return;
         }
@@ -183,44 +184,44 @@ class Property extends AbstractResource
         }
 
         if (false === $groupId) {
-            error_log("no group found");
+            error_log('no group found');
 
             return false;
         }
 
-        /**
+        /*
          * Get existing options or create new ones
          */
         foreach ($group['options'] as &$option) {
             $option['filterable'] = isset($group['filterable']) ? (int) $group['filterable'] : 1;
 
             if (isset($option['id'])) {
-                $sql = "
+                $sql = '
 					SELECT o.`id`
 					FROM `s_filter_options` o
 					WHERE o.`id` = ?
-				";
+				';
                 $optionId = Shopware()->Db()->fetchOne($sql, [$option['id']]);
             } elseif (isset($option['name'])) {
                 // First try to get option by name with associated group
-                $sql = "
+                $sql = '
 					SELECT o.`id`
 					FROM `s_filter_options` o
 					INNER JOIN `s_filter_relations` r
 					ON r.groupID = ?
 					AND r.optionID = o.id
 					WHERE o.`name` = ?
-					";
+					';
                 $optionId = Shopware()->Db()->fetchOne($sql, [$groupId, $option['name']]);
 
                 // Then try to find option by name ignoring associated groups
                 if (false === $optionId) {
-                    $sql = "
+                    $sql = '
 						SELECT o.`id`
 						FROM `s_filter_options` o
 						WHERE o.`name` = ?
 						LIMIT 1
-						";
+						';
                     $optionId = Shopware()->Db()->fetchOne($sql, [$option['name']]);
                 }
             }
@@ -233,7 +234,7 @@ class Property extends AbstractResource
             }
 
             if (false === $optionId) {
-                error_log("option not found");
+                error_log('option not found');
 
                 return false;
             }
@@ -242,26 +243,24 @@ class Property extends AbstractResource
             $sql = 'INSERT IGNORE INTO `s_filter_relations` (`groupID`, `optionID`) VALUES (?, ?)';
             Shopware()->Db()->query($sql, [$groupId, $optionId]);
 
-
             foreach ($option['values'] as &$value) {
                 $value['position'] = isset($value['position']) ? $value['position'] : '';
 
-
                 if (isset($value['id'])) {
-                    $sql = "
+                    $sql = '
 						SELECT v.`id`
 						FROM `s_filter_values` v
 						WHERE v.`id` = ?
-					";
+					';
                     $valueId = Shopware()->Db()->fetchOne($sql, [$value['id']]);
                 } elseif (isset($value['value'])) {
                     // Try to get value by value with associated option
-                    $sql = "
+                    $sql = '
 						SELECT v.`id`
 						FROM `s_filter_values` v
 						WHERE v.`value` = ?
 						AND v.`optionID` = ?
-						";
+						';
                     $valueId = Shopware()->Db()->fetchOne($sql, [$value['value'], $optionId]);
                 }
 
@@ -273,7 +272,7 @@ class Property extends AbstractResource
                 }
 
                 if (false === $valueId) {
-                    error_log("value not found");
+                    error_log('value not found');
 
                     return false;
                 }

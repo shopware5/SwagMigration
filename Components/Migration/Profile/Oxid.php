@@ -8,8 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
-use Shopware\SwagMigration\Components\Migration\Profile;
 use Exception;
+use Shopware\SwagMigration\Components\Migration\Profile;
 
 class Oxid extends Profile
 {
@@ -24,6 +24,7 @@ class Oxid extends Profile
      * Returns a select for a rough estimation for the total number of entities
      *
      * @param $for
+     *
      * @return string
      */
     public function getEstimationSelect($for)
@@ -153,7 +154,7 @@ class Oxid extends Profile
         $values = [
             'ORDERFOLDER_NEW' => 'Neu',
             'ORDERFOLDER_FINISHED' => 'Bearbeitet',
-            'ORDERFOLDER_PROBLEMS' => 'Probleme'
+            'ORDERFOLDER_PROBLEMS' => 'Probleme',
         ];
         foreach ($keys as $key) {
             $status[$key] = isset($values[$key]) ? $values[$key] : $key;
@@ -169,8 +170,7 @@ class Oxid extends Profile
      */
     public function getCustomerSelect()
     {
-
-        /**
+        /*
          * Intentionally do not join last orders shipping address in order to get customers shipping address
          * as this data is not essential at this point and will run over a join without index => slow
          */
@@ -236,6 +236,7 @@ class Oxid extends Profile
      * Returns the sql statement to select articles with
      *
      * @param $id int Id of the product to query
+     *
      * @return string
      */
     public function getProductPropertiesSelect($id)
@@ -396,7 +397,7 @@ class Oxid extends Profile
     public function getProductImageSelect()
     {
         $sql = [];
-        for ($i = 1; $i <= 12; $i++) {
+        for ($i = 1; $i <= 12; ++$i) {
             $sql[] = "
 				SELECT OXID as `productID`, CONCAT('$i/', OXPIC$i) as `image`, $i as `position`, IF($i=1, 1, 0) as `main`
 				FROM {$this->quoteTable('articles', 'a')}
@@ -515,7 +516,7 @@ class Oxid extends Profile
             LEFT JOIN {$this->quoteTable('object2seodata', 's')}
             ON s.OXOBJECTID = c.OXID
 			WHERE c.OXSHOPID='{$baseShopId}'
-		"
+		",
         ];
         foreach ($keys as $key => $languageID) {
             if (empty($key)) {

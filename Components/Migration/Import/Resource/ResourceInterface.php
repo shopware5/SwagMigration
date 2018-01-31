@@ -24,6 +24,7 @@ interface ResourceInterface
      * a Progress object will be passed, so you can get some context info for your snippet
      *
      * @param Progress $progress
+     *
      * @return string
      */
     public function getCurrentProgressMessage(Progress $progress);

@@ -15,7 +15,7 @@ use Shopware\SwagMigration\Components\DbServices\Import\Import;
 
 class Resources implements SubscriberInterface
 {
-    /** @var Container $container*/
+    /** @var Container $container */
     private $container;
 
     /**
@@ -29,7 +29,7 @@ class Resources implements SubscriberInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function getSubscribedEvents()
     {

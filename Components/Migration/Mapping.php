@@ -34,8 +34,8 @@ class Mapping
     /**
      * Constructor. Sets some dependencies.
      *
-     * @param Profile $source
-     * @param Profile $target
+     * @param Profile                               $source
+     * @param Profile                               $target
      * @param \Enlight_Components_Snippet_Namespace $namespace
      */
     public function __construct($source, $target, \Enlight_Components_Snippet_Namespace $namespace)
@@ -79,11 +79,11 @@ class Mapping
         foreach ($shops as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'shop',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"],
-                'required' => true
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
+                'required' => true,
             ];
         }
 
@@ -92,17 +92,17 @@ class Mapping
         foreach ($languages as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'language',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"],
-                'required' => true
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
+                'required' => true,
             ];
         }
 
         $target = $this->setAliases($this->Target()->getCustomerGroups());
         $customerGroups = $this->mapArrays($this->Source()->getCustomerGroups(), $target);
-        $wooCustomerGroups = unserialize(reset($customerGroups)["value"]);
+        $wooCustomerGroups = unserialize(reset($customerGroups)['value']);
 
         if ($wooCustomerGroups != false) {
             $customerGroups = $this->refactorSerializedArray($wooCustomerGroups);
@@ -111,17 +111,17 @@ class Mapping
         foreach ($customerGroups as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'customer_group',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"],
-                'required' => true
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
+                'required' => true,
             ];
         }
 
         $target = $this->setAliases($this->Target()->getPriceGroups());
         $priceGroups = $this->mapArrays($this->Source()->getPriceGroups(), $target);
-        $wooPriceGroups = unserialize(reset($priceGroups)["value"]);
+        $wooPriceGroups = unserialize(reset($priceGroups)['value']);
 
         if ($wooPriceGroups != false) {
             $priceGroups = $this->refactorSerializedArray($wooPriceGroups);
@@ -130,10 +130,10 @@ class Mapping
         foreach ($priceGroups as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'price_group',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -154,10 +154,10 @@ class Mapping
         foreach ($paymentMeans as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'payment_mean',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -166,10 +166,10 @@ class Mapping
         foreach ($orderStatus as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'order_status',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -178,10 +178,10 @@ class Mapping
         foreach ($taxRates as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'tax_rate',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -190,10 +190,10 @@ class Mapping
         foreach ($attributes as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'attribute',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -202,10 +202,10 @@ class Mapping
         foreach ($attributes as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'property_options',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -215,10 +215,10 @@ class Mapping
         foreach ($attributes as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
-                'name' => $name["value"],
+                'name' => $name['value'],
                 'group' => 'configurator_mapping',
-                'mapping_name' => $name["mapping"],
-                'mapping' => $name["mapping_value"]
+                'mapping_name' => $name['mapping'],
+                'mapping' => $name['mapping_value'],
             ];
         }
 
@@ -229,6 +229,7 @@ class Mapping
      * Returns the selectable values for a given entity-mapping
      *
      * @param $entity
+     *
      * @return array
      */
     public function getMappingForEntity($entity)
@@ -272,10 +273,9 @@ class Mapping
         $rows = [
             [
                 'id' => $this->namespace->get('pleaseSelect', 'Please select'),
-                'name' => $this->namespace->get('pleaseSelect', 'Please select')
-            ]
+                'name' => $this->namespace->get('pleaseSelect', 'Please select'),
+            ],
         ];
-
 
         if (!empty($values)) {
             foreach ($values as $key => $value) {
@@ -290,44 +290,45 @@ class Mapping
      * Helper function to set an automatic mapping when the user open the mapping panel.
      *
      * @param $array
+     *
      * @return mixed
      */
     public function setAliases($array)
     {
         $aliasList = [
             //Languages - Shops
-            ["deutsch", "german", "main store", "main", "mainstore", "hauptshop deutsch"],
-            ["englisch", "english", "default english"],
-            ["französisch", "french"],
+            ['deutsch', 'german', 'main store', 'main', 'mainstore', 'hauptshop deutsch'],
+            ['englisch', 'english', 'default english'],
+            ['französisch', 'french'],
             //Payments
-            ["vorkasse", "vorauskasse", "prepayment", "in advance"],
+            ['vorkasse', 'vorauskasse', 'prepayment', 'in advance'],
             //order states
             [
-                "in bearbeitung(wartet)",
-                "in bearbeitung",
-                "wird bearbeitet",
-                "bearbeitung",
-                "in progress",
-                "in process",
-                "processing"
+                'in bearbeitung(wartet)',
+                'in bearbeitung',
+                'wird bearbeitet',
+                'bearbeitung',
+                'in progress',
+                'in process',
+                'processing',
             ],
-            ["offen", "open", "opened"],
-            ["komplett abgeschlossen", "abgeschlossen", "completed", "fully completed", "finish", "finished"],
-            ["teilweise abgeschlossen", "partially completed", "partially finished"],
-            ["storniert / abgelehnt", "storniert", "abgelehnt", "canceled", "declined", "rejected", "denied"],
-            ["zur lieferung bereit", "lieferbereit", "ready for delivery", "ready for deliver", "ready to ship"],
+            ['offen', 'open', 'opened'],
+            ['komplett abgeschlossen', 'abgeschlossen', 'completed', 'fully completed', 'finish', 'finished'],
+            ['teilweise abgeschlossen', 'partially completed', 'partially finished'],
+            ['storniert / abgelehnt', 'storniert', 'abgelehnt', 'canceled', 'declined', 'rejected', 'denied'],
+            ['zur lieferung bereit', 'lieferbereit', 'ready for delivery', 'ready for deliver', 'ready to ship'],
             [
-                "klärung notwendig",
-                "klärung",
-                "mehr informationen notwendig",
-                "clarification needed",
-                "declaration needed",
-                "more information needed"
+                'klärung notwendig',
+                'klärung',
+                'mehr informationen notwendig',
+                'clarification needed',
+                'declaration needed',
+                'more information needed',
             ],
-            ["abgebrochen", "canceled", "aborted"],
+            ['abgebrochen', 'canceled', 'aborted'],
             //taxes
-            ["Standardsatz", "standard tax rate", "19%", "19 %"],
-            ["ermäßigter Steuersatz", "reduced tax rate", "7%", "7 %"]
+            ['Standardsatz', 'standard tax rate', '19%', '19 %'],
+            ['ermäßigter Steuersatz', 'reduced tax rate', '7%', '7 %'],
         ];
 
         foreach ($array as &$element) {
@@ -349,37 +350,38 @@ class Mapping
      *
      * @param $sourceArray
      * @param $targetArray
+     *
      * @return mixed
      */
     private function mapArrays($sourceArray, $targetArray)
     {
         foreach ($sourceArray as &$source) {
-            $source = ["value" => $source, "mapping" => '', "mapping_value" => ''];
+            $source = ['value' => $source, 'mapping' => '', 'mapping_value' => ''];
             foreach ($targetArray as $key => $target) {
                 if (is_array($target)) {
                     foreach ($target as $alias) {
-                        if (strtolower($source["value"]) == strtolower($alias)
-                            || (strtolower(substr($source["value"], 0, 6)) == strtolower(substr($alias, 0, 6)))
+                        if (strtolower($source['value']) == strtolower($alias)
+                            || (strtolower(substr($source['value'], 0, 6)) == strtolower(substr($alias, 0, 6)))
                         ) {
-                            $source["mapping"] = $target[0];
-                            $source["mapping_value"] = $key;
+                            $source['mapping'] = $target[0];
+                            $source['mapping_value'] = $key;
                             break;
                         }
                     }
                 } else {
-                    if (strtolower($source["value"]) == strtolower($target)
-                        || (strtolower(substr($source["value"], 0, 6)) == strtolower(substr($target, 0, 6)))
+                    if (strtolower($source['value']) == strtolower($target)
+                        || (strtolower(substr($source['value'], 0, 6)) == strtolower(substr($target, 0, 6)))
                     ) {
-                        $source["mapping"] = $target;
-                        $source["mapping_value"] = $key;
+                        $source['mapping'] = $target;
+                        $source['mapping_value'] = $key;
                         break;
                     }
                 }
             }
 
             if ($source['mapping'] === '' && $source['mapping_value'] === '') {
-                $source["mapping"] = $this->namespace->get('pleaseSelect', 'Please select');
-                $source["mapping_value"] = $this->namespace->get('pleaseSelect', 'Please select');
+                $source['mapping'] = $this->namespace->get('pleaseSelect', 'Please select');
+                $source['mapping_value'] = $this->namespace->get('pleaseSelect', 'Please select');
             }
         }
 
@@ -390,19 +392,20 @@ class Mapping
      * This function returns an refactored unserialized array.
      *
      * @param $array
+     *
      * @return array
      */
     private function refactorSerializedArray($array)
     {
-        $refactoredArray = array();
+        $refactoredArray = [];
         foreach ($array as $value) {
-            $refactoredArray[] = array(
-                "value" => $value["name"],
-                "mapping" => "Bitte wählen",
-                "mapping_value" => "Bitte wählen"
-            );
+            $refactoredArray[] = [
+                'value' => $value['name'],
+                'mapping' => 'Bitte wählen',
+                'mapping_value' => 'Bitte wählen',
+            ];
         }
-        return $refactoredArray;
 
+        return $refactoredArray;
     }
 }

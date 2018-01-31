@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
 use Shopware\SwagMigration\Components\Migration\Profile;
-use Exception;
 
 class Woocommerce extends Profile
 {
@@ -24,11 +23,11 @@ class Woocommerce extends Profile
      * Returns a select for a rough estimation for the total number of entities
      *
      * @param $for
+     *
      * @return string
      */
     public function getEstimationSelect($for)
     {
-
     }
 
     /**
@@ -281,6 +280,7 @@ class Woocommerce extends Profile
 
     /**
      * @param $productId
+     *
      * @return string
      */
     public function getArticleNumberSelect($productId)
@@ -301,6 +301,7 @@ class Woocommerce extends Profile
      * Returns the SUM of all order item totals to get the invoice_amount
      *
      * @param $orderId
+     *
      * @return string
      */
     public function getOrderAmounts($orderId)
@@ -507,7 +508,7 @@ class Woocommerce extends Profile
             'complete' => 'Completed',
             'canceled' => 'Canceled',
             'refunded' => 'Refunded',
-            'failed' => 'Failed'
+            'failed' => 'Failed',
         ];
     }
 }

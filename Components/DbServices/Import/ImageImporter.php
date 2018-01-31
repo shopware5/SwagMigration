@@ -11,10 +11,10 @@ namespace Shopware\SwagMigration\Components\DbServices\Import;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 use Shopware\Components\Logger;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Media\Media;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Image;
 use Shopware\Models\Article\Repository as ArticleRepository;
+use Shopware\Models\Media\Media;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ImageImporter
@@ -35,8 +35,8 @@ class ImageImporter
      * ImageImporter constructor.
      *
      * @param PDOConnection $db
-     * @param ModelManager $em
-     * @param Logger $logger
+     * @param ModelManager  $em
+     * @param Logger        $logger
      */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
@@ -46,19 +46,8 @@ class ImageImporter
     }
 
     /**
-     * @return ArticleRepository
-     */
-    private function getArticleRepository()
-    {
-        if ($this->articleRepository === null) {
-            $this->articleRepository = $this->em->getRepository('Shopware\Models\Article\Article');
-        }
-
-        return $this->articleRepository;
-    }
-
-    /**
      * @param array $image
+     *
      * @return int
      */
     public function importArticleImage(array $image)
@@ -128,7 +117,20 @@ class ImageImporter
     }
 
     /**
+     * @return ArticleRepository
+     */
+    private function getArticleRepository()
+    {
+        if ($this->articleRepository === null) {
+            $this->articleRepository = $this->em->getRepository('Shopware\Models\Article\Article');
+        }
+
+        return $this->articleRepository;
+    }
+
+    /**
      * @param array $image
+     *
      * @return array
      */
     private function prepareImageData(array $image)
@@ -155,7 +157,8 @@ class ImageImporter
 
     /**
      * @param int|string $main
-     * @param int $articleId
+     * @param int        $articleId
+     *
      * @return int
      */
     private function setMain($main, $articleId)
@@ -186,15 +189,17 @@ class ImageImporter
     /**
      * @param string $image
      * @param string $name
+     *
      * @return bool|string
      */
     private function copyImage($image, $name)
     {
-        $uploadDir = Shopware()->DocPath('media_' . 'temp');
-        $ext = "";
+        $uploadDir = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'media/temp';
+
+        $ext = '';
         if (!empty($image)) {
             foreach (['.png', '.gif', '.jpg'] as $extension) {
-                if(stristr($image, $extension) !== FALSE) {
+                if (stristr($image, $extension) !== false) {
                     $ext = $extension;
                     break;
                 }

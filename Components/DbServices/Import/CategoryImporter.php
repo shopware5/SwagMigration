@@ -32,8 +32,8 @@ class CategoryImporter
      * CategoryImporter constructor.
      *
      * @param PDOConnection $db
-     * @param ModelManager $em
-     * @param Logger $logger
+     * @param ModelManager  $em
+     * @param Logger        $logger
      */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
@@ -45,6 +45,7 @@ class CategoryImporter
 
     /**
      * @param array $category
+     *
      * @return bool|int
      */
     public function import(array $category)
@@ -85,7 +86,7 @@ class CategoryImporter
         $categoryId = $model->getId();
         if (!empty($attributes)) {
             $attributeID = $this->db->fetchOne(
-                "SELECT id FROM s_categories_attributes WHERE categoryID = ?",
+                'SELECT id FROM s_categories_attributes WHERE categoryID = ?',
                 [$categoryId]
             );
             if ($attributeID === false) {
@@ -101,49 +102,6 @@ class CategoryImporter
         }
 
         return $categoryId;
-    }
-
-    /**
-     * @param array $category
-     * @return array
-     */
-    private function prepareCategoryData(array $category)
-    {
-        // In order to be compatible with the old API syntax but to also be able to use ->fromArray(),
-        // we map from the old keys to doctrine keys
-        $mappings = [
-            'description' => 'name',
-            'cmsheadline' => 'cmsHeadline',
-            'metakeywords' => 'metaKeywords',
-            'metadescription' => 'metaDescription'
-        ];
-
-        foreach ($mappings as $original => $new) {
-            if (isset($category[$original])) {
-                $category[$new] = $category[$original];
-                unset($category[$original]);
-            }
-        }
-
-        return $category;
-    }
-
-    /**
-     * @param array $category
-     * @return array
-     */
-    private function prepareCategoryAttributesData(array $category)
-    {
-        $attributes = [];
-        for ($i = 1; $i <= 6; $i++) {
-            if (isset($category['ac_attr' . $i])) {
-                $attributes['attribute' . $i] = (string) $category['ac_attr' . $i];
-            } elseif (isset($category['attr'][$i])) {
-                $attributes['attribute' . $i] = (string) $category['attr'][$i];
-            }
-        }
-
-        return $attributes;
     }
 
     /**
@@ -170,5 +128,50 @@ class CategoryImporter
         $categoryDenormalization = Shopware()->Container()->get('categorydenormalization');
         $categoryDenormalization->addAssignment($articleId, $categoryId);
         $categoryDenormalization->disableTransactions();
+    }
+
+    /**
+     * @param array $category
+     *
+     * @return array
+     */
+    private function prepareCategoryData(array $category)
+    {
+        // In order to be compatible with the old API syntax but to also be able to use ->fromArray(),
+        // we map from the old keys to doctrine keys
+        $mappings = [
+            'description' => 'name',
+            'cmsheadline' => 'cmsHeadline',
+            'metakeywords' => 'metaKeywords',
+            'metadescription' => 'metaDescription',
+        ];
+
+        foreach ($mappings as $original => $new) {
+            if (isset($category[$original])) {
+                $category[$new] = $category[$original];
+                unset($category[$original]);
+            }
+        }
+
+        return $category;
+    }
+
+    /**
+     * @param array $category
+     *
+     * @return array
+     */
+    private function prepareCategoryAttributesData(array $category)
+    {
+        $attributes = [];
+        for ($i = 1; $i <= 6; ++$i) {
+            if (isset($category['ac_attr' . $i])) {
+                $attributes['attribute' . $i] = (string) $category['ac_attr' . $i];
+            } elseif (isset($category['attr'][$i])) {
+                $attributes['attribute' . $i] = (string) $category['attr'][$i];
+            }
+        }
+
+        return $attributes;
     }
 }

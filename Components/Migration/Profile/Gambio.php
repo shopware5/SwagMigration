@@ -17,7 +17,7 @@ class Gambio extends XtCommerce
      */
     protected $db_prefix = '';
 
-    /**
+    /*
      *
      * Currently extends from XTC profile
      *

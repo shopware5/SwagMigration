@@ -27,6 +27,7 @@ class PriceImporter
 
     /**
      * @param array $price
+     *
      * @return bool|int
      */
     public function importArticlePrice(array $price)
@@ -74,13 +75,14 @@ class PriceImporter
         $created = $this->createPrice($price, $article);
         if (empty($created)) {
             return false;
-        } else {
-            return (int) $this->db->lastInsertId();
         }
+
+        return (int) $this->db->lastInsertId();
     }
 
     /**
      * @param array $price
+     *
      * @return array
      */
     private function preparePriceData(array $price)
@@ -111,6 +113,7 @@ class PriceImporter
 
     /**
      * @param array $price
+     *
      * @return bool|array
      */
     private function getArticleNumbers(array $price)
@@ -143,8 +146,8 @@ class PriceImporter
 
     /**
      * @param string $priceGroup
-     * @param int $from
-     * @param int $detailId
+     * @param int    $from
+     * @param int    $detailId
      */
     private function deleteOldPrices($priceGroup, $from, $detailId)
     {
@@ -157,9 +160,10 @@ class PriceImporter
 
     /**
      * @param string $priceGroup
-     * @param float $percent
-     * @param int $articleId
-     * @param int $detailId
+     * @param float  $percent
+     * @param int    $articleId
+     * @param int    $detailId
+     *
      * @return bool|float
      */
     private function getPrice($priceGroup, $percent, $articleId, $detailId)
@@ -176,14 +180,15 @@ class PriceImporter
             return false;
         }
 
-        return ($price * (100 - $percent) / 100);
+        return $price * (100 - $percent) / 100;
     }
 
     /**
-     * @param int $from
+     * @param int    $from
      * @param string $priceGroup
-     * @param int $articleId
-     * @param int $detailId
+     * @param int    $articleId
+     * @param int    $detailId
+     *
      * @return bool
      */
     private function setTo($from, $priceGroup, $articleId, $detailId)
@@ -207,6 +212,7 @@ class PriceImporter
     /**
      * @param array $price
      * @param array $article
+     *
      * @return bool
      */
     private function createPrice(array $price, array $article)
@@ -241,10 +247,11 @@ class PriceImporter
      * Replace comma with point for decimal delimiter
      *
      * @param string $value
+     *
      * @return float
      */
     private function toFloat($value)
     {
-        return floatval(str_replace(",", ".", $value));
+        return floatval(str_replace(',', '.', $value));
     }
 }

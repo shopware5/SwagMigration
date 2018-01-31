@@ -6,31 +6,28 @@
  * file that was distributed with this source code.
  */
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\DBAL\Connection;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
-use Shopware\SwagMigration\Commands\MigrateCommand;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Md5Reversed;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Sha512;
 use Shopware\SwagMigration\Subscriber\Resources;
-use Doctrine\DBAL\Connection;
-use Shopware\Components\Model\ModelManager;
 
 /**
  * Shopware SwagMigration Plugin - Bootstrap
  *
  * @category  Shopware
- * @package   Shopware\Plugins\SwagMigration
+ *
  * @copyright Copyright (c), shopware AG (http://www.shopware.com)
  */
 class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
     /**
-     * @var PDOConnection $db
+     * @var PDOConnection
      */
     private $db;
 
     /**
-     * @var Connection $connection
+     * @var Connection
      */
     private $connection;
 
@@ -42,7 +39,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        $this->checkVersion('5.2.0');
+        $this->checkVersion('5.4.0');
         $this->subscribeEvents();
 
         $parent = $this->Menu()->findOneBy(['label' => 'Inhalte']);
@@ -54,7 +51,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
                 'parent' => $parent,
                 'position' => 0,
                 'controller' => 'SwagMigration',
-                'action' => 'Index'
+                'action' => 'Index',
             ]
         );
 
@@ -96,6 +93,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
     /**
      * @param string $version
+     *
      * @throws Exception
      */
     public function checkVersion($version)
@@ -109,11 +107,12 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      * Update the plugin to the current version
      *
      * @param string $version
+     *
      * @return array
      */
     public function update($version)
     {
-        $this->checkVersion('5.2.0');
+        $this->checkVersion('5.4.0');
         $this->subscribeEvents();
 
         // Create form
@@ -186,7 +185,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             * Dabei werden zu lange Produkt-Nummern abgeschnitten. Dies kann zu 'Duplicate Key'-Fehlern führen<br>
             * Artikel mit ungültigen Nummern werden Sie später nur ändern und speichern können, wenn Sie dabei die Nummer anpassen<br>
         ";
-        $sql = "UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?";
+        $sql = 'UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?';
         $this->db->query($sql, [$newSnippet, 'numberNotValid', $oldSnippet]);
 
         return true;
@@ -263,26 +262,18 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
                 'debugMigration' => [
                     'label' => 'Debug output',
                     'description' => 'Should a debug output be written? Attention! Could reduce the import speed.',
-                ]
-            ]
+                ],
+            ],
         ];
 
         $this->addFormTranslations($translation);
     }
 
     /**
-     * Convenience function to register template and snippet dirs
-     */
-    protected function registerMyTemplateDir()
-    {
-        $this->get('snippets')->addConfigDir($this->Path() . 'Snippets/');
-        $this->get('template')->addTemplateDir($this->Path() . 'Views/');
-    }
-
-    /**
      * Callback function to register our password encoders
      *
      * @param Enlight_Event_EventArgs $args
+     *
      * @return array
      */
     public function onAddPasswordEncoder(\Enlight_Event_EventArgs $args)
@@ -352,8 +343,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     /**
      * Returns the version of the plugin as a string
      *
-     * @return string
      * @throws Exception
+     *
+     * @return string
      */
     public function getVersion()
     {
@@ -361,9 +353,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 
         if ($info) {
             return $info['currentVersion'];
-        } else {
-            throw new Exception('The plugin has an invalid version file.');
         }
+        throw new Exception('The plugin has an invalid version file.');
     }
 
     /**
@@ -375,5 +366,14 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     public function getLabel()
     {
         return 'Shopware Migration';
+    }
+
+    /**
+     * Convenience function to register template and snippet dirs
+     */
+    protected function registerMyTemplateDir()
+    {
+        $this->get('snippets')->addConfigDir($this->Path() . 'Snippets/');
+        $this->get('template')->addTemplateDir($this->Path() . 'Views/');
     }
 }

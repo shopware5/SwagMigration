@@ -14,38 +14,38 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 class Variant extends AbstractResource
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDefaultErrorMessage()
     {
         return $this->getNameSpace()->get(
             'errorGeneratingVariantsFromAttributes',
-            "An error occurred while generating configurator variants"
+            'An error occurred while generating configurator variants'
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
         return sprintf(
-            $this->getNameSpace()->get('variantsArticleProgress', "Generating variants for product %s out of %s"),
+            $this->getNameSpace()->get('variantsArticleProgress', 'Generating variants for product %s out of %s'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
         );
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function getDoneMessage()
     {
-        return $this->getNameSpace()->get('generatedVariants', "Variants successfully generated");
+        return $this->getNameSpace()->get('generatedVariants', 'Variants successfully generated');
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function run()
     {
@@ -65,11 +65,11 @@ class Variant extends AbstractResource
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
-        if ($call["profile"] != "WooCommerce") {
+        if ($call['profile'] != 'WooCommerce') {
             while ($product = $products_result->fetch()) {
                 $this->migrateVariant($product);
             }
-        } elseif ($call["profile"] == "WooCommerce") {
+        } elseif ($call['profile'] == 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedVariants = $normalizer->normalizeVariants($products_result->fetchAll());
 
@@ -81,41 +81,12 @@ class Variant extends AbstractResource
         echo $this->getProgress()->done();
     }
 
-    private function migrateVariant($product)
-    {
-        $id = $product['productID'];
-
-        // continue if product was not imported before
-        $productId = $this->getBaseArticleInfo($id);
-        if (false === $productId) {
-            return;
-        }
-
-        $groups = $this->getConfiguratorGroups($productId);
-
-        $params = [
-            'articleId' => $productId,
-            'groups' => $groups
-
-        ];
-
-        $this->increaseProgress();
-
-        // Return the groups
-        // The ExtJS frontend will care of the generation by triggering
-        // the default article controller
-
-        $this->getProgress()->addRequestParam('params', $params);
-        $this->getProgress()->addRequestParam('create_variants', true);
-
-        return $this->getProgress();
-    }
-
     /**
      * Helper function which gets the configurator groups for
      * a given product
      *
      * @param $productId
+     *
      * @return array
      */
     public function getConfiguratorGroups($productId)
@@ -138,7 +109,7 @@ class Variant extends AbstractResource
         // this relation seems not to be available in the configurator models
         // (the configuratorSet-Model returns all group's options, even those
         // not related to the given set)
-        $sql = "SELECT options.group_id, TRUE AS active, options.id FROM `s_article_configurator_sets` sets
+        $sql = 'SELECT options.group_id, TRUE AS active, options.id FROM `s_article_configurator_sets` sets
 
 	     LEFT JOIN s_article_configurator_set_option_relations relations
 	     ON relations.set_id = sets.id
@@ -146,7 +117,7 @@ class Variant extends AbstractResource
 	     LEFT JOIN s_article_configurator_options options
 	     ON options.id = relations.option_id
 
-	     WHERE sets.id = ?";
+	     WHERE sets.id = ?';
         $results = Shopware()->Db()->fetchAll($sql, [$configuratorArray['id']]);
 
         // Sort the options by group
@@ -169,5 +140,34 @@ class Variant extends AbstractResource
         }
 
         return $groups;
+    }
+
+    private function migrateVariant($product)
+    {
+        $id = $product['productID'];
+
+        // continue if product was not imported before
+        $productId = $this->getBaseArticleInfo($id);
+        if (false === $productId) {
+            return;
+        }
+
+        $groups = $this->getConfiguratorGroups($productId);
+
+        $params = [
+            'articleId' => $productId,
+            'groups' => $groups,
+        ];
+
+        $this->increaseProgress();
+
+        // Return the groups
+        // The ExtJS frontend will care of the generation by triggering
+        // the default article controller
+
+        $this->getProgress()->addRequestParam('params', $params);
+        $this->getProgress()->addRequestParam('create_variants', true);
+
+        return $this->getProgress();
     }
 }

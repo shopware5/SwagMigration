@@ -97,7 +97,7 @@ class Veyton extends XtCommerce
      */
     public function getAttributedProductsSelect()
     {
-        return "SELECT 0;";
+        return 'SELECT 0;';
     }
 
     /**
@@ -105,15 +105,16 @@ class Veyton extends XtCommerce
      */
     public function getPropertyOptionSelect()
     {
-        return "
+        return '
    			SELECT 0;
-   		";
+   		';
     }
 
     /**
      * Returns a sql statement which selects additional info for a given productID
      *
      * @param $productId int The product to query
+     *
      * @return string
      */
     public function getAdditionalProductSelect($productId)
@@ -253,7 +254,7 @@ class Veyton extends XtCommerce
 						`discount_quantity` as `from`,
 						`price`,
 						'$price_group' as pricegroup
-					FROM {$this->quoteTable('products_price_group_'.$price_group)}
+					FROM {$this->quoteTable('products_price_group_' . $price_group)}
 					ORDER BY productID, `from`
 				)
 				";
