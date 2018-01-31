@@ -8,8 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
-use Shopware\SwagMigration\Components\Migration\Profile;
 use Exception;
+use Shopware\SwagMigration\Components\Migration\Profile;
 
 class XtCommerce extends Profile
 {
@@ -147,6 +147,7 @@ class XtCommerce extends Profile
      * Returns the sql statement to select articles with
      *
      * @param $id
+     *
      * @return string
      */
     public function getProductPropertiesSelect($id)
@@ -204,6 +205,7 @@ class XtCommerce extends Profile
      * Select attributes for a given article
      *
      * @param $id
+     *
      * @return string
      */
     public function getProductAttributesSelect($id)
@@ -310,7 +312,7 @@ class XtCommerce extends Profile
 						`quantity` as `from`,
 						`personal_offer` as `price`,
 						'$price_group' as pricegroup
-					FROM {$this->quoteTable('personal_offers_by_customers_status_'.$price_group)}
+					FROM {$this->quoteTable('personal_offers_by_customers_status_' . $price_group)}
 					WHERE `personal_offer`!=0
 					ORDER BY productID, `from`
 				";
@@ -378,6 +380,7 @@ class XtCommerce extends Profile
      * This function creates an database index on the orders table
      *
      * @param int $offset
+     *
      * @return \Zend_Db_Statement_Interface
      */
     public function queryCustomers($offset = 0)

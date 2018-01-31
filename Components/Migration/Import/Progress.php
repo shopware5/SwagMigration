@@ -79,23 +79,21 @@ class Progress extends Enlight_Class
             'offset' => $this->getOffset(),
             'progress' => $progress,
             'estimated' => $this->getEstimation(),
-            'task_start_time' => $this->getStartTime()
+            'task_start_time' => $this->getStartTime(),
         ];
-
 
         foreach ($this->getRequestParams() as $key => $value) {
             $output[$key] = $value;
         }
 
         echo Zend_Json::encode($output);
-
-        return;
     }
 
     /**
      * Abort the progress with an error
      *
      * @param $message
+     *
      * @return $this
      */
     public function error($message)
@@ -220,8 +218,6 @@ class Progress extends Enlight_Class
 
     /**
      * Get progress
-     *
-     * @return null
      */
     public function getProgress()
     {
@@ -303,6 +299,7 @@ class Progress extends Enlight_Class
      *
      * @param $key
      * @param $value
+     *
      * @return $this
      */
     public function addRequestParam($key, $value)

@@ -68,8 +68,8 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * Constructor
      *
      * @param Progress $progress
-     * @param Profile $source
-     * @param Profile $target
+     * @param Profile  $source
+     * @param Profile  $target
      * @param $request
      */
     public function __construct($progress, $source, $target, $request)
@@ -256,6 +256,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      *
      * @param $number int The invalid ordernumber to fix
      * @param $id int Id of the article
+     *
      * @return string
      */
     public function makeInvalidNumberValid($number, $id)
@@ -276,7 +277,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         );
 
         // Increase - save
-        $sql = "UPDATE s_order_number SET number = ? WHERE name = ?";
+        $sql = 'UPDATE s_order_number SET number = ? WHERE name = ?';
         Shopware()->Db()->query($sql, [++$number, 'articleordernumber']);
 
         // Save mapping
@@ -285,7 +286,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
             [
                 'typeID' => Migration::MAPPING_VALID_NUMBER,
                 'sourceID' => $id,
-                'targetID' => $number
+                'targetID' => $number,
             ]
         );
 
@@ -296,6 +297,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * Returns a SW-productID for a given source-productId
      *
      * @param $productId
+     *
      * @return string
      */
     public function getBaseArticleInfo($productId)
@@ -315,7 +317,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
             [
                 $productId,
                 Migration::MAPPING_ARTICLE,
-                Migration::MAPPING_VALID_NUMBER
+                Migration::MAPPING_VALID_NUMBER,
             ]
         );
     }

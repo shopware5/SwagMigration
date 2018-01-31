@@ -140,7 +140,7 @@ class Prestashop14 extends Profile
      */
     public function getAttributedProductsSelect()
     {
-        return "
+        return '
             SELECT
             DISTINCT p.id_product AS productID
 
@@ -150,13 +150,14 @@ class Prestashop14 extends Profile
             ON p.id_product =a.id_product
 
             WHERE a.id_product IS NOT NULL
-        ";
+        ';
     }
 
     /**
      * Select attributes for a given article
      *
      * @param $id
+     *
      * @return string
      */
     public function getProductAttributesSelect($id)

@@ -301,11 +301,6 @@ class Order extends AbstractResource
             'countryID' => !empty($order['shipping_lastname']) && !empty($order['shipping_countryID']) ? $order['shipping_countryID'] : $data_billing['countryID'],
         ];
 
-        if (version_compare(Shopware::VERSION, '5.0', '=<')) {
-            $data_billing['streetnumber'] = !empty($order['billing_streetnumber']) ? $order['billing_streetnumber'] : '';
-            $data_shipping['streetnumber'] = !empty($order['shipping_lastname']) && !empty($order['shipping_streetnumber']) ? $order['shipping_streetnumber'] : $data_billing['streetnumber'];
-        }
-
         foreach ($data_billing as $key => $attribute) {
             if ($attribute === null) {
                 $data_billing[$key] = '';

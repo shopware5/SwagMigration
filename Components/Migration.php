@@ -43,8 +43,10 @@ class Migration extends \Enlight_Class
      * For the generation of the profile is a factory used, because of the profile type is not known until runtime.
      *
      * @static
+     *
      * @param $profile
      * @param array $config
+     *
      * @return \Enlight_Class
      */
     public static function profileFactory($profile, $config = [])
@@ -59,7 +61,6 @@ class Migration extends \Enlight_Class
         return $migrationAdapter;
     }
 
-
     /**
      * Generates an instances of an import resource
      *
@@ -68,6 +69,7 @@ class Migration extends \Enlight_Class
      * @param Profile $source
      * @param Profile $target
      * @param $request
+     *
      * @return AbstractResource
      */
     public static function resourceFactory($name, $progress, $source, $target, $request)
@@ -80,7 +82,7 @@ class Migration extends \Enlight_Class
                 $progress,
                 $source,
                 $target,
-                $request
+                $request,
             ]
         );
 

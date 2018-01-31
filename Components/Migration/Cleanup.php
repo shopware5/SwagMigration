@@ -8,26 +8,40 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
-use Shopware\SwagMigration\Components\Migration;
 use Exception;
 use Shopware\SwagMigration\Components\DbServices\DeleteService;
+use Shopware\SwagMigration\Components\Migration;
+use Shopware_Components_Config;
 
 /**
  * Helper to clean up the target shop
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components\Migration
+ *
  * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Cleanup
 {
+    /**
+     * @var string
+     */
+    private $shopBasePath;
+
+    /**
+     * @var Shopware_Components_Config
+     */
+    private $shopConfig;
+
     /**
      * Constructor: Disable foreign key checks
      */
     public function __construct()
     {
         // Disable foreign key checks
-        Shopware()->Db()->exec("SET foreign_key_checks = 0;");
+        Shopware()->Db()->exec('SET foreign_key_checks = 0;');
+
+        $this->shopBasePath = Shopware()->Container()->getParameter('shopware.app.rootdir');
+        $this->shopConfig = Shopware()->Container()->get('config');
     }
 
     /**
@@ -53,7 +67,7 @@ class Cleanup
                     $this->removeMigrationMappingsByType(Migration::MAPPING_ORDER);
                     break;
                 case 'clear_votes':
-                    Shopware()->Db()->exec("TRUNCATE s_articles_vote;");
+                    Shopware()->Db()->exec('TRUNCATE s_articles_vote;');
                     break;
                 case 'clear_articles':
                     $this->sDeleteAllArticles();
@@ -136,7 +150,7 @@ class Cleanup
      */
     public function sDeleteAllArticles()
     {
-        $sql = "
+        $sql = '
             SET foreign_key_checks = 0;
 			TRUNCATE s_articles;
 			TRUNCATE s_filter_articles;
@@ -173,7 +187,7 @@ class Cleanup
 			TRUNCATE s_article_configurator_templates;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_article_img_mappings;
-        ";
+        ';
 
         Shopware()->Db()->query($sql);
 
@@ -200,7 +214,7 @@ class Cleanup
      */
     public function sDeleteAllOrders()
     {
-        $sql = "
+        $sql = '
             SET foreign_key_checks = 0;
             TRUNCATE s_order;
             TRUNCATE s_order_attributes;
@@ -218,7 +232,7 @@ class Cleanup
             TRUNCATE s_order_esd;
             TRUNCATE s_order_history;
             TRUNCATE s_order_notes;
-        ";
+        ';
 
         Shopware()->Db()->query($sql);
     }
@@ -228,7 +242,7 @@ class Cleanup
      */
     public function sDeleteAllCustomers()
     {
-        $sql = "
+        $sql = '
             SET foreign_key_checks = 0;
             TRUNCATE s_user;
             TRUNCATE s_user_attributes;
@@ -239,7 +253,7 @@ class Cleanup
             TRUNCATE s_user_addresses;
             TRUNCATE s_user_addresses_attributes;
             TRUNCATE s_user_debit;
-	   ";
+	   ';
 
         Shopware()->Db()->query($sql);
     }
@@ -278,27 +292,32 @@ class Cleanup
 		';
         Shopware()->Db()->query($sql);
 
-        $this->clearFolder(Shopware()->DocPath('media/image'), 'image');
-        $this->clearFolder(Shopware()->DocPath('media/image/thumbnail'), 'image');
+        $imageDir = $this->shopBasePath . 'media/image';
+
+        $this->clearFolder($imageDir, 'image');
+        $this->clearFolder($imageDir . '/thumbnail', 'image');
     }
 
     private function sDeleteArticleDownloads()
     {
         // Truncate tables
-        Shopware()->Db()->query("TRUNCATE s_articles_downloads");
+        Shopware()->Db()->query('TRUNCATE s_articles_downloads');
+
+        $downloadsDir = $this->shopBasePath . 'files/downloads';
 
         // delete files
-        $this->clearFolder(Shopware()->DocPath('files/downloads'));
+        $this->clearFolder($downloadsDir);
     }
 
     private function sDeleteEsdArticleDownloads()
     {
         // Truncate tables
-        Shopware()->Db()->query("TRUNCATE s_articles_esd");
+        Shopware()->Db()->query('TRUNCATE s_articles_esd');
 
         // delete files
+        $filesDir = $this->shopBasePath . 'files';
         $this->clearFolder(
-            Shopware()->DocPath('files') . Shopware()->Config()->get('sESDKEY')
+            $filesDir . $this->shopConfig->get('sESDKEY')
         );
     }
 

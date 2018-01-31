@@ -132,7 +132,7 @@ class Magento extends Profile
             'pending' => 'Pending',
             'holded' => 'On Hold',
             'processing' => 'Processing',
-            'complete' => 'Complete'
+            'complete' => 'Complete',
         ];
     }
 
@@ -153,6 +153,7 @@ class Magento extends Profile
      * Returns the sql statement to select articles with
      *
      * @param id
+     *
      * @return string
      */
     public function getProductPropertiesSelect($id)
@@ -195,6 +196,7 @@ class Magento extends Profile
      * Returns the entity type id for a given type
      *
      * @param $type
+     *
      * @return string
      */
     public function getEntityTypeId($type)
@@ -262,6 +264,7 @@ class Magento extends Profile
      * Returns a sql statement which selects additional info for a given productID
      *
      * @param $productId
+     *
      * @return string
      */
     public function getAdditionalProductSelect($productId)
@@ -328,7 +331,7 @@ class Magento extends Profile
             'cost',
             'tax_class_id',
             'meta_keyword',
-            'special_price'
+            'special_price',
         ];
 
         $custom_select = '';
@@ -517,7 +520,7 @@ class Magento extends Profile
 				FROM
 					{$this->quoteTable('core_store')} s,
 					{$this->quoteTable('core_store_group')} g,
-					{$this->quoteTable('catalog_category_flat_store_'.$shopID)} c
+					{$this->quoteTable('catalog_category_flat_store_' . $shopID)} c
 				WHERE g.`group_id`=s.`group_id`
 				AND c.`path` LIKE CONCAT('1/', g.`root_category_id`, '/%')
 				AND s.`store_id`={$this->Db()->quote($shopID)}
@@ -569,7 +572,7 @@ class Magento extends Profile
             'password_hash',
             'taxvat',
             'default_billing',
-            'default_shipping'
+            'default_shipping',
         ];
         $addressAttributes = [
             //'firstname', 'middlename', 'lastname', 'company', 'region',
@@ -577,7 +580,7 @@ class Magento extends Profile
             'country_id',
             'postcode',
             'street',
-            'telephone'
+            'telephone',
         ];
 
         return "
@@ -736,9 +739,10 @@ class Magento extends Profile
      * Returns the sql statement to select the shop system article attribute fields
      *
      * @param string $type
-     * @param null $attributes
-     * @param null $store_id
-     * @param bool $full_select
+     * @param null   $attributes
+     * @param null   $store_id
+     * @param bool   $full_select
+     *
      * @return string
      */
     public function createTableSelect(
@@ -786,7 +790,7 @@ class Magento extends Profile
                     $select_fields[] = "{$type_quoted}.{$attribute}";
                 } else {
                     $join_fields .= "
-						LEFT JOIN {$this->quoteTable($type.'_entity_'.$attribute_fields[$attribute]['type'])} `$attribute`
+						LEFT JOIN {$this->quoteTable($type . '_entity_' . $attribute_fields[$attribute]['type'])} `$attribute`
 						ON	`{$attribute}`.attribute_id = {$attribute_fields[$attribute]['id']}
 						AND `{$attribute}`.entity_id = {$type_quoted}.entity_id
 					";
@@ -802,14 +806,13 @@ class Magento extends Profile
 
         if (!$full_select) {
             return $join_fields;
-        } else {
-            $select_fields = implode(', ', $select_fields);
+        }
+        $select_fields = implode(', ', $select_fields);
 
-            return "
+        return "
 				SELECT $select_fields
-				FROM {$this->quoteTable($type.'_entity')} $type
+				FROM {$this->quoteTable($type . '_entity')} $type
 				$join_fields
 			";
-        }
     }
 }

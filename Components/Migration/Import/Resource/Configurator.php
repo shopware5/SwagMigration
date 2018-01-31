@@ -171,13 +171,7 @@ class Configurator extends AbstractResource
             Shopware()->Db()->query($sql);
 
             if ($price) {
-                if (version_compare(Shopware::VERSION, '5.0', '>=') || Shopware::VERSION == '___VERSION___') {
-                    $sql = "INSERT INTO `s_article_configurator_price_variations` (`configurator_set_id`, `options`, `variation`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
-                } elseif (version_compare(Shopware::VERSION, '4.4', '>=')) {
-                    $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `options`, `surcharge`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
-                } else {
-                    $sql = "INSERT INTO `s_article_configurator_price_surcharges` (`configurator_set_id`, `parent_id`, `surcharge`) VALUES ({$configuratorSetId}, {$optionId}, {$price})";
-                }
+                $sql = "INSERT INTO `s_article_configurator_price_variations` (`configurator_set_id`, `options`, `variation`) VALUES ({$configuratorSetId}, CONCAT('|', {$optionId}, '|'), {$price})";
                 Shopware()->Db()->query($sql);
             }
         }

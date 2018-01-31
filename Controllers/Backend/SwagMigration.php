@@ -1,4 +1,11 @@
 <?php
+/**
+ * (c) shopware AG <info@shopware.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Cleanup;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
@@ -12,7 +19,6 @@ use Shopware\SwagMigration\Components\Migration\Profile;
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Backend_ExtJs
 {
     /**
@@ -21,22 +27,22 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * @var array
      */
     public $imports = [
-        'import_products'                     => 'Product',
-        'import_translations'                 => 'Translation',
-        'import_properties'                   => 'Property',
-        'import_categories'                   => 'Category',
-        'import_article_categories'           => 'Category',
-        'import_prices'                       => 'Price',
-        'import_generate_variants'            => 'Configurator',
+        'import_products' => 'Product',
+        'import_translations' => 'Translation',
+        'import_properties' => 'Property',
+        'import_categories' => 'Category',
+        'import_article_categories' => 'Category',
+        'import_prices' => 'Price',
+        'import_generate_variants' => 'Configurator',
         'import_create_configurator_variants' => 'Variant',
-        'import_images'                       => 'Image',
-        'import_customers'                    => 'Customer',
-        'import_ratings'                      => 'Rating',
-        'import_orders'                       => 'Order',
-        'import_order_details'                => 'Order',
-        'import_downloads'                    => 'Download',
-        'import_downloads_esd'                => 'DownloadESD',
-        'import_orders_esd'                   => 'DownloadESDOrder'
+        'import_images' => 'Image',
+        'import_customers' => 'Customer',
+        'import_ratings' => 'Rating',
+        'import_orders' => 'Order',
+        'import_order_details' => 'Order',
+        'import_downloads' => 'Download',
+        'import_downloads_esd' => 'DownloadESD',
+        'import_orders_esd' => 'DownloadESDOrder',
     ];
 
     /**
@@ -108,7 +114,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setMaxExecutionTime();
 
-        $this->View()->addTemplateDir(dirname(__FILE__) . "/../../Views/");
+        $this->View()->addTemplateDir(dirname(__FILE__) . '/../../Views/');
         parent::init();
     }
 
@@ -124,7 +130,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         // Setting the current shopware database as default will fail,
         // if the user wants to connect to a remote database. So the dbname
         // needs to be unset
-        $config['dbname'] = "";
+        $config['dbname'] = '';
 
         // Populate the config object by the request data
         $query = $this->Request()->getPost() + $this->Request()->getQuery();
@@ -214,8 +220,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      *
      * The default value is 10 seconds, if a higher value is configured, this will used (reduced by 10).
      * However: No value higher than 60 seconds is possible - we need *some* responsiveness
-     *
-     * @return void
      */
     public function setMaxExecutionTime()
     {
@@ -286,7 +290,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $rows[] = ['name' => $database];
             }
         } catch (\Exception $e) {
-            $msg = sprintf("An error occured: %s", $e->getMessage());
+            $msg = sprintf('An error occured: %s', $e->getMessage());
             echo Zend_Json::encode(['success' => false, 'message' => $msg]);
 
             return;
@@ -336,11 +340,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function checkFormAction()
     {
-       $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $this->setRenderer(false);
 
         try {
-            if ($call["profile"] == "WooCommerce") {
+            if ($call['profile'] == 'WooCommerce') {
                 $shops = $this->Source()->getNormalizedShops();
                 $languages = $this->Source()->getNormalizedLanguages();
             } else {
@@ -358,8 +362,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                             'success' => false,
                             'message' => $this->getNamespace()->get(
                                 'databaseProfileDoesNotMatch',
-                                "The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import."
-                            )
+                                'The selected profile does not match the selected database. Please make sure that the selected database is the database you want to import.'
+                            ),
                         ]
                     );
                     break;
@@ -381,38 +385,12 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         echo Zend_Json::encode(
             [
-                'message' => $this->getNamespace()->get('importFinished', "Import finished"),
+                'message' => $this->getNamespace()->get('importFinished', 'Import finished'),
                 'success' => true,
                 'progress' => 1,
-                'done' => true
+                'done' => true,
             ]
         );
-    }
-
-    /**
-     * Convenience method which prints a given error for the extjs app
-     *
-     * @param $e \Exception
-     * @param $errorDescription string A simple explanation of what happened
-     */
-    protected function printError($e, $errorDescription)
-    {
-        $error = [
-            'message' => $errorDescription,
-            'error' => $e->getMessage(),
-            'code' => $e->getCode(),
-            'file' => $e->getFile(),
-            'line' => $e->getLine(),
-            'trace' => $e->getTraceAsString(),
-            'success' => false,
-            'progress' => 1,
-            'done' => true
-        ];
-        if (!$this->Front()->Plugins()->Json()->getRenderer()) {
-            echo Zend_Json::encode($error);
-        } else {
-            $this->view->assign($error);
-        }
     }
 
     /**
@@ -421,6 +399,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * Will also inject the dependencies needed and return the created object
      *
      * @param $importType string The import resource to create
+     *
      * @return AbstractResource
      */
     public function initImport($importType)
@@ -490,8 +469,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
     /**
      * This function imports the different data types.
-     *
-     * @return void
      */
     public function importAction()
     {
@@ -513,10 +490,10 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         echo Zend_Json::encode(
             [
-                'message' => $this->getNamespace()->get('importedSelectedData', "Selected data successfully imported!"),
+                'message' => $this->getNamespace()->get('importedSelectedData', 'Selected data successfully imported!'),
                 'success' => true,
                 'progress' => 1,
-                'done' => true
+                'done' => true,
             ]
         );
     }
@@ -525,6 +502,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      * Helper method to print "currently importing" messages
      *
      * @param $type
+     *
      * @return bool
      */
     public function printCurrentImportMessage($type)
@@ -537,21 +515,47 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         if ($messageShown) {
             return false;
         }
-        $import = $this->getNamespace()->get("currentImport" . $type, $type);
+        $import = $this->getNamespace()->get('currentImport' . $type, $type);
 
         echo Zend_Json::encode(
             [
                 'message' => sprintf(
-                    $this->getNamespace()->get('currentlyImporting', "Current import step: %s"),
+                    $this->getNamespace()->get('currentlyImporting', 'Current import step: %s'),
                     $import
                 ),
                 'success' => true,
                 'offset' => 0,
                 'progress' => 0,
-                'messageShown' => 1
+                'messageShown' => 1,
             ]
         );
 
         return true;
+    }
+
+    /**
+     * Convenience method which prints a given error for the extjs app
+     *
+     * @param $e \Exception
+     * @param $errorDescription string A simple explanation of what happened
+     */
+    protected function printError($e, $errorDescription)
+    {
+        $error = [
+            'message' => $errorDescription,
+            'error' => $e->getMessage(),
+            'code' => $e->getCode(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString(),
+            'success' => false,
+            'progress' => 1,
+            'done' => true,
+        ];
+        if (!$this->Front()->Plugins()->Json()->getRenderer()) {
+            echo Zend_Json::encode($error);
+        } else {
+            $this->view->assign($error);
+        }
     }
 }

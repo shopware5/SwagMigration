@@ -9,10 +9,11 @@
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
 
-    "currentVersion": "2.5.1",
+    "currentVersion": "2.6.0",
 
     "changelog": {
         "de": {
+            "2.6.0": "Shopware 5.4 Kompatibilität",
             "2.5.1": "PT-7514 - Timeout erhöht; PT-7552 - Magento bis Version 1.9.3.4; PT-7512, PT-8269 - Shopware 5.3 und PHP7 Kompatibilität;",
             "2.5.0": "PT-5854, PT-6421, PT-6423 - Feature: Shopware 5.2 Kompatibilität;",
             "2.4.2": "PT-5920 - Bugfix: Artikelimport;",
@@ -26,6 +27,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
+            "2.6.0": "Shopware 5.4 compatibility",
             "2.5.1": "PT-7514 - Increase timeout; PT-7552 - Magento up to version 1.9.3.4; PT-7512, PT-8269 - Shopware 5.3 and PHP7 compatibility;",
             "2.5.0": "PT-5854, PT-6421, PT-6423 - Feature: Shopware 5.2 compatibility;",
             "2.4.2": "PT-5920 - Bugfix: Product import;",
@@ -41,7 +43,7 @@
     },
 
     "compatibility": {
-        "minimumVersion": "5.2.0",
+        "minimumVersion": "5.4.0",
         "maximumVersion": null,
         "blacklist": [
         ]

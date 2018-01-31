@@ -14,7 +14,7 @@ use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
  * Password interface for md5 hashed with salt first
  *
  * @category  Shopware
- * @package Shopware\Plugins\SwagMigration\Components
+ *
  * @copyright Copyright (c) 2015, shopware AG (http://www.shopware.de)
  */
 class Sha512 implements PasswordEncoderInterface
@@ -22,10 +22,10 @@ class Sha512 implements PasswordEncoderInterface
     /**
      * @var array
      */
-    protected $options = array(
+    protected $options = [
         'iterations' => 1000,
-        'salt_len' => 32
-    );
+        'salt_len' => 32,
+    ];
 
     /**
      * @return string
@@ -36,8 +36,9 @@ class Sha512 implements PasswordEncoderInterface
     }
 
     /**
-     * @param  string $password
-     * @param  string $hash
+     * @param string $password
+     * @param string $hash
+     *
      * @return bool
      */
     public function isPasswordValid($password, $hash)
@@ -48,39 +49,25 @@ class Sha512 implements PasswordEncoderInterface
 
         list($sha512, $salt) = explode(':', $hash);
 
-        return hash("sha512", $password . $salt) == $sha512;
+        return hash('sha512', $password . $salt) == $sha512;
     }
 
     /**
-     * @param  string $password
+     * @param string $password
+     *
      * @return string
      */
     public function encodePassword($password)
     {
         $iterations = $this->options['iterations'];
-        $salt       = $this->getSalt();
+        $salt = $this->getSalt();
 
         return $this->generateInternal($password, $salt, $iterations);
     }
 
     /**
-     * @param  string  $password
-     * @param  string  $salt
-     * @param  integer $iterations
-     * @return string
-     */
-    protected function generateInternal($password, $salt, $iterations)
-    {
-        $hash = '';
-        for ($i = 0; $i <= $iterations; $i++) {
-            $hash = hash('sha512', $hash . $password . $salt);
-        }
-
-        return $iterations . ':' . $salt . ':' . $hash;
-    }
-
-    /**
-     * @param  string $hash
+     * @param string $hash
+     *
      * @return bool
      */
     public function isReencodeNeeded($hash)
@@ -90,6 +77,7 @@ class Sha512 implements PasswordEncoderInterface
 
     /**
      * Generate a salt using the best number generator available
+     *
      * @return string
      */
     public function getSalt()
@@ -125,7 +113,7 @@ class Sha512 implements PasswordEncoderInterface
         }
         if (!$buffer_valid || strlen($buffer) < $raw_length) {
             $bl = strlen($buffer);
-            for ($i = 0; $i < $raw_length; $i++) {
+            for ($i = 0; $i < $raw_length; ++$i) {
                 if ($i < $bl) {
                     $buffer[$i] = $buffer[$i] ^ chr(mt_rand(0, 255));
                 } else {
@@ -136,5 +124,22 @@ class Sha512 implements PasswordEncoderInterface
         $salt = str_replace('+', '.', base64_encode($buffer));
 
         return substr($salt, 0, $required_salt_len);
+    }
+
+    /**
+     * @param string $password
+     * @param string $salt
+     * @param int    $iterations
+     *
+     * @return string
+     */
+    protected function generateInternal($password, $salt, $iterations)
+    {
+        $hash = '';
+        for ($i = 0; $i <= $iterations; ++$i) {
+            $hash = hash('sha512', $hash . $password . $salt);
+        }
+
+        return $iterations . ':' . $salt . ':' . $hash;
     }
 }
