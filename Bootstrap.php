@@ -60,7 +60,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
 			  `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			  `typeID` INT(11) UNSIGNED NOT NULL,
 			  `sourceID` VARCHAR(255) NOT NULL,
-			  `targetID` INT(11) UNSIGNED NOT NULL,
+			  `targetID` VARCHAR(255) NOT NULL,
 			  PRIMARY KEY (`id`),
 			  UNIQUE KEY `typeID` (`typeID`,`sourceID`)
 			) ENGINE=MyISAM  DEFAULT CHARSET=latin1;';
