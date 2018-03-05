@@ -9,7 +9,7 @@
  * Shopware Store - database store
  * Holds a list of database names
  */
-//{block name="backend/swag_migration/store/database"}
+// {block name="backend/swag_migration/store/database"}
 Ext.define('Shopware.apps.SwagMigration.store.Database', {
     /**
      * Extend for the standard ExtJS 4
@@ -47,12 +47,11 @@ Ext.define('Shopware.apps.SwagMigration.store.Database', {
             type: 'json',
             root: 'data',
             totalProperty: 'total'
-        },
+        }
 
 //        actionMethods: {
 //            read   : 'POST'
 //        }
     }
 });
-//{/block}
-
+// {/block}

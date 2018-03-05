@@ -9,7 +9,7 @@
  * Shopware Model - database model
  * Represents a database
  */
-//{block name="backend/swag_migration/model/database"}
+// {block name="backend/swag_migration/model/database"}
 Ext.define('Shopware.apps.SwagMigration.model.Database', {
     /**
      * Extends the standard Ext Model
@@ -22,10 +22,10 @@ Ext.define('Shopware.apps.SwagMigration.model.Database', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/database/fields"}{/block}
+        // {block name="backend/swag_migration/model/database/fields"}{/block}
         { name: 'id', type: 'int' },
         { name: 'name', type: 'string' }
     ]
 
 });
-//{/block}
+// {/block}

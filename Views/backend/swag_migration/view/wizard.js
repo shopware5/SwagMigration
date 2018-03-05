@@ -5,12 +5,12 @@
  * file that was distributed with this source code.
  */
 
-//{namespace name="backend/swag_migration/main"}
+// {namespace name="backend/swag_migration/main"}
 
 /**
  * Shopware UI - Main Wizard
  */
-//{block name="backend/swag_migration/view/wizard"}
+// {block name="backend/swag_migration/view/wizard"}
 Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.migration-wizard',
@@ -64,8 +64,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
         }, {
             internalId: 2,
             xtype: 'migration-form-import'
-        }]
-
+        }];
     },
 
     /**
@@ -78,7 +77,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
             text: '{s name=prevBtn}Back{/s}',
             cls: 'secondary',
             handler: function(btn) {
-                me.fireEvent('navigate', btn.up("panel"), "prev");
+                me.fireEvent('navigate', btn.up('panel'), 'prev');
             },
             disabled: true
         });
@@ -87,7 +86,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
             text: '{s name=nextBtn}Next{/s}',
             cls: 'primary',
             handler: function(btn) {
-                me.fireEvent('navigate', btn.up("panel"), "next");
+                me.fireEvent('navigate', btn.up('panel'), 'next');
             }
         });
 
@@ -95,9 +94,8 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
             me.buttonPrev,
             '->', // greedy spacer so that the buttons are aligned to each side
             me.buttonNext
-        ]
+        ];
     }
 
-
 });
-//{/block}
+// {/block}

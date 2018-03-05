@@ -8,20 +8,20 @@
 /**
  *
  */
-//{block name="backend/swag_migration/application"}
+// {block name="backend/swag_migration/application"}
 Ext.define('Shopware.apps.SwagMigration', {
 
     /**
      * The name of the module. Used for internal purpose
      * @string
      */
-    name:'Shopware.apps.SwagMigration',
+    name: 'Shopware.apps.SwagMigration',
 
     /**
      * Extends from our special controller, which handles the sub-application behavior and the event bus
      * @string
      */
-    extend:'Enlight.app.SubApplication',
+    extend: 'Enlight.app.SubApplication',
 
     /**
      * Enable bulk loading
@@ -51,7 +51,6 @@ Ext.define('Shopware.apps.SwagMigration', {
         'form.fieldsets.DatabaseSelection',
         'form.fieldsets.ProfileSelection'
     ],
-
 
     /**
      * Array of models to require from AppName.model namespace.
@@ -104,5 +103,4 @@ Ext.define('Shopware.apps.SwagMigration', {
         return mainController.mainWindow;
     }
 });
-//{/block}
-
+// {/block}

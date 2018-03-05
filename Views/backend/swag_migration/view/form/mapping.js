@@ -9,8 +9,8 @@
  * Shopware UI - Migration database form
  * Form for the database and import settings
  */
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/view/form/mapping"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/view/form/mapping"}
 Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
     /**
      * Define that the billing field set is an extension of the Ext.form.FieldSet
@@ -63,15 +63,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
     selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
 
     /**
-	 * The initComponent template method is an important initialization step for a Component.
+     * The initComponent template method is an important initialization step for a Component.
      * It is intended to be implemented by each subclass of Ext.Component to provide any needed constructor logic.
      * The initComponent method of the class being created is called first,
      * with each initComponent method up the hierarchy to Ext.Component being called thereafter.
      * This makes it easy to implement and, if needed, override the constructor logic of the Component at any step in the hierarchy.
      * The initComponent method must contain a call to callParent in order to ensure that the parent class' initComponent method is also called.
-	 *
-	 * @return void
-	 */
+     *
+     * @return void
+     */
     initComponent: function () {
         var me = this;
 
@@ -96,7 +96,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * Returns an array with the grids available in this view
      * @return Array
      */
-    createItems: function() {
+    createItems: function () {
         var me = this;
 
         me.leftGrid = me.createGrid(me.mappingStoreLeft);
@@ -112,7 +112,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * Create the grids for the mappings
      * @param gridStore Ext.data.Store
      */
-    createGrid: function(gridStore) {
+    createGrid: function (gridStore) {
         var me = this;
 
         return Ext.create('Ext.grid.Panel', {
@@ -123,7 +123,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                     clicksToEdit: 1
                 })
             ],
-            features: [ me.createGroupingFeature() ],
+            features: [me.createGroupingFeature()],
             columns: me.getGridColumns()
         });
     },
@@ -132,16 +132,16 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * create the grouping feature for the grid
      * @return Ext.grid.feature.GroupingSummary
      */
-    createGroupingFeature: function() {
+    createGroupingFeature: function () {
         var me = this;
 
         return Ext.create('Ext.grid.feature.GroupingSummary', {
             groupHeaderTpl: Ext.create('Ext.XTemplate',
                 '<span>{ name:this.formatHeader }</span>',
                 {
-                    formatHeader: function(field) {
-                        if(me.snippets.group[field]) {
-                            return Ext.String.format("[0]: [1]", me.snippets.group.group, me.snippets.group[field]);
+                    formatHeader: function (field) {
+                        if (me.snippets.group[field]) {
+                            return Ext.String.format('[0]: [1]', me.snippets.group.group, me.snippets.group[field]);
                         }
                         return field;
                     }
@@ -150,7 +150,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
         });
     },
 
-    getGridColumns: function() {
+    getGridColumns: function () {
         var me = this;
 
         return [
@@ -168,38 +168,37 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                     return record.data.mapping_name;
                 },
 
-                getEditor: function(record) {
-                    if (record && record.get('group') == 'configurator_mapping') {
+                getEditor: function (record) {
+                    if (record && record.get('group') === 'configurator_mapping') {
                         return me.getTextEditor();
                     }
 
                     return me.getDefaultEditor();
                 }
 
-
             }, {
                 dataIndex: 'validate',
                 header: '',
                 sortable: false,
                 flex: 1,
-                renderer: function(val, p, r){
-                    if(r.data.mapping_name && r.data.mapping_name != me.selectionNeeded) {
+                renderer: function (val, p, r) {
+                    if (r.data.mapping_name && r.data.mapping_name != me.selectionNeeded) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
-                                'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "{s name=mappedProperty}This property has been mapped{/s}");
-                    } else if(r.data.required) {
+                            'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
+                            '{s name=mappedProperty}This property has been mapped{/s}');
+                    } else if (r.data.required) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-minus-circle-frame" ' +
-                                'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "{s name=requiredProperty}Mapping of this property is required{/s}");
+                            'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
+                            '{s name=requiredProperty}Mapping of this property is required{/s}');
                     } else {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-exclamation--frame" ' +
-                                'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                                "{s name=missingProperty}Properties not being mapped will be skipped during the migration{/s}");
+                            'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
+                            '{s name=missingProperty}Properties not being mapped will be skipped during the migration{/s}');
                     }
                 }
             }, {
                 dataIndex: 'group',
-                header: "Gruppe",
+                header: 'Gruppe',
                 flex: 1,
                 sortable: false,
                 hidden: true
@@ -211,21 +210,21 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * Helper function to check if all required mappings have been set
      * @return  Boolean
      */
-    areAllRequiredItemsMapped: function() {
+    areAllRequiredItemsMapped: function () {
         var me = this,
             allMapped = true;
 
-        this.mappingStoreLeft.each(function(record){
-            if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
+        this.mappingStoreLeft.each(function (record) {
+            if (record.data.required) {
+                if (record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
         }, this);
 
-        this.mappingStoreRight.each(function(record){
-            if(record.data.required) {
-                if(record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
+        this.mappingStoreRight.each(function (record) {
+            if (record.data.required) {
+                if (record.data.mapping_name == '' || record.data.mapping_name == me.selectionNeeded || record.data.mapping == '') {
                     allMapped = false;
                 }
             }
@@ -234,22 +233,21 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
         return allMapped;
     },
 
-
     /**
      * Helper function that will return a unified store for the left and the right grid.
      * @return Ext.data.Store
      */
-    getGridStore: function() {
+    getGridStore: function () {
         var me = this,
             totalStore = Ext.create('Ext.data.Store', {
-            model: 'Shopware.apps.SwagMigration.model.Mapping'
-        });
+                model: 'Shopware.apps.SwagMigration.model.Mapping'
+            });
 
         totalStore.removeAll();
-        me.mappingStoreLeft.each(function(record){
+        me.mappingStoreLeft.each(function (record) {
             totalStore.add(record);
         }, this);
-        me.mappingStoreRight.each(function(record){
+        me.mappingStoreRight.each(function (record) {
             totalStore.add(record);
         }, this);
 
@@ -261,12 +259,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
      * a option in any case, this method was implemented
      * @return Boolean
      */
-    validate: function() {
+    validate: function () {
         return this.areAllRequiredItemsMapped();
     },
 
-
-    getDefaultEditor: function() {
+    getDefaultEditor: function () {
         var me = this;
         return {
             xtype: 'combo',
@@ -289,26 +286,34 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
 
             }),
             listeners: {
-                'select': { fn:function(combo, records, index) {
-                    var record = records[0];
-                    combo.ownerCt.editingPlugin.context.record.set('mapping_name', record.data.name);
-                    combo.ownerCt.editingPlugin.completeEdit();
-                    me.fireEvent('validate');
+                'select': {
+                    fn: function (combo, records) {
+                        var record = records[0];
+                        combo.ownerCt.editingPlugin.context.record.set('mapping_name', record.data.name);
+                        combo.ownerCt.editingPlugin.completeEdit();
+                        me.fireEvent('validate');
 //                  var disableButton = !this.areAllRequiredItemsMapped();
 //                  this.buttons[1].setDisabled(disableButton);
-
-                }, scope: this },
-                'beforequery': { fn: function (e) {
-                    me.fireEvent('beforequery', e, me);
-                }, scope: this },
-                'beforeexpand': { fn: function () {
-                    return true;
-                }, scope: this }
+                    },
+                    scope: this
+                },
+                'beforequery': {
+                    fn: function (e) {
+                        me.fireEvent('beforequery', e, me);
+                    },
+                    scope: this
+                },
+                'beforeexpand': {
+                    fn: function () {
+                        return true;
+                    },
+                    scope: this
+                }
             }
         };
     },
 
-    getTextEditor: function() {
+    getTextEditor: function () {
         var me = this;
 
         return {
@@ -316,14 +321,14 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
             allowBlank: true,
             editable: true,
             listeners: {
-                focus: function(component, evO, eOpts) {
+                focus: function () {
                     var record = this.ownerCt.editingPlugin.context.record;
 
                     if (record.get('mapping_name') == me.selectionNeeded) {
                         this.setValue('');
                     }
                 },
-                blur: function() {
+                blur: function () {
                     var record = this.ownerCt.editingPlugin.context.record;
 
                     if (this.getValue() == '') {
@@ -333,8 +338,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                     record.set('mapping', this.getValue());
                     this.ownerCt.editingPlugin.completeEdit();
                 },
-                specialkey: function(field, e){
-
+                specialkey: function (field, e) {
                     if (e.getKey() == e.ENTER) {
                         var record = this.ownerCt.editingPlugin.context.record;
 
@@ -351,4 +355,4 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
     }
 
 });
-//{/block}
+// {/block}

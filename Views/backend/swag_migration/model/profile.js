@@ -9,7 +9,7 @@
  * Shopware Model - Profile models
  * Holds a profile record representing an available profile to migrate from
  */
-//{block name="backend/swag_migration/model/profile"}
+// {block name="backend/swag_migration/model/profile"}
 Ext.define('Shopware.apps.SwagMigration.model.Profile', {
     /**
      * Extends the standard Ext Model
@@ -22,10 +22,10 @@ Ext.define('Shopware.apps.SwagMigration.model.Profile', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/profile/fields"}{/block}
+        // {block name="backend/swag_migration/model/profile/fields"}{/block}
         { name: 'id', type: 'string' },
         { name: 'name', type: 'string' }
     ]
 
 });
-//{/block}
+// {/block}

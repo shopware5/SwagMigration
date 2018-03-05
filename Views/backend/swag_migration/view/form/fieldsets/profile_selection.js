@@ -9,20 +9,20 @@
  * Shopware UI - Migration database form
  * DatabaseSelection fieldset
  */
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/view/form/fieldSets/profileSelection"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/view/form/fieldSets/profileSelection"}
 Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
     /**
      * Define that the base field set is an extension of the Ext.form.FieldSet
      * @string
      */
-    extend:'Ext.form.FieldSet',
+    extend: 'Ext.form.FieldSet',
 
     /**
      * List of short aliases for class names. Most useful for defining xtypes for widgets.
      * @string
      */
-    alias:'widget.migration-fieldset-profile-selection',
+    alias: 'widget.migration-fieldset-profile-selection',
 
     /**
      * Title of the fieldset
@@ -32,7 +32,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
     /**
      * Default style for the child elements
      */
-    defaults:{ anchor:'100%' },
+    defaults: { anchor: '100%' },
 
     initComponent: function() {
         var me = this;
@@ -61,13 +61,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
             allowBlank: false,
             mode: 'remote',
             selectOnFocus: true,
-            forceSelection : true,
+            forceSelection: true,
             editable: false,
             store: me.profileStore,
             listeners: {
-                change: function(combo, newValue, oldValue, eOpts) {
+                change: function(combo, newValue) {
                     if (newValue) {
-                        var databaseSelection = me.up().down('migration-fieldset-database-selection').databaseSelection
+                        var databaseSelection = me.up().down('migration-fieldset-database-selection').databaseSelection;
                         databaseSelection.setDisabled(false);
                         databaseSelection.emptyText = '{s name=selectDatabaseWhenSettingsMatch}Select source database if above settings do match{/s}';
                         databaseSelection.select(null);
@@ -77,12 +77,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
         });
 
         return [{
-                xtype: 'label',
-                text: '{s name=profileSelectDescription}Select the shop you want to migrate to Shopware{/s}'
-            },
+            xtype: 'label',
+            text: '{s name=profileSelectDescription}Select the shop you want to migrate to Shopware{/s}'
+        },
             me.profileSelection
         ];
-
     }
 
 });

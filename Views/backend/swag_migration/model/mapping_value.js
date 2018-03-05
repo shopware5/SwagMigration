@@ -7,9 +7,9 @@
 
 /**
  * Shopware Model - mapping value model
- * Represents a valued available for a spcific mapping
+ * Represents a valued available for a specific mapping
  */
-//{block name="backend/swag_migration/model/mapping_value"}
+// {block name="backend/swag_migration/model/mapping_value"}
 Ext.define('Shopware.apps.SwagMigration.model.MappingValue', {
     /**
      * Extends the standard Ext Model
@@ -22,10 +22,10 @@ Ext.define('Shopware.apps.SwagMigration.model.MappingValue', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/mapping_value/fields"}{/block}
+        // {block name="backend/swag_migration/model/mapping_value/fields"}{/block}
         { name: 'id', type: 'string' },
         { name: 'name', type: 'string' }
     ]
 
 });
-//{/block}
+// {/block}

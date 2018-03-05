@@ -9,7 +9,7 @@
  * Shopware Store - mappingLeft store
  * Holds the main mappings for the shop
  */
-//{block name="backend/swag_migration/store/mapping_left"}
+// {block name="backend/swag_migration/store/mapping_left"}
 Ext.define('Shopware.apps.SwagMigration.store.MappingLeft', {
     /**
      * Extend for the standard ExtJS 4
@@ -52,5 +52,4 @@ Ext.define('Shopware.apps.SwagMigration.store.MappingLeft', {
         }
     }
 });
-//{/block}
-
+// {/block}

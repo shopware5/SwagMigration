@@ -9,20 +9,20 @@
  * Shopware UI - Migration database form
  * DatabaseSelection fieldset
  */
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/view/form/fieldSets/databaseSelection"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/view/form/fieldSets/databaseSelection"}
 Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', {
     /**
      * Define that the base field set is an extension of the Ext.form.FieldSet
      * @string
      */
-    extend:'Ext.form.FieldSet',
+    extend: 'Ext.form.FieldSet',
 
     /**
      * List of short aliases for class names. Most useful for defining xtypes for widgets.
      * @string
      */
-    alias:'widget.migration-fieldset-database-selection',
+    alias: 'widget.migration-fieldset-database-selection',
 
     /**
      * Title of the fieldSet
@@ -30,7 +30,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
     title: '{s name=databaseSettings}Database settings{/s}',
 
     /**
-     * Default config for the cild elements
+     * Default config for the child elements
      */
     defaults: { anchor: '100%' },
 
@@ -39,7 +39,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
      */
     defaultType: 'textfield',
 
-
     initComponent: function() {
         var me = this;
 
@@ -47,7 +46,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
 
         me.callParent(arguments);
     },
-
 
     /**
      * Creates the database selection combobox
@@ -87,7 +85,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
                             e.combo.select(null);
                         }
                     });
-                }, scope: this }
+                },
+                    scope: this }
             }
         });
 
@@ -103,39 +102,36 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
 
         me.createDatabaseSelection();
 
-
         me.databaseSettingsForm = [{
-                xtype: 'label',
-                text: '{s name=dbDescription}Database settings for the shop you want to migrate{/s}'
-            }, {
-				fieldLabel: '{s name=dbUser}User{/s}',
-				name: 'username',
-				value: 'root'
-			}, {
-				fieldLabel: '{s name=dbPassword}Password{/s}',
-				name: 'password',
-				inputType: 'password',
-				value: 'root'
-			}, {
-				fieldLabel: '{s name=dbServer}Server{/s}',
-				name: 'host',
-				value: 'localhost',
-				allowBlank: false
-			}, {
-				fieldLabel: '{s name=dbPort}Port{/s}',
-				name: 'port',
-				value: 'default'
-			}, {
-				fieldLabel: '{s name=dbPrefix}Prefix{/s}',
-				name: 'prefix',
-				value: 'default'
-			}, me.databaseSelection
+            xtype: 'label',
+            text: '{s name=dbDescription}Database settings for the shop you want to migrate{/s}'
+        }, {
+            fieldLabel: '{s name=dbUser}User{/s}',
+            name: 'username',
+            value: 'root'
+        }, {
+            fieldLabel: '{s name=dbPassword}Password{/s}',
+            name: 'password',
+            inputType: 'password',
+            value: 'root'
+        }, {
+            fieldLabel: '{s name=dbServer}Server{/s}',
+            name: 'host',
+            value: 'localhost',
+            allowBlank: false
+        }, {
+            fieldLabel: '{s name=dbPort}Port{/s}',
+            name: 'port',
+            value: 'default'
+        }, {
+            fieldLabel: '{s name=dbPrefix}Prefix{/s}',
+            name: 'prefix',
+            value: 'default'
+        }, me.databaseSelection
         ];
 
         return me.databaseSettingsForm;
-
     }
-
 
 });
 // {/block}
