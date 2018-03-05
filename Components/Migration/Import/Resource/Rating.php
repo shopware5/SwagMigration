@@ -60,11 +60,11 @@ class Rating extends AbstractResource
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($rating = $result->fetch()) {
                 $this->migrateRating($rating);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedRatings = $normalizer->normalizeRatings($result->fetchAll());
 
@@ -76,6 +76,9 @@ class Rating extends AbstractResource
         return $this->getProgress()->done();
     }
 
+    /**
+     * @param array $rating
+     */
     private function migrateRating($rating)
     {
         $sql = '

@@ -115,14 +115,20 @@ class CustomerImporter
         'text6' => 'shipping_text6',
     ];
 
-    /** @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
-    /** @var ModelManager $em */
-    private $em = null;
+    /**
+     * @var ModelManager
+     */
+    private $em;
 
-    /** @var Config $config */
-    private $config = null;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * CustomerImporter constructor.
@@ -375,16 +381,16 @@ class CustomerImporter
             $customer['newsletter'] = empty($customer['newsletter']) ? 0 : 1;
         }
         if (isset($customer['paymentID'])) {
-            $customer['paymentID'] = intval($customer['paymentID']);
+            $customer['paymentID'] = (int) $customer['paymentID'];
         }
         if (isset($customer['paymentpreset'])) {
-            $customer['paymentpreset'] = intval($customer['paymentpreset']);
+            $customer['paymentpreset'] = (int) $customer['paymentpreset'];
         }
         if (isset($customer['subshopID'])) {
-            $customer['subshopID '] = intval($customer['subshopID']);
+            $customer['subshopID '] = (int) $customer['subshopID'];
         }
         if (isset($customer['userID'])) {
-            $customer['userID'] = intval($customer['userID']);
+            $customer['userID'] = (int) $customer['userID'];
         }
         if (isset($customer['validation'])) {
             $customer['validation'] = $this->db->quote((string) $customer['validation']);
@@ -421,9 +427,8 @@ class CustomerImporter
     private function findExistingEntry($table, $where)
     {
         $sql = "SELECT id FROM $table WHERE $where";
-        $id = (int) $this->db->fetchOne($sql);
 
-        return $id;
+        return (int) $this->db->fetchOne($sql);
     }
 
     /**
@@ -435,9 +440,8 @@ class CustomerImporter
     private function doesEntryExist($table, $where)
     {
         $sql = "SELECT id FROM $table WHERE $where";
-        $id = $this->db->fetchOne($sql);
 
-        return $id;
+        return $this->db->fetchOne($sql);
     }
 
     /**
@@ -554,7 +558,7 @@ class CustomerImporter
             $customer['ustid'] = $this->db->quote((string) $customer['ustid']);
         }
         if (isset($customer['billing_countryID'])) {
-            $customer['billing_countryID'] = intval($customer['billing_countryID']);
+            $customer['billing_countryID'] = (int) $customer['billing_countryID'];
         }
         if (isset($customer['customernumber'])) {
             $customer['customernumber'] = $this->db->quote((string) $customer['customernumber']);
@@ -594,9 +598,8 @@ class CustomerImporter
         $sql = "SELECT id
                 FROM s_core_countries
                 WHERE countryiso = $countryIso";
-        $result = $this->db->fetchOne($sql);
 
-        return $result;
+        return $this->db->fetchOne($sql);
     }
 
     /**
@@ -683,7 +686,7 @@ class CustomerImporter
             $customer['shipping_city'] = $this->db->quote((string) $customer['shipping_city']);
         }
         if (isset($customer['shipping_countryID'])) {
-            $customer['shipping_countryID'] = intval($customer['shipping_countryID']);
+            $customer['shipping_countryID'] = (int) $customer['shipping_countryID'];
         }
         if (empty($customer['shipping_countryID']) && !empty($customer['shipping_countryiso'])) {
             $customer['shipping_countryID'] = (int) $this->getCountryID($customer['shipping_countryiso']);
@@ -815,7 +818,7 @@ class CustomerImporter
             $defaultNewsletterGroup = $this->config->get('sNEWSLETTERDEFAULTGROUP');
             $newsletterGroupId = empty($defaultNewsletterGroup) ? 1 : (int) $defaultNewsletterGroup;
         } else {
-            $newsletterGroupId = intval($newsletterGroupId);
+            $newsletterGroupId = (int) $newsletterGroupId;
         }
 
         return $newsletterGroupId;
@@ -887,15 +890,15 @@ class CustomerImporter
             || !empty($customer['shipping_street'])
             || !empty($customer['shipping_lastname'])
         ) {
-            if ($customer['shipping_firstname'] == $customer['billing_firstname'] &&
-                $customer['shipping_lastname'] == $customer['billing_lastname']) {
+            if ($customer['shipping_firstname'] === $customer['billing_firstname'] &&
+                $customer['shipping_lastname'] === $customer['billing_lastname']) {
                 $addresses[] = [
                     'userID' => $customer['userID'],
                     'company' => $customer['shipping_company'],
                     'department' => $customer['shipping_company'],
                     'salutation' => $customer['shipping_salutation'],
-                    'firstname' => (!empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer['firstname']),
-                    'lastname' => (!empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer['lastname']),
+                    'firstname' => !empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer['firstname'],
+                    'lastname' => !empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer['lastname'],
                     'street' => $customer['shipping_street'],
                     'zipcode' => $customer['shipping_zipcode'],
                     'city' => $customer['shipping_city'],

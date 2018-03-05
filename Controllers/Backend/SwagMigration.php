@@ -5,7 +5,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Cleanup;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
@@ -114,7 +113,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setMaxExecutionTime();
 
-        $this->View()->addTemplateDir(dirname(__FILE__) . '/../../Views/');
+        $this->View()->addTemplateDir(__DIR__ . '/../../Views/');
         parent::init();
     }
 
@@ -134,22 +133,22 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         // Populate the config object by the request data
         $query = $this->Request()->getPost() + $this->Request()->getQuery();
-        if (isset($query['username']) && $query['username'] != 'default') {
+        if (isset($query['username']) && $query['username'] !== 'default') {
             $config['username'] = $query['username'];
         }
-        if (isset($query['prefix']) && $query['prefix'] != 'default') {
+        if (isset($query['prefix']) && $query['prefix'] !== 'default') {
             $config['prefix'] = $query['prefix'];
         }
-        if (isset($query['password']) && $query['password'] != 'default') {
+        if (isset($query['password']) && $query['password'] !== 'default') {
             $config['password'] = $query['password'];
         }
-        if (isset($query['host']) && $query['host'] != 'default') {
+        if (isset($query['host']) && $query['host'] !== 'default') {
             $config['host'] = $query['host'];
         }
-        if (isset($query['port']) && $query['port'] != 'default') {
+        if (isset($query['port']) && $query['port'] !== 'default') {
             $config['port'] = $query['port'];
         }
-        if (isset($query['database']) && $query['database'] != 'default') {
+        if (isset($query['database']) && $query['database'] !== 'default') {
             $config['dbname'] = $query['database'];
         }
 
@@ -330,7 +329,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $this->setRenderer(false);
 
-        $rows = $this->Mapping()->getMappingForEntity($this->Request()->mapping);
+        $rows = $this->Mapping()->getMappingForEntity($this->Request()->getParam('mapping'));
 
         echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
     }
@@ -344,7 +343,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $this->setRenderer(false);
 
         try {
-            if ($call['profile'] == 'WooCommerce') {
+            if ($call['profile'] === 'WooCommerce') {
                 $shops = $this->Source()->getNormalizedShops();
                 $languages = $this->Source()->getNormalizedLanguages();
             } else {
@@ -404,7 +403,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function initImport($importType)
     {
-        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $offset = (int) $this->Request()->getParam('offset', 0);
         $name = $this->imports[$importType];
 
         /** @var $progress Progress */
@@ -482,7 +481,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             }
         }
 
-        if (!empty($this->Request()->finish_import)) {
+        if (!empty($this->Request()->getParam('finish_import'))) {
             $this->finishImport();
 
             return;
@@ -507,11 +506,11 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function printCurrentImportMessage($type)
     {
-        $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
+        $offset = (int) $this->Request()->getParam('offset', 0);
         if ($offset > 0) {
             return false;
         }
-        $messageShown = empty($this->Request()->messageShown) ? false : (bool) $this->Request()->messageShown;
+        $messageShown = (bool) $this->Request()->getParam('messageShown', false);
         if ($messageShown) {
             return false;
         }

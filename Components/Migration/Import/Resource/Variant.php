@@ -8,6 +8,7 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
+use Shopware\Models\Article\Article;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
@@ -65,11 +66,11 @@ class Variant extends AbstractResource
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($product = $products_result->fetch()) {
                 $this->migrateVariant($product);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedVariants = $normalizer->normalizeVariants($products_result->fetchAll());
 
@@ -94,13 +95,14 @@ class Variant extends AbstractResource
         // get configurator groups for the given product
         $builder = Shopware()->Models()->createQueryBuilder();
         $builder->select(['PARTIAL article.{id}', 'configuratorSet', 'groups'])
-                ->from('Shopware\Models\Article\Article', 'article')
+                ->from(Article::class, 'article')
                 ->innerJoin('article.configuratorSet', 'configuratorSet')
                 ->leftJoin('configuratorSet.groups', 'groups')
                 ->where('article.id = ?1')
                 ->setParameter(1, $productId);
 
-        $result = array_pop($builder->getQuery()->getArrayResult());
+        $result = $builder->getQuery()->getArrayResult();
+        $result = array_pop($result);
 
         $configuratorArray = $result['configuratorSet'];
         $groups = $configuratorArray['groups'];
@@ -142,6 +144,11 @@ class Variant extends AbstractResource
         return $groups;
     }
 
+    /**
+     * @param array $product
+     *
+     * @return Progress
+     */
     private function migrateVariant($product)
     {
         $id = $product['productID'];

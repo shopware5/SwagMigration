@@ -152,7 +152,7 @@ class Magento17 extends Profile
     /**
      * Returns the sql statement to select articles with
      *
-     * @param id
+     * @param $id
      *
      * @return string
      */
@@ -786,7 +786,7 @@ class Magento17 extends Profile
 					ON 1
 				";
             } else {
-                if ($attribute_fields[$attribute]['type'] == 'static') {
+                if ($attribute_fields[$attribute]['type'] === 'static') {
                     $select_fields[] = "{$type_quoted}.{$attribute}";
                 } else {
                     $join_fields .= "

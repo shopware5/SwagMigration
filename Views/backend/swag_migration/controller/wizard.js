@@ -5,15 +5,15 @@
  * file that was distributed with this source code.
  */
 
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/controller/wizard"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/controller/wizard"}
 Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
     /**
      * The parent class that this class extends.
      * @string
      */
-    extend:'Ext.app.Controller',
+    extend: 'Ext.app.Controller',
 
     /**
      * Set component references for easy access
@@ -35,7 +35,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
     selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
 
-
     /**
      * A template method that is called when your application boots.
      * It is called before the Application's launch function is executed
@@ -43,17 +42,17 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      *
      * @return void
      */
-    init:function () {
+    init: function () {
         var me = this;
 
         me.control({
             'migration-wizard': {
                 'navigate': me.onNavigate
-                },
+            },
             'migration-form-mapping': {
                 'beforequery': me.onQueryMappingValues,
                 'validate': me.onValidateCurrentCard
-                },
+            },
             'migration-form-import': {
                 'validate': me.onValidateCurrentCard
             }
@@ -62,7 +61,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         me.callParent(arguments);
     },
 
-
     /**
      * Fired when the user expands a combo editor in one of the mapping grids
      * Will load available mapping values from the backend controller
@@ -70,8 +68,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      * @param migrationCard
      */
     onQueryMappingValues: function(e, migrationCard) {
-        var me = this,
-            panel = migrationCard.up("panel"),
+        var panel = migrationCard.up('panel'),
             layout = panel.getLayout(),
             items = layout.getLayoutItems(),
             databaseCard = items[0],
@@ -96,7 +93,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             profile = databaseValues.profile,
             activeCard = layout.getActiveItem();
 
-        switch(direction) {
+        switch (direction) {
             case 'next':
                 if (!activeCard.getForm().isValid()) {
                     return;
@@ -106,7 +103,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     case 0:
                         activeCard.getForm().submit({
                             url: '{url action="checkForm"}',
-                            success: function(fp, o) {
+                            success: function() {
                                 layout.next();
                                 me.checkLayoutButtons(panel);
                                 me.loadMappingStores(panel);
@@ -120,17 +117,17 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                         layout.next();
                         me.checkLayoutButtons(panel);
                         activeCard = layout.getActiveItem();
-                        if ("Magento" == profile || "Prestashop14" == profile || "Prestashop15" == profile) {
+                        if (profile === 'Magento' || profile === 'Prestashop14' || profile === 'Prestashop15') {
                             activeCard.setShowPasswordInfo(true);
                         } else {
                             activeCard.setShowPasswordInfo(true);
                         }
-                        if ("Prestashop14" == profile || "Prestashop15" == profile) {
+                        if (profile === 'Prestashop14' || profile === 'Prestashop15') {
                             activeCard.setSaltInputNeeded(true);
                         } else {
                             activeCard.setSaltInputNeeded(false);
                         }
-                        if ("Oxid" == profile) {
+                        if (profile === 'Oxid') {
                             activeCard.setImportAllowed(true);
                         } else {
                             activeCard.setImportAllowed(false);
@@ -147,7 +144,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         }
 
         me.checkLayoutButtons(panel);
-
     },
 
     /**
@@ -171,32 +167,31 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
         Ext.iterate(importCardValues, function(key, value) {
             config[key] = value;
-            if(key.substring(0, 7) === "import_") {
+            if (key.substring(0, 7) === 'import_') {
                 total += 1;
             }
         });
         config.tasks = total;
 
-        mappingStore.each(function(record){
-            if(record.get('mapping') == 0 || record.get('mapping') == me.selectionNeeded) {
-                config[record.get('group')+'['+record.get('internalId')+']'] = "";
+        mappingStore.each(function(record) {
+            if (record.get('mapping') == 0 || record.get('mapping') == me.selectionNeeded) {
+                config[record.get('group') + '[' + record.get('internalId') + ']'] = '';
             } else {
-                config[record.get('group')+'['+record.get('internalId')+']'] = record.get('mapping');
+                config[record.get('group') + '[' + record.get('internalId') + ']'] = record.get('mapping');
             }
         }, this);
 
         config.action = 'import';
 
         me.progressWindow = Ext.MessageBox.show({
-            title        : 'Import',
-            msg          : "{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}",
-            width        : 500,
-            progress     : true,
-            closable     : false,
-            buttons      : Ext.MessageBox.CANCEL,
-            fn           : function(buttonId, text, opt) {
-
-                if (buttonId != 'cancel') {
+            title: 'Import',
+            msg: '{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}',
+            width: 500,
+            progress: true,
+            closable: false,
+            buttons: Ext.MessageBox.CANCEL,
+            fn: function(buttonId) {
+                if (buttonId !== 'cancel') {
                     return;
                 }
 
@@ -214,12 +209,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         me.progressWindow.setSize(500, 160);
         me.progressWindow.doLayout();
 
-
         me.progressWindow.progressBar.reset();
         me.progressWindow.progressBar.updateProgress(0, '{s name=startingImport}Starting Import...{/s}');
 
         me.runImportRequest(config);
-
     },
 
     /**
@@ -228,7 +221,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      */
     runImportRequest: function(config) {
         var me = this,
-            progressText = '';
+            progressText = '',
+            result;
         if (config.offset > 0) {
             config.messageShown = 0;
         }
@@ -239,13 +233,13 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             return;
         }
         Ext.Ajax.request({
-            url: '{url controller="SwagMigration"}/'+config.action,
+            url: '{url controller="SwagMigration"}/' + config.action,
             // Don't intercept the request
             timeout: 14400000,
-            params : config,
+            params: config,
             method: 'POST',
-            success: function (response, request) {
-                if(!response.responseText) {
+            success: function (response) {
+                if (!response.responseText) {
                     Ext.Msg.alert(
                         '{s name=importFailedWithoutErrors}Import failed{/s}',
                         'The server aborted the import without any error message.' +
@@ -261,29 +255,29 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     return;
                 }
                 result = Ext.JSON.decode(response.responseText);
-                if(!result) {
+                if (!result) {
                     me.progressWindow.close();
-                    Ext.Msg.alert('{s name=importFailes}Import failed{/s}', response.responseText);
-                } else if(!result.success) {
+                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', response.responseText);
+                } else if (!result.success) {
                     me.progressWindow.close();
 
-                    var message = '<b>' + result.message + '</b>' +  '<br><br>' +
+                    var message = '<b>' + result.message + '</b>' + '<br><br>' +
                                '<b>Code</b>  : ' + result.code + '<br>' +
                                '<b>Line</b>  : ' + result.line + '<br>' +
                                '<b>File</b>  : ' + result.file + '<br><br>' +
                                '<b>Error</b> : ' + result.error + '<br>' +
                                '<b>Trace</b> : ' + result.trace + '<br>';
 
-                    Ext.Msg.alert('{s name=importFailes}Import failed{/s}', message);
-                } else if(result.progress<1 || result.done !== true) {
+                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', message);
+                } else if (result.progress < 1 || result.done !== true) {
                     // If special value -1 was returned, calculate total progress from number of done tasks
-                    if(result.progress === -1) {
+                    if (result.progress === -1) {
                         result.progress = me.getDoneTasks(config);
                     }
 
                     progressText = result.message;
                     if (result.estimated > 0 && result.offset > 0) {
-                        progressText =  result.message + Ext.String.format(me.snippets.estimated, Math.ceil(result.estimated/60));
+                        progressText = result.message + Ext.String.format(me.snippets.estimated, Math.ceil(result.estimated / 60));
                     }
                     me.progressWindow.progressBar.updateProgress(result.progress, progressText);
                     Ext.iterate(result, function(key, value) {
@@ -292,7 +286,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
                     // Special treatment for variant creation:
                     // If all variants have been created, 'runImportRequest' will be called again
-                    if(result.create_variants) {
+                    if (result.create_variants) {
                         me.createVariants(result.params, result.offset, result.count, config);
                         return;
                     }
@@ -303,10 +297,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     Ext.Msg.alert('Import', result.message);
                 }
             },
-            failure: function (response, request) {
+            failure: function (response) {
                 me.progressWindow.close();
-                if(response.responseText) {
-                    Ext.Msg.alert('{s name=importFailes}Import failed{/s}', response.responseText);
+                if (response.responseText) {
+                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', response.responseText);
                 } else {
                     Ext.Msg.alert(
                         '{s name=importFailedWithoutErrors}Import failed{/s}',
@@ -338,16 +332,14 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             articleId = params.articleId,
             generatorConfig;
 
-
         var configurator = Ext.create('Shopware.apps.SwagMigration.model.Configurator', {
-            articleId:articleId
+            articleId: articleId
         });
 
         var configuratorGroups = Ext.create('Ext.data.Store', { model: 'Shopware.apps.SwagMigration.model.ConfiguratorGroup' });
 
         // Create group/option models and set all of them active
         Ext.each(params.groups, function (group) {
-
             // Create groupModel and the corresponding options store
             var groupModel = Ext.create('Shopware.apps.SwagMigration.model.ConfiguratorGroup', {
                 active: true,
@@ -366,7 +358,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             });
 
             // Variant calculation
-            if(groupOptions.count() >  0) {
+            if (groupOptions.count() > 0) {
                 totalCount = totalCount * groupOptions.count();
             }
 
@@ -393,7 +385,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
     /**
      * Triggers the article controllers' variant generation method until all variants
-     * have been created. If creation was successfull, migration will be continued.
+     * have been created. If creation was successful, migration will be continued.
      *
      * @param model
      * @param generatorConfig
@@ -401,7 +393,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      * @param totalProducts
      * @param importConfig
      */
-    startVariantGenerator: function(model,  generatorConfig, currentProduct, totalProducts, importConfig) {
+    startVariantGenerator: function(model, generatorConfig, currentProduct, totalProducts, importConfig) {
         var me = this;
 
        // If import was canceled, return and set the cancel flag bag to false
@@ -417,7 +409,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         model.setDirty();
 
         model.save({
-            success: function(record, operation) {
+            success: function() {
                 // Calculate and show progress
                 var doneVariants = Ext.Array.min([generatorConfig.offset + generatorConfig.limit, model.get('totalCount')]);
                 var progress = doneVariants / model.get('totalCount');
@@ -429,8 +421,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                         )
                 );
 
-
-                //if the last variant was created, continue migration
+                // if the last variant was created, continue migration
                 if (generatorConfig.offset + generatorConfig.limit >= model.get('totalCount')) {
                     me.runImportRequest(importConfig);
                 } else {
@@ -438,11 +429,11 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                     me.startVariantGenerator(model, generatorConfig, currentProduct, totalProducts, importConfig);
                 }
             },
-            failure: function(record, operation) {
+            failure: function(record) {
                 var rawData = record.getProxy().getReader().rawData,
                     message = '<br>' + rawData.message;
                 me.progressWindow.close();
-                Ext.Msg.alert('{s name=importFailes}Import failed{/s}', message);
+                Ext.Msg.alert('{s name=importFails}Import failed{/s}', message);
             }
         });
     },
@@ -452,26 +443,24 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      * @param config
      */
     getDoneTasks: function(config) {
-        var me = this,
-        done = 0,
-        total = config.tasks;
+        var done = 0,
+            total = config.tasks;
 
-        if(total === 0) {
+        if (total === 0) {
             return 1;
         }
 
         Ext.iterate(config, function(key, value) {
-            if(key.substring(0, 7) === "import_" && value === null) {
+            if (key.substring(0, 7) === 'import_' && value === null) {
                 done += 1;
             }
         });
 
-        if(done === 0) {
+        if (done === 0) {
             return 0;
         }
 
-        return done/total;
-
+        return done / total;
     },
 
     /**
@@ -499,7 +488,6 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 me.onValidateCurrentCard();
             }
         });
-
     },
 
     /**
@@ -517,35 +505,32 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      * @param panel
      */
     checkLayoutButtons: function(panel) {
-        var me = this,
-            valid = false,
+        var valid = false,
             layout = panel.getLayout(),
             prevButton = panel.buttonPrev,
             nextButton = panel.buttonNext,
             activeCard = layout.getActiveItem();
 
-        if(activeCard.internalId === 2) {
+        if (activeCard.internalId === 2) {
             nextButton.setText('{s name=startBtn}Start{/s}');
-        }else{
+        } else {
             nextButton.setText('{s name=nextBtn}Next{/s}');
         }
 
         prevButton.setDisabled((activeCard.internalId <= 0));
 
-        if(activeCard.validate) {
+        if (activeCard.validate) {
             valid = activeCard.validate();
-        }else{
+        } else {
             valid = activeCard.getForm().isValid();
         }
 
-        if(valid && activeCard.internalId >= 3) {
+        if (valid && activeCard.internalId >= 3) {
             valid = false;
         }
 
         nextButton.setDisabled(!valid);
-
     }
 
-
 });
-//{/block}
+// {/block}

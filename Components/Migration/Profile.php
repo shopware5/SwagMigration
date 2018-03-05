@@ -119,7 +119,7 @@ abstract class Profile extends Enlight_Class
         $databases = $this->db->fetchCol('SHOW DATABASES');
 
         foreach ($databases as $key => $database) {
-            if ($database == 'information_schema') {
+            if ($database === 'information_schema') {
                 unset($databases[$key]);
             }
         }
@@ -152,7 +152,7 @@ abstract class Profile extends Enlight_Class
                 if (!empty($row['type'])) {
                     switch ($row['type']) {
                         case 'bool':
-                            if ($row['value'] == 'false') {
+                            if ($row['value'] === 'false') {
                                 $row['value'] = false;
                             } else {
                                 $row['value'] = (bool) $row['value'];
@@ -185,7 +185,7 @@ abstract class Profile extends Enlight_Class
      */
     public function limit($sql, $count = 0, $offset = 0)
     {
-        $count = intval($count);
+        $count = (int) $count;
         if ($count <= 0) {
             $count = 2147483647;
         }

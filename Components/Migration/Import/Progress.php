@@ -22,42 +22,49 @@ class Progress extends Enlight_Class
      * @var string
      */
     protected $message;
+
     /**
      * Progress successful?
      *
      * @var int
      */
     protected $success;
+
     /**
      * Progress offset
      *
      * @var int
      */
     protected $offset;
+
     /**
      * Total number of items
      *
      * @var int
      */
     protected $count;
+
     /**
      * Progress. If not set, the progress is calculated dynamically
      *
      * @var null|float
      */
-    protected $progress = null;
+    protected $progress;
+
     /**
      * Additional request params
      *
      * @var array
      */
     protected $requestParams = [];
+
     /**
      * Progress status
      *
      * @var 0, STATUS_ERROR or STATUS_DONE
      */
     protected $status = 0;
+
     /**
      * When did the progress start
      *

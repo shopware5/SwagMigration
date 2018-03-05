@@ -70,7 +70,7 @@ class Image extends AbstractResource
 
         $this->initTaskTimer();
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
         }
 
@@ -78,7 +78,7 @@ class Image extends AbstractResource
         $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($image = $result->fetch()) {
-            if ($call['profile'] != 'WooCommerce') {
+            if ($call['profile'] !== 'WooCommerce') {
                 $image['link'] = $image_path . $image['image'];
             } else {
                 $image['link'] = $image['image'];

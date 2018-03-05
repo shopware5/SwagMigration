@@ -82,7 +82,7 @@ class DownloadESD extends AbstractResource
             $document = file_get_contents($documentUrl);
 
             if ($this->get_http_response_code($documentUrl) != 200 // check http response code and only continue if document can be accessed
-                || strlen($document) == 0
+                || $document === ''
                 || !isset($orderNumber) // We have to check for an existing article number. Otherwise the file can't be associated with existing shopware's ESD article
             ) {
                 return $this->getProgress()->error(sprintf($downloadNotPossibleSnippet, $filename));

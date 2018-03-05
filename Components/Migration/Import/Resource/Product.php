@@ -24,8 +24,10 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
  */
 class Product extends AbstractResource
 {
-    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
-    private $db = null;
+    /**
+     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     */
+    private $db;
 
     /**
      * {@inheritdoc}

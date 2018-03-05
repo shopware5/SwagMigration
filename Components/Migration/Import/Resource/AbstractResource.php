@@ -119,7 +119,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         $startTime = (int) $this->Request()->getParam('task_start_time', 0);
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
-        if ($startTime == 0 || $offset == 0) {
+        if ($startTime === 0 || $offset === 0) {
             $startTime = time();
         }
 

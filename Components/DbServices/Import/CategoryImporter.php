@@ -16,16 +16,24 @@ use Shopware\Models\Category\Repository as CategoryRepository;
 
 class CategoryImporter
 {
-    /** @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
-    /** @var ModelManager $em */
-    private $em = null;
+    /**
+     * @var ModelManager
+     */
+    private $em;
 
-    /** @var CategoryRepository $repository */
-    private $repository = null;
+    /**
+     * @var CategoryRepository
+     */
+    private $repository;
 
-    /* @var Logger $logger */
+    /**
+     * @var Logger
+     */
     private $logger;
 
     /**
@@ -39,7 +47,7 @@ class CategoryImporter
     {
         $this->db = $db;
         $this->em = $em;
-        $this->repository = $this->em->getRepository('Shopware\Models\Category\Category');
+        $this->repository = $this->em->getRepository(Category::class);
         $this->logger = $logger;
     }
 
@@ -110,8 +118,8 @@ class CategoryImporter
      */
     public function assignArticlesToCategory($articleId, $categoryId)
     {
-        $categoryId = intval($categoryId);
-        $articleId = intval($articleId);
+        $categoryId = (int) $categoryId;
+        $articleId = (int) $articleId;
         if (empty($categoryId) || empty($articleId)) {
             return;
         }

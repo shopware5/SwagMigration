@@ -9,19 +9,19 @@
  * Shopware UI - Migration database form
  * ClearShop fieldset
  */
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/view/form/fieldSets/clearShop"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/view/form/fieldSets/clearShop"}
 Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
     /**
      * Define that the base field set is an extension of the Ext.form.FieldSet
      * @string
      */
-    extend:'Ext.form.FieldSet',
+    extend: 'Ext.form.FieldSet',
     /**
      * List of short aliases for class names. Most useful for defining xtypes for widgets.
      * @string
      */
-    alias:'widget.migration-fieldset-clearshop',
+    alias: 'widget.migration-fieldset-clearshop',
 
     /**
      * Layout type for the component.
@@ -33,7 +33,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 
     title: '{s name=initShop}Initialize Shop{/s}',
 
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
 
         me.items = me.getClearShopElements();
@@ -45,53 +45,53 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
      *
      * @return Array
      */
-    getClearShopElements: function() {
+    getClearShopElements: function () {
         var me = this;
 
         var leftContainer = Ext.create('Ext.container.Container', {
-            columnWidth:.3,
-            border:false,
+            columnWidth: 0.3,
+            border: false,
             cls: Ext.baseCSSPrefix + 'field-set-container',
-            layout:'anchor',
-            defaults:{
-                anchor:'100%',
-                labelWidth:150,
-                minWidth:250,
-                xtype:'textfield'
+            layout: 'anchor',
+            defaults: {
+                anchor: '100%',
+                labelWidth: 150,
+                minWidth: 250,
+                xtype: 'textfield'
             },
-            items:me.getLeftElements()
+            items: me.getLeftElements()
         });
 
         var middleContainer = Ext.create('Ext.container.Container', {
-            columnWidth:.3,
-            border:false,
+            columnWidth: 0.3,
+            border: false,
             cls: Ext.baseCSSPrefix + 'field-set-container',
-            layout:'anchor',
-            defaults:{
-                anchor:'100%',
-                labelWidth:100,
-                xtype:'textfield'
+            layout: 'anchor',
+            defaults: {
+                anchor: '100%',
+                labelWidth: 100,
+                xtype: 'textfield'
             },
-            items:me.getMiddleElements()
+            items: me.getMiddleElements()
         });
 
         var rightContainer = Ext.create('Ext.container.Container', {
-            columnWidth:.3,
-            border:false,
+            columnWidth: 0.3,
+            border: false,
             cls: Ext.baseCSSPrefix + 'field-set-container',
-            layout:'anchor',
-            defaults:{
-                anchor:'100%',
-                labelWidth:100,
-                xtype:'textfield'
+            layout: 'anchor',
+            defaults: {
+                anchor: '100%',
+                labelWidth: 100,
+                xtype: 'textfield'
             },
-            items:me.getRightElements()
+            items: me.getRightElements()
         });
 
         var checkBoxes = Ext.create('Ext.container.Container', {
-            border:false,
-            layout:'column',
-            items:[ leftContainer, middleContainer, rightContainer]
+            border: false,
+            layout: 'column',
+            items: [leftContainer, middleContainer, rightContainer]
         });
 
         return [checkBoxes, me.getClearShopButtons()];
@@ -101,7 +101,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
      * Helper function which returns the left side of the "init shop" fieldSet
      * @return Array
      */
-    getLeftElements: function() {
+    getLeftElements: function () {
         var me = this;
 
         me.leftCheckBoxes = [
@@ -130,7 +130,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
      * Helper function which returns the middle of the "init shop" fieldSet
      * @return Array
      */
-    getMiddleElements: function() {
+    getMiddleElements: function () {
         var me = this;
 
         me.middleCheckBoxes = [
@@ -159,7 +159,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
      * Helper function which returns the right side of the "init shop" fieldSet
      * @return Array
      */
-    getRightElements: function() {
+    getRightElements: function () {
         var me = this;
 
         me.rightCheckBoxes = [
@@ -177,14 +177,14 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 //            })
         ];
 
-        return me.rightCheckBoxes
+        return me.rightCheckBoxes;
     },
 
     /**
      * Helper function which returns the "Delete selected data" buttons
      * @return Ext.container.Container
      */
-    getClearShopButtons: function() {
+    getClearShopButtons: function () {
         var me = this;
 
         var deleteButton = Ext.create('Ext.button.Button', {
@@ -193,23 +193,22 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
             text: '{s name=deleteCategoriesAndArticles}Delete selected data{/s}',
             cls: 'primary',
             scope: this,
-            handler  : function() {
+            handler: function () {
                 Ext.Msg.show({
                     title: '{s name=initShop}Reset this Shop{/s}',
                     msg: '{s name=initShop/AreYouSure}Are you sure? All selected elements will be deleted permanently.{/s}',
                     buttons: Ext.Msg.YESNO,
                     scope: this,
                     fn: function (btn) {
-                        if (btn === "yes") {
+                        if (btn === 'yes') {
                             var form = me.up('form');
                             form.setLoading(true);
                             Ext.Ajax.request({
                                 url: '{url action="clearShop"}',
                                 params: form.getForm().getValues(),
-                                success: function (r, o){
+                                success: function () {
                                     form.setLoading(false);
                                     Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
-
                                 },
                                 scope: this
                             });
@@ -227,24 +226,20 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
             cls: 'small',
             style: 'position: absolute;right:0;top:10px;',
             scope: this,
-            handler  : function() {
+            handler: function () {
                 var me = this;
-                Ext.each(me.leftCheckBoxes.concat(me.middleCheckBoxes, me.rightCheckBoxes), function(checkbox) {
+                Ext.each(me.leftCheckBoxes.concat(me.middleCheckBoxes, me.rightCheckBoxes), function (checkbox) {
                     checkbox.setValue(!checkbox.getValue());
                 });
-
             }
         });
-
 
         return Ext.create('Ext.container.Container', {
             border: false,
             layout: 'anchor',
-            items: [ deleteButton,  inverseButton ]
+            items: [deleteButton, inverseButton]
         });
-
     }
-
 
 });
 // {/block}

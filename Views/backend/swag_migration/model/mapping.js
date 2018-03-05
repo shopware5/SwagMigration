@@ -9,7 +9,7 @@
  * Shopware Model - mapping model
  * Represents a mapping from the old shop to the new shop
  */
-//{block name="backend/swag_migration/model/mapping"}
+// {block name="backend/swag_migration/model/mapping"}
 Ext.define('Shopware.apps.SwagMigration.model.Mapping', {
     /**
      * Extends the standard Ext Model
@@ -22,7 +22,7 @@ Ext.define('Shopware.apps.SwagMigration.model.Mapping', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/mapping/fields"}{/block}
+        // {block name="backend/swag_migration/model/mapping/fields"}{/block}
         { name: 'id', type: 'int' },
         { name: 'internalId', type: 'string' },    // e.g. anothershop_1
         { name: 'name', type: 'string' },           // e.g. Another Shop 1
@@ -33,4 +33,4 @@ Ext.define('Shopware.apps.SwagMigration.model.Mapping', {
     ]
 
 });
-//{/block}
+// {/block}

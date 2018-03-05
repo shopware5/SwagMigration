@@ -9,7 +9,7 @@
  * Shopware Model - Article models.
  * The configurator model is responsible to create the article variants based on the configurator settings.
  */
-//{block name="backend/swag_migration/model/configurator"}
+// {block name="backend/swag_migration/model/configurator"}
 Ext.define('Shopware.apps.SwagMigration.model.Configurator', {
     /**
      * Extends the standard Ext Model
@@ -22,24 +22,29 @@ Ext.define('Shopware.apps.SwagMigration.model.Configurator', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/configurator/fields"}{/block}
-		'articleId', 'setId', 'offset', 'limit', 'totalCount', 'mergeType'
+        // {block name="backend/swag_migration/model/configurator/fields"}{/block}
+        'articleId', 'setId', 'offset', 'limit', 'totalCount', 'mergeType'
     ],
 
     associations: [
-        { type: 'hasMany', model: 'Shopware.apps.SwagMigration.model.ConfiguratorGroup', name: 'getConfiguratorGroups', associationKey: 'groups' }
+        {
+            type: 'hasMany',
+            model: 'Shopware.apps.SwagMigration.model.ConfiguratorGroup',
+            name: 'getConfiguratorGroups',
+            associationKey: 'groups'
+        }
     ],
 
     /**
      * Configure the data communication
      * @object
      */
-    proxy:{
+    proxy: {
         /**
          * Set proxy type to ajax
          * @string
          */
-        type:'ajax',
+        type: 'ajax',
 
         /**
          * Configure the url mapping for the different
@@ -55,12 +60,12 @@ Ext.define('Shopware.apps.SwagMigration.model.Configurator', {
          * Configure the data reader
          * @object
          */
-        reader:{
-            type:'json',
-            root:'data',
-            totalProperty:'total'
+        reader: {
+            type: 'json',
+            root: 'data',
+            totalProperty: 'total'
         }
     }
 
 });
-//{/block}
+// {/block}

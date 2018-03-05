@@ -5,8 +5,8 @@
  * file that was distributed with this source code.
  */
 
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/controller/main"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/controller/main"}
 Ext.define('Shopware.apps.SwagMigration.controller.Main', {
 
     /**
@@ -51,4 +51,4 @@ Ext.define('Shopware.apps.SwagMigration.controller.Main', {
     }
 
 });
-//{/block}
+// {/block}

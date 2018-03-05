@@ -9,8 +9,8 @@
  * Shopware UI - Progress dialog
  * A dialog window showing the progress of the import
  */
-//{namespace name=backend/swag_migration/main}
-//{block name="backend/swag_migration/view/progress"}
+// {namespace name=backend/swag_migration/main}
+// {block name="backend/swag_migration/view/progress"}
 Ext.define('Shopware.apps.SwagMigration.view.Progress', {
     /**
      * Define that the plugin manager main window is an extension of the enlight application window
@@ -76,7 +76,6 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
         }
     },
 
-
     /**
      * Initializes the component.
      *
@@ -90,7 +89,6 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
         me.callParent(arguments);
     },
 
-
     /**
      * Creates the card layout panel
      */
@@ -98,14 +96,12 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
         var me = this;
 
         return [{
-                xtype: 'label',
-                text: 'asdasasd'
-            },
+            xtype: 'label',
+            text: 'asdasasd'
+        },
             me.createProgressBar()
         ];
-
     },
-
 
     /**
      * Creates the progress bar for the window
@@ -118,10 +114,8 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
 
         });
 
-
         return me.progressBar;
-
     }
 
 });
-//{/block}
+// {/block}

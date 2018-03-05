@@ -12,7 +12,7 @@
  * contains a proxy to define which request has to been sent to save, update and delete
  * the article.
  */
-//{block name="backend/swag_migration/model/configurator_option"}
+// {block name="backend/swag_migration/model/configurator_option"}
 Ext.define('Shopware.apps.SwagMigration.model.ConfiguratorOption', {
     /**
      * Extends the standard Ext Model
@@ -25,7 +25,7 @@ Ext.define('Shopware.apps.SwagMigration.model.ConfiguratorOption', {
      * @array
      */
     fields: [
-		//{block name="backend/swag_migration/model/configurator_option/fields"}{/block}
+        // {block name="backend/swag_migration/model/configurator_option/fields"}{/block}
         { name: 'id', type: 'int', useNull: true },
         { name: 'groupId', type: 'int' },
         { name: 'active', type: 'boolean', defaultValue: false },
@@ -35,4 +35,4 @@ Ext.define('Shopware.apps.SwagMigration.model.ConfiguratorOption', {
     ]
 
 });
-//{/block}
+// {/block}
