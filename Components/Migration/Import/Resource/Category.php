@@ -24,8 +24,10 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  */
 class Category extends AbstractResource
 {
-    /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql */
-    private $db = null;
+    /**
+     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     */
+    private $db;
 
     /** @var array */
     private $unmapped = [];
@@ -54,7 +56,9 @@ class Category extends AbstractResource
                 'errorImportingCategories',
                 'An error occurred while importing categories'
             );
-        } elseif ($this->getInternalName() == 'import_article_categories') {
+        }
+
+        if ($this->getInternalName() == 'import_article_categories') {
             return $this->getNameSpace()->get(
                 'errorImportingArticleCategories',
                 'An error assigning articles to categories'
@@ -73,7 +77,9 @@ class Category extends AbstractResource
                 $progress->getOffset(),
                 $progress->getCount()
             );
-        } elseif ($this->getInternalName() == 'import_article_categories') {
+        }
+
+        if ($this->getInternalName() == 'import_article_categories') {
             return sprintf(
                 $this->getNameSpace()->get('progressArticleCategories', '%s out of %s articles assigned to categories'),
                 $progress->getOffset(),
@@ -170,7 +176,9 @@ class Category extends AbstractResource
     {
         if ($this->getInternalName() == 'import_categories') {
             return $this->importCategories();
-        } elseif ($this->getInternalName() == 'import_article_categories') {
+        }
+
+        if ($this->getInternalName() == 'import_article_categories') {
             return $this->importArticleCategories();
         }
     }
@@ -195,7 +203,7 @@ class Category extends AbstractResource
             );
         }
 
-        if ($call['profile'] == 'WooCommerce') {
+        if ($call['profile'] === 'WooCommerce') {
             $locale = $this->Source()->getNormalizedLanguages();
 
             $sql = 'SELECT id FROM s_core_locales WHERE locale = ?';
@@ -213,7 +221,7 @@ class Category extends AbstractResource
         $this->initTaskTimer();
 
         while (!$skip && $category = $categories->fetch()) {
-            if ($call['profile'] == 'WooCommerce') {
+            if ($call['profile'] === 'WooCommerce') {
                 $category['languageID'] = $languageId;
             }
 

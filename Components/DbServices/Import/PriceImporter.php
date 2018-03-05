@@ -12,12 +12,12 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 
 class PriceImporter
 {
-    /* @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
     /**
-     * PriceImporter constructor.
-     *
      * @param PDOConnection $db
      */
     public function __construct(PDOConnection $db)
@@ -96,7 +96,7 @@ class PriceImporter
         $price['pseudoprice'] = isset($price['pseudoprice']) ? $this->toFloat($price['pseudoprice']) : 0;
         $price['baseprice'] = isset($price['baseprice']) ? $this->toFloat($price['baseprice']) : 0;
         $price['percent'] = isset($price['percent']) ? $this->toFloat($price['percent']) : 0;
-        $price['from'] = empty($price['from']) ? 1 : intval($price['from']);
+        $price['from'] = empty($price['from']) ? 1 : (int) $price['from'];
         if (empty($price['pricegroup'])) {
             $price['pricegroup'] = 'EK';
         }
@@ -123,10 +123,10 @@ class PriceImporter
         }
 
         if (!empty($price['articledetailsID'])) {
-            $price['articledetailsID'] = intval($price['articledetailsID']);
+            $price['articledetailsID'] = (int) $price['articledetailsID'];
             $where = "id = {$price['articledetailsID']}";
         } elseif (!empty($price['articleID'])) {
-            $price['articleID'] = intval($price['articleID']);
+            $price['articleID'] = (int) $price['articleID'];
             $where = "articleID = {$price['articleID']} AND kind = 1";
         } else {
             $price['ordernumber'] = $this->db->quote((string) $price['ordernumber']);
@@ -252,6 +252,6 @@ class PriceImporter
      */
     private function toFloat($value)
     {
-        return floatval(str_replace(',', '.', $value));
+        return (float) str_replace(',', '.', $value);
     }
 }

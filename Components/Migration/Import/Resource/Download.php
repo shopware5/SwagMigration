@@ -106,7 +106,7 @@ class Download extends AbstractResource
                 }
             }
 
-            if (strlen($document) == 0) {
+            if ($document === '') {
                 continue;
             }
             file_put_contents($localPath . str_replace('%20', ' ', $path), $document);

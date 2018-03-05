@@ -16,42 +16,62 @@ use Symfony\Component\DependencyInjection\Container;
 
 class Import
 {
-    /** @var Container $container */
+    /**
+     * @var Container
+     */
     private $container;
 
-    /* @var PDOConnection $db */
-    private $db = null;
-
-    /* @var ModelManager $em */
-    private $em = null;
-
-    /** @var Logger $logger */
-    private $logger;
-
-    /** @var Config $config */
-    private $config;
-
-    /* @var ArticleImporter $articleImporter */
-    private $articleImporter = null;
-
-    /* @var CategoryImporter $categoryImporter */
-    private $categoryImporter = null;
-
-    /* @var CustomerImporter $customerImporter */
-    private $customerImporter = null;
-
-    /* @var ImageImporter $imageImporter */
-    private $imageImporter = null;
-
-    /* @var PriceImporter $priceImporter */
-    private $priceImporter = null;
-
-    /* @var TranslationImporter $translationImporter */
-    private $translationImporter = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
     /**
-     * Import constructor.
-     *
+     * @var ModelManager
+     */
+    private $em;
+
+    /**
+     * @var Logger
+     */
+    private $logger;
+
+    /**
+     * @var Config
+     */
+    private $config;
+
+    /**
+     * @var ArticleImporter
+     */
+    private $articleImporter;
+
+    /**
+     * @var CategoryImporter
+     */
+    private $categoryImporter;
+
+    /**
+     * @var CustomerImporter
+     */
+    private $customerImporter;
+
+    /**
+     * @var ImageImporter
+     */
+    private $imageImporter;
+
+    /**
+     * @var PriceImporter
+     */
+    private $priceImporter;
+
+    /**
+     * @var TranslationImporter
+     */
+    private $translationImporter;
+
+    /**
      * @param Container $container
      */
     public function __construct(Container $container)
@@ -72,9 +92,7 @@ class Import
      */
     public function category(array $category)
     {
-        $categoryId = $this->getCategoryImporter()->import($category);
-
-        return $categoryId;
+        return $this->getCategoryImporter()->import($category);
     }
 
     /**
@@ -117,9 +135,7 @@ class Import
      */
     public function setArticlePriceData(array $article)
     {
-        $articlePricesId = $this->getArticleImporter()->setPriceData($article);
-
-        return $articlePricesId;
+        return $this->getArticleImporter()->setPriceData($article);
     }
 
     /**
@@ -137,9 +153,7 @@ class Import
      */
     public function addArticleLink(array $linkData)
     {
-        $linkId = $this->getArticleImporter()->addArticleLink($linkData);
-
-        return $linkId;
+        return $this->getArticleImporter()->addArticleLink($linkData);
     }
 
     /**
@@ -147,7 +161,7 @@ class Import
      */
     public function deleteArticleImages($articleId)
     {
-        $articleId = intval($articleId);
+        $articleId = (int) $articleId;
 
         $this->getArticleImporter()->deleteImages($articleId);
     }
@@ -159,9 +173,7 @@ class Import
      */
     public function customer(array $customer)
     {
-        $customerData = $this->getCustomerImporter()->import($customer);
-
-        return $customerData;
+        return $this->getCustomerImporter()->import($customer);
     }
 
     /**
@@ -171,9 +183,7 @@ class Import
      */
     public function articleImage(array $image)
     {
-        $imageId = $this->getImageImporter()->importArticleImage($image);
-
-        return $imageId;
+        return $this->getImageImporter()->importArticleImage($image);
     }
 
     /**
@@ -183,9 +193,7 @@ class Import
      */
     public function articlePrice(array $price)
     {
-        $priceId = $this->getPriceImporter()->importArticlePrice($price);
-
-        return $priceId;
+        return $this->getPriceImporter()->importArticlePrice($price);
     }
 
     /**

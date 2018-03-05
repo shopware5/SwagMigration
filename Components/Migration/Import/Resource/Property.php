@@ -98,7 +98,7 @@ class Property extends AbstractResource
                 if (!array_key_exists($property['option'], $options)) {
                     $options[$property['option']] = ['name' => $property['option'], 'values' => [['value' => $property['value']]]];
                 } else {
-                    array_push($options[$property['option']]['values'], ['value' => $property['value']]);
+                    $options[$property['option']]['values'][] = ['value' => $property['value']];
                 }
             }
 
@@ -281,7 +281,9 @@ class Property extends AbstractResource
                 $sql = 'INSERT IGNORE INTO `s_filter_articles` (`articleID`, `valueID`) VALUES (?, ?)';
                 Shopware()->Db()->query($sql, [$productId, $valueId]);
             }
+            unset($value);
         }
+        unset($option);
 
         // Set filter group for the given article
         Shopware()->Db()->query('UPDATE s_articles SET filtergroupID = ? WHERE id = ?', [$groupId, $productId]);

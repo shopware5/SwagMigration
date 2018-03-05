@@ -5,7 +5,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 use Doctrine\DBAL\Connection;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Md5Reversed;
@@ -94,12 +93,12 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     /**
      * @param string $version
      *
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function checkVersion($version)
     {
         if (!$this->assertMinimumVersion($version)) {
-            throw new Exception('This plugin requires Shopware ' . $version . ' or a later version');
+            throw new RuntimeException('This plugin requires Shopware ' . $version . ' or a later version');
         }
     }
 
@@ -108,7 +107,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      *
      * @param string $version
      *
-     * @return array
+     * @return bool
      */
     public function update($version)
     {
@@ -343,7 +342,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     /**
      * Returns the version of the plugin as a string
      *
-     * @throws Exception
+     * @throws RuntimeException
      *
      * @return string
      */
@@ -354,7 +353,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         if ($info) {
             return $info['currentVersion'];
         }
-        throw new Exception('The plugin has an invalid version file.');
+        throw new RuntimeException('The plugin has an invalid version file.');
     }
 
     /**

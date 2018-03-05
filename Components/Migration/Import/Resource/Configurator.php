@@ -65,11 +65,11 @@ class Configurator extends AbstractResource
         $this->getProgress()->setCount($count);
         $this->initTaskTimer();
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($product = $products_result->fetch()) {
                 $this->migrateConfigurator($product);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedVariants = $normalizer->normalizeVariants($products_result->fetchAll());
 
@@ -84,6 +84,11 @@ class Configurator extends AbstractResource
         return $this->getProgress()->done();
     }
 
+    /**
+     * @param array $product
+     *
+     * @return Progress
+     */
     private function migrateConfigurator($product)
     {
         $id = $product['productID'];

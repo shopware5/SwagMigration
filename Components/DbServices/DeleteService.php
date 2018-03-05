@@ -12,8 +12,10 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 
 class DeleteService
 {
-    /** @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
     /**
      * DeleteService constructor.

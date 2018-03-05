@@ -12,8 +12,10 @@ use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 
 class TranslationImporter
 {
-    /* @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
     /**
      * TranslationImporter constructor.
@@ -98,7 +100,7 @@ class TranslationImporter
     private function prepareTranslationData(array $objectData, $objectType, $objectLanguage)
     {
         $map = ['txtzusatztxt' => 'additionaltext'];
-        if ($objectType == 'article') {
+        if ($objectType === 'article') {
             $map['txtArtikel'] = 'name';
             $map['txtshortdescription'] = 'description';
             $map['txtlangbeschreibung'] = 'description_long';

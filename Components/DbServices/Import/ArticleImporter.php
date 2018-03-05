@@ -76,19 +76,29 @@ class ArticleImporter
         'shippingtime',
     ];
 
-    /* @var ArticleRepository $articleRepository */
-    private $articleRepository = null;
+    /**
+     * @var ArticleRepository
+     */
+    private $articleRepository;
 
-    /* @var MediaRepository $mediaRepository */
-    private $mediaRepository = null;
+    /**
+     * @var MediaRepository
+     */
+    private $mediaRepository;
 
-    /** @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
-    /** @var ModelManager $em */
-    private $em = null;
+    /**
+     * @var ModelManager
+     */
+    private $em;
 
-    /* @var Logger $logger */
+    /**
+     * @var Logger
+     * */
     private $logger;
 
     /**
@@ -213,7 +223,7 @@ class ArticleImporter
         if (isset($article['variant_group_names'])) {
             $variantGroupNames = explode('|', $article['variant_group_names']);
             // make sure that the number of group names matches the number of options
-            $groupNames = count($additionalTextData) == count($variantGroupNames) ? $variantGroupNames : null;
+            $groupNames = count($additionalTextData) === count($variantGroupNames) ? $variantGroupNames : null;
         }
 
         $optionIDs = [];
@@ -328,7 +338,7 @@ class ArticleImporter
         if (empty($price['from'])) {
             $price['from'] = 1;
         } else {
-            $price['from'] = intval($price['from']);
+            $price['from'] = (int) $price['from'];
         }
         if (empty($price['pricegroup'])) {
             $price['pricegroup'] = 'EK';
@@ -514,7 +524,7 @@ class ArticleImporter
     private function getArticleRepository()
     {
         if ($this->articleRepository === null) {
-            $this->articleRepository = $this->em->getRepository('Shopware\Models\Article\Article');
+            $this->articleRepository = $this->em->getRepository(Article::class);
         }
 
         return $this->articleRepository;
@@ -526,7 +536,7 @@ class ArticleImporter
     private function getMediaRepository()
     {
         if ($this->mediaRepository === null) {
-            $this->mediaRepository = $this->em->getRepository('Shopware\Models\Media\Media');
+            $this->mediaRepository = $this->em->getRepository(Media::class);
         }
 
         return $this->mediaRepository;
@@ -555,19 +565,19 @@ class ArticleImporter
             $article['keywords'] = $this->db->quote((string) $article['keywords']);
         }
         if (isset($article['supplierID'])) {
-            $article['supplierID'] = intval($article['supplierID']);
+            $article['supplierID'] = (int) $article['supplierID'];
         }
         if (isset($article['taxID'])) {
-            $article['taxID'] = intval($article['taxID']);
+            $article['taxID'] = (int) $article['taxID'];
         }
         if (isset($article['filtergroupID'])) {
-            $article['filtergroupID'] = intval($article['filtergroupID']);
+            $article['filtergroupID'] = (int) $article['filtergroupID'];
         }
         if (isset($article['pricegroupID'])) {
-            $article['pricegroupID'] = intval($article['pricegroupID']);
+            $article['pricegroupID'] = (int) $article['pricegroupID'];
         }
         if (isset($article['pseudosales'])) {
-            $article['pseudosales'] = intval($article['pseudosales']);
+            $article['pseudosales'] = (int) $article['pseudosales'];
         }
         if (isset($article['topseller'])) {
             $article['topseller'] = empty($article['topseller']) ? 0 : 1;
@@ -583,16 +593,16 @@ class ArticleImporter
             $article['crossbundlelook'] = empty($article['crossbundlelook']) ? 0 : 1;
         }
         if (isset($article['main_detail_id'])) {
-            $article['main_detail_id'] = intval($article['main_detail_id']);
+            $article['main_detail_id'] = (int) $article['main_detail_id'];
         }
         if (isset($article['configurator_set_id'])) {
-            $article['configurator_set_id'] = intval($article['configurator_set_id']);
+            $article['configurator_set_id'] = (int) $article['configurator_set_id'];
         }
         if (isset($article['template'])) {
-            $article['template'] = intval($article['template']);
+            $article['template'] = (int) $article['template'];
         }
         if (isset($article['mode'])) {
-            $article['mode'] = intval($article['mode']);
+            $article['mode'] = (int) $article['mode'];
         }
         if (!empty($article['added'])) {
             $article['added'] = $this->toDate($article['added']);
@@ -626,19 +636,19 @@ class ArticleImporter
     private function prepareArticleDetailData(array $article)
     {
         if (isset($article['articleID'])) {
-            $article['articleID'] = intval($article['articleID']);
+            $article['articleID'] = (int) $article['articleID'];
         }
         if (isset($article['ordernumber'])) {
             $article['ordernumber'] = $this->db->quote($this->toString($article['ordernumber']));
         }
         if (isset($article['impressions'])) {
-            $article['impressions'] = intval($article['impressions']);
+            $article['impressions'] = (int) $article['impressions'];
         }
         if (isset($article['sales'])) {
-            $article['sales'] = intval($article['sales']);
+            $article['sales'] = (int) $article['sales'];
         }
         if (isset($article['position'])) {
-            $article['position'] = intval($article['position']);
+            $article['position'] = (int) $article['position'];
         }
         if (isset($article['width'])) {
             $article['width'] = $this->toFloat($article['width']);
@@ -653,16 +663,16 @@ class ArticleImporter
             $article['ean'] = $this->db->quote((string) $article['ean']);
         }
         if (isset($article['unitID'])) {
-            $article['unitID'] = intval($article['unitID']);
+            $article['unitID'] = (int) $article['unitID'];
         }
         if (isset($article['purchasesteps'])) {
-            $article['purchasesteps'] = intval($article['purchasesteps']);
+            $article['purchasesteps'] = (int) $article['purchasesteps'];
         }
         if (isset($article['maxpurchase'])) {
-            $article['maxpurchase'] = intval($article['maxpurchase']);
+            $article['maxpurchase'] = (int) $article['maxpurchase'];
         }
         if (isset($article['minpurchase'])) {
-            $article['minpurchase'] = intval($article['minpurchase']);
+            $article['minpurchase'] = (int) $article['minpurchase'];
         }
         if (isset($article['purchaseunit'])) {
             $article['purchaseunit'] = $this->toFloat($article['purchaseunit']);
@@ -685,8 +695,8 @@ class ArticleImporter
             $article['laststock'] = empty($article['laststock']) ? 0 : 1;
         }
 
-        $article['stockmin'] = empty($article['stockmin']) ? 0 : intval($article['stockmin']);
-        $article['instock'] = empty($article['instock']) ? 0 : intval($article['instock']);
+        $article['stockmin'] = empty($article['stockmin']) ? 0 : (int) $article['stockmin'];
+        $article['instock'] = empty($article['instock']) ? 0 : (int) $article['instock'];
         $article['weight'] = empty($article['weight']) ? 0 : $this->toFloat($article['weight']);
         $article['additionaltext'] = empty($article['additionaltext']) ? "''" : $this->db->quote((string) $article['additionaltext']);
         $article['suppliernumber'] = empty($article['suppliernumber']) ? "''" : $this->db->quote($this->toString($article['suppliernumber']));
@@ -702,7 +712,7 @@ class ArticleImporter
     private function prepareArticleAttributesData(array $article)
     {
         if (isset($article['articledetailsID'])) {
-            $article['articledetailsID'] = intval($article['articledetailsID']);
+            $article['articledetailsID'] = (int) $article['articledetailsID'];
         }
 
         if (isset($article['attr']) && is_array($article['attr'])) {
@@ -737,7 +747,7 @@ class ArticleImporter
     {
         // checks whether main detail exists
         if (!empty($article['maindetailsID'])) {
-            $article['maindetailsID'] = intval($article['maindetailsID']);
+            $article['maindetailsID'] = (int) $article['maindetailsID'];
             $sql = 'SELECT id, articleID
                     FROM s_articles_details
                     WHERE id = ? AND kind = 1';
@@ -831,7 +841,7 @@ class ArticleImporter
             return false;
         }
 
-        $supplierId = intval($supplierId);
+        $supplierId = (int) $supplierId;
 
         $sql = 'SELECT id FROM s_articles_supplier WHERE id = ' . $supplierId;
         $id = $this->db->fetchOne($sql);
@@ -872,7 +882,7 @@ class ArticleImporter
             $this->db->query($sql);
         }
 
-        return intval($supplierID);
+        return (int) $supplierID;
     }
 
     /**
@@ -1087,10 +1097,10 @@ class ArticleImporter
             return false;
         }
         if (!empty($article['articledetailsID'])) {
-            $article['articledetailsID'] = intval($article['articledetailsID']);
+            $article['articledetailsID'] = (int) $article['articledetailsID'];
             $where = "id = {$article['articledetailsID']}";
         } elseif (!empty($article['articleID'])) {
-            $article['articleID'] = intval($article['articleID']);
+            $article['articleID'] = (int) $article['articleID'];
             $where = "articleID = {$article['articleID']} AND kind = 1";
         } else {
             $article['ordernumber'] = $this->db->quote((string) $article['ordernumber']);
@@ -1134,10 +1144,10 @@ class ArticleImporter
                 FROM s_articles_details
                 WHERE ';
         if (!empty($article['articleID'])) {
-            $article['articleID'] = intval($article['articleID']);
+            $article['articleID'] = (int) $article['articleID'];
             $sql .= "articleID = {$article['articleID']}";
         } elseif (!empty($article['articledetailsID'])) {
-            $article['articledetailsID'] = intval($article['articledetailsID']);
+            $article['articledetailsID'] = (int) $article['articledetailsID'];
             $sql .= "id = {$article['articledetailsID']}";
         } else {
             $article['ordernumber'] = $this->db->quote((string) $article['ordernumber']);
@@ -1161,10 +1171,13 @@ class ArticleImporter
     {
         if (empty($type)) {
             return false;
-        } elseif (is_array($type)) {
+        }
+
+        if (is_array($type)) {
             foreach ($type as &$value) {
                 $value = $this->db->quote($value);
             }
+            unset($value);
             $type = implode(',', $type);
         } else {
             $type = $this->db->quote($type);
@@ -1198,7 +1211,7 @@ class ArticleImporter
      */
     private function deleteArticle($articleID)
     {
-        $article['articleID'] = intval($articleID);
+        $article['articleID'] = (int) $articleID;
         $article['kind'] = 1;
         $sql = "SELECT id
                 FROM s_articles_details
@@ -1363,11 +1376,11 @@ class ArticleImporter
      */
     private function toFloat($value)
     {
-        if (gettype($value) === 'float') {
+        if (is_float($value)) {
             return $value;
         }
 
-        return floatval(str_replace(',', '.', $value));
+        return (float) str_replace(',', '.', $value);
     }
 
     /**

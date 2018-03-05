@@ -66,6 +66,9 @@ class Woocommerce extends Profile
         return $keys;
     }
 
+    /**
+     * @return string
+     */
     public function getCustomerGroupSelect()
     {
         return "

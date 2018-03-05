@@ -77,11 +77,11 @@ class Customer extends AbstractResource
         /* @var Import $import */
         $import = Shopware()->Container()->get('swagmigration.import');
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($customer = $result->fetch()) {
                 $this->migrateCustomer($customer, $import, $salt);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedCustomers = $normalizer->normalizeCustomers($result->fetchAll());
 

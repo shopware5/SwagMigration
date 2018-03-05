@@ -90,6 +90,11 @@ class WooCommerce
         '_line_total' => 'price',
     ];
 
+    /**
+     * @param array $products
+     *
+     * @return array
+     */
     public function normalizeProducts($products)
     {
         $normalizedProducts = [];
@@ -213,10 +218,10 @@ class WooCommerce
         }
 
         foreach ($normalizedCustomers as $key => $customer) {
-            if ($customer['firstname'] == '') {
+            if ($customer['firstname'] === '') {
                 $normalizedCustomers[$key]['firstname'] = $customer['billing_firstname'];
             }
-            if ($customer['lastname'] == '') {
+            if ($customer['lastname'] === '') {
                 $normalizedCustomers[$key]['lastname'] = $customer['billing_lastname'];
             }
             $normalizedCustomers[$key]['salutation'] = 'mr';

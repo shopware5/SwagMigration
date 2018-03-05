@@ -30,7 +30,7 @@ class Migration extends \Enlight_Class
      *
      * @var string
      */
-    protected static $profileNamespace = 'Shopware\SwagMigration\Components\Migration\Profile';
+    protected static $profileNamespace = Profile::class;
 
     /**
      * Namespace for the import resources
@@ -49,16 +49,14 @@ class Migration extends \Enlight_Class
      *
      * @return \Enlight_Class
      */
-    public static function profileFactory($profile, $config = [])
+    public static function profileFactory($profile, array $config = [])
     {
         $profileNamespace = empty($config['profileNamespace']) ? self::$profileNamespace : $config['profileNamespace'];
 
         $profileName = $profileNamespace . '\\';
         $profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
 
-        $migrationAdapter = \Enlight_Class::Instance($profileName, [$config]);
-
-        return $migrationAdapter;
+        return \Enlight_Class::Instance($profileName, [$config]);
     }
 
     /**

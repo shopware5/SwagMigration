@@ -24,7 +24,9 @@ class Order extends AbstractResource
     {
         if ($this->getInternalName() == 'import_orders') {
             return $this->getNameSpace()->get('errorImportingOrders', 'An error occurred while importing orders');
-        } elseif ($this->getInternalName() == 'import_order_details') {
+        }
+
+        if ($this->getInternalName() == 'import_order_details') {
             return $this->getNameSpace()->get(
                 'errorImportingOrderDetails',
                 'An error occurred while importing order details'
@@ -43,7 +45,9 @@ class Order extends AbstractResource
                 $this->getProgress()->getOffset(),
                 $this->getProgress()->getCount()
             );
-        } elseif ($this->getInternalName() == 'import_order_details') {
+        }
+
+        if ($this->getInternalName() == 'import_order_details') {
             return sprintf(
                 $this->getNameSpace()->get('progressOrderDetails', '%s out of %s order details imported'),
                 $this->getProgress()->getOffset(),
@@ -67,7 +71,9 @@ class Order extends AbstractResource
     {
         if ($this->getInternalName() == 'import_orders') {
             return $this->importOrders();
-        } elseif ($this->getInternalName() == 'import_order_details') {
+        }
+
+        if ($this->getInternalName() == 'import_order_details') {
             return $this->importOrderDetails();
         }
     }
@@ -93,11 +99,11 @@ class Order extends AbstractResource
 
         $this->initTaskTimer();
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($order = $result->fetch()) {
                 $this->migrateOrder($order);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedOrders = $normalizer->normalizeOrders($result->fetchAll());
 
@@ -153,11 +159,11 @@ class Order extends AbstractResource
 
         $this->initTaskTimer();
 
-        if ($call['profile'] != 'WooCommerce') {
+        if ($call['profile'] !== 'WooCommerce') {
             while ($order = $result->fetch()) {
                 $this->migrateOrderDetail($order, $numberValidationMode, $numberSnippet);
             }
-        } elseif ($call['profile'] == 'WooCommerce') {
+        } elseif ($call['profile'] === 'WooCommerce') {
             $normalizer = new WooCommerce();
             $normalizedOrderDetails = $normalizer->normalizeOrderDetails($result->fetchAll());
 

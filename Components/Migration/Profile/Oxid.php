@@ -476,11 +476,11 @@ class Oxid extends Profile
         try {
             $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
 
-            return $this->db()->fetchOne($sql);
+            return $this->Db()->fetchOne($sql);
         } catch (Exception $e) {
             $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = 'oxbaseshop'";
 
-            return $this->db()->fetchOne($sql);
+            return $this->Db()->fetchOne($sql);
         }
     }
 

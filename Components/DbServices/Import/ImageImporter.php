@@ -14,21 +14,30 @@ use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Image;
 use Shopware\Models\Article\Repository as ArticleRepository;
+use Shopware\Models\Media\Album;
 use Shopware\Models\Media\Media;
 use Symfony\Component\HttpFoundation\File\File;
 
 class ImageImporter
 {
-    /* @var ArticleRepository $articleRepository */
-    private $articleRepository = null;
+    /**
+     * @var ArticleRepository
+     */
+    private $articleRepository;
 
-    /* @var PDOConnection $db */
-    private $db = null;
+    /**
+     * @var PDOConnection
+     */
+    private $db;
 
-    /* @var ModelManager $em */
-    private $em = null;
+    /**
+     * @var ModelManager
+     */
+    private $em;
 
-    /* @var Logger $logger */
+    /**
+     * @var Logger
+     */
     private $logger;
 
     /**
@@ -90,7 +99,7 @@ class ImageImporter
 
         $media->setAlbumId($image['albumID']);
         /* @var \Shopware\Models\Media\Album $album */
-        $album = $this->em->find('Shopware\Models\Media\Album', $image['albumID']);
+        $album = $this->em->find(Album::class, $image['albumID']);
         $media->setAlbum($album);
 
         $articleImage = new Image();
@@ -122,7 +131,7 @@ class ImageImporter
     private function getArticleRepository()
     {
         if ($this->articleRepository === null) {
-            $this->articleRepository = $this->em->getRepository('Shopware\Models\Article\Article');
+            $this->articleRepository = $this->em->getRepository(Article::class);
         }
 
         return $this->articleRepository;
@@ -139,7 +148,7 @@ class ImageImporter
             $image['image'] = $image['link'];
         }
         if (isset($image['articleID'])) {
-            $image['articleID'] = intval($image['articleID']);
+            $image['articleID'] = (int) $image['articleID'];
         }
         if (empty($image['description'])) {
             $image['description'] = '';
@@ -149,7 +158,7 @@ class ImageImporter
         }
 
         $image['albumID'] = isset($image['albumID']) ? (int) $image['albumID'] : -1;
-        $image['position'] = !empty($image['position']) ? intval($image['position']) : 0;
+        $image['position'] = !empty($image['position']) ? (int) $image['position'] : 0;
         $image['name'] = empty($image['name']) ? md5(uniqid(mt_rand(), true)) : pathinfo($image['name'], PATHINFO_FILENAME);
 
         return $image;
