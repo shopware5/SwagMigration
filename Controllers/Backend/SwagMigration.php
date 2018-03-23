@@ -263,6 +263,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $this->setRenderer(false);
 
         $rows = [
+            ['id' => 'Magento2', 'name' => $this->getNamespace()->get('profile-magento-2')],
             ['id' => 'Magento', 'name' => $this->getNamespace()->get('profile-magento')],
             ['id' => 'Magento17', 'name' => $this->getNamespace()->get('profile-magento-old')],
             ['id' => 'Oxid', 'name' => $this->getNamespace()->get('profile-oxid')],
