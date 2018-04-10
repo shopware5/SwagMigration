@@ -13,10 +13,17 @@ use Zend_Db_Expr;
 
 class Magento2 extends Profile
 {
+    public function __construct($options)
+    {
+        parent::__construct($options);
+
+        $this->db_prefix = '';
+    }
+
     /**
-     * Returns the directory of the article images.
+     * Returns the directory of the product images.
      *
-     * @return string {String} | image path
+     * @return string
      */
     public function getProductImagePath()
     {
@@ -36,20 +43,20 @@ class Magento2 extends Profile
     /**
      * Returns the sql statement to select the config base path
      *
-     * @return string {String} | sql for the config base path
+     * @return string
      */
     public function getConfigSelect()
     {
-        return "
+        return '
 			SELECT `path` as name, `value`
 			FROM core_config_data
-		";
+		';
     }
 
     /**
      * Returns the sql statement to select the shop system languages
      *
-     * @return string {String} | sql for languages
+     * @return string
      */
     public function getLanguageSelect()
     {
@@ -84,48 +91,47 @@ class Magento2 extends Profile
     /**
      * Returns the sql statement to select the shop system sub shops
      *
-     * @return string {String} | sql for sub shops
+     * @return string
      */
     public function getShopSelect()
     {
-        return "
+        return '
 			SELECT `store_id` as id, `name` as name
 			FROM store
 			WHERE `store_id`!=0
-		";
+		';
     }
 
     /**
      * Returns the sql statement to select the shop system price groups
      *
-     * @return string {String} | sql for price groups
+     * @return string
      */
     public function getPriceGroupSelect()
     {
-        return "
+        return '
 			SELECT `customer_group_id` as id, `customer_group_code` as name
 			FROM customer_group
-		";
+		';
     }
 
     /**
      * Returns the sql statement to select the shop system payments
      *
-     * @return string {String} | sql for the payments
-     *
+     * @return string
      */
     public function getPaymentMeanSelect()
     {
-        return "
+        return '
 			SELECT `method` as id, `method` as name
 			FROM quote_payment
-		";
+		';
     }
 
     /**
      * Returns an array of the order states mapping, with keys and descriptions
      *
-     * @return array {Array} | order states: key - description
+     * @return array
      */
     public function getOrderStatus()
     {
@@ -140,18 +146,18 @@ class Magento2 extends Profile
     /**
      * Returns the sql statement to select the shop system tax rates
      *
-     * @return string {String} | sql for the tax rates
+     * @return string
      */
     public function getTaxRateSelect()
     {
-        return "
+        return '
 			SELECT `class_id` as id, `class_name` as name
 			FROM tax_class
-		";
+		';
     }
 
     /**
-     * Returns the sql statement to select articles with
+     * Returns the sql statement to select product with
      *
      * @param $id
      *
@@ -169,7 +175,7 @@ class Magento2 extends Profile
             -- The actual product
             FROM  catalog_product_entity p
 
-            -- Maps Articles to attributes
+            -- Maps products to attributes
             INNER JOIN catalog_product_entity_int entity_int
             ON entity_int.entity_id=p.entity_id
 
@@ -183,7 +189,7 @@ class Magento2 extends Profile
 			ON eav_settings.attribute_id = eav.attribute_id
 			AND eav_settings.is_filterable = 1
 
-            -- Joins article option relation
+            -- Joins products option relation
             INNER  JOIN eav_attribute_option_value option_value
             ON option_value.option_id=entity_int.value
             AND option_value.store_id=0
@@ -236,9 +242,9 @@ class Magento2 extends Profile
     }
 
     /**
-     * Returns the sql statement to select the shop system article attributes
+     * Returns the sql statement to select the shop system product attributes
      *
-     * @return string {String} | sql for the article attributes
+     * @return string
      */
     public function getAttributeSelect()
     {
@@ -272,24 +278,23 @@ class Magento2 extends Profile
             SELECT
 
             p.entity_id                                    as productID,
-            IFNULL(r.parent_id, p.entity_id)               as parentID,
             GROUP_CONCAT(eav.attribute_code SEPARATOR '|') as variant_group_names,
             GROUP_CONCAT(option_value.value SEPARATOR '|') as additionaltext
 
             -- The actual product
             FROM catalog_product_entity p
 
-            -- Relation to parent article
+            -- Relation to parent product
             -- LEFT JOIN catalog_product_relation r
             -- ON r.child_id=p.entity_id
             LEFT JOIN catalog_product_super_link r
             ON r.product_id = p.entity_id
 
-            -- Join parent article if available
+            -- Join parent product if available
             LEFT JOIN catalog_product_entity parent
             ON parent.entity_id = r.parent_id
 
-            -- Maps Articles to attributes
+            -- Maps products to attributes
             INNER JOIN catalog_product_entity_int entity_int
             ON entity_int.entity_id=p.entity_id
 
@@ -302,7 +307,7 @@ class Magento2 extends Profile
             INNER JOIN catalog_eav_attribute eav_attr
             ON eav_attr.attribute_id = eav.attribute_id
 
-            -- Joins article option relation
+            -- Joins product option relation
             INNER  JOIN eav_attribute_option_value option_value
             ON option_value.option_id=entity_int.value
             AND option_value.store_id = 0
@@ -315,9 +320,9 @@ class Magento2 extends Profile
     }
 
     /**
-     * Returns the sql statement to select the shop system articles
+     * Returns the sql statement to select the shop system products
      *
-     * @return string {String} | sql for the articles
+     * @return string
      */
     public function getProductSelect()
     {
@@ -377,7 +382,7 @@ class Magento2 extends Profile
 			ON cs.`product_id`=catalog_product.`entity_id`
 			AND cs.`stock_id`=1
 
-            -- maps child articles to parents
+            -- maps child products to parents
 			LEFT JOIN catalog_product_relation relation
 			ON catalog_product.entity_id=relation.child_id
 
@@ -393,9 +398,9 @@ class Magento2 extends Profile
     }
 
     /**
-     * Returns the sql statement to select the shop system article translations
+     * Returns the sql statement to select the shop system product translations
      *
-     * @return string {String} | sql for the article translations
+     * @return string
      */
     public function getProductTranslationSelect()
     {
@@ -438,13 +443,13 @@ class Magento2 extends Profile
     }
 
     /**
-     * Returns the sql statement to select the shop system article prices
+     * Returns the sql statement to select the shop system product prices
      *
-     * @return string {String} | sql for the article prices
+     * @return string
      */
     public function getProductPriceSelect()
     {
-        return "
+        return '
 			SELECT
 				`entity_id` as `productID`,
 				`qty` as `from`,
@@ -453,17 +458,17 @@ class Magento2 extends Profile
 				`customer_group_id` as `pricegroup`
 			FROM catalog_product_entity_tier_price
 			ORDER BY `productID`, `pricegroup`, `from`
-		";
+		';
     }
 
     /**
-     * Returns the sql statement to select the shop system article image allocation
+     * Returns the sql statement to select the shop system product image allocation
      *
-     * @return string {String} | sql for the article image allocation
+     * @return string
      */
     public function getProductImageSelect()
     {
-        return "
+        return '
 			SELECT
 				gv.entity_id as productID,
 				g.value as image,
@@ -476,54 +481,60 @@ class Magento2 extends Profile
 			WHERE gv.`value_id`=g.`value_id`
 			AND gv.`store_id`=0
 			ORDER BY productID, position
-		";
+		';
     }
 
     /**
-     * Returns the sql statement to select the shop system article category allocation
+     * Returns the sql statement to select the shop system product category allocation
      *
-     * @return string {String} | sql for the article category allocation
+     * @return string
      */
     public function getProductCategorySelect()
     {
-        return "
+        return '
 			SELECT product_id as productID, category_id as categoryID
 			FROM catalog_category_product
 			ORDER BY position
-		";
+		';
     }
 
     /**
      * Returns the sql statement to select the shop system categories.
      * If the shop system have more than one sub shop the sql statements will join with "UNION ALL".
      *
-     * @return string {String} | sql for the categories
+     * @return string
      */
     public function getCategorySelect()
     {
+        $entityTypeId = $this->getEntityTypeId('catalog_category');
+        $attributeId = $this->getAttributeId($entityTypeId, 'name');
+
         $sql = [];
         foreach ($this->getShops() as $shopID => $shop) {
             $sql[] = "
 				SELECT
-					IF(entity_id=g.`root_category_id`, 0, entity_id) as categoryID,
-					IF(parent_id=g.`root_category_id`, 0, parent_id) as parentID,
-					s.`store_id` as languageID,
+					c.entity_id as categoryID,
+					c.parent_id as parentID,
+					s.store_id as languageID,
 					c.level,
-					c.name as description,
+					ev.value as description,
 					c.position as position,
-					c.meta_keywords as metaKeywords,
-					c.meta_description as metaDescription,
-					c.meta_title as cmsheadline,
-                    c.meta_title as meta_title,
-					c.description as cmstext,
-					c.is_active as active
+					'' as metaKeywords,
+					'' as metaDescription,
+					'' as cmsheadline,
+                    ev.value as meta_title,
+					'' as cmstext,
+					1 as active
 				FROM
 					store s,
 					store_group g,
-					catalog_category_flat_store_$shopID c
+					catalog_category_entity c
+					LEFT JOIN catalog_category_entity_varchar ev
+                      ON (c.entity_id = ev.entity_id)
 				WHERE g.`group_id`=s.`group_id`
-				AND c.`path` LIKE CONCAT('1/', g.`root_category_id`, '/%')
+				AND c.`path` REGEXP CONCAT('^1$|1\/', g.root_category_id, '(\/)?')
 				AND s.`store_id`={$this->Db()->quote($shopID)}
+				AND ev.attribute_id = {$this->Db()->quote($attributeId)}
 
                 ORDER BY parentID ASC
 			";
@@ -533,13 +544,13 @@ class Magento2 extends Profile
     }
 
     /**
-     * Returns the sql statement to select the shop system article ratings
+     * Returns the sql statement to select the shop system product ratings
      *
-     * @return string {String} | sql for the article ratings
+     * @return string
      */
     public function getProductRatingSelect()
     {
-        return "
+        return '
 			SELECT
 				r.`entity_pk_value` as `productID`,
 				rd.`customer_id` as `customerID`,
@@ -552,13 +563,13 @@ class Magento2 extends Profile
 			FROM review r, review_detail rd
 			WHERE r.`review_id`=rd.`review_id`
 			AND r.`entity_id`=1
-		";
+		';
     }
 
     /**
      * Returns the sql statement to select the shop system customer
      *
-     * @return string {String} | sql for the customer data
+     * @return string
      */
     public function getCustomerSelect()
     {
@@ -656,7 +667,7 @@ class Magento2 extends Profile
     /**
      * Returns the sql statement to select the shop system customer
      *
-     * @return string {String} | sql for the customer data
+     * @return string
      */
     public function getOrderSelect()
     {
@@ -729,11 +740,11 @@ class Magento2 extends Profile
     /**
      * Returns the sql statement to select all shop system order details
      *
-     * @return string {String} | sql for order details
+     * @return string
      */
     public function getOrderDetailSelect()
     {
-        return "
+        return '
 			SELECT
 				order_id as orderID,
 				product_id  as productID,
@@ -744,11 +755,11 @@ class Magento2 extends Profile
 				tax_percent as tax,
 				0 as modus
 			FROM sales_order_item
-		";
+		';
     }
 
     /**
-     * Returns the sql statement to select the shop system article attribute fields
+     * Returns the sql statement to select the shop system product attribute fields
      *
      * @param string $type
      * @param null   $attributes
@@ -828,10 +839,19 @@ class Magento2 extends Profile
 			";
     }
 
-    public function __construct($options)
+    /**
+     * @param int    $entityTypeId
+     * @param string $attributeCode
+     *
+     * @return string
+     */
+    private function getAttributeId($entityTypeId, $attributeCode)
     {
-        parent::__construct($options);
+        $sql = "SELECT attribute_id 
+                FROM eav_attribute 
+                WHERE entity_type_id = {$this->Db()->quote($entityTypeId)} 
+                AND attribute_code LIKE {$this->Db()->quote($attributeCode)}";
 
-        $this->db_prefix = '';
+        return $this->db->fetchOne($sql);
     }
 }
