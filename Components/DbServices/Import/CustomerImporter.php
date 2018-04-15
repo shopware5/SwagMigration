@@ -151,7 +151,9 @@ class CustomerImporter
      */
     public function import(array $customer)
     {
-        $isCustomer = $this->doesEntryExist('`s_user`', "`email` LIKE '{$customer['email']}'");
+        $quotedCustomerEmail = $this->quoteCustomerEmail($customer);
+
+        $isCustomer = $this->doesEntryExist('`s_user`', "`email` LIKE $quotedCustomerEmail");
 
         $customer['addresses'] = $this->getCustomerAddresses($customer);
 
@@ -292,12 +294,12 @@ class CustomerImporter
 
             $customer['customernumber'] = $this->getCustomerNumber($customer['userID']);
 
-            $customer = $this->newsletterSubscribe($customer);
+            $customer = $this->newsletterSubscribe($customer, $quotedCustomerEmail);
         } else {
             $customer['userID'] = $isCustomer;
             $customer['customernumber'] = $this->getCustomerNumber($customer['userID']);
 
-            $customer = $this->newsletterSubscribe($customer);
+            $customer = $this->newsletterSubscribe($customer, $quotedCustomerEmail);
         }
 
         foreach ($customer['addresses'] as $address) {
@@ -366,7 +368,7 @@ class CustomerImporter
             $customer['encoder'] = $this->db->quote($customer['encoder']);
         }
         if (isset($customer['email'])) {
-            $customer['email'] = empty($customer['email']) ? $customer['email'] : $this->db->quote(trim($customer['email']));
+            $customer['email'] = $this->quoteCustomerEmail($customer);
         }
         if (isset($customer['language'])) {
             $customer['language'] = $this->db->quote((string) $customer['language']);
@@ -496,6 +498,15 @@ class CustomerImporter
         }
 
         return $customer;
+    }
+
+    /**
+     * @param array $customer Array containing the unquoted customer data.
+     * @return string The trimmed and quoted customer email or an empty string if empty.
+     */
+    private function quoteCustomerEmail(array $customer)
+    {
+        return empty($customer['email']) ? $customer['email'] : $this->db->quote(trim($customer['email']));
     }
 
     /**
@@ -777,29 +788,30 @@ class CustomerImporter
 
     /**
      * @param array $customer
+     * @param string $quotedCustomerEmail
      *
      * @return array
      */
-    private function newsletterSubscribe(array $customer)
+    private function newsletterSubscribe(array $customer, $quotedCustomerEmail)
     {
-        if (!isset($customer['newsletter'])) {
+        if (!isset($customer['newsletter']) || empty($quotedCustomerEmail)) {
             return $customer;
         }
 
         if (empty($customer['newsletter'])) {
             $sql = 'DELETE FROM s_campaigns_mailaddresses
-                    WHERE email = "' . $customer['email'] . '"';
+                    WHERE email = ' . $quotedCustomerEmail;
             $this->db->query($sql);
         } else {
             $customer['newslettergroupID'] = $this->getNewsletterGroupId($customer['newslettergroupID']);
 
             $sql = 'SELECT id
                     FROM s_campaigns_mailaddresses
-                    WHERE email = "' . $customer['email'] . '"';
+                    WHERE email = ' . $quotedCustomerEmail;
             $result = $this->db->fetchOne($sql);
             if (empty($result)) {
                 $sql = "INSERT INTO s_campaigns_mailaddresses (customer, groupID, email)
-                        VALUES (1, {$customer['newslettergroupID']}, {$customer['email']});";
+                        VALUES (1, {$customer['newslettergroupID']}, $quotedCustomerEmail);";
                 $this->db->query($sql);
             }
         }
