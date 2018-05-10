@@ -78,7 +78,7 @@ abstract class Profile extends Enlight_Class
             $this->db->setProfiler(new Profiler(true, $this->db));
         }
 
-        if (isset($config['prefix'])) {
+        if (isset($options['prefix'])) {
             $this->db_prefix = $options['prefix'];
         }
     }
