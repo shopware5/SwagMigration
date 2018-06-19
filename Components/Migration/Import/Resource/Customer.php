@@ -79,6 +79,10 @@ class Customer extends AbstractResource
 
         if ($call['profile'] !== 'WooCommerce') {
             while ($customer = $result->fetch()) {
+                if (!empty($customer['salt'])) {
+                    // use customer specific salt
+                    $salt = $customer['salt'];
+                }
                 $this->migrateCustomer($customer, $import, $salt);
             }
         } elseif ($call['profile'] === 'WooCommerce') {
