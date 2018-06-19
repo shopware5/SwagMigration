@@ -49,7 +49,7 @@ class Profiler extends \Zend_Db_Profiler
 
         parent::__construct($enabled);
 
-        $migrationPath = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'files/migration';
+        $migrationPath = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'files/migration/';
         if (!is_dir($migrationPath)) {
             mkdir($migrationPath);
         }
