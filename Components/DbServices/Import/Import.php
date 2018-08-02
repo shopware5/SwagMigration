@@ -81,6 +81,7 @@ class Import
         $this->em = $this->container->get('models');
         $this->logger = $this->container->get('pluginlogger');
         $this->config = $this->container->get('config');
+        $this->db->exec("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
     }
 
     /**

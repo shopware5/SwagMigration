@@ -251,7 +251,7 @@ class Category extends AbstractResource
 
             if (!empty($category['parentID'])) {
                 // Map the category IDs
-                if (false !== $target_parent) {
+                if ($target_parent !== false) {
                     $category['parent'] = $target_parent;
                 } else {
                     if (empty($target_parent)) {
@@ -286,7 +286,7 @@ class Category extends AbstractResource
                     );
                 }
             } catch (Exception $e) {
-                var_dump($e->getMessage());
+                print_r($e->getMessage());
                 Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
                 $this->increaseProgress();
                 exit();
@@ -411,7 +411,7 @@ class Category extends AbstractResource
                 $target_parent = $this->getCategoryTargetLike($category['parentID']);
             }
 
-            if (false !== $target_parent) {
+            if ($target_parent !== false) {
                 $category['parent'] = $target_parent;
             } else {
                 continue;
