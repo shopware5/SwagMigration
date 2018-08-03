@@ -150,7 +150,7 @@ class Cleanup
      */
     public function sDeleteAllArticles()
     {
-        $sql = '
+        $sql = <<<SQL
             SET foreign_key_checks = 0;
 			TRUNCATE s_articles;
 			TRUNCATE s_filter_articles;
@@ -173,6 +173,7 @@ class Cleanup
 			TRUNCATE s_articles_relationships;
 			TRUNCATE s_articles_similar;
 			TRUNCATE s_articles_translations;
+			DELETE FROM s_core_translations WHERE objecttype = 'article'; 
 			TRUNCATE s_article_configurator_dependencies;
 			TRUNCATE s_article_configurator_groups;
 			TRUNCATE s_article_configurator_options;
@@ -187,7 +188,7 @@ class Cleanup
 			TRUNCATE s_article_configurator_templates;
 			TRUNCATE s_article_img_mapping_rules;
 			TRUNCATE s_article_img_mappings;
-        ';
+SQL;
 
         Shopware()->Db()->query($sql);
 
