@@ -250,7 +250,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $data = $this->Request()->getParams();
 
         $cleanup = new Cleanup();
-        $cleanup->cleanUpByArray($data);
+        $cleanup->cleanUpByArray(array_keys($data));
 
         echo Zend_Json::encode(['success' => true]);
     }

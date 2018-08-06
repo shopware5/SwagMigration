@@ -54,7 +54,7 @@ class Cleanup
         /* @var DeleteService $deleteService */
         $deleteService = Shopware()->Container()->get('swagmigration.deleteService');
 
-        foreach ($data as $key => $value) {
+        foreach ($data as $key) {
             switch ($key) {
                 case 'clear_customers':
                     $this->sDeleteAllCustomers();
