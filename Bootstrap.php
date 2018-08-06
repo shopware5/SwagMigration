@@ -6,6 +6,7 @@
  * file that was distributed with this source code.
  */
 use Doctrine\DBAL\Connection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Md5Reversed;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Sha512;
@@ -205,6 +206,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $this->subscribeEvent('Shopware_Components_Password_Manager_AddEncoder', 'onAddPasswordEncoder');
 
         $this->subscribeEvent('Enlight_Controller_Action_PostDispatch', 'onPostDispatch', 110);
+
+        $this->subscribeEvent('Shopware_Console_Add_Command', 'onStartDispatch');
+        $this->subscribeEvent('Shopware_Console_Add_Command', 'onAddConsoleCommands');
     }
 
     /**
@@ -283,6 +287,18 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         $hashes[] = new Sha512();
 
         return $hashes;
+    }
+
+    /**
+     * Callback function to register commands
+     *
+     * @return ArrayCollection
+     */
+    public function onAddConsoleCommands()
+    {
+        return new ArrayCollection([
+            new \Shopware\SwagMigration\Commands\CleanDataCommand(),
+        ]);
     }
 
     /**
