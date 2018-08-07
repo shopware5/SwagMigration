@@ -329,8 +329,14 @@ class Cleanup
      */
     private function clearFolder($path, $type = null)
     {
+        $path .= DIRECTORY_SEPARATOR;
+
         if ($handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
+                if (!is_file($file)) {
+                    continue;
+                }
+
                 switch ($type) {
                     case 'image':
                         // only delete .jpg, .jpeg, .png and .gif; ignore case
