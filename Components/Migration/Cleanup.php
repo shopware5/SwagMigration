@@ -317,7 +317,7 @@ class Cleanup
         // delete files
         $filesDir = $this->shopBasePath . 'files';
         $this->clearFolder(
-            $filesDir . $this->shopConfig->get('sESDKEY')
+            $filesDir . DIRECTORY_SEPARATOR . $this->shopConfig->get('sESDKEY')
         );
     }
 
@@ -331,7 +331,7 @@ class Cleanup
     {
         $path .= DIRECTORY_SEPARATOR;
 
-        if ($handle = opendir($path)) {
+        if (is_dir($path) && $handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
                 if (!is_file($file)) {
                     continue;
