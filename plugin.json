@@ -10,7 +10,7 @@
     "currentVersion": "2.8.0",
     "changelog": {
         "de": {
-            "2.8.0": "PT-9168 - 5.5 Kompatibilität;",
+            "2.8.0": "PT-9168 - Shopware 5.5 Kompatibilität;",
             "2.7.1": "PT-8886 - Datenbank Prefix Einstellung wird wieder korrekt berücksichtigt; PT-9107 - Kunden E-mail wird vorm Import escaped;",
             "2.7.0": "PT-8001 - Produkt Attribute werden wieder korrekt ausgelesen; PT-9033 - Magento 2 Profil hinzugefügt;",
             "2.6.0": "PT-7058 - Kundenimport verbessert; PT-8810, PT-8982 - Shopware 5.4 Kompatibilität;",
@@ -27,7 +27,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
-            "2.8.0": "PT-9168 - 5.5 Compatibility;",
+            "2.8.0": "PT-9168 - Shopware 5.5 Compatibility;",
             "2.7.1": "PT-8886 - Database prefix setting is considered correctly again; PT-9107 - Customer e-mail is escaped before import;",
             "2.7.0": "PT-8001 - Product attributes are read out again correctly; PT-9033 - Add Magento 2 profile;",
             "2.6.0": "PT-7058 - Improve customer import; PT-8810, PT-8982 - Shopware 5.4 compatibility;",
@@ -45,7 +45,7 @@
         }
     },
     "compatibility": {
-        "minimumVersion": "5.4.0",
+        "minimumVersion": "5.5.0",
         "maximumVersion": null,
         "blacklist": [
         ]
