@@ -292,7 +292,7 @@ class Prestashop15 extends Profile
 					ON a.id_product=pr.id_product
 
 					WHERE `id_group`=$price_group || `id_group`=0
-					ORDER BY id_product, `from`
+					ORDER BY pr.id_product, `from`
 				";
             }
         }
