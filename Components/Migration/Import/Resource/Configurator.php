@@ -21,7 +21,7 @@ class Configurator extends AbstractResource
     {
         return $this->getNameSpace()->get(
             'errorGeneratingVariantsFromAttributes',
-            'An error occurred while generating configuratos'
+            'An error occurred while generating configurators'
         );
     }
 
