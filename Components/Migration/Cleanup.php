@@ -317,7 +317,7 @@ class Cleanup
         // delete files
         $filesDir = $this->shopBasePath . 'files';
         $this->clearFolder(
-            $filesDir . $this->shopConfig->get('sESDKEY')
+            $filesDir . DIRECTORY_SEPARATOR . $this->shopConfig->get('sESDKEY')
         );
     }
 
@@ -329,8 +329,14 @@ class Cleanup
      */
     private function clearFolder($path, $type = null)
     {
-        if ($handle = opendir($path)) {
+        $path .= DIRECTORY_SEPARATOR;
+
+        if (is_dir($path) && $handle = opendir($path)) {
             while (false !== ($file = readdir($handle))) {
+                if (!is_file($path . $file)) {
+                    continue;
+                }
+
                 switch ($type) {
                     case 'image':
                         // only delete .jpg, .jpeg, .png and .gif; ignore case
