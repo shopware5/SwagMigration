@@ -7,9 +7,10 @@
     "license": "MIT",
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
-    "currentVersion": "2.8.0",
+    "currentVersion": "2.8.1",
     "changelog": {
         "de": {
+            "2.8.1": "PT-9296 - Log-Dateipfad korrigiert; PT-9454 - Performance Optimierung beim Datenbank-Cleanup; PT-9457 - Cleanup der Download-Dateien verbessert;",
             "2.8.0": "PT-9168 - Shopware 5.5 Kompatibilität;",
             "2.7.1": "PT-8886 - Datenbank Prefix Einstellung wird wieder korrekt berücksichtigt; PT-9107 - Kunden E-mail wird vorm Import escaped;",
             "2.7.0": "PT-8001 - Produkt Attribute werden wieder korrekt ausgelesen; PT-9033 - Magento 2 Profil hinzugefügt;",
@@ -27,6 +28,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
+            "2.8.1": "PT-9296 - Fix log file path; PT-9454 - Improve performance during database cleanup; PT-9457 - Imrpoved cleanup of download files;",
             "2.8.0": "PT-9168 - Shopware 5.5 Compatibility;",
             "2.7.1": "PT-8886 - Database prefix setting is considered correctly again; PT-9107 - Customer e-mail is escaped before import;",
             "2.7.0": "PT-8001 - Product attributes are read out again correctly; PT-9033 - Add Magento 2 profile;",
