@@ -16,6 +16,10 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Image
  *
  * Image import adapter
+ *
+ * @category  Shopware
+ *
+ * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Image extends AbstractResource
 {

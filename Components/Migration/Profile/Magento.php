@@ -334,11 +334,10 @@ class Magento extends Profile
             'special_price',
         ];
 
-        $custom_select = '';
+        $productAttributes = array();
+
         foreach ($this->getAttributes() as $attributeID => $attribute) {
-            $custom_select .= ",
-				$attributeID.value									as `$attributeID`";
-            $attributes[] = $attributeID;
+            $productAttributes[] = $attributeID;
         }
 
         $sql = "
@@ -365,7 +364,8 @@ class Magento extends Profile
 				IFNULL(special_price.value, price.value)		as price,
 				IF(special_price.value IS NULL, 0, price.value) as pseudoprice
 
-				$custom_select
+                {$this->createAttributeSelect('catalog_product', $productAttributes, 0)}
+
 
 			FROM {$this->quoteTable('catalog_product_entity')} catalog_product
 
@@ -813,5 +813,63 @@ class Magento extends Profile
 				FROM {$this->quoteTable($type . '_entity')} $type
 				$join_fields
 			";
+    }
+
+
+    /**
+     * Returns the sql statement to select the shop system article attribute fields
+     *
+     * @param string $type
+     * @param null   $attributes
+     * @param null   $store_id
+     *
+     * @return string
+     */
+    public function createAttributeSelect(
+        $type = 'catalog_product',
+        $attributes = null,
+        $store_id = null
+    ) {
+        $sql = "
+			SELECT
+				ea.attribute_code 	as `name`,
+				ea.attribute_id 	as `id`,
+				ea.backend_type 	as `type`,
+				ea.is_required		as `required`
+			FROM {$this->quoteTable('eav_attribute')} ea, {$this->quoteTable('eav_entity_type')} et
+			WHERE ea.`entity_type_id`=et.entity_type_id
+			AND et.entity_type_code=?
+			AND ea.frontend_input!=''
+		";
+        if (!empty($attributes)) {
+            $sql .= 'AND ea.attribute_code IN (' . $this->Db()->quote($attributes) . ')';
+        } else {
+            $sql .= 'ORDER BY `required` DESC, `name`';
+        }
+        $attribute_fields = $this->Db()->fetchAssoc($sql, [$type]);
+
+        if (empty($attributes)) {
+            $attributes = array_keys($attribute_fields);
+        }
+
+        $join_fields = '';
+        foreach ($attributes as $attribute) {
+            if (empty($attribute_fields[$attribute])) {
+                $join_fields .= ",
+					NULL as `$attribute`
+				";
+            } else {
+                $join_fields .="
+                ,(
+                    SELECT value FROM {$this->quoteTable($type . '_entity_' . $attribute_fields[$attribute]['type'])}
+                    WHERE entity_id = {$type}.entity_id
+                    AND store_id = {$this->Db()->quote($store_id)}
+                    AND attribute_id = {$attribute_fields[$attribute]['id']}
+                ) as `{$attribute}`
+                ";
+            }
+        }
+
+        return $join_fields;
     }
 }
