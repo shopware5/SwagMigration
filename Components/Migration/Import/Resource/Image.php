@@ -71,7 +71,10 @@ class Image extends AbstractResource
         $this->initTaskTimer();
 
         if ($call['profile'] !== 'WooCommerce') {
-            $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+            $productImagePath = '/' . $this->Source()->getProductImagePath();
+            $productImagePath = str_replace('//', '/', $productImagePath);
+
+            $image_path = rtrim($this->Request()->basepath, '/') . $productImagePath;
         }
 
         /* @var Import $import */

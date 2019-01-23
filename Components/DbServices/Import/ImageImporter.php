@@ -203,7 +203,7 @@ class ImageImporter
      */
     private function copyImage($image, $name)
     {
-        $uploadDir = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'media/temp';
+        $uploadDir = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'media/temp/';
 
         $ext = '';
         if (!empty($image)) {
@@ -215,6 +215,7 @@ class ImageImporter
             }
 
             $uploadFile = $uploadDir . $name . $ext;
+
             if (!copy($image, $uploadFile)) {
                 $this->logger->error("Copying image from '$image' to '$uploadFile' did not work!");
 
