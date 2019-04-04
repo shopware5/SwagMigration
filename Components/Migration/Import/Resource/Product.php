@@ -226,7 +226,7 @@ class Product extends AbstractResource
 
         //Attribute
         if (!empty($attributes)) {
-            if (array_key_exists('attr', $product) {
+            if (!array_key_exists('attr', $product)) {
                 $product['attr'] = [];
             }
 
