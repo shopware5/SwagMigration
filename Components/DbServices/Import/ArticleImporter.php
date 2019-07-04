@@ -480,7 +480,8 @@ class ArticleImporter
                 $linkData['articleID'],
                 $linkData['description'],
                 $linkData['link'],
-                $linkData['target'], ]
+                $linkData['target'],
+            ]
         );
 
         return $this->db->lastInsertId();
@@ -1037,8 +1038,13 @@ class ArticleImporter
             foreach ($article['attr'] as $key => $value) {
                 $values .= ", $key = $value";
             }
+
+            if ($values === '') {
+                return $article;
+            }
+
             $sql = "UPDATE s_articles_attributes
-                    SET articleID = {$article['articleID']} $values
+                    SET $values
                     WHERE articledetailsID = {$article['articledetailsID']}";
             $this->db->query($sql);
         } else {
@@ -1046,8 +1052,13 @@ class ArticleImporter
                 $columns = ', ' . implode(', ', array_keys($article['attr']));
                 $values = ', ' . implode(', ', $article['attr']);
             }
+
+            if ($values === '') {
+                return $article;
+            }
+
             $sql = "INSERT INTO s_articles_attributes
-                    (articleID, articledetailsID $columns) VALUES
+                    (articledetailsID $columns) VALUES
                     ({$article['articleID']}, {$article['articledetailsID']} $values)";
 
             $this->db->query($sql);
@@ -1246,9 +1257,11 @@ class ArticleImporter
             $this->db->query($sql);
         }
 
+        $sql = 'DELETE FROM s_articles_attributes WHERE articledetailsID = ' . $articleID['articledetailsID'];
+        $this->db->query($sql);
+
         $tables = [
             's_articles_details',
-            's_articles_attributes',
             's_articles_esd',
             's_articles_prices',
             's_articles_relationships',
