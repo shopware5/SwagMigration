@@ -567,7 +567,6 @@ class Magento extends Profile
             'firstname',
             'middlename',
             'lastname',
-            'company',
             'dob',
             'password_hash',
             'taxvat',
@@ -581,6 +580,7 @@ class Magento extends Profile
             'postcode',
             'street',
             'telephone',
+            'company',
         ];
 
         return "
