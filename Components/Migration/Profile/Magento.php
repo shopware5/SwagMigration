@@ -709,6 +709,7 @@ class Magento extends Profile
 			ON sa.parent_id=o.entity_id
 			AND sa.address_type='shipping'
 			WHERE p.entity_id = o.entity_id
+			AND o.entity_id != 0
 		";
     }
 
