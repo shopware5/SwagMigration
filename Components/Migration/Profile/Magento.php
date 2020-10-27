@@ -700,8 +700,7 @@ class Magento extends Profile
 				o.`shipping_amount`							as invoice_shipping_net
 
 			FROM
-				{$this->quoteTable('sales_flat_quote')} q,
-				{$this->quoteTable('sales_flat_quote_payment')} p,
+				{$this->quoteTable('sales_flat_order_payment')} p,
 				{$this->quoteTable('sales_flat_order', 'o')}
 			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} ba
 			ON ba.parent_id=o.entity_id
@@ -709,8 +708,8 @@ class Magento extends Profile
 			LEFT JOIN {$this->quoteTable('sales_flat_order_address')} sa
 			ON sa.parent_id=o.entity_id
 			AND sa.address_type='shipping'
-			WHERE o.quote_id = q.entity_id
-			AND p.quote_id = q.entity_id
+			WHERE p.entity_id = o.entity_id
+			AND o.entity_id != 0
 		";
     }
 
