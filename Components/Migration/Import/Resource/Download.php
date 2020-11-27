@@ -60,7 +60,7 @@ class Download extends AbstractResource
         $count = $result->rowCount() + $offset;
         $this->getProgress()->setCount($count);
 
-        $localPath = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'files/downloads';
+        $localPath = Shopware()->Container()->getParameter('shopware.app.rootDir') . 'files/downloads';
 
         $remotePath = rtrim($this->Request()->basepath, '/') . '/out/media/';
 

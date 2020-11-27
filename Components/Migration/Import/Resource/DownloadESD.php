@@ -60,7 +60,7 @@ class DownloadESD extends AbstractResource
 
         $this->getProgress()->setCount($count);
 
-        $basePath = Shopware()->Container()->getParameter('shopware.app.rootdir');
+        $basePath = Shopware()->Container()->getParameter('shopware.app.rootDir');
         $pathSuffix = Shopware()->Container()->get('config')->get('sESDKEY');
 
         $localPath = $basePath . 'files/' . $pathSuffix;

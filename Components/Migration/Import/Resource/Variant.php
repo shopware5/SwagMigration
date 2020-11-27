@@ -79,7 +79,7 @@ class Variant extends AbstractResource
             }
         }
 
-        echo $this->getProgress()->done();
+        return $this->getProgress()->done();
     }
 
     /**

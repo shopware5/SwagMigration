@@ -387,12 +387,12 @@ class XtCommerce extends Profile
     {
         if ($offset === 0) {
             try {
-                $sql = 'ALTER TABLE `orders` DROP INDEX `customers_id`;';
+                $sql = 'DROP INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
             } catch (Exception $e) {
             }
             try {
-                $sql = 'ALTER TABLE `orders` ADD INDEX ( `customers_id` );';
+                $sql = 'ADD INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
             } catch (Exception $e) {
             }

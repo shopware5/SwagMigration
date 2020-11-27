@@ -71,7 +71,7 @@ Ext.define('Shopware.apps.SwagMigration.view.main.Window', {
      * Title of the window.
      * @string
      */
-    title: '{s name=window_title}Migrate shop{/s}',
+    title: '{s name="window_title"}Migrate shop{/s}',
 
     /**
      * Initializes the component.

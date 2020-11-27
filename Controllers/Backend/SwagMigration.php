@@ -350,8 +350,6 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             } else {
                 $shops = $this->Source()->getShops();
                 $languages = $this->Source()->getLanguages();
-                //$image_path = rtrim($this->Request()->basepath.$this->Source()->getProductImagePath(), '/').'/';
-                //$client = new Zend_Http_Client($image_path);
                 echo Zend_Json::encode(['success' => true]);
             }
         } catch (Zend_Db_Statement_Exception $e) {

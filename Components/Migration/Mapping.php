@@ -102,9 +102,16 @@ class Mapping
 
         $target = $this->setAliases($this->Target()->getCustomerGroups());
         $customerGroups = $this->mapArrays($this->Source()->getCustomerGroups(), $target);
-        $wooCustomerGroups = unserialize(reset($customerGroups)['value']);
 
-        if ($wooCustomerGroups != false) {
+        $wooCustomerGroups = false;
+        if ($customerGroups !== null && $customerGroups !== false) {
+            $firstElement = \reset($customerGroups);
+            if (isset($firstElement['value'])) {
+                $wooCustomerGroups = \unserialize($firstElement['value']);
+            }
+        }
+
+        if ($wooCustomerGroups !== false) {
             $customerGroups = $this->refactorSerializedArray($wooCustomerGroups);
         }
 
@@ -149,7 +156,7 @@ class Mapping
     {
         $rows = [];
 
-        $target = $this->setAliases($this->Target()->getPaymentMeans());
+        $target = $this->setAliases($this->Target()->getPaymentMeans() ?: []);
         $paymentMeans = $this->mapArrays($this->Source()->getPaymentMeans(), $target);
         foreach ($paymentMeans as $id => $name) {
             $rows[] = [
@@ -161,7 +168,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getOrderStatus());
+        $target = $this->setAliases($this->Target()->getOrderStatus() ?: []);
         $orderStatus = $this->mapArrays($this->Source()->getOrderStatus(), $target);
         foreach ($orderStatus as $id => $name) {
             $rows[] = [
@@ -173,7 +180,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getTaxRates());
+        $target = $this->setAliases($this->Target()->getTaxRates() ?: []);
         $taxRates = $this->mapArrays($this->Source()->getTaxRates(), $target);
         foreach ($taxRates as $id => $name) {
             $rows[] = [
@@ -185,7 +192,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getAttributes());
+        $target = $this->setAliases($this->Target()->getAttributes() ?: []);
         $attributes = $this->mapArrays($this->Source()->getAttributes(), $target);
         foreach ($attributes as $id => $name) {
             $rows[] = [
@@ -197,7 +204,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getProperties());
+        $target = $this->setAliases($this->Target()->getProperties() ?: []);
         $attributes = $this->mapArrays($this->Source()->getProperties(), $target);
         foreach ($attributes as $id => $name) {
             $rows[] = [
@@ -209,8 +216,9 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases(sort($this->Target()->getConfiguratorOptions()));
-        $attributes = $this->mapArrays($this->Source()->getConfiguratorOptions(), $target);
+        $targetConfiguratorOptions = $this->Target()->getConfiguratorOptions() ?: [];
+        $target = $this->setAliases(sort($targetConfiguratorOptions));
+        $attributes = $this->mapArrays($this->Source()->getConfiguratorOptions(), $target) ?: [];
         ksort($attributes);
         foreach ($attributes as $id => $name) {
             $rows[] = [
@@ -220,6 +228,12 @@ class Mapping
                 'mapping_name' => $name['mapping'],
                 'mapping' => $name['mapping_value'],
             ];
+        }
+
+        foreach ($rows as $index => $row) {
+            foreach ($row as $key => $value) {
+                $rows[$index][$key] = mb_convert_encoding($value, 'UTF-8');
+            }
         }
 
         return $rows;

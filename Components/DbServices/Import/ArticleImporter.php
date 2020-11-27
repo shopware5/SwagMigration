@@ -1257,7 +1257,7 @@ class ArticleImporter
             $this->db->query($sql);
         }
 
-        $sql = 'DELETE FROM s_articles_attributes WHERE articledetailsID = ' . $articleID['articledetailsID'];
+        $sql = 'DELETE FROM s_articles_attributes WHERE articledetailsID = ' . $article['articledetailsID'];
         $this->db->query($sql);
 
         $tables = [

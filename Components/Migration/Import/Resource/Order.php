@@ -367,7 +367,8 @@ class Order extends AbstractResource
         }
 
         if (empty($number)) {
-            Shopware()->PluginLogger()->error("Order '{$order['orderID']}' was not imported because the Article Ordernumber was emtpy.");
+            Shopware()->Container()->get('pluginlogger')
+                ->error("Order '{$order['orderID']}' was not imported because the Article Ordernumber was emtpy.");
 
             return;
         }

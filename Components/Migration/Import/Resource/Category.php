@@ -255,7 +255,9 @@ class Category extends AbstractResource
                     $category['parent'] = $target_parent;
                 } else {
                     if (empty($target_parent)) {
-                        Shopware()->PluginLogger()->error("Order '{$category['description']}' was not imported because the parent category was not found. The plugin tries to create it later.");
+                        Shopware()->Container()->get('pluginlogger')
+                            ->error("Order '{$category['description']}' was not imported because the parent category was not found. The plugin tries to create it later.");
+
                         $this->unmapped[] = $category;
                         continue;
                     }
@@ -287,7 +289,9 @@ class Category extends AbstractResource
                 }
             } catch (Exception $e) {
                 print_r($e->getMessage());
-                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                Shopware()->Container()->get('pluginlogger')
+                    ->error("Category '{$category['description']}' was not imported.");
+
                 $this->increaseProgress();
                 exit();
             }
@@ -434,7 +438,9 @@ class Category extends AbstractResource
                 unset($this->unmapped[$key]);
             } catch (Exception $e) {
                 var_dump($e->getMessage());
-                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                Shopware()->Container()->get('pluginlogger')
+                    ->error("Category '{$category['description']}' was not imported.");
+
                 $this->increaseProgress();
                 exit();
             }

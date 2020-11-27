@@ -27,7 +27,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
     /**
      * Title of the fieldSet
      */
-    title: '{s name=databaseSettings}Database settings{/s}',
+    title: '{s name="databaseSettings"}Database settings{/s}',
 
     /**
      * Default config for the child elements
@@ -56,13 +56,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
 
         me.databaseSelection = Ext.create('Ext.form.ComboBox', {
             store: me.databaseStore,
-            fieldLabel: '{s name=database}Database{/s}',
+            fieldLabel: '{s name="database"}Database{/s}',
             name: 'database',
             displayField: 'name',
             allowBlank: false,
             mode: 'remote',
             disabled: true,
-            emptyText: '{s name=selctProfileFirst}You need to select a profile first{/s}',
+            emptyText: '{s name="selctProfileFirst"}You need to select a profile first{/s}',
             listeners: {
                 'beforequery': { fn: function(e) {
                     var form = this.up().getForm(),
@@ -80,8 +80,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
                         if (!success) {
                             var rawData = operation.request.proxy.reader.jsonData,
                                 message = rawData.message;
-                            Shopware.Notification.createGrowlMessage('{s name=getDatabases/errorTitle}Error{/s}', '{s name=getDatabases/errorMessage}Could not get databases{/s}' + '<br />' + message, 'SwagMigration');
-                            e.combo.emptyText = '{s name=selectDatabaseWhenSettingsMatch}Select source database if above settings do match{/s}';
+                            Shopware.Notification.createGrowlMessage('{s name="getDatabases/errorTitle"}Error{/s}', '{s name="getDatabases/errorMessage"}Could not get databases{/s}' + '<br />' + message, 'SwagMigration');
+                            e.combo.emptyText = '{s name="selectDatabaseWhenSettingsMatch"}Select source database if above settings do match{/s}';
                             e.combo.select(null);
                         }
                     });
@@ -104,27 +104,27 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
 
         me.databaseSettingsForm = [{
             xtype: 'label',
-            text: '{s name=dbDescription}Database settings for the shop you want to migrate{/s}'
+            text: '{s name="dbDescription"}Database settings for the shop you want to migrate{/s}'
         }, {
-            fieldLabel: '{s name=dbUser}User{/s}',
+            fieldLabel: '{s name="dbUser"}User{/s}',
             name: 'username',
             value: 'root'
         }, {
-            fieldLabel: '{s name=dbPassword}Password{/s}',
+            fieldLabel: '{s name="dbPassword"}Password{/s}',
             name: 'password',
             inputType: 'password',
             value: 'root'
         }, {
-            fieldLabel: '{s name=dbServer}Server{/s}',
+            fieldLabel: '{s name="dbServer"}Server{/s}',
             name: 'host',
             value: 'localhost',
             allowBlank: false
         }, {
-            fieldLabel: '{s name=dbPort}Port{/s}',
+            fieldLabel: '{s name="dbPort"}Port{/s}',
             name: 'port',
             value: 'default'
         }, {
-            fieldLabel: '{s name=dbPrefix}Prefix{/s}',
+            fieldLabel: '{s name="dbPrefix"}Prefix{/s}',
             name: 'prefix',
             value: 'default'
         }, me.databaseSelection

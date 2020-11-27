@@ -27,7 +27,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
     /**
      * Title of the fieldset
      */
-    title: '{s name=selectProfile}Select profile{/s}',
+    title: '{s name="selectProfile"}Select profile{/s}',
 
     /**
      * Default style for the child elements
@@ -50,7 +50,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
         var me = this;
 
         me.profileSelection = Ext.create('Ext.form.ComboBox', {
-            fieldLabel: '{s name=profile}Profile{/s}',
+            fieldLabel: '{s name="profile"}Profile{/s}',
             name: 'profile',
             hiddenName: 'profile',
             valueField: 'id',
@@ -69,7 +69,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
                     if (newValue) {
                         var databaseSelection = me.up().down('migration-fieldset-database-selection').databaseSelection;
                         databaseSelection.setDisabled(false);
-                        databaseSelection.emptyText = '{s name=selectDatabaseWhenSettingsMatch}Select source database if above settings do match{/s}';
+                        databaseSelection.emptyText = '{s name="selectDatabaseWhenSettingsMatch"}Select source database if above settings do match{/s}';
                         databaseSelection.select(null);
                     }
                 }
@@ -78,7 +78,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
 
         return [{
             xtype: 'label',
-            text: '{s name=profileSelectDescription}Select the shop you want to migrate to Shopware{/s}'
+            text: '{s name="profileSelectDescription"}Select the shop you want to migrate to Shopware{/s}'
         },
             me.profileSelection
         ];

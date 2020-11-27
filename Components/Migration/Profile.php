@@ -12,6 +12,7 @@ use ArrayObject;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Enlight_Class;
+use setasign\Fpdi\PdfParser\Type\PdfIndirectObjectReference;
 use Shopware\Components\DependencyInjection\Bridge\Db;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 

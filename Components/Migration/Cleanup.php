@@ -40,7 +40,7 @@ class Cleanup
         // Disable foreign key checks
         Shopware()->Db()->exec('SET foreign_key_checks = 0;');
 
-        $this->shopBasePath = Shopware()->Container()->getParameter('shopware.app.rootdir');
+        $this->shopBasePath = Shopware()->Container()->getParameter('shopware.app.rootDir');
         $this->shopConfig = Shopware()->Container()->get('config');
     }
 
