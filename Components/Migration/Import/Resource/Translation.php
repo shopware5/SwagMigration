@@ -16,10 +16,6 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Translation
  *
  * Translation import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Translation extends AbstractResource
 {
@@ -39,7 +35,7 @@ class Translation extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressTranslations', '%s out of %s translations imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -92,7 +88,7 @@ class Translation extends AbstractResource
             }
 
             //prevent productId from being double
-            if (stristr($translation['productID'], 'e')) {
+            if (\stristr($translation['productID'], 'e')) {
                 $translation['productID'] = "'" . $translation['productID'] . "'";
             }
 

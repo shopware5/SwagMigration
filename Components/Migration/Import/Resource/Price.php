@@ -16,10 +16,6 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Price
  *
  * Price import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Price extends AbstractResource
 {
@@ -36,7 +32,7 @@ class Price extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressPrices', '%s out of %s prices imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -120,13 +116,13 @@ class Price extends AbstractResource
             );
 
             if (!empty($price_config)) {
-                $price = array_merge($price, $price_config);
+                $price = \array_merge($price, $price_config);
                 if (isset($price['net_price'])) {
                     if (empty($price['tax'])) {
                         $price['price'] = $price['net_price'];
                         unset($price['net_price'], $price['tax']);
                     } else {
-                        $price['price'] = round($price['net_price'] * (100 + $price['tax']) / 100, 2);
+                        $price['price'] = \round($price['net_price'] * (100 + $price['tax']) / 100, 2);
                         unset($price['net_price']);
                     }
                 }
@@ -136,7 +132,7 @@ class Price extends AbstractResource
                         $price['pseudoprice'] = $price['net_pseudoprice'];
                         unset($price['net_pseudoprice'], $price['tax']);
                     } else {
-                        $price['pseudoprice'] = round($price['net_pseudoprice'] * (100 + $price['tax']) / 100, 2);
+                        $price['pseudoprice'] = \round($price['net_pseudoprice'] * (100 + $price['tax']) / 100, 2);
                         unset($price['net_pseudoprice']);
                     }
                 }

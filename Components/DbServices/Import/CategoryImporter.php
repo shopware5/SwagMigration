@@ -38,10 +38,6 @@ class CategoryImporter
 
     /**
      * CategoryImporter constructor.
-     *
-     * @param PDOConnection $db
-     * @param ModelManager  $em
-     * @param Logger        $logger
      */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
@@ -52,8 +48,6 @@ class CategoryImporter
     }
 
     /**
-     * @param array $category
-     *
      * @return bool|int
      */
     public function import(array $category)
@@ -139,8 +133,6 @@ class CategoryImporter
     }
 
     /**
-     * @param array $category
-     *
      * @return array
      */
     private function prepareCategoryData(array $category)
@@ -165,8 +157,6 @@ class CategoryImporter
     }
 
     /**
-     * @param array $category
-     *
      * @return array
      */
     private function prepareCategoryAttributesData(array $category)

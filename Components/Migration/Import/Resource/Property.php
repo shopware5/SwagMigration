@@ -28,7 +28,7 @@ class Property extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressProductProperties', '%s out of %s product properties imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -95,7 +95,7 @@ class Property extends AbstractResource
                 $groupName = $property['group'];
 
                 // Create new element or extend existing
-                if (!array_key_exists($property['option'], $options)) {
+                if (!\array_key_exists($property['option'], $options)) {
                     $options[$property['option']] = ['name' => $property['option'], 'values' => [['value' => $property['value']]]];
                 } else {
                     $options[$property['option']]['values'][] = ['value' => $property['value']];
@@ -149,7 +149,7 @@ class Property extends AbstractResource
      *        )
      *    )
      *
-     * @param $data
+     * @param array data
      *
      * @return bool
      */
@@ -172,7 +172,7 @@ class Property extends AbstractResource
             $sql = 'SELECT `id` FROM `s_filter` WHERE `name` = ?';
             $groupId = Shopware()->Db()->fetchOne($sql, [$group['name']]);
         } else {
-            error_log('no group info passed');
+            \error_log('no group info passed');
 
             return;
         }
@@ -184,7 +184,7 @@ class Property extends AbstractResource
         }
 
         if ($groupId === false) {
-            error_log('no group found');
+            \error_log('no group found');
 
             return false;
         }
@@ -232,7 +232,7 @@ class Property extends AbstractResource
             }
 
             if ($optionId === false) {
-                error_log('option not found');
+                \error_log('option not found');
 
                 return false;
             }
@@ -271,7 +271,7 @@ class Property extends AbstractResource
                 }
 
                 if ($valueId === false) {
-                    error_log('value not found');
+                    \error_log('value not found');
 
                     return false;
                 }

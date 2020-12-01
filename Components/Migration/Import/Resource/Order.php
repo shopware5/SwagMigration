@@ -40,7 +40,7 @@ class Order extends AbstractResource
     public function getCurrentProgressMessage(Progress $progress)
     {
         if ($this->getInternalName() == 'import_orders') {
-            return sprintf(
+            return \sprintf(
                 $this->getNameSpace()->get('progressOrders', '%s out of %s orders imported'),
                 $this->getProgress()->getOffset(),
                 $this->getProgress()->getCount()
@@ -48,7 +48,7 @@ class Order extends AbstractResource
         }
 
         if ($this->getInternalName() == 'import_order_details') {
-            return sprintf(
+            return \sprintf(
                 $this->getNameSpace()->get('progressOrderDetails', '%s out of %s order details imported'),
                 $this->getProgress()->getOffset(),
                 $this->getProgress()->getCount()
@@ -85,7 +85,7 @@ class Order extends AbstractResource
      */
     public function importOrders()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryOrders($offset);
@@ -111,11 +111,11 @@ class Order extends AbstractResource
                 $orderAmounts = $this->Source()->queryOrderAmounts($order)->fetchAll();
                 $order['invoice_amount'] = $orderAmounts[0]['invoice_amount'];
 
-                if (array_key_exists('orderTaxRate', $order)) {
+                if (\array_key_exists('orderTaxRate', $order)) {
                     $order['invoice_amount'] = $order['invoice_amount'] + $order['orderTaxRate'];
                 }
 
-                if (array_key_exists('invoice_shipping_net', $order)) {
+                if (\array_key_exists('invoice_shipping_net', $order)) {
                     $order['invoice_shipping'] = $order['invoice_shipping_net'] + $order['shippingTax'];
                     $order['invoice_amount'] = $order['invoice_amount'] + $order['invoice_shipping'];
                 }
@@ -137,7 +137,7 @@ class Order extends AbstractResource
      */
     public function importOrderDetails()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
@@ -182,13 +182,9 @@ class Order extends AbstractResource
      * This Function does the real migration. It had to be outsourced because of the different
      * format types of some profiles.
      *
-     * @param $order
-     *
-     * @throws \Zend_Db_Adapter_Exception
-     *
      * @return Progress
      */
-    private function migrateOrder($order)
+    private function migrateOrder(array $order = [])
     {
         if (isset($order['languageID']) && isset($this->Request()->language[$order['languageID']])) {
             $order['languageID'] = $this->Request()->language[$order['languageID']];
@@ -350,15 +346,12 @@ class Order extends AbstractResource
      * This Function does the real migration. It had to be outsourced because of the different
      * format types of some profiles.
      *
-     * @param $order
-     * @param $numberValidationMode
-     * @param $numberSnippet
-     *
-     * @throws \Zend_Db_Adapter_Exception
+     * @param string $numberValidationMode
+     * @param string $numberSnippet
      *
      * @return Progress
      */
-    private function migrateOrderDetail($order, $numberValidationMode, $numberSnippet)
+    private function migrateOrderDetail(array $order, $numberValidationMode, $numberSnippet)
     {
         // Check the ordernumber
         $number = $order['article_ordernumber'];
@@ -373,19 +366,19 @@ class Order extends AbstractResource
             return;
         }
 
-        if (strpos($number, '#')) {
-            $number = str_replace('#', '', $number);
+        if (\strpos($number, '#')) {
+            $number = \str_replace('#', '', $number);
         }
 
         if ($numberValidationMode !== 'ignore'
-            && (empty($number) || strlen($number) > 30 || strlen($number) < 4
-                || preg_match('/[^a-zA-Z0-9-_.]/', $number))
+            && (empty($number) || \strlen($number) > 30 || \strlen($number) < 4
+                || \preg_match('/[^a-zA-Z0-9-_.]/', $number))
         ) {
             switch ($numberValidationMode) {
                 case 'complain':
                     echo Zend_Json::encode(
                         [
-                            'message' => sprintf($numberSnippet, $number),
+                            'message' => \sprintf($numberSnippet, $number),
                             'success' => false,
                             'import_products' => null,
                             'offset' => 0,

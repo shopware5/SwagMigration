@@ -146,7 +146,7 @@ class XtCommerce extends Profile
     /**
      * Returns the sql statement to select articles with
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -204,7 +204,7 @@ class XtCommerce extends Profile
     /**
      * Select attributes for a given article
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -319,7 +319,7 @@ class XtCommerce extends Profile
             }
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')';
+        return '(' . \implode(') UNION ALL (', $sql) . ')';
     }
 
     /**

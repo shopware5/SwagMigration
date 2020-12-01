@@ -113,7 +113,7 @@ class Veyton extends XtCommerce
     /**
      * Returns a sql statement which selects additional info for a given productID
      *
-     * @param $productId int The product to query
+     * @param int $productId The product to query
      *
      * @return string
      */

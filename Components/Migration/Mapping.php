@@ -20,9 +20,9 @@ class Mapping
     protected $source;
 
     /**
-     * The targe shop
+     * The target shop
      *
-     * @var
+     * @var Profile
      */
     protected $target;
 
@@ -34,9 +34,8 @@ class Mapping
     /**
      * Constructor. Sets some dependencies.
      *
-     * @param Profile                               $source
-     * @param Profile                               $target
-     * @param \Enlight_Components_Snippet_Namespace $namespace
+     * @param Profile $source
+     * @param Profile $target
      */
     public function __construct($source, $target, \Enlight_Components_Snippet_Namespace $namespace)
     {
@@ -48,7 +47,7 @@ class Mapping
     /**
      * Legacy getter for the target shop
      *
-     * @return mixed
+     * @return Profile
      */
     public function Target()
     {
@@ -58,7 +57,7 @@ class Mapping
     /**
      * Legacy setter for the source shop
      *
-     * @return mixed
+     * @return Profile
      */
     public function Source()
     {
@@ -74,7 +73,7 @@ class Mapping
     {
         $rows = [];
 
-        $target = $this->setAliases($this->Target()->getShops());
+        $target = $this->setAliases($this->Target()->getShops() ?: []);
         $shops = $this->mapArrays($this->Source()->getShops(), $target);
         foreach ($shops as $id => $name) {
             $rows[] = [
@@ -87,7 +86,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getLanguages());
+        $target = $this->setAliases($this->Target()->getLanguages() ?: []);
         $languages = $this->mapArrays($this->Source()->getLanguages(), $target);
         foreach ($languages as $id => $name) {
             $rows[] = [
@@ -100,7 +99,7 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getCustomerGroups());
+        $target = $this->setAliases($this->Target()->getCustomerGroups() ?: []);
         $customerGroups = $this->mapArrays($this->Source()->getCustomerGroups(), $target);
 
         $wooCustomerGroups = false;
@@ -126,9 +125,9 @@ class Mapping
             ];
         }
 
-        $target = $this->setAliases($this->Target()->getPriceGroups());
+        $target = $this->setAliases($this->Target()->getPriceGroups() ?: []);
         $priceGroups = $this->mapArrays($this->Source()->getPriceGroups(), $target);
-        $wooPriceGroups = unserialize(reset($priceGroups)['value']);
+        $wooPriceGroups = \unserialize(\reset($priceGroups)['value']);
 
         if ($wooPriceGroups != false) {
             $priceGroups = $this->refactorSerializedArray($wooPriceGroups);
@@ -217,9 +216,11 @@ class Mapping
         }
 
         $targetConfiguratorOptions = $this->Target()->getConfiguratorOptions() ?: [];
-        $target = $this->setAliases(sort($targetConfiguratorOptions));
+        \sort($targetConfiguratorOptions);
+
+        $target = $this->setAliases($targetConfiguratorOptions ?: []);
         $attributes = $this->mapArrays($this->Source()->getConfiguratorOptions(), $target) ?: [];
-        ksort($attributes);
+        \ksort($attributes);
         foreach ($attributes as $id => $name) {
             $rows[] = [
                 'internalId' => $id,
@@ -232,7 +233,7 @@ class Mapping
 
         foreach ($rows as $index => $row) {
             foreach ($row as $key => $value) {
-                $rows[$index][$key] = mb_convert_encoding($value, 'UTF-8');
+                $rows[$index][$key] = \mb_convert_encoding($value, 'UTF-8');
             }
         }
 
@@ -242,7 +243,7 @@ class Mapping
     /**
      * Returns the selectable values for a given entity-mapping
      *
-     * @param $entity
+     * @param string $entity
      *
      * @return array
      */
@@ -303,9 +304,7 @@ class Mapping
     /**
      * Helper function to set an automatic mapping when the user open the mapping panel.
      *
-     * @param $array
-     *
-     * @return mixed
+     * @param array $array
      */
     public function setAliases($array)
     {
@@ -348,8 +347,8 @@ class Mapping
         foreach ($array as &$element) {
             $temp = $element;
             foreach ($aliasList as $alias) {
-                if (in_array(strtolower($temp), $alias)) {
-                    array_unshift($alias, $temp);
+                if (\in_array(\strtolower($temp), $alias)) {
+                    \array_unshift($alias, $temp);
                     $element = $alias;
                     break;
                 }
@@ -362,20 +361,20 @@ class Mapping
     /**
      * Internal helper function for the automatic mapping
      *
-     * @param $sourceArray
-     * @param $targetArray
+     * @param array $sourceArray
+     * @param array $targetArray
      *
-     * @return mixed
+     * @return array
      */
     private function mapArrays($sourceArray, $targetArray)
     {
         foreach ($sourceArray as &$source) {
             $source = ['value' => $source, 'mapping' => '', 'mapping_value' => ''];
             foreach ($targetArray as $key => $target) {
-                if (is_array($target)) {
+                if (\is_array($target)) {
                     foreach ($target as $alias) {
-                        if (strtolower($source['value']) == strtolower($alias)
-                            || (strtolower(substr($source['value'], 0, 6)) == strtolower(substr($alias, 0, 6)))
+                        if (\strtolower($source['value']) == \strtolower($alias)
+                            || (\strtolower(\substr($source['value'], 0, 6)) == \strtolower(\substr($alias, 0, 6)))
                         ) {
                             $source['mapping'] = $target[0];
                             $source['mapping_value'] = $key;
@@ -383,8 +382,8 @@ class Mapping
                         }
                     }
                 } else {
-                    if (strtolower($source['value']) == strtolower($target)
-                        || (strtolower(substr($source['value'], 0, 6)) == strtolower(substr($target, 0, 6)))
+                    if (\strtolower($source['value']) == \strtolower($target)
+                        || (\strtolower(\substr($source['value'], 0, 6)) == \strtolower(\substr($target, 0, 6)))
                     ) {
                         $source['mapping'] = $target;
                         $source['mapping_value'] = $key;
@@ -405,11 +404,9 @@ class Mapping
     /**
      * This function returns an refactored unserialized array.
      *
-     * @param $array
-     *
      * @return array
      */
-    private function refactorSerializedArray($array)
+    private function refactorSerializedArray(array $array = [])
     {
         $refactoredArray = [];
         foreach ($array as $value) {

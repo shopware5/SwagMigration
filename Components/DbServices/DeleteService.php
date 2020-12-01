@@ -19,8 +19,6 @@ class DeleteService
 
     /**
      * DeleteService constructor.
-     *
-     * @param PDOConnection $db
      */
     public function __construct(PDOConnection $db)
     {
@@ -40,7 +38,7 @@ class DeleteService
         if (empty($shopCategoriesIds)) {
             $sql = 'TRUNCATE s_categories';
         } else {
-            $ids = 'id != ' . implode(' AND id != ', $shopCategoriesIds);
+            $ids = 'id != ' . \implode(' AND id != ', $shopCategoriesIds);
             $sql = 'DELETE FROM s_categories
                     WHERE parent IS NOT NULL
                       AND ' . $ids;

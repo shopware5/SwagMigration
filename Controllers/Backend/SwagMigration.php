@@ -5,6 +5,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Cleanup;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
@@ -97,7 +98,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Set the renderer - most often used, to disable the renderer
      *
-     * @param $renderer
+     * @param bool $renderer
      */
     public function setRenderer($renderer)
     {
@@ -224,7 +225,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     {
         $value = 10;
 
-        $configValue = (int) ini_get('max_execution_time');
+        $configValue = (int) \ini_get('max_execution_time');
 
         // We don't want infinite execution time - set it to 40 seconds in case
         if ($configValue <= 0) {
@@ -236,7 +237,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         }
 
         // Don't allow values above a minute
-        $value = min(60, $value);
+        $value = \min(60, $value);
 
         $this->max_execution = $value;
     }
@@ -250,7 +251,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $data = $this->Request()->getParams();
 
         $cleanup = new Cleanup();
-        $cleanup->cleanUpByArray(array_keys($data));
+        $cleanup->cleanUpByArray(\array_keys($data));
 
         echo Zend_Json::encode(['success' => true]);
     }
@@ -274,7 +275,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ['id' => 'Prestashop14', 'name' => $this->getNamespace()->get('profile-presta-old')],
             ['id' => 'WooCommerce', 'name' => $this->getNamespace()->get('profile-woo')],
         ];
-        echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
+        echo Zend_Json::encode(['data' => $rows, 'count' => \count($rows)]);
     }
 
     /**
@@ -290,13 +291,13 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
                 $rows[] = ['name' => $database];
             }
         } catch (\Exception $e) {
-            $msg = sprintf('An error occured: %s', $e->getMessage());
+            $msg = \sprintf('An error occured: %s', $e->getMessage());
             echo Zend_Json::encode(['success' => false, 'message' => $msg]);
 
             return;
         }
 
-        echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
+        echo Zend_Json::encode(['data' => $rows, 'count' => \count($rows)]);
     }
 
     /**
@@ -308,7 +309,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingLeft();
 
-        echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
+        echo Zend_Json::encode(['data' => $rows, 'count' => \count($rows)]);
     }
 
     /**
@@ -320,7 +321,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingRight();
 
-        echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
+        echo Zend_Json::encode(['data' => $rows, 'count' => \count($rows)]);
     }
 
     /**
@@ -332,7 +333,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         $rows = $this->Mapping()->getMappingForEntity($this->Request()->getParam('mapping'));
 
-        echo Zend_Json::encode(['data' => $rows, 'count' => count($rows)]);
+        echo Zend_Json::encode(['data' => $rows, 'count' => \count($rows)]);
     }
 
     /**
@@ -340,7 +341,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function checkFormAction()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $this->setRenderer(false);
 
         try {
@@ -396,7 +397,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      *
      * Will also inject the dependencies needed and return the created object
      *
-     * @param $importType string The import resource to create
+     * @param string $importType The import resource to create
      *
      * @return AbstractResource
      */
@@ -405,7 +406,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
         $offset = (int) $this->Request()->getParam('offset', 0);
         $name = $this->imports[$importType];
 
-        /** @var $progress Progress */
+        /** @var Progress $progress */
         $progress = new Progress();
         $progress->setOffset($offset);
 
@@ -425,7 +426,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Triggers the actual import for a given type
      *
-     * @param $importType
+     * @param string $importType
      */
     public function runImport($importType)
     {
@@ -499,7 +500,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Helper method to print "currently importing" messages
      *
-     * @param $type
+     * @param string $type
      *
      * @return bool
      */
@@ -517,7 +518,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
 
         echo Zend_Json::encode(
             [
-                'message' => sprintf(
+                'message' => \sprintf(
                     $this->getNamespace()->get('currentlyImporting', 'Current import step: %s'),
                     $import
                 ),
@@ -534,8 +535,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
     /**
      * Convenience method which prints a given error for the extjs app
      *
-     * @param $e \Exception
-     * @param $errorDescription string A simple explanation of what happened
+     * @param \Exception $e
+     * @param string     $errorDescription A simple explanation of what happened
      */
     protected function printError($e, $errorDescription)
     {

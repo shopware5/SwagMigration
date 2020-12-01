@@ -178,7 +178,7 @@ class Oxid extends Profile
         }
 
         $status = [];
-        $keys = array_keys($orderStatus);
+        $keys = \array_keys($orderStatus);
         $values = [
             'ORDERFOLDER_NEW' => 'Neu',
             'ORDERFOLDER_FINISHED' => 'Bearbeitet',
@@ -434,11 +434,13 @@ class Oxid extends Profile
 			";
         }
 
-        return implode('UNION ALL', $sql);
+        return \implode('UNION ALL', $sql);
     }
 
     /**
      * Returns the sql statement to select the shop system article translations
+     *
+     * @param int|null $offset
      *
      * @return string {String} | sql for the article translations
      */
@@ -468,7 +470,7 @@ class Oxid extends Profile
 			";
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')';
+        return '(' . \implode(') UNION ALL (', $sql) . ')';
     }
 
     /**
@@ -576,7 +578,7 @@ class Oxid extends Profile
 			";
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ') ORDER BY catLeft';
+        return '(' . \implode(') UNION ALL (', $sql) . ') ORDER BY catLeft';
     }
 
     /**
@@ -804,10 +806,10 @@ class Oxid extends Profile
         }
 
         foreach ($subQueries as $index => $subQuery) {
-            $subQueries[$index] = sprintf('(%s)', $subQuery);
+            $subQueries[$index] = \sprintf('(%s)', $subQuery);
         }
 
-        return sprintf('SELECT SUM(%s)', implode(',', $subQueries));
+        return \sprintf('SELECT SUM(%s)', \implode(',', $subQueries));
     }
 
     /**

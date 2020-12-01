@@ -12,10 +12,6 @@ use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
 
 /**
  * Password interface for md5 hashed with salt first
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2015, shopware AG (http://www.shopware.de)
  */
 class Sha512 implements PasswordEncoderInterface
 {
@@ -43,13 +39,13 @@ class Sha512 implements PasswordEncoderInterface
      */
     public function isPasswordValid($password, $hash)
     {
-        if (strpos($hash, ':') === false) {
-            return $hash == md5($password);
+        if (\strpos($hash, ':') === false) {
+            return $hash == \md5($password);
         }
 
-        list($sha512, $salt) = explode(':', $hash);
+        list($sha512, $salt) = \explode(':', $hash);
 
-        return hash('sha512', $password . $salt) == $sha512;
+        return \hash('sha512', $password . $salt) == $sha512;
     }
 
     /**
@@ -87,43 +83,43 @@ class Sha512 implements PasswordEncoderInterface
         $buffer = '';
         $raw_length = (int) ($required_salt_len * 3 / 4 + 1);
         $buffer_valid = false;
-        if (function_exists('mcrypt_create_iv') && !defined('PHALANGER')) {
+        if (\function_exists('mcrypt_create_iv') && !\defined('PHALANGER')) {
             $buffer = mcrypt_create_iv($raw_length, MCRYPT_DEV_URANDOM);
             if ($buffer) {
                 $buffer_valid = true;
             }
         }
-        if (!$buffer_valid && function_exists('openssl_random_pseudo_bytes')) {
-            $buffer = openssl_random_pseudo_bytes($raw_length);
+        if (!$buffer_valid && \function_exists('openssl_random_pseudo_bytes')) {
+            $buffer = \openssl_random_pseudo_bytes($raw_length);
             if ($buffer) {
                 $buffer_valid = true;
             }
         }
-        if (!$buffer_valid && is_readable('/dev/urandom')) {
-            $f = fopen('/dev/urandom', 'r');
-            $read = strlen($buffer);
+        if (!$buffer_valid && \is_readable('/dev/urandom')) {
+            $f = \fopen('/dev/urandom', 'r');
+            $read = \strlen($buffer);
             while ($read < $raw_length) {
-                $buffer .= fread($f, $raw_length - $read);
-                $read = strlen($buffer);
+                $buffer .= \fread($f, $raw_length - $read);
+                $read = \strlen($buffer);
             }
-            fclose($f);
+            \fclose($f);
             if ($read >= $raw_length) {
                 $buffer_valid = true;
             }
         }
-        if (!$buffer_valid || strlen($buffer) < $raw_length) {
-            $bl = strlen($buffer);
+        if (!$buffer_valid || \strlen($buffer) < $raw_length) {
+            $bl = \strlen($buffer);
             for ($i = 0; $i < $raw_length; ++$i) {
                 if ($i < $bl) {
-                    $buffer[$i] = $buffer[$i] ^ chr(mt_rand(0, 255));
+                    $buffer[$i] = $buffer[$i] ^ \chr(\mt_rand(0, 255));
                 } else {
-                    $buffer .= chr(mt_rand(0, 255));
+                    $buffer .= \chr(\mt_rand(0, 255));
                 }
             }
         }
-        $salt = str_replace('+', '.', base64_encode($buffer));
+        $salt = \str_replace('+', '.', \base64_encode($buffer));
 
-        return substr($salt, 0, $required_salt_len);
+        return \substr($salt, 0, $required_salt_len);
     }
 
     /**
@@ -137,7 +133,7 @@ class Sha512 implements PasswordEncoderInterface
     {
         $hash = '';
         for ($i = 0; $i <= $iterations; ++$i) {
-            $hash = hash('sha512', $hash . $password . $salt);
+            $hash = \hash('sha512', $hash . $password . $salt);
         }
 
         return $iterations . ':' . $salt . ':' . $hash;

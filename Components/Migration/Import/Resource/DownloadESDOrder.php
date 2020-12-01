@@ -26,7 +26,7 @@ class DownloadESDOrder extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressDownload', '%s out of %s ESD Orders imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()

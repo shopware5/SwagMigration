@@ -152,7 +152,7 @@ class Magento17 extends Profile
     /**
      * Returns the sql statement to select articles with
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -195,7 +195,7 @@ class Magento17 extends Profile
     /**
      * Returns the entity type id for a given type
      *
-     * @param $type
+     * @param string $type
      *
      * @return string
      */
@@ -263,7 +263,7 @@ class Magento17 extends Profile
     /**
      * Returns a sql statement which selects additional info for a given productID
      *
-     * @param $productId
+     * @param int $productId
      *
      * @return string
      */
@@ -529,7 +529,7 @@ class Magento17 extends Profile
 			";
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')' . ' ORDER BY languageID ASC, level, parentID ASC';
+        return '(' . \implode(') UNION ALL (', $sql) . ') ORDER BY languageID ASC, level, parentID ASC';
     }
 
     /**
@@ -770,7 +770,7 @@ class Magento17 extends Profile
         $attribute_fields = $this->Db()->fetchAssoc($sql, [$type]);
 
         if (empty($attributes)) {
-            $attributes = array_keys($attribute_fields);
+            $attributes = \array_keys($attribute_fields);
         }
 
         $select_fields = [];
@@ -806,7 +806,7 @@ class Magento17 extends Profile
         if (!$full_select) {
             return $join_fields;
         }
-        $select_fields = implode(', ', $select_fields);
+        $select_fields = \implode(', ', $select_fields);
 
         return "
 				SELECT $select_fields

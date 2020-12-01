@@ -156,7 +156,7 @@ class Prestashop14 extends Profile
     /**
      * Select attributes for a given article
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -289,7 +289,7 @@ class Prestashop14 extends Profile
             }
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')';
+        return '(' . \implode(') UNION ALL (', $sql) . ')';
     }
 
     /**

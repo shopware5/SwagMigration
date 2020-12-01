@@ -12,10 +12,6 @@ use Shopware\Components\Password\Encoder\PasswordEncoderInterface;
 
 /**
  * Password interface for md5 hashed with salt first
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2013, shopware AG (http://www.shopware.de)
  */
 class Md5Reversed implements PasswordEncoderInterface
 {
@@ -35,12 +31,12 @@ class Md5Reversed implements PasswordEncoderInterface
      */
     public function isPasswordValid($password, $hash)
     {
-        if (strpos($hash, ':') === false) {
-            return $hash == md5($password);
+        if (\strpos($hash, ':') === false) {
+            return $hash == \md5($password);
         }
-        list($md5, $salt) = explode(':', $hash);
+        list($md5, $salt) = \explode(':', $hash);
 
-        return $md5 == md5($salt . $password);
+        return $md5 == \md5($salt . $password);
     }
 
     /**
@@ -50,7 +46,7 @@ class Md5Reversed implements PasswordEncoderInterface
      */
     public function encodePassword($password)
     {
-        return md5($password);
+        return \md5($password);
     }
 
     /**

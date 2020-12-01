@@ -9,6 +9,7 @@
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Enlight_Class;
+use Enlight_Controller_Request_RequestHttp as Request;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Profile;
@@ -18,7 +19,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Internal name of the import step used by the controller
      *
-     * @var
+     * @var string
      */
     public $internal_name;
 
@@ -46,7 +47,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Request object
      *
-     * @var
+     * @var Request
      */
     protected $request;
 
@@ -70,22 +71,20 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * @param Progress $progress
      * @param Profile  $source
      * @param Profile  $target
-     * @param $request
+     * @param Request  $request
      */
     public function __construct($progress, $source, $target, $request)
     {
         $this->progress = $progress;
         $this->target = $target;
         $this->source = $source;
-        $this->requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : time();
+        $this->requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : \time();
         $this->request = $request;
         parent::__construct();
     }
 
     /**
      * Get the snippet object
-     *
-     * @return mixed
      */
     public function getNameSpace()
     {
@@ -99,7 +98,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      */
     public function newRequestNeeded()
     {
-        if (time() - $this->getRequestTime() >= $this->getMaxExecution()) {
+        if (\time() - $this->getRequestTime() >= $this->getMaxExecution()) {
             return true;
         }
 
@@ -120,7 +119,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         $offset = empty($this->Request()->offset) ? 0 : (int) $this->Request()->offset;
 
         if ($startTime === 0 || $offset === 0) {
-            $startTime = time();
+            $startTime = \time();
         }
 
         $this->Request()->setParam('task_start_time', $startTime);
@@ -133,7 +132,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Set the progress object for this instance
      *
-     * @param $progress
+     * @param Progress $progress
      */
     public function setProgress($progress)
     {
@@ -153,7 +152,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Set the time of the request
      *
-     * @param $requestTime
+     * @param int $requestTime
      */
     public function setRequestTime($requestTime)
     {
@@ -173,7 +172,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Set the max execution time. Needed for the newRequestNeeded() check
      *
-     * @param $maxExecution
+     * @param int $maxExecution
      */
     public function setMaxExecution($maxExecution)
     {
@@ -193,7 +192,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Legacy getter for the request object
      *
-     * @return mixed
+     * @return Request
      */
     public function Request()
     {
@@ -223,7 +222,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Increase the progress by one
      *
-     * @return mixed
+     * @return int
      */
     public function increaseProgress()
     {
@@ -233,7 +232,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Setter for the internal name of the current resource
      *
-     * @param $internal_name
+     * @param string $internal_name
      */
     public function setInternalName($internal_name)
     {
@@ -243,7 +242,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Getter for the internal name of the current resource
      *
-     * @return mixed
+     * @return string
      */
     public function getInternalName()
     {
@@ -254,8 +253,8 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * Takes an invalid product number and creates a valid one from it
      * by returning its md5 hash
      *
-     * @param $number int The invalid ordernumber to fix
-     * @param $id int Id of the article
+     * @param int $number The invalid ordernumber to fix
+     * @param int $id Id of the article
      *
      * @return string
      */
@@ -296,7 +295,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     /**
      * Returns a SW-productID for a given source-productId
      *
-     * @param $productId
+     * @param int $productId
      *
      * @return string
      */

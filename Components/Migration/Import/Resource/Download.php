@@ -25,7 +25,7 @@ class Download extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressDownload', '%s out of %s downloads imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -62,7 +62,7 @@ class Download extends AbstractResource
 
         $localPath = Shopware()->Container()->getParameter('shopware.app.rootDir') . 'files/downloads';
 
-        $remotePath = rtrim($this->Request()->basepath, '/') . '/out/media/';
+        $remotePath = \rtrim($this->Request()->basepath, '/') . '/out/media/';
 
         $numberSnippet = $this->getNameSpace()->get(
             'numberNotValid',
@@ -82,23 +82,23 @@ class Download extends AbstractResource
             $path = $media['url'];
 
             // Clear-Path
-            $path = basename($path);
-            $path = str_replace(' ', '%20', $path);
+            $path = \basename($path);
+            $path = \str_replace(' ', '%20', $path);
 
             $documentUrl = $remotePath . $path;
-            $document = file_get_contents($documentUrl);
+            $document = \file_get_contents($documentUrl);
 
             // Check the ordernumber
             if (!isset($orderNumber)) {
                 $orderNumber = '';
             }
             if ($numberValidationMode !== 'ignore'
-                && (empty($orderNumber) || strlen($orderNumber) > 30 || strlen($orderNumber) < 4
-                            || preg_match('/[^a-zA-Z0-9-_.]/', $orderNumber))
+                && (empty($orderNumber) || \strlen($orderNumber) > 30 || \strlen($orderNumber) < 4
+                            || \preg_match('/[^a-zA-Z0-9-_.]/', $orderNumber))
             ) {
                 switch ($numberValidationMode) {
                     case 'complain':
-                        return $this->getProgress()->error(sprintf($numberSnippet, $orderNumber));
+                        return $this->getProgress()->error(\sprintf($numberSnippet, $orderNumber));
                         break;
                     case 'make_valid':
                         $orderNumber = $this->makeInvalidNumberValid($orderNumber, $media['productID']);
@@ -109,7 +109,7 @@ class Download extends AbstractResource
             if ($document === '') {
                 continue;
             }
-            file_put_contents($localPath . str_replace('%20', ' ', $path), $document);
+            \file_put_contents($localPath . \str_replace('%20', ' ', $path), $document);
 
             // Write entry to database
             $sql = 'SELECT articleID
@@ -129,7 +129,7 @@ class Download extends AbstractResource
             // Add entry to s_articles_downloads
             Shopware()->Db()->query(
                 'INSERT INTO s_articles_downloads (articleID, description, filename, size) VALUES (?,?,?,?)',
-                [$getShopwareArticleId, $description, '/files/downloads/' . $path, filesize($localPath . $path)]
+                [$getShopwareArticleId, $description, '/files/downloads/' . $path, \filesize($localPath . $path)]
             );
         }
 

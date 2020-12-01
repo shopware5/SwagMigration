@@ -12,7 +12,7 @@ use ArrayObject;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Enlight_Class;
-use setasign\Fpdi\PdfParser\Type\PdfIndirectObjectReference;
+use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseConnection;
 use Shopware\Components\DependencyInjection\Bridge\Db;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
@@ -21,14 +21,14 @@ abstract class Profile extends Enlight_Class
     /**
      * Global variable for the database object
      *
-     * @var mixed
+     * @var DatabaseConnection
      */
     protected $db;
 
     /**
      * Prefix of each database table in the profile
      *
-     * @var
+     * @var string
      */
     protected $db_prefix;
 
@@ -42,14 +42,14 @@ abstract class Profile extends Enlight_Class
     /**
      * Array of the configuration
      *
-     * @var
+     * @var array
      */
     protected $config;
 
     /**
      * Default language of shopware
      *
-     * @var
+     * @var int
      */
     protected $default_language;
 
@@ -58,16 +58,14 @@ abstract class Profile extends Enlight_Class
      * The system does not need to be able to import $default_limit entities per query
      * but it must be able to *select* that much entities within a reasonable time.
      *
-     * @var
+     * @var int
      */
     protected $default_limit = 1000;
 
     /**
      * Class constructor to open the database connection
-     *
-     * @param $options
      */
-    public function __construct($options)
+    public function __construct(array $options)
     {
         parent::__construct();
 
@@ -87,6 +85,8 @@ abstract class Profile extends Enlight_Class
     /**
      * In some shops, any single variant of an product has assigned all the product's images
      * In order to sort this out, return 'true' in the shop's profile
+     *
+     * @return bool
      */
     public function checkForDuplicateImages()
     {
@@ -96,8 +96,8 @@ abstract class Profile extends Enlight_Class
     /**
      * This function add the profile database prefix to the given table
      *
-     * @param $table
-     * @param null $alias
+     * @param string      $table
+     * @param string|null $alias
      *
      * @return string
      */
@@ -131,7 +131,7 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the database object
      *
-     * @return \Zend_Db_Adapter_Abstract
+     * @return DatabaseConnection
      */
     public function Db()
     {
@@ -141,11 +141,11 @@ abstract class Profile extends Enlight_Class
     /**
      * This function returns the configuration array
      *
-     * @return mixed
+     * @return array|ArrayObject
      */
     public function Config()
     {
-        if (!isset($this->config) && method_exists($this, 'getConfigSelect')) {
+        if (!isset($this->config) && \method_exists($this, 'getConfigSelect')) {
             $config = [];
             $sql = $this->getConfigSelect();
             $rows = $this->db->fetchAll($sql);
@@ -160,7 +160,7 @@ abstract class Profile extends Enlight_Class
                             }
                             break;
                         case 'aarr':
-                            $row['value'] = unserialize($row['value']);
+                            $row['value'] = \unserialize($row['value']);
                             break;
                         case 'str':
                         default:
@@ -178,9 +178,9 @@ abstract class Profile extends Enlight_Class
     /**
      * This function executes an sql statement with the given parameters
      *
-     * @param $sql
-     * @param int $count
-     * @param int $offset
+     * @param string $sql
+     * @param int    $count
+     * @param int    $offset
      *
      * @return string
      */
@@ -196,8 +196,6 @@ abstract class Profile extends Enlight_Class
 
     /**
      * This function returns the customer group select statement of the current profile
-     *
-     * @return mixed
      */
     public function getPriceGroupSelect()
     {
@@ -207,11 +205,11 @@ abstract class Profile extends Enlight_Class
     /**
      * This function returns the profile sub shops
      *
-     * @return array
+     * @return array|void
      */
     public function getShops()
     {
-        if (!method_exists($this, 'getShopSelect')) {
+        if (!\method_exists($this, 'getShopSelect')) {
             return;
         }
 
@@ -223,7 +221,7 @@ abstract class Profile extends Enlight_Class
      */
     public function getNormalizedShops()
     {
-        if (!method_exists($this, 'getShopSelect')) {
+        if (!\method_exists($this, 'getShopSelect')) {
             return;
         }
         $normalizer = new WooCommerce();
@@ -236,11 +234,11 @@ abstract class Profile extends Enlight_Class
     /**
      * This function returns the profile languages
      *
-     * @return array
+     * @return array|void
      */
     public function getLanguages()
     {
-        if (!method_exists($this, 'getLanguageSelect')) {
+        if (!\method_exists($this, 'getLanguageSelect')) {
             return;
         }
 
@@ -252,7 +250,7 @@ abstract class Profile extends Enlight_Class
      */
     public function getNormalizedLanguages()
     {
-        if (!method_exists($this, 'getLanguageSelect')) {
+        if (!\method_exists($this, 'getLanguageSelect')) {
             return;
         }
         $normalizer = new WooCommerce();
@@ -265,11 +263,11 @@ abstract class Profile extends Enlight_Class
     /**
      * This function returns the profile default language
      *
-     * @return mixed
+     * @return int
      */
     public function getDefaultLanguage()
     {
-        if ($this->default_language === null && method_exists($this, 'getDefaultLanguageSelect')) {
+        if ($this->default_language === null && \method_exists($this, 'getDefaultLanguageSelect')) {
             $this->default_language = $this->db->fetchOne($this->getDefaultLanguageSelect());
         }
 
@@ -279,7 +277,7 @@ abstract class Profile extends Enlight_Class
     /**
      * This function sets the profile default language
      *
-     * @param $language
+     * @param int $language
      */
     public function setDefaultLanguage($language)
     {
@@ -289,11 +287,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the customer groups, selected by the profile  sql
      *
-     * @return array
+     * @return array|void
      */
     public function getCustomerGroups()
     {
-        if (!method_exists($this, 'getCustomerGroupSelect')) {
+        if (!\method_exists($this, 'getCustomerGroupSelect')) {
             return;
         }
 
@@ -303,11 +301,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the price groups, selected by the profile sql
      *
-     * @return array
+     * @return array|void
      */
     public function getPriceGroups()
     {
-        if (!method_exists($this, 'getPriceGroupSelect')) {
+        if (!\method_exists($this, 'getPriceGroupSelect')) {
             return;
         }
 
@@ -317,11 +315,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the payment, selected by the profile  sql
      *
-     * @return array
+     * @return array|void
      */
     public function getProperties()
     {
-        if (!method_exists($this, 'getPropertyOptionSelect')) {
+        if (!\method_exists($this, 'getPropertyOptionSelect')) {
             return;
         }
 
@@ -331,11 +329,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the payment, selected by the profile  sql
      *
-     * @return array
+     * @return array|void
      */
     public function getPaymentMeans()
     {
-        if (!method_exists($this, 'getPaymentMeanSelect')) {
+        if (!\method_exists($this, 'getPaymentMeanSelect')) {
             return;
         }
 
@@ -345,11 +343,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the order states, selected by the profile sql
      *
-     * @return array
+     * @return array|void
      */
     public function getOrderStatus()
     {
-        if (!method_exists($this, 'getOrderStatusSelect')) {
+        if (!\method_exists($this, 'getOrderStatusSelect')) {
             return;
         }
 
@@ -359,18 +357,18 @@ abstract class Profile extends Enlight_Class
     /**
      * Query available configurator options for
      *
-     * @return array
+     * @return array|void
      */
     public function getConfiguratorOptions()
     {
-        if (!method_exists($this, 'getConfiguratorOptionsSelect')) {
+        if (!\method_exists($this, 'getConfiguratorOptionsSelect')) {
             return;
         }
         $result = $this->db->fetchCol($this->getConfiguratorOptionsSelect());
 
         $output = [];
         foreach ($result as $value) {
-            $value = ucwords(strtolower($value));
+            $value = \ucwords(\strtolower($value));
             $output[$value] = $value;
         }
 
@@ -380,11 +378,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the article attributes, selected by the profile sql
      *
-     * @return array
+     * @return array|void
      */
     public function getAttributes()
     {
-        if (!method_exists($this, 'getAttributeSelect')) {
+        if (!\method_exists($this, 'getAttributeSelect')) {
             return;
         }
 
@@ -394,11 +392,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the tax rates, selected by the profile sql
      *
-     * @return array
+     * @return array|void
      */
     public function getTaxRates()
     {
-        if (!method_exists($this, 'getTaxRateSelect')) {
+        if (!\method_exists($this, 'getTaxRateSelect')) {
             return;
         }
 
@@ -408,11 +406,11 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the supplier, selected by the profile sql
      *
-     * @return array
+     * @return array|void
      */
     public function getSuppliers()
     {
-        if (!method_exists($this, 'getSupplierSelect')) {
+        if (!\method_exists($this, 'getSupplierSelect')) {
             return;
         }
 
@@ -423,13 +421,13 @@ abstract class Profile extends Enlight_Class
      * Returns the additional data for the article which will
      * be merged with the actual product
      *
-     * @param $productId
+     * @param int $productId
      *
-     * @return mixed
+     * @return array|void
      */
     public function getAdditionalProductInfo($productId)
     {
-        if (!method_exists($this, 'getAdditionalProductSelect')) {
+        if (!\method_exists($this, 'getAdditionalProductSelect')) {
             return;
         }
 
@@ -439,7 +437,7 @@ abstract class Profile extends Enlight_Class
     /**
      * Returns the categories, selected by the profile sql
      *
-     * @param $offset
+     * @param int $offset
      *
      * @return array
      */
@@ -455,11 +453,11 @@ abstract class Profile extends Enlight_Class
      *
      * @param int $offset
      *
-     * @return mixed
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryAttributedProducts($offset = 0)
     {
-        if (!method_exists($this, 'getAttributedProductsSelect')) {
+        if (!\method_exists($this, 'getAttributedProductsSelect')) {
             return;
         }
         $sql = $this->getAttributedProductsSelect();
@@ -473,14 +471,14 @@ abstract class Profile extends Enlight_Class
     /**
      * Get attributes for a given product id
      *
-     * @param $id
+     * @param int $id
      * @param int $offset
      *
-     * @return mixed
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryProductAttributes($id, $offset = 0)
     {
-        if (!method_exists($this, 'getProductAttributesSelect')) {
+        if (!\method_exists($this, 'getProductAttributesSelect')) {
             return;
         }
         $sql = $this->getProductAttributesSelect($id);
@@ -494,13 +492,13 @@ abstract class Profile extends Enlight_Class
     /**
      * Query products which have properties
      *
-     * @param $offset
+     * @param int $offset
      *
-     * @return \Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryProductsWithProperties($offset)
     {
-        if (!method_exists($this, 'getProductsWithPropertiesSelect')) {
+        if (!\method_exists($this, 'getProductsWithPropertiesSelect')) {
             return;
         }
         $sql = $this->getProductsWithPropertiesSelect();
@@ -514,13 +512,13 @@ abstract class Profile extends Enlight_Class
     /**
      * Queries the properties for a given product id
      *
-     * @param $id
+     * @param int $id
      *
-     * @return \Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryProductProperties($id)
     {
-        if (!method_exists($this, 'getProductPropertiesSelect')) {
+        if (!\method_exists($this, 'getProductPropertiesSelect')) {
             return;
         }
 
@@ -640,11 +638,11 @@ abstract class Profile extends Enlight_Class
      *
      * @param int $offset
      *
-     * @return \Zend_Db_Statement_Interface
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryProductTranslations($offset = 0)
     {
-        if (!method_exists($this, 'getProductTranslationSelect')) {
+        if (!\method_exists($this, 'getProductTranslationSelect')) {
             return;
         }
 
@@ -708,13 +706,14 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     * @param $order
      *
-     * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
+     * @param array $order
+     *
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryOrderDetailArticleNumber($order)
     {
-        if (!method_exists($this, 'getArticleNumberSelect')) {
+        if (!\method_exists($this, 'getArticleNumberSelect')) {
             return;
         }
 
@@ -724,13 +723,13 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     * @param $order
+     * @param array $order
      *
-     * @return \Zend_Db_Statement_Interface|\Zend_Db_Statement_Pdo
+     * @return \Zend_Db_Statement_Interface|void
      */
     public function queryOrderAmounts($order)
     {
-        if (!method_exists($this, 'getOrderAmounts')) {
+        if (!\method_exists($this, 'getOrderAmounts')) {
             return;
         }
 
@@ -760,13 +759,13 @@ abstract class Profile extends Enlight_Class
      * Returns a rough estimation of number of entities to import
      * No need for correctness, only the estimated time depends on this
      *
-     * @param $for
+     * @param string $for
      *
      * @return bool|string
      */
     public function getEstimation($for)
     {
-        if (!method_exists($this, 'getEstimationSelect')) {
+        if (!\method_exists($this, 'getEstimationSelect')) {
             return false;
         }
         $sql = $this->getEstimationSelect($for);
@@ -779,7 +778,7 @@ abstract class Profile extends Enlight_Class
      */
     public function queryArticleDownload()
     {
-        if (!method_exists($this, 'getDownloadSelect')) {
+        if (!\method_exists($this, 'getDownloadSelect')) {
             return false;
         }
         $sql = $this->getDownloadSelect();
@@ -788,11 +787,11 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     * @return false|\Zend_Db_Statement_Interface
+     * @return bool|\Zend_Db_Statement_Interface
      */
     public function queryArticleDownloadESD()
     {
-        if (!method_exists($this, 'getDownloadEsdSelect')) {
+        if (!\method_exists($this, 'getDownloadEsdSelect')) {
             return false;
         }
         $sql = $this->getDownloadEsdSelect();

@@ -19,7 +19,9 @@ use Shopware\Models\Media\Repository as MediaRepository;
 
 class ArticleImporter
 {
-    /** @var array $articleFields */
+    /**
+     * @var array
+     */
     private $articleFields = [
         'supplierID',
         'name',
@@ -45,7 +47,9 @@ class ArticleImporter
         'configurator_set_id',
     ];
 
-    /** @var array $articleDetailFields */
+    /**
+     * @var array
+     */
     private $articleDetailFields = [
         'articleID',
         'ordernumber',
@@ -98,15 +102,11 @@ class ArticleImporter
 
     /**
      * @var Logger
-     * */
+     */
     private $logger;
 
     /**
      * ArticleImporter constructor.
-     *
-     * @param PDOConnection $db
-     * @param ModelManager  $em
-     * @param Logger        $logger
      */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
@@ -116,8 +116,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array|bool
      */
     public function import(array $article)
@@ -186,8 +184,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|int|string
      */
     public function setConfiguratorData(array $article)
@@ -219,18 +215,18 @@ class ArticleImporter
         }
 
         $groupNames = null;
-        $additionalTextData = explode('|', $article['additionaltext']);
+        $additionalTextData = \explode('|', $article['additionaltext']);
         if (isset($article['variant_group_names'])) {
-            $variantGroupNames = explode('|', $article['variant_group_names']);
+            $variantGroupNames = \explode('|', $article['variant_group_names']);
             // make sure that the number of group names matches the number of options
-            $groupNames = count($additionalTextData) === count($variantGroupNames) ? $variantGroupNames : null;
+            $groupNames = \count($additionalTextData) === \count($variantGroupNames) ? $variantGroupNames : null;
         }
 
         $optionIDs = [];
         $groupIDs = [];
         foreach ($additionalTextData as $idx => $option) {
             $hidx = $idx + 1;
-            $option = trim(str_replace("'", '', $option));
+            $option = \trim(\str_replace("'", '', $option));
 
             if ($groupNames) {
                 $genericGroupName = $this->db->quote($groupNames[$idx]);
@@ -308,8 +304,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $price
-     *
      * @return bool|string
      */
     public function setPriceData(array $price)
@@ -434,8 +428,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool
      */
     public function deleteArticleLinks(array $article)
@@ -457,8 +449,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $linkData
-     *
      * @return bool|string
      */
     public function addArticleLink(array $linkData)
@@ -466,7 +456,7 @@ class ArticleImporter
         if (!($linkData['articleID'] = $this->getArticleID($linkData))) {
             return false;
         }
-        if (empty($linkData) || !is_array($linkData) || empty($linkData['link']) || empty($linkData['description'])) {
+        if (empty($linkData) || !\is_array($linkData) || empty($linkData['link']) || empty($linkData['description'])) {
             return false;
         }
         if (empty($linkData['target'])) {
@@ -544,8 +534,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function prepareArticleData(array $article)
@@ -630,8 +618,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function prepareArticleDetailData(array $article)
@@ -706,8 +692,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function prepareArticleAttributesData(array $article)
@@ -716,10 +700,10 @@ class ArticleImporter
             $article['articledetailsID'] = (int) $article['articledetailsID'];
         }
 
-        if (isset($article['attr']) && is_array($article['attr'])) {
+        if (isset($article['attr']) && \is_array($article['attr'])) {
             foreach ($article['attr'] as $attrKey => $attrValue) {
-                $key = (int) str_replace('attr', '', $attrKey);
-                if (is_int($key) && $key <= 20) {
+                $key = (int) \str_replace('attr', '', $attrKey);
+                if (\is_int($key) && $key <= 20) {
                     $article['attr'][$attrKey] = $this->db->quote((string) $attrValue);
                 } else {
                     unset($article['attr'][$attrKey]);
@@ -740,8 +724,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|array
      */
     private function findExistingEntries(array $article)
@@ -810,8 +792,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|int
      */
     private function getSupplierId(array $article)
@@ -887,8 +867,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|array
      */
     private function getTaxData(array $article)
@@ -918,8 +896,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function createOrUpdateArticle(array $article)
@@ -938,7 +914,7 @@ class ArticleImporter
                     $insertValues[] = $article[$field];
                 }
             }
-            $values = '(' . implode(', ', $insertFields) . ') VALUES (' . implode(', ', $insertValues) . ')';
+            $values = '(' . \implode(', ', $insertFields) . ') VALUES (' . \implode(', ', $insertValues) . ')';
             $sql = "INSERT INTO s_articles $values";
             $this->db->query($sql);
             $article['articleID'] = $this->db->lastInsertId();
@@ -953,8 +929,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function createOrUpdateArticleDetail(array $article)
@@ -972,7 +946,7 @@ class ArticleImporter
                     $insertValues[] = $article[$field];
                 }
             }
-            $values = '(' . implode(', ', $insertFields) . ') VALUES (' . implode(', ', $insertValues) . ')';
+            $values = '(' . \implode(', ', $insertFields) . ') VALUES (' . \implode(', ', $insertValues) . ')';
             $sql = "INSERT INTO s_articles_details $values";
             $this->db->query($sql);
             $article['articledetailsID'] = $this->db->lastInsertId();
@@ -983,7 +957,7 @@ class ArticleImporter
                     $values[] = $field . '=' . $article[$field];
                 }
             }
-            $values = implode(', ', $values);
+            $values = \implode(', ', $values);
             $sql = "UPDATE s_articles_details
                     SET $values
                     WHERE id = {$article['articledetailsID']}";
@@ -993,9 +967,6 @@ class ArticleImporter
         return $article;
     }
 
-    /**
-     * @param array $article
-     */
     private function setArticleMainDetailId(array $article)
     {
         if ($article['kind'] !== 1) {
@@ -1008,9 +979,6 @@ class ArticleImporter
         $this->db->query($sql, [$article['articledetailsID'], $article['articleID']]);
     }
 
-    /**
-     * @param array $article
-     */
     private function setArticlePrices(array $article)
     {
         $this->db->update(
@@ -1021,8 +989,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return array
      */
     private function setArticleAttributes(array $article)
@@ -1049,8 +1015,8 @@ class ArticleImporter
             $this->db->query($sql);
         } else {
             if (!empty($article['attr'])) {
-                $columns = ', ' . implode(', ', array_keys($article['attr']));
-                $values = ', ' . implode(', ', $article['attr']);
+                $columns = ', ' . \implode(', ', \array_keys($article['attr']));
+                $values = ', ' . \implode(', ', $article['attr']);
             }
 
             if ($values === '') {
@@ -1069,8 +1035,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|array
      */
     private function getConfiguratorData(array $article)
@@ -1095,8 +1059,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|array
      */
     private function getArticleNumbers(array $article)
@@ -1129,8 +1091,6 @@ class ArticleImporter
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|string
      */
     private function getArticleID(array $article)
@@ -1138,13 +1098,13 @@ class ArticleImporter
         if (empty($article)) {
             return false;
         }
-        if (is_string($article)) {
+        if (\is_string($article)) {
             $article = ['ordernumber' => $article];
         }
-        if (is_int($article)) {
+        if (\is_int($article)) {
             $article = ['articleID' => $article];
         }
-        if (!is_array($article)) {
+        if (!\is_array($article)) {
             return false;
         }
         if (empty($article['articleID']) && empty($article['articledetailsID']) && empty($article['ordernumber'])) {
@@ -1174,7 +1134,7 @@ class ArticleImporter
 
     /**
      * @param string|array      $type
-     * @param null|string|array $objectKey
+     * @param string|array|null $objectKey
      *
      * @return bool
      */
@@ -1184,12 +1144,12 @@ class ArticleImporter
             return false;
         }
 
-        if (is_array($type)) {
+        if (\is_array($type)) {
             foreach ($type as &$value) {
                 $value = $this->db->quote($value);
             }
             unset($value);
-            $type = implode(',', $type);
+            $type = \implode(',', $type);
         } else {
             $type = $this->db->quote($type);
         }
@@ -1197,11 +1157,11 @@ class ArticleImporter
         $sql = 'DELETE FROM s_core_translations
                 WHERE objecttype IN (' . $type . ')';
         if (!empty($objectKey)) {
-            if (is_array($objectKey)) {
+            if (\is_array($objectKey)) {
                 foreach ($objectKey as &$value) {
                     $value = $this->db->quote($value);
                 }
-                $objectKey = implode(',', $objectKey);
+                $objectKey = \implode(',', $objectKey);
             } else {
                 $objectKey = $this->db->quote($objectKey);
             }
@@ -1253,7 +1213,7 @@ class ArticleImporter
         $esdIDs = $this->db->fetchCol($sql);
         if (!empty($esdIDs)) {
             $sql = 'DELETE FROM s_articles_esd_serials
-                    WHERE esdID = ' . implode(' OR esdID=', $esdIDs);
+                    WHERE esdID = ' . \implode(' OR esdID=', $esdIDs);
             $this->db->query($sql);
         }
 
@@ -1370,12 +1330,12 @@ class ArticleImporter
      */
     private function toString($description)
     {
-        $description = html_entity_decode($description);
-        $description = preg_replace('!<[^>]*?>!', ' ', $description);
-        $description = str_replace(chr(0xa0), ' ', $description);
-        $description = preg_replace('/\s\s+/', ' ', $description);
-        $description = htmlspecialchars($description);
-        $description = trim($description);
+        $description = \html_entity_decode($description);
+        $description = \preg_replace('!<[^>]*?>!', ' ', $description);
+        $description = \str_replace(\chr(0xa0), ' ', $description);
+        $description = \preg_replace('/\s\s+/', ' ', $description);
+        $description = \htmlspecialchars($description);
+        $description = \trim($description);
 
         return $description;
     }
@@ -1389,11 +1349,11 @@ class ArticleImporter
      */
     private function toFloat($value)
     {
-        if (is_float($value)) {
+        if (\is_float($value)) {
             return $value;
         }
 
-        return (float) str_replace(',', '.', $value);
+        return (float) \str_replace(',', '.', $value);
     }
 
     /**
