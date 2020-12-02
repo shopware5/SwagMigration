@@ -5,6 +5,7 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 use Doctrine\DBAL\Connection;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as PDOConnection;
 use Shopware\SwagMigration\Components\Migration\PasswordEncoder\Md5Reversed;
@@ -13,10 +14,6 @@ use Shopware\SwagMigration\Subscriber\Resources;
 
 /**
  * Shopware SwagMigration Plugin - Bootstrap
- *
- * @category  Shopware
- *
- * @copyright Copyright (c), shopware AG (http://www.shopware.com)
  */
 class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
@@ -332,7 +329,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             'version' => $this->getVersion(),
             'label' => $this->getLabel(),
             'author' => 'shopware AG',
-            'description' => file_get_contents($this->Path() . 'info.txt'),
+            'description' => \file_get_contents($this->Path() . 'info.txt'),
             'support' => 'http://forum.shopware.com/',
             'link' => 'http://forum.shopware.com/',
             'copyright' => 'shopware AG',
@@ -348,7 +345,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
      */
     public function getVersion()
     {
-        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
+        $info = \json_decode(\file_get_contents(__DIR__ . \DIRECTORY_SEPARATOR . 'plugin.json'), true);
 
         if ($info) {
             return $info['currentVersion'];

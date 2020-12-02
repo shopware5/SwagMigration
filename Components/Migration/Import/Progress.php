@@ -47,7 +47,7 @@ class Progress extends Enlight_Class
     /**
      * Progress. If not set, the progress is calculated dynamically
      *
-     * @var null|float
+     * @var float|null
      */
     protected $progress;
 
@@ -99,7 +99,7 @@ class Progress extends Enlight_Class
     /**
      * Abort the progress with an error
      *
-     * @param $message
+     * @param string $message
      *
      * @return $this
      */
@@ -137,7 +137,7 @@ class Progress extends Enlight_Class
     public function getEstimation()
     {
         if ($this->count && $this->offset) {
-            return (time() - $this->startTime) / $this->offset * ($this->count - $this->offset);
+            return (\time() - $this->startTime) / $this->offset * ($this->count - $this->offset);
         }
 
         return -1;
@@ -146,7 +146,7 @@ class Progress extends Enlight_Class
     /**
      * Set the total number of items to import
      *
-     * @param $count
+     * @param int $count
      */
     public function setCount($count)
     {
@@ -156,7 +156,7 @@ class Progress extends Enlight_Class
     /**
      * Return the number of items to import
      *
-     * @return mixed
+     * @return int
      */
     public function getCount()
     {
@@ -166,7 +166,7 @@ class Progress extends Enlight_Class
     /**
      * Set the progress message
      *
-     * @param $message
+     * @param string $message
      */
     public function setMessage($message)
     {
@@ -176,7 +176,7 @@ class Progress extends Enlight_Class
     /**
      * Get the progress message
      *
-     * @return mixed
+     * @return string
      */
     public function getMessage()
     {
@@ -186,7 +186,7 @@ class Progress extends Enlight_Class
     /**
      * Set progress offset
      *
-     * @param $offset
+     * @param int $offset
      */
     public function setOffset($offset)
     {
@@ -196,7 +196,7 @@ class Progress extends Enlight_Class
     /**
      * Get progress offset
      *
-     * @return mixed
+     * @return int
      */
     public function getOffset()
     {
@@ -206,7 +206,7 @@ class Progress extends Enlight_Class
     /**
      * Increase the progress offset by one
      *
-     * @return mixed
+     * @return int
      */
     public function increaseOffset()
     {
@@ -216,7 +216,7 @@ class Progress extends Enlight_Class
     /**
      * Set the progress
      *
-     * @param $progress
+     * @param float|null $progress
      */
     public function setProgress($progress)
     {
@@ -225,6 +225,8 @@ class Progress extends Enlight_Class
 
     /**
      * Get progress
+     *
+     * @return float|null
      */
     public function getProgress()
     {
@@ -244,7 +246,7 @@ class Progress extends Enlight_Class
     /**
      * Return start time of the progress
      *
-     * @return mixed
+     * @return int
      */
     public function getStartTime()
     {
@@ -254,7 +256,7 @@ class Progress extends Enlight_Class
     /**
      * Set the start time of the progress
      *
-     * @param $startTime
+     * @param int $startTime
      */
     public function setStartTime($startTime)
     {
@@ -264,7 +266,7 @@ class Progress extends Enlight_Class
     /**
      * Set success
      *
-     * @param $success
+     * @param int $success
      */
     public function setSuccess($success)
     {
@@ -274,7 +276,7 @@ class Progress extends Enlight_Class
     /**
      * Return progress' success
      *
-     * @return mixed
+     * @return int
      */
     public function getSuccess()
     {
@@ -284,7 +286,7 @@ class Progress extends Enlight_Class
     /**
      * Set request params
      *
-     * @param $requestParams
+     * @param array $requestParams
      */
     public function setRequestParams($requestParams)
     {
@@ -304,8 +306,8 @@ class Progress extends Enlight_Class
     /**
      * Add a single request param
      *
-     * @param $key
-     * @param $value
+     * @param string $key
+     * @param mixed  $value
      *
      * @return $this
      */
@@ -319,7 +321,7 @@ class Progress extends Enlight_Class
     /**
      * Set the progress status
      *
-     * @param $status
+     * @param int $status
      */
     public function setStatus($status)
     {
@@ -343,7 +345,7 @@ class Progress extends Enlight_Class
      */
     public function isError()
     {
-        return self::STATUS_ERROR == $this->getStatus();
+        return $this->getStatus() == self::STATUS_ERROR;
     }
 
     /**
@@ -353,6 +355,6 @@ class Progress extends Enlight_Class
      */
     public function isDone()
     {
-        return self::STATUS_DONE == $this->getStatus();
+        return $this->getStatus() == self::STATUS_DONE;
     }
 }

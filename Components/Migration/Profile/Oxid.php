@@ -23,7 +23,7 @@ class Oxid extends Profile
     /**
      * Returns a select for a rough estimation for the total number of entities
      *
-     * @param $for
+     * @param string $for
      *
      * @return string
      */
@@ -73,7 +73,14 @@ class Oxid extends Profile
      */
     public function getLanguages()
     {
-        return $this->Config()->aLanguages;
+        $sql = $this->getConfigSelect() . ' WHERE OXVARNAME LIKE "aLanguages"';
+        $a = $this->Db()->fetchAssoc($sql);
+
+        if (isset($a['value'])) {
+            return \unserialize($a['value'], ['array']);
+        }
+
+        return [];
     }
 
     /**
@@ -83,17 +90,31 @@ class Oxid extends Profile
      */
     public function getLanguageKeys()
     {
-        $keys = [];
-        $params = $this->Config()->aLanguageParams;
-        foreach ($params as $id => $param) {
-            $keys[$param['baseId']] = $id;
+        $sql = $this->getConfigSelect() . ' WHERE OXVARNAME LIKE "aLanguageParams"';
+
+        $languageKeys = $this->Db()->fetchAll($sql);
+
+        $result = [];
+        foreach ($languageKeys as $key => $value) {
+            if (isset($value['value'])) {
+                $keys = \unserialize($value['value'], ['array']);
+                foreach ($keys as $index => $res) {
+                    if ((int) $res['baseId'] === 0) {
+                        continue;
+                    }
+
+                    $result[$index] = $res['baseId'];
+                }
+            }
         }
 
-        return $keys;
+        return $result;
     }
 
     /**
      * Returns the property options of the shop
+     *
+     * @return string
      */
     public function getPropertyOptionSelect()
     {
@@ -149,8 +170,15 @@ class Oxid extends Profile
      */
     public function getOrderStatus()
     {
+        $sql = $this->getConfigSelect() . ' WHERE OXVARNAME LIKE "aOrderfolder"';
+        $orderStatus = $this->Db()->fetchAssoc($sql);
+
+        if (isset($orderStatus['value'])) {
+            $orderStatus = \unserialize($orderStatus['value'], ['array']);
+        }
+
         $status = [];
-        $keys = array_keys($this->Config()->aOrderfolder);
+        $keys = \array_keys($orderStatus);
         $values = [
             'ORDERFOLDER_NEW' => 'Neu',
             'ORDERFOLDER_FINISHED' => 'Bearbeitet',
@@ -235,7 +263,7 @@ class Oxid extends Profile
     /**
      * Returns the sql statement to select articles with
      *
-     * @param $id int Id of the product to query
+     * @param int $id | Id of the product to query
      *
      * @return string
      */
@@ -406,31 +434,34 @@ class Oxid extends Profile
 			";
         }
 
-        return implode('UNION ALL', $sql);
+        return \implode('UNION ALL', $sql);
     }
 
     /**
      * Returns the sql statement to select the shop system article translations
      *
+     * @param int|null $offset
+     *
      * @return string {String} | sql for the article translations
      */
-    public function getProductTranslationSelect()
+    public function getProductTranslationSelect($offset = 0)
     {
         $keys = $this->getLanguageKeys();
         foreach ($keys as $key => $languageID) {
             if (empty($key)) {
                 continue;
             }
+
             $sql[] = "
 				SELECT
 					a.OXID 					as productID,
 					{$this->Db()->quote($languageID)} as languageID,
-					a.OXTITLE_$key 			as name,
-					a.OXVARSELECT_$key 		as additionaltext,
-					a.OXSHORTDESC_$key 		as description,
-					a.OXSEARCHKEYS_$key 	as keywords,
-					e.OXLONGDESC_$key 		as description_long,
-					e.OXTAGS_$key 			as tags
+					a.OXTITLE_$languageID 			as name,
+					a.OXVARSELECT_$languageID 		as additionaltext,
+					a.OXSHORTDESC_$languageID 		as description,
+					a.OXSEARCHKEYS_$languageID 	as keywords,
+					e.OXLONGDESC_$languageID 		as description_long,
+					e.OXTAGS_$languageID 			as tags
 
 				FROM {$this->quoteTable('articles', 'a')}
 
@@ -439,7 +470,7 @@ class Oxid extends Profile
 			";
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')';
+        return '(' . \implode(') UNION ALL (', $sql) . ')';
     }
 
     /**
@@ -470,6 +501,8 @@ class Oxid extends Profile
 
     /**
      * Returns the Root-id for the categories
+     *
+     * @return string|bool
      */
     public function getBaseShopId()
     {
@@ -528,10 +561,10 @@ class Oxid extends Profile
 					(CASE WHEN c.OXPARENTID = 'oxrootid' THEN '' ELSE c.OXPARENTID END) as parentID,
 					{$this->Db()->quote($languageID)} as languageID,
 					-- OXSHOPID as shopID,
-					IF(c.OXTITLE_$key='', c.OXTITLE, c.OXTITLE_$key) as description,
-					IF(c.OXDESC_$key='', c.OXDESC, c.OXDESC_$key) as cmsheadline,
-					IF(c.OXLONGDESC_$key='', c.OXLONGDESC, c.OXLONGDESC_$key) as cmstext,
-					IF(c.OXACTIVE_$key='', c.OXACTIVE, c.OXACTIVE_$key) as active,
+					IF(c.OXTITLE_$languageID='', c.OXTITLE, c.OXTITLE_$languageID) as description,
+					IF(c.OXDESC_$languageID='', c.OXDESC, c.OXDESC_$languageID) as cmsheadline,
+					IF(c.OXLONGDESC_$languageID='', c.OXLONGDESC, c.OXLONGDESC_$languageID) as cmstext,
+					IF(c.OXACTIVE_$languageID='', c.OXACTIVE, c.OXACTIVE_$languageID) as active,
 					c.OXHIDDEN as hidetop,
 					c.OXSORT as position,
 				    c.OXEXTLINK as external,
@@ -545,7 +578,7 @@ class Oxid extends Profile
 			";
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ') ORDER BY catLeft';
+        return '(' . \implode(') UNION ALL (', $sql) . ') ORDER BY catLeft';
     }
 
     /**
@@ -739,5 +772,61 @@ class Oxid extends Profile
             FROM {$this->quoteTable('orderfiles')} of
             INNER JOIN {$this->quoteTable('order')} o ON of.OXORDERID = o.OXID
         ";
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductTableCountSql()
+    {
+        return 'SELECT COUNT(*) FROM ' . $this->quoteTable('articles');
+    }
+
+    /**
+     * @return string
+     */
+    public function getTranslationTableCountSql()
+    {
+        $keys = $this->getLanguageKeys();
+
+        $subQueries = [];
+        foreach ($keys as $key => $languageID) {
+            if (empty($key)) {
+                continue;
+            }
+
+            $subQueries[] = "
+				SELECT COUNT(a.OXTITLE_$languageID)
+
+				FROM {$this->quoteTable('articles', 'a')}
+
+				LEFT JOIN {$this->quoteTable('artextends', 'e')}
+				ON e.OXID=a.OXID
+			";
+        }
+
+        foreach ($subQueries as $index => $subQuery) {
+            $subQueries[$index] = \sprintf('(%s)', $subQuery);
+        }
+
+        return \sprintf('SELECT SUM(%s)', \implode(',', $subQueries));
+    }
+
+    /**
+     * @return string
+     */
+    public function getProductPropertiesCountSql()
+    {
+        return "
+			SELECT COUNT(p.OXID)
+
+			FROM {$this->quoteTable('articles', 'p')}
+
+			INNER JOIN {$this->quoteTable('object2attribute', 'o2a')}
+			ON o2a.OXOBJECTID = p.OXID
+
+			INNER JOIN {$this->quoteTable('attribute', 'a')}
+			ON a.OXID = o2a.OXATTRID
+		";
     }
 }

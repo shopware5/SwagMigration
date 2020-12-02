@@ -8,6 +8,7 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseConnection;
 use Exception;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
 use Shopware\SwagMigration\Components\Migration;
@@ -17,25 +18,23 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Category
  *
  * Category import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Category extends AbstractResource
 {
     /**
-     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @var DatabaseConnection
      */
     private $db;
 
-    /** @var array */
+    /**
+     * @var array
+     */
     private $unmapped = [];
 
     /**
      * @throws Exception
      *
-     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @return DatabaseConnection
      */
     public function getDb()
     {
@@ -72,7 +71,7 @@ class Category extends AbstractResource
     public function getCurrentProgressMessage(Progress $progress)
     {
         if ($this->getInternalName() == 'import_categories') {
-            return sprintf(
+            return \sprintf(
                 $this->getNameSpace()->get('progressCategories', '%s out of %s categories imported'),
                 $progress->getOffset(),
                 $progress->getCount()
@@ -80,7 +79,7 @@ class Category extends AbstractResource
         }
 
         if ($this->getInternalName() == 'import_article_categories') {
-            return sprintf(
+            return \sprintf(
                 $this->getNameSpace()->get('progressArticleCategories', '%s out of %s articles assigned to categories'),
                 $progress->getOffset(),
                 $progress->getCount()
@@ -99,8 +98,8 @@ class Category extends AbstractResource
     /**
      * Set a category target id
      *
-     * @param $id
-     * @param $target
+     * @param int $id
+     * @param int $target
      */
     public function setCategoryTarget($id, $target)
     {
@@ -118,7 +117,7 @@ class Category extends AbstractResource
     /**
      * Get a category target id
      *
-     * @param $id
+     * @param int $id
      *
      * @return bool|string
      */
@@ -137,7 +136,7 @@ class Category extends AbstractResource
     /**
      * Get a category target id
      *
-     * @param $id
+     * @param int $id
      *
      * @return bool|string
      */
@@ -159,7 +158,7 @@ class Category extends AbstractResource
     /**
      * Delete category target
      *
-     * @param $id
+     * @param int $id
      */
     public function deleteCategoryTarget($id)
     {
@@ -190,7 +189,7 @@ class Category extends AbstractResource
      */
     public function importCategories()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $skip = false;
@@ -227,7 +226,7 @@ class Category extends AbstractResource
 
             //check if the category split into the different translations
             if (!empty($category['languageID'])
-                && strpos($category['categoryID'], Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
+                && \strpos($category['categoryID'], Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
             ) {
                 $category['categoryID'] = $category['categoryID'] . Migration::CATEGORY_LANGUAGE_SEPARATOR . $category['languageID'];
 
@@ -255,7 +254,9 @@ class Category extends AbstractResource
                     $category['parent'] = $target_parent;
                 } else {
                     if (empty($target_parent)) {
-                        Shopware()->PluginLogger()->error("Order '{$category['description']}' was not imported because the parent category was not found. The plugin tries to create it later.");
+                        Shopware()->Container()->get('pluginlogger')
+                            ->error("Order '{$category['description']}' was not imported because the parent category was not found. The plugin tries to create it later.");
+
                         $this->unmapped[] = $category;
                         continue;
                     }
@@ -286,8 +287,10 @@ class Category extends AbstractResource
                     );
                 }
             } catch (Exception $e) {
-                print_r($e->getMessage());
-                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                \print_r($e->getMessage());
+                Shopware()->Container()->get('pluginlogger')
+                    ->error("Category '{$category['description']}' was not imported.");
+
                 $this->increaseProgress();
                 exit();
             }
@@ -306,7 +309,7 @@ class Category extends AbstractResource
             }
         }
 
-        if (count($this->unmapped) > 0) {
+        if (\count($this->unmapped) > 0) {
             $this->importCategoriesWithoutParents();
             if ($this->newRequestNeeded()) {
                 return $this->getProgress();
@@ -433,14 +436,21 @@ class Category extends AbstractResource
                 }
                 unset($this->unmapped[$key]);
             } catch (Exception $e) {
-                var_dump($e->getMessage());
-                Shopware()->PluginLogger()->error("Category '{$category['description']}' was not imported.");
+                Shopware()->Container()->get('pluginlogger')
+                    ->error(
+                        sprintf(
+                            'Category "%s" was not imported. Error message: %s',
+                            $category['description'],
+                            $e->getMessage()
+                        )
+                    );
+
                 $this->increaseProgress();
                 exit();
             }
         }
 
-        if (count($this->unmapped) > 0) {
+        if (\count($this->unmapped) > 0) {
             $this->importCategoriesWithoutParents();
             if ($this->newRequestNeeded()) {
                 return $this->getProgress();

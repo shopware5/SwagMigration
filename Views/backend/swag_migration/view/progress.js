@@ -63,7 +63,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
      * Title of the window.
      * @string
      */
-    title: '{s name=progressTitle}Importing...{/s}',
+    title: '{s name="progressTitle"}Importing...{/s}',
 
     /**
      * Makes the progress window modal

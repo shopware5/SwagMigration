@@ -23,8 +23,6 @@ interface ResourceInterface
      * Returns the progress message for the current import step
      * a Progress object will be passed, so you can get some context info for your snippet
      *
-     * @param Progress $progress
-     *
      * @return string
      */
     public function getCurrentProgressMessage(Progress $progress);

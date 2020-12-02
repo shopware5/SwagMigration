@@ -17,17 +17,12 @@ class PriceImporter
      */
     private $db;
 
-    /**
-     * @param PDOConnection $db
-     */
     public function __construct(PDOConnection $db)
     {
         $this->db = $db;
     }
 
     /**
-     * @param array $price
-     *
      * @return bool|int
      */
     public function importArticlePrice(array $price)
@@ -81,8 +76,6 @@ class PriceImporter
     }
 
     /**
-     * @param array $price
-     *
      * @return array
      */
     private function preparePriceData(array $price)
@@ -112,8 +105,6 @@ class PriceImporter
     }
 
     /**
-     * @param array $price
-     *
      * @return bool|array
      */
     private function getArticleNumbers(array $price)
@@ -210,9 +201,6 @@ class PriceImporter
     }
 
     /**
-     * @param array $price
-     * @param array $article
-     *
      * @return bool
      */
     private function createPrice(array $price, array $article)
@@ -252,6 +240,6 @@ class PriceImporter
      */
     private function toFloat($value)
     {
-        return (float) str_replace(',', '.', $value);
+        return (float) \str_replace(',', '.', $value);
     }
 }

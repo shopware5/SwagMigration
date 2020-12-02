@@ -18,10 +18,6 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
  * Shopware SwagMigration Components - Customer
  *
  * Customer import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Customer extends AbstractResource
 {
@@ -38,7 +34,7 @@ class Customer extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressCustomers', '%s out of %s customers imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -58,7 +54,7 @@ class Customer extends AbstractResource
      */
     public function run()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $salt = $this->Request()->salt;
@@ -96,8 +92,6 @@ class Customer extends AbstractResource
     /**
      * Import the customer debit
      *
-     * @param array $customer
-     *
      * @return bool
      */
     public function importCustomerDebit(array $customer)
@@ -112,14 +106,14 @@ class Customer extends AbstractResource
 
         // Iterate the array, remove unneeded fields and check if the required fields exist
         foreach ($customer as $key => $value) {
-            if (array_key_exists($key, $fields)) {
+            if (\array_key_exists($key, $fields)) {
                 $fields[$key] = true;
             } else {
                 unset($customer[$key]);
             }
         }
         // Required field not found
-        if (in_array(false, $fields)) {
+        if (\in_array(false, $fields)) {
             return false;
         }
 
@@ -129,15 +123,12 @@ class Customer extends AbstractResource
     }
 
     /**
-     * @param $customer
-     * @param $import
-     * @param $salt
-     *
-     * @throws \Zend_Db_Adapter_Exception
+     * @param Import $import
+     * @param string $salt
      *
      * @return Progress
      */
-    private function migrateCustomer($customer, $import, $salt)
+    private function migrateCustomer(array $customer, $import, $salt)
     {
         if (isset($customer['customergroupID'])
             && isset($this->Request()->customer_group[$customer['customergroupID']])
@@ -207,7 +198,7 @@ class Customer extends AbstractResource
         $customer_result = $import->customer($customer);
 
         if (!empty($customer_result)) {
-            $customer = array_merge($customer, $customer_result);
+            $customer = \array_merge($customer, $customer_result);
 
             if (!empty($customer['account'])) {
                 $this->importCustomerDebit($customer);

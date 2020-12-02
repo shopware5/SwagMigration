@@ -30,7 +30,7 @@ class Configurator extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('configuratorProgress', '%s out of %s configurators imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -51,7 +51,7 @@ class Configurator extends AbstractResource
     public function run()
     {
         $offset = $this->getProgress()->getOffset();
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
 
         $products_result = $this->Source()->queryAttributedProducts($offset);
         if (empty($products_result)) {
@@ -95,7 +95,7 @@ class Configurator extends AbstractResource
 
         // Skip products which have not been imported before
         $productId = $this->getBaseArticleInfo($id);
-        if (false === $productId) {
+        if ($productId === false) {
             return;
         }
 
@@ -107,7 +107,7 @@ class Configurator extends AbstractResource
                 FROM `s_article_configurator_sets`
                 WHERE `name`='{$configuratorSetName}' LIMIT 1"
         );
-        if (false === $configuratorSetId) {
+        if ($configuratorSetId === false) {
             $sql = "INSERT INTO s_article_configurator_sets SET `name`='{$configuratorSetName}'";
             Shopware()->Db()->query($sql);
             $configuratorSetId = Shopware()->Db()->lastInsertId();

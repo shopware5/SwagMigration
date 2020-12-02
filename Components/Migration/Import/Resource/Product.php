@@ -8,6 +8,7 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
+use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseConnection;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
@@ -17,15 +18,11 @@ use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
  * Shopware SwagMigration Components - Product
  *
  * Product import wrapper
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Product extends AbstractResource
 {
     /**
-     * @var \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @var DatabaseConnection
      */
     private $db;
 
@@ -42,7 +39,7 @@ class Product extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressProducts', '%s out of %s products imported'),
             $progress->getOffset(),
             $progress->getCount()
@@ -58,9 +55,7 @@ class Product extends AbstractResource
     }
 
     /**
-     * @throws \Exception
-     *
-     * @return \Enlight_Components_Db_Adapter_Pdo_Mysql
+     * @return DatabaseConnection
      */
     public function getDb()
     {
@@ -78,7 +73,6 @@ class Product extends AbstractResource
     {
         $numberValidationMode = $this->Request()->getParam('number_validation_mode', 'complain');
 
-        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
         $db = $this->getDb();
 
         /* @var Import $import */
@@ -98,7 +92,7 @@ class Product extends AbstractResource
 
         $offset = $this->getProgress()->getOffset();
 
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $products = $this->Source()->queryProducts($offset);
 
         $this->getProgress()->setCount($products->rowCount() + $offset);
@@ -137,13 +131,13 @@ class Product extends AbstractResource
      * Helper function to remove an old article detail ans set another detail instead of it. Will also update
      * s_plugin_migrations in order to link other child-products to the new detail instead of the old one
      *
-     * @param $oldMainDetail
-     * @param $newMainDetail
-     * @param $articleId
+     * @param int $oldMainDetail
+     * @param int $newMainDetail
+     * @param int $articleId
      */
     public function replaceProductDetail($oldMainDetail, $newMainDetail, $articleId)
     {
-        /* @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
+        /* @var Enlight_Components_Db_Adapter_Pdo_Mysql $db */
         $db = $this->getDb();
 
         // Delete old main detail
@@ -167,16 +161,14 @@ class Product extends AbstractResource
      * This function migrates the product to Shopware. It has been excluded because the data coming from
      * different Systems made this necessary.
      *
-     * @param $product
-     * @param $numberValidationMode
-     * @param $db
-     * @param $import
-     * @param $numberSnippet
-     * @param $call
+     * @param string             $numberValidationMode
+     * @param DatabaseConnection $db
+     * @param Import             $import
+     * @param string             $numberSnippet
      *
      * @return Progress
      */
-    private function migrateProduct($product, $numberValidationMode, $db, $import, $numberSnippet, $call)
+    private function migrateProduct(array $product, $numberValidationMode, $db, $import, $numberSnippet, array $call)
     {
         if ($call['profile'] !== 'WooCommerce') {
             $configuratorMapping = $this->Request()->get('configurator_mapping');
@@ -194,13 +186,13 @@ class Product extends AbstractResource
         $additionalProductInfo = $this->Source()->getAdditionalProductInfo($product['productID']);
         if (!empty($additionalProductInfo)) {
             // Merge the results with the pre-existing product array
-            $product = array_merge($product, $additionalProductInfo);
+            $product = \array_merge($product, $additionalProductInfo);
         }
 
         // If no group name for the variants' options was specified
         // try to get it from the initial mapping
         if (!empty($product['additionaltext']) && empty($product['variant_group_names'])) {
-            $additional = ucwords(strtolower($product['additionaltext']));
+            $additional = \ucwords(\strtolower($product['additionaltext']));
             if (isset($configuratorMapping[$additional])) {
                 $product['variant_group_names'] = $configuratorMapping[$additional];
             }
@@ -210,11 +202,11 @@ class Product extends AbstractResource
         $number = isset($product['ordernumber']) ? $product['ordernumber'] : '';
 
         if ($numberValidationMode !== 'ignore'
-            && (empty($number) || strlen($number) > 30 || strlen($number) < 4 || preg_match('/[^a-zA-Z0-9-_.]/', $number))
+            && (empty($number) || \strlen($number) > 30 || \strlen($number) < 4 || \preg_match('/[^a-zA-Z0-9-_.]/', $number))
         ) {
             switch ($numberValidationMode) {
                 case 'complain':
-                    return $this->getProgress()->error(sprintf($numberSnippet, $number));
+                    return $this->getProgress()->error(\sprintf($numberSnippet, $number));
                     break;
                 case 'make_valid':
                     $product['ordernumber'] = $this->makeInvalidNumberValid($number, $product['productID']);
@@ -244,7 +236,7 @@ class Product extends AbstractResource
         }
 
         //Supplier
-        if (empty($product['supplierID']) && empty($product['supplier']) || !array_key_exists('supplier', $product)) {
+        if (empty($product['supplierID']) && empty($product['supplier']) || !\array_key_exists('supplier', $product)) {
             $product['supplier'] = $supplier;
         }
 
@@ -270,14 +262,14 @@ class Product extends AbstractResource
 
         //Description
         if (isset($product['description'])) {
-            $product['description'] = strip_tags($product['description']);
+            $product['description'] = \strip_tags($product['description']);
         }
 
         //Article
         $product_result = $import->article($product);
 
         if (!empty($product_result)) {
-            $product = array_merge($product, $product_result);
+            $product = \array_merge($product, $product_result);
             /*
              * Check if the parent article's detail has configurator options associated
              *
@@ -301,7 +293,7 @@ class Product extends AbstractResource
 
             if ($numberWasGenerated === true) {
                 $sql = 'UPDATE s_plugin_migrations SET targetID = ? WHERE targetID = ?';
-                $db->query($sql, [$product['articledetailsID'], str_replace(Shopware()->Config()->backendAutoOrderNumberPrefix, '', $product['ordernumber'])]);
+                $db->query($sql, [$product['articledetailsID'], \str_replace(Shopware()->Config()->backendAutoOrderNumberPrefix, '', $product['ordernumber'])]);
             }
 
             // In some cases we need to make sure, that the article configurator is
@@ -337,7 +329,7 @@ class Product extends AbstractResource
                     $product['price'] = $product['net_price'];
                     unset($product['net_price'], $product['tax']);
                 } else {
-                    $product['price'] = round($product['net_price'] * (100 + $product['tax']) / 100, 2);
+                    $product['price'] = \round($product['net_price'] * (100 + $product['tax']) / 100, 2);
                     unset($product['net_price']);
                 }
             }

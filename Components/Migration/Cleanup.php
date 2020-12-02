@@ -15,10 +15,6 @@ use Shopware_Components_Config;
 
 /**
  * Helper to clean up the target shop
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Cleanup
 {
@@ -40,14 +36,14 @@ class Cleanup
         // Disable foreign key checks
         Shopware()->Db()->exec('SET foreign_key_checks = 0;');
 
-        $this->shopBasePath = Shopware()->Container()->getParameter('shopware.app.rootdir');
+        $this->shopBasePath = Shopware()->Container()->getParameter('shopware.app.rootDir');
         $this->shopConfig = Shopware()->Container()->get('config');
     }
 
     /**
      * Performs cleanup by a list of given operations
      *
-     * @param $data
+     * @param array $data
      */
     public function cleanUpByArray($data)
     {
@@ -137,7 +133,7 @@ class Cleanup
     /**
      * Remove mappings by a given type
      *
-     * @param $type
+     * @param string $type
      */
     public function removeMigrationMappingsByType($type)
     {
@@ -317,35 +313,35 @@ class Cleanup
         // delete files
         $filesDir = $this->shopBasePath . 'files';
         $this->clearFolder(
-            $filesDir . DIRECTORY_SEPARATOR . $this->shopConfig->get('sESDKEY')
+            $filesDir . \DIRECTORY_SEPARATOR . $this->shopConfig->get('sESDKEY')
         );
     }
 
     /**
      * Cleans a folder
      *
-     * @param $path string folder to clean
-     * @param $type string file type of files - one of 'image' | null
+     * @param string      $path folder to clean
+     * @param string|null $type file type of files - one of 'image' | null
      */
     private function clearFolder($path, $type = null)
     {
-        $path .= DIRECTORY_SEPARATOR;
+        $path .= \DIRECTORY_SEPARATOR;
 
-        if (is_dir($path) && $handle = opendir($path)) {
-            while (false !== ($file = readdir($handle))) {
-                if (!is_file($path . $file)) {
+        if (\is_dir($path) && $handle = \opendir($path)) {
+            while (false !== ($file = \readdir($handle))) {
+                if (!\is_file($path . $file)) {
                     continue;
                 }
 
                 switch ($type) {
                     case 'image':
                         // only delete .jpg, .jpeg, .png and .gif; ignore case
-                        if (preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
-                            unlink($path . $file);
+                        if (\preg_match('/.jpg|.jpeg|.png|.gif/i', $file)) {
+                            \unlink($path . $file);
                         }
                         break;
                     default:
-                        unlink($path . $file);
+                        \unlink($path . $file);
                 }
             }
         }

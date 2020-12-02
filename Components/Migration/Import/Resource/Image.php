@@ -16,10 +16,6 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Image
  *
  * Image import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Image extends AbstractResource
 {
@@ -36,7 +32,7 @@ class Image extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressImages', '%s out of %s images imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -56,7 +52,7 @@ class Image extends AbstractResource
      */
     public function run()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductImages($offset);
@@ -71,7 +67,7 @@ class Image extends AbstractResource
         $this->initTaskTimer();
 
         if ($call['profile'] !== 'WooCommerce') {
-            $image_path = rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
+            $image_path = \rtrim($this->Request()->basepath, '/') . '/' . $this->Source()->getProductImagePath();
         }
 
         /* @var Import $import */
@@ -85,7 +81,7 @@ class Image extends AbstractResource
             }
 
             if (!isset($image['name'])) {
-                $image['name'] = pathinfo(basename($image['image']), PATHINFO_FILENAME);
+                $image['name'] = \pathinfo(\basename($image['image']), \PATHINFO_FILENAME);
             }
             $image['name'] = $this->removeSpecialCharacters($image['name']);
 
@@ -153,17 +149,17 @@ class Image extends AbstractResource
     /**
      * Helper function which tells, if a given image was already assigned to a given product
      *
-     * @param $articleId
-     * @param $image
+     * @param int $articleId
+     * @param string $image
      *
      * @return bool
      */
     public function imageAlreadyImported($articleId, $image)
     {
         // Get a proper image name (without path and extension)
-        $info = pathinfo($image);
+        $info = \pathinfo($image);
         $extension = $info['extension'];
-        $name = basename($image, '.' . $extension);
+        $name = \basename($image, '.' . $extension);
 
         // Find images with the same articleId and image name
         $sql = '
@@ -193,12 +189,12 @@ class Image extends AbstractResource
      */
     private function removeSpecialCharacters($name)
     {
-        $name = iconv('utf-8', 'ascii//translit', $name);
-        $name = strtolower($name);
-        $name = preg_replace('#[^a-z0-9\-_]#', '-', $name);
-        $name = preg_replace('#-{2,}#', '-', $name);
-        $name = trim($name, '-');
+        $name = \iconv('utf-8', 'ascii//translit', $name);
+        $name = \strtolower($name);
+        $name = \preg_replace('#[^a-z0-9\-_]#', '-', $name);
+        $name = \preg_replace('#-{2,}#', '-', $name);
+        $name = \trim($name, '-');
 
-        return mb_substr($name, 0, 180);
+        return \mb_substr($name, 0, 180);
     }
 }

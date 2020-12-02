@@ -24,8 +24,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
     ],
 
     snippets: {
-        variantProgress: '{s name=variantGenerationProgress}Generated [0] out of [1] variants for product [2]/[3]{/s}',
-        estimated: '{s name=timeRemaining} (~[0] Minute(s) remaining){/s}'
+        variantProgress: '{s name="variantGenerationProgress"}Generated [0] out of [1] variants for product [2]/[3]{/s}',
+        estimated: '{s name="timeRemaining"} (~[0] Minute(s) remaining){/s}'
     },
 
     /**
@@ -33,7 +33,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
      */
     cancel: false,
 
-    selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
+    selectionNeeded: '{s name="pleaseSelect"}Please select{/s}',
 
     /**
      * A template method that is called when your application boots.
@@ -109,7 +109,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                                 me.loadMappingStores(panel);
                             },
                             failure: function (fp, o) {
-                                Ext.Msg.alert('{s name=error}Error{/s}', o.result.message);
+                                Ext.Msg.alert('{s name="error"}Error{/s}', o.result.message);
                             }
                         });
                         break;
@@ -185,7 +185,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
 
         me.progressWindow = Ext.MessageBox.show({
             title: 'Import',
-            msg: '{s name=importPendingMessage}Depending on the import settings and the amount of data being imported, import might take a while.{/s}',
+            msg: '{s name="importPendingMessage"}Depending on the import settings and the amount of data being imported, import might take a while.{/s}',
             width: 500,
             progress: true,
             closable: false,
@@ -199,8 +199,8 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 // after the next request
                 me.cancel = true;
                 Ext.Msg.alert(
-                    '{s name=importCanceled}Import canceled by user{/s}',
-                    '{s name=importCanceled}Import canceled by user{/s}'
+                    '{s name="importCanceled"}Import canceled by user{/s}',
+                    '{s name="importCanceled"}Import canceled by user{/s}'
                 );
             }
         });
@@ -210,7 +210,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
         me.progressWindow.doLayout();
 
         me.progressWindow.progressBar.reset();
-        me.progressWindow.progressBar.updateProgress(0, '{s name=startingImport}Starting Import...{/s}');
+        me.progressWindow.progressBar.updateProgress(0, '{s name="startingImport"}Starting Import...{/s}');
 
         me.runImportRequest(config);
     },
@@ -241,7 +241,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             success: function (response) {
                 if (!response.responseText) {
                     Ext.Msg.alert(
-                        '{s name=importFailedWithoutErrors}Import failed{/s}',
+                        '{s name="importFailedWithoutErrors"}Import failed{/s}',
                         'The server aborted the import without any error message.' +
                         ' Usually this is caused by low max-execution limits or SQL-server timeouts.' +
                         '' +
@@ -257,7 +257,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 result = Ext.JSON.decode(response.responseText);
                 if (!result) {
                     me.progressWindow.close();
-                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', response.responseText);
+                    Ext.Msg.alert('{s name="importFails"}Import failed{/s}', response.responseText);
                 } else if (!result.success) {
                     me.progressWindow.close();
 
@@ -268,7 +268,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                                '<b>Error</b> : ' + result.error + '<br>' +
                                '<b>Trace</b> : ' + result.trace + '<br>';
 
-                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', message);
+                    Ext.Msg.alert('{s name="importFails"}Import failed{/s}', message);
                 } else if (result.progress < 1 || result.done !== true) {
                     // If special value -1 was returned, calculate total progress from number of done tasks
                     if (result.progress === -1) {
@@ -300,10 +300,10 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             failure: function (response) {
                 me.progressWindow.close();
                 if (response.responseText) {
-                    Ext.Msg.alert('{s name=importFails}Import failed{/s}', response.responseText);
+                    Ext.Msg.alert('{s name="importFails"}Import failed{/s}', response.responseText);
                 } else {
                     Ext.Msg.alert(
-                        '{s name=importFailedWithoutErrors}Import failed{/s}',
+                        '{s name="importFailedWithoutErrors"}Import failed{/s}',
                         'The server aborted the import without any error message.' +
                         ' Usually this is caused by low max-execution limits or SQL-server timeouts.' +
                         '' +
@@ -433,7 +433,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 var rawData = record.getProxy().getReader().rawData,
                     message = '<br>' + rawData.message;
                 me.progressWindow.close();
-                Ext.Msg.alert('{s name=importFails}Import failed{/s}', message);
+                Ext.Msg.alert('{s name="importFails"}Import failed{/s}', message);
             }
         });
     },
@@ -512,9 +512,9 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
             activeCard = layout.getActiveItem();
 
         if (activeCard.internalId === 2) {
-            nextButton.setText('{s name=startBtn}Start{/s}');
+            nextButton.setText('{s name="startBtn"}Start{/s}');
         } else {
-            nextButton.setText('{s name=nextBtn}Next{/s}');
+            nextButton.setText('{s name="nextBtn"}Next{/s}');
         }
 
         prevButton.setDisabled((activeCard.internalId <= 0));

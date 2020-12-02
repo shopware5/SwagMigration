@@ -42,10 +42,6 @@ class ImageImporter
 
     /**
      * ImageImporter constructor.
-     *
-     * @param PDOConnection $db
-     * @param ModelManager  $em
-     * @param Logger        $logger
      */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
@@ -55,13 +51,11 @@ class ImageImporter
     }
 
     /**
-     * @param array $image
-     *
      * @return int
      */
     public function importArticleImage(array $image)
     {
-        if (empty($image) || !is_array($image)) {
+        if (empty($image) || !\is_array($image)) {
             return false;
         }
 
@@ -103,7 +97,7 @@ class ImageImporter
         $media->setAlbum($album);
 
         $articleImage = new Image();
-        list($width, $height) = getimagesize($uploadFile);
+        list($width, $height) = \getimagesize($uploadFile);
         $articleImage->setDescription($image['description']);
         $articleImage->setMedia($media);
         $articleImage->setArticle($article);
@@ -138,8 +132,6 @@ class ImageImporter
     }
 
     /**
-     * @param array $image
-     *
      * @return array
      */
     private function prepareImageData(array $image)
@@ -159,7 +151,7 @@ class ImageImporter
 
         $image['albumID'] = isset($image['albumID']) ? (int) $image['albumID'] : -1;
         $image['position'] = !empty($image['position']) ? (int) $image['position'] : 0;
-        $image['name'] = empty($image['name']) ? md5(uniqid(mt_rand(), true)) : pathinfo($image['name'], PATHINFO_FILENAME);
+        $image['name'] = empty($image['name']) ? \md5(\uniqid(\mt_rand(), true)) : \pathinfo($image['name'], \PATHINFO_FILENAME);
 
         return $image;
     }
@@ -203,33 +195,33 @@ class ImageImporter
      */
     private function copyImage($image, $name)
     {
-        $uploadDir = Shopware()->Container()->getParameter('shopware.app.rootdir') . 'media/temp';
+        $uploadDir = Shopware()->Container()->getParameter('shopware.app.rootDir') . 'media/temp';
 
         $ext = '';
         if (!empty($image)) {
             foreach (['.png', '.gif', '.jpg'] as $extension) {
-                if (stristr($image, $extension) !== false) {
+                if (\stristr($image, $extension) !== false) {
                     $ext = $extension;
                     break;
                 }
             }
 
             $uploadFile = $uploadDir . $name . $ext;
-            if (!copy($image, $uploadFile)) {
+            if (!\copy($image, $uploadFile)) {
                 $this->logger->error("Copying image from '$image' to '$uploadFile' did not work!");
 
                 return false;
             }
 
-            if (getimagesize($uploadFile) === false) {
-                unlink($uploadFile);
+            if (\getimagesize($uploadFile) === false) {
+                \unlink($uploadFile);
                 $this->logger->error("The file '$uploadFile' is not a valid image!");
 
                 return false;
             }
         } else {
             foreach (['.png', '.gif', '.jpg'] as $extension) {
-                if (file_exists($uploadDir . $name . $extension)) {
+                if (\file_exists($uploadDir . $name . $extension)) {
                     $uploadFile = $uploadDir . $name . $extension;
                     break;
                 }

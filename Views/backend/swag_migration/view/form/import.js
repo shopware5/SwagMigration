@@ -80,13 +80,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
     createItems: function () {
         var me = this;
 
-        me.passwordInfo = Shopware.Notification.createBlockMessage('{s name=passwordInfo}Attention: If you want the customer to be able to login with his old password, you should not uninstall the migration tool, as it provides the password encoder for migrated customers. Once a customer has logged in, his password will be converted to a shopware-password, so in most cases it should be safe to uninstall the migration tool after a year.{/s}', 'notice');
+        me.passwordInfo = Shopware.Notification.createBlockMessage('{s name="passwordInfo"}Attention: If you want the customer to be able to login with his old password, you should not uninstall the migration tool, as it provides the password encoder for migrated customers. Once a customer has logged in, his password will be converted to a shopware-password, so in most cases it should be safe to uninstall the migration tool after a year.{/s}', 'notice');
         me.passwordInfo.margin = '10 5';
 
         me.fieldSet = {
             xtype: 'fieldset',
             layout: 'column',
-            title: '{s name=importSettings}Import settings{/s}',
+            title: '{s name="importSettings"}Import settings{/s}',
             autoHeight: true,
             defaults: {
                 anchor: '100%',
@@ -99,7 +99,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.advancedOptionsFieldset = {
             xtype: 'fieldset',
-            title: '{s name=importSettingsAdvanced}Advanced import settings{/s}',
+            title: '{s name="importSettingsAdvanced"}Advanced import settings{/s}',
             autoHeight: true,
             defaults: {
                 anchor: '100%',
@@ -156,19 +156,19 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             items;
 
         items = [{
-            fieldLabel: '{s name=importProducts}Import products{/s}',
+            fieldLabel: '{s name="importProducts"}Import products{/s}',
             name: 'import_products',
             xtype: 'checkbox'
         }, {
-            fieldLabel: '{s name=importTranslations}Import translations{/s}',
+            fieldLabel: '{s name="importTranslations"}Import translations{/s}',
             name: 'import_translations',
             xtype: 'checkbox'
         }, {
-            fieldLabel: '{s name=importProperties}Import product properties{/s}',
+            fieldLabel: '{s name="importProperties"}Import product properties{/s}',
             name: 'import_properties',
             xtype: 'checkbox'
         }, {
-            fieldLabel: '{s name=importCategories}Import categories{/s}',
+            fieldLabel: '{s name="importCategories"}Import categories{/s}',
             name: 'import_categories',
             xtype: 'checkbox'
         }, {
@@ -178,11 +178,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
             checked: false,
             hidden: true
         }, {
-            fieldLabel: '{s name=importPrices}Import customer group prices{/s}',
+            fieldLabel: '{s name="importPrices"}Import customer group prices{/s}',
             name: 'import_prices',
             xtype: 'checkbox'
         }, {
-            fieldLabel: '{s name=generateVariants}Generate variants from attributes{/s}',
+            fieldLabel: '{s name="generateVariants"}Generate variants from attributes{/s}',
             name: 'import_generate_variants',
             xtype: 'checkbox'
         }, {
@@ -195,8 +195,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
-            fieldLabel: '{s name=importDownloads}Import article downloads{/s}',
-            helpText: '{s name=importDownloadsHelptext}Imports article attached downloads (e.g. a pdf-manual){/s}',
+            fieldLabel: '{s name="importDownloads"}Import article downloads{/s}',
+            helpText: '{s name="importDownloadsHelptext"}Imports article attached downloads (e.g. a pdf-manual){/s}',
             name: 'import_downloads',
             checked: false,
             listeners: {
@@ -223,8 +223,8 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importEsdInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
-            fieldLabel: '{s name=importDownloadsEsd}Import ESD Downloads{/s}',
-            helpText: '{s name=importDownloadsEsdHelptext}There is no guarantee that esd downloads can be imported. Main restriction: the particular file must be available for download in the customer area of the base shop. Reasons for a file not to be downloadable may include: max number of downloads reached or download link expired.{/s}',
+            fieldLabel: '{s name="importDownloadsEsd"}Import ESD Downloads{/s}',
+            helpText: '{s name="importDownloadsEsdHelptext"}There is no guarantee that esd downloads can be imported. Main restriction: the particular file must be available for download in the customer area of the base shop. Reasons for a file not to be downloadable may include: max number of downloads reached or download link expired.{/s}',
             name: 'import_downloads_esd',
             checked: false,
             hidden: true,
@@ -238,7 +238,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
         me.importEsdOrderInput = Ext.create('Ext.form.field.Checkbox', {
             labelWidth: 250,
-            fieldLabel: '{s name=importEsdOrders}Import ESD Orders{/s}',
+            fieldLabel: '{s name="importEsdOrders"}Import ESD Orders{/s}',
             helpText: '{s name="importEsdOrdersHelptext"}Makes ESD articles available for download by customers in the frontend.{/s}',
             name: 'import_orders_esd',
             checked: false,
@@ -257,9 +257,9 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         var me = this;
 
         me.basePath = Ext.create('Ext.form.field.Text', {
-            fieldLabel: '{s name=articleImagesPath}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
+            fieldLabel: '{s name="articleImagesPath"}Shop path (e.g. http://www.example.org/old_shop or /var/www/old_shop){/s}',
             name: 'basepath',
-            helpText: '{s name=helpTextBasePathTrailingSlash}Please append trailing slash to base path.{/s}',
+            helpText: '{s name="helpTextBasePathTrailingSlash"}Please append trailing slash to base path.{/s}',
             value: '',
             labelWidth: 250,
             allowBlank: false,
@@ -271,12 +271,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         });
 
         me.saltInput = Ext.create('Ext.form.field.Text', {
-            fieldLabel: '{s name=saltInput}Password Salt{/s}',
+            fieldLabel: '{s name="saltInput"}Password Salt{/s}',
             name: 'salt',
             value: '',
             labelWidth: 250,
             allowBlank: true,
-            helpText: "{s name=saltInputHelp}The destination shop uses a salt to make its password more secure. In this special case the salt cannot be read automatically. Please copy the salt from /destination_shop/config/settings.inc.php to this field. It is defined as 'COOKIE KEY' there.{/s}",
+            helpText: '{s name="saltInputHelp"}The destination shop uses a salt to make its password more secure. In this special case the salt cannot be read automatically. Please copy the salt from /destination_shop/config/settings.inc.php to this field. It is defined as \"COOKIE KEY\" there.{/s}',
             hidden: !me.saltInputNeeded,
             listeners: {
                 change: function () {
@@ -286,11 +286,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         });
 
         me.imageInput = Ext.create('Ext.form.field.Checkbox', {
-            fieldLabel: '{s name=importArticleImages}Import product images{/s}',
+            fieldLabel: '{s name="importArticleImages"}Import product images{/s}',
             name: 'import_images',
             xtype: 'checkbox',
             labelWidth: 250,
-            helpText: '{s name=thumbnailGenerationNeeded}After image import you need to generate the image thumbnails in the media manager for the article album.{/s}',
+            helpText: '{s name="thumbnailGenerationNeeded"}After image import you need to generate the image thumbnails in the media manager for the article album.{/s}',
             checked: me.basePathAllow,
             listeners: {
                 change: function (checkBox, newValue) {
@@ -309,7 +309,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
         return [
             me.imageInput,
             {
-                fieldLabel: '{s name=importCustomers}Import customers{/s}',
+                fieldLabel: '{s name="importCustomers"}Import customers{/s}',
                 name: 'import_customers',
                 xtype: 'checkbox',
                 listeners: {
@@ -325,11 +325,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                     }
                 }
             }, {
-                fieldLabel: '{s name=importRatings}Import ratings{/s}',
+                fieldLabel: '{s name="importRatings"}Import ratings{/s}',
                 name: 'import_ratings',
                 xtype: 'checkbox'
             }, {
-                fieldLabel: '{s name=importOrders}Import orders{/s}',
+                fieldLabel: '{s name="importOrders"}Import orders{/s}',
                 name: 'import_orders',
                 xtype: 'checkbox',
                 listeners: {
@@ -343,12 +343,12 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
                     }
                 }
             }, {
-                fieldLabel: '{s name=finish}Finish import{/s}',
+                fieldLabel: '{s name="finish"}Finish import{/s}',
                 name: 'finish_import',
                 xtype: 'checkbox',
                 checked: false
             }, {
-                fieldLabel: '{s name=defaultSupplier}Default supplier{/s}',
+                fieldLabel: '{s name="defaultSupplier"}Default supplier{/s}',
                 name: 'supplier',
                 hiddenName: 'supplier',
                 valueField: 'name',
@@ -372,26 +372,26 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Import', {
 
     getAdvancedInputItems: function () {
         var radioGroup = Ext.create('Ext.form.RadioGroup', {
-            fieldLabel: '{s name=handleInvalidProductNumbers}How to handle invalid product numbers{/s}',
+            fieldLabel: '{s name="handleInvalidProductNumbers"}How to handle invalid product numbers{/s}',
             labelWidth: 500,
             columns: 1,
             items: [
                 {
                     xtype: 'radiofield',
-                    boxLabel: '{s name=handleProductNumber/complain}Complain about invalid product numbers{/s}',
+                    boxLabel: '{s name="handleProductNumber/complain"}Complain about invalid product numbers{/s}',
                     name: 'number_validation_mode',
                     checked: true,
                     inputValue: 'complain'
                 },
                 {
                     xtype: 'radiofield',
-                    boxLabel: '{s name=handleProductNumber/convert}Generate new valid numbers{/s}',
+                    boxLabel: '{s name="handleProductNumber/convert"}Generate new valid numbers{/s}',
                     name: 'number_validation_mode',
                     inputValue: 'make_valid'
                 },
                 {
                     xtype: 'radiofield',
-                    boxLabel: '{s name=handleProductNumber/ignore}Ignore invalid product numbers (not recommended){/s}',
+                    boxLabel: '{s name="handleProductNumber/ignore"}Ignore invalid product numbers (not recommended){/s}',
                     name: 'number_validation_mode',
                     inputValue: 'ignore'
                 }

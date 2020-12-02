@@ -22,7 +22,7 @@ class Woocommerce extends Profile
     /**
      * Returns a select for a rough estimation for the total number of entities
      *
-     * @param $for
+     * @param string $for
      *
      * @return string
      */
@@ -282,7 +282,7 @@ class Woocommerce extends Profile
     }
 
     /**
-     * @param $productId
+     * @param int $productId
      *
      * @return string
      */
@@ -303,7 +303,7 @@ class Woocommerce extends Profile
     /**
      * Returns the SUM of all order item totals to get the invoice_amount
      *
-     * @param $orderId
+     * @param int $orderId
      *
      * @return string
      */

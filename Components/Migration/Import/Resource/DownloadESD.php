@@ -26,7 +26,7 @@ class DownloadESD extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressDownload', '%s out of %s ESD downloads imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -60,7 +60,7 @@ class DownloadESD extends AbstractResource
 
         $this->getProgress()->setCount($count);
 
-        $basePath = Shopware()->Container()->getParameter('shopware.app.rootdir');
+        $basePath = Shopware()->Container()->getParameter('shopware.app.rootDir');
         $pathSuffix = Shopware()->Container()->get('config')->get('sESDKEY');
 
         $localPath = $basePath . 'files/' . $pathSuffix;
@@ -79,18 +79,18 @@ class DownloadESD extends AbstractResource
             $documentUrl = $remotePath . $path;
 
             // execute the actual download and check for success
-            $document = file_get_contents($documentUrl);
+            $document = \file_get_contents($documentUrl);
 
             if ($this->get_http_response_code($documentUrl) != 200 // check http response code and only continue if document can be accessed
                 || $document === ''
                 || !isset($orderNumber) // We have to check for an existing article number. Otherwise the file can't be associated with existing shopware's ESD article
             ) {
-                return $this->getProgress()->error(sprintf($downloadNotPossibleSnippet, $filename));
+                return $this->getProgress()->error(\sprintf($downloadNotPossibleSnippet, $filename));
                 continue;
             }
 
             // write file to disk
-            file_put_contents($localPath . $filename, $document);
+            \file_put_contents($localPath . $filename, $document);
 
             // get article_detail information
             list($articleDetailsId, $articleId) = Shopware()->Db()->fetchRow(
@@ -138,8 +138,8 @@ class DownloadESD extends AbstractResource
      */
     private function get_http_response_code($url)
     {
-        $headers = get_headers($url);
+        $headers = \get_headers($url);
 
-        return substr($headers[0], 9, 3);
+        return \substr($headers[0], 9, 3);
     }
 }

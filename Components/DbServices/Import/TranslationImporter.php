@@ -19,8 +19,6 @@ class TranslationImporter
 
     /**
      * TranslationImporter constructor.
-     *
-     * @param PDOConnection $db
      */
     public function __construct(PDOConnection $db)
     {
@@ -31,7 +29,6 @@ class TranslationImporter
      * @param string $objectType
      * @param string $objectKey
      * @param string $objectLanguage
-     * @param array  $objectData
      *
      * @return bool|int
      */
@@ -54,7 +51,7 @@ class TranslationImporter
         $objectType = $this->db->quote((string) $objectType);
         $objectKey = $this->db->quote((string) $objectKey);
         $objectLanguage = $this->db->quote((string) $objectLanguage);
-        $objectData = $this->db->quote(serialize($objectData));
+        $objectData = $this->db->quote(\serialize($objectData));
 
         $id = $this->findExistingEntry($objectType, $objectKey, $objectLanguage);
         $objectDataId = $this->createOrUpdate($id, $objectType, $objectData, $objectKey, $objectLanguage);
@@ -91,7 +88,6 @@ class TranslationImporter
     }
 
     /**
-     * @param array  $objectData
      * @param string $objectType
      * @param string $objectLanguage
      *
@@ -196,12 +192,12 @@ class TranslationImporter
      */
     private function toString($value)
     {
-        $value = html_entity_decode($value);
-        $value = preg_replace('!<[^>]*?>!', ' ', $value);
-        $value = str_replace(chr(0xa0), ' ', $value);
-        $value = preg_replace('/\s\s+/', ' ', $value);
-        $value = htmlspecialchars($value);
-        $value = trim($value);
+        $value = \html_entity_decode($value);
+        $value = \preg_replace('!<[^>]*?>!', ' ', $value);
+        $value = \str_replace(\chr(0xa0), ' ', $value);
+        $value = \preg_replace('/\s\s+/', ' ', $value);
+        $value = \htmlspecialchars($value);
+        $value = \trim($value);
 
         return $value;
     }

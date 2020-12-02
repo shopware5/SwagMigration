@@ -28,7 +28,7 @@ class Rating extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('progressRatings', '%s out of %s ratings imported'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -48,7 +48,7 @@ class Rating extends AbstractResource
      */
     public function run()
     {
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
         $offset = $this->getProgress()->getOffset();
 
         $result = $this->Source()->queryProductRatings();

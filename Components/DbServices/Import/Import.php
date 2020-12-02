@@ -71,9 +71,6 @@ class Import
      */
     private $translationImporter;
 
-    /**
-     * @param Container $container
-     */
     public function __construct(Container $container)
     {
         $this->container = $container;
@@ -86,8 +83,6 @@ class Import
 
     /**
      * Create categories
-     *
-     * @param array $category
      *
      * @return int
      */
@@ -108,8 +103,6 @@ class Import
     /**
      * Create products
      *
-     * @param array $article
-     *
      * @return array|bool
      */
     public function article(array $article)
@@ -121,8 +114,6 @@ class Import
 
     /**
      * Create a new style configurator from a simple variant
-     *
-     * @param array $article
      */
     public function setArticleConfigurationData(array $article)
     {
@@ -130,8 +121,6 @@ class Import
     }
 
     /**
-     * @param array $article
-     *
      * @return bool|string
      */
     public function setArticlePriceData(array $article)
@@ -139,17 +128,12 @@ class Import
         return $this->getArticleImporter()->setPriceData($article);
     }
 
-    /**
-     * @param array $article
-     */
     public function deleteArticleLinks(array $article)
     {
         $this->getArticleImporter()->deleteArticleLinks($article);
     }
 
     /**
-     * @param array $linkData
-     *
      * @return bool|string
      */
     public function addArticleLink(array $linkData)
@@ -168,8 +152,6 @@ class Import
     }
 
     /**
-     * @param array $customer
-     *
      * @return array
      */
     public function customer(array $customer)
@@ -178,8 +160,6 @@ class Import
     }
 
     /**
-     * @param array $image
-     *
      * @return int
      */
     public function articleImage(array $image)
@@ -188,8 +168,6 @@ class Import
     }
 
     /**
-     * @param array $price
-     *
      * @return bool|int
      */
     public function articlePrice(array $price)
@@ -201,7 +179,6 @@ class Import
      * @param string $type
      * @param string $objectKey
      * @param string $language
-     * @param array  $translation
      *
      * @return bool|int
      */

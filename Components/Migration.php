@@ -8,6 +8,8 @@
 
 namespace Shopware\SwagMigration\Components;
 
+use Enlight_Controller_Request_RequestHttp as Request;
+use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Import\Resource\AbstractResource;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
@@ -44,8 +46,7 @@ class Migration extends \Enlight_Class
      *
      * @static
      *
-     * @param $profile
-     * @param array $config
+     * @param string $profile
      *
      * @return \Enlight_Class
      */
@@ -54,7 +55,7 @@ class Migration extends \Enlight_Class
         $profileNamespace = empty($config['profileNamespace']) ? self::$profileNamespace : $config['profileNamespace'];
 
         $profileName = $profileNamespace . '\\';
-        $profileName .= str_replace(' ', '', ucwords(str_replace('_', ' ', strtolower($profile))));
+        $profileName .= \str_replace(' ', '', \ucwords(\str_replace('_', ' ', \strtolower($profile))));
 
         return \Enlight_Class::Instance($profileName, [$config]);
     }
@@ -62,11 +63,11 @@ class Migration extends \Enlight_Class
     /**
      * Generates an instances of an import resource
      *
-     * @param string $name
-     * @param $progress
-     * @param Profile $source
-     * @param Profile $target
-     * @param $request
+     * @param string   $name
+     * @param Progress $progress
+     * @param Profile  $source
+     * @param Profile  $target
+     * @param Request  $request
      *
      * @return AbstractResource
      */

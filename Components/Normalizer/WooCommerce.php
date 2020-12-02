@@ -10,10 +10,6 @@ namespace Shopware\SwagMigration\Components\Normalizer;
 
 /**
  * Helper to normalize all WooCommerce data from DB
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2016, shopware AG (http://www.shopware.de)
  */
 class WooCommerce
 {
@@ -100,7 +96,7 @@ class WooCommerce
         $normalizedProducts = [];
 
         foreach ($products as $product) {
-            if (!array_key_exists($product['productID'], $normalizedProducts)) {
+            if (!\array_key_exists($product['productID'], $normalizedProducts)) {
                 $normalizedProducts[$product['productID']] = $product;
             } else {
                 $normalizedProducts[$product['productID']][$this->mapArrayKey($product['meta_key'], $this->productMapping)] = $product['meta_value'];
@@ -111,7 +107,7 @@ class WooCommerce
     }
 
     /**
-     * @param $results
+     * @param array $results
      *
      * @return array
      */
@@ -127,7 +123,7 @@ class WooCommerce
     }
 
     /**
-     * @param $results
+     * @param array $results
      *
      * @return array
      */
@@ -143,14 +139,14 @@ class WooCommerce
     }
 
     /**
-     * @param $key
-     * @param $array
+     * @param string $key
+     * @param array  $array
      *
-     * @return mixed
+     * @return string|mixed
      */
     public function mapArrayKey($key, $array)
     {
-        if (array_key_exists($key, $array)) {
+        if (\array_key_exists($key, $array)) {
             return $array[$key];
         }
 
@@ -158,7 +154,7 @@ class WooCommerce
     }
 
     /**
-     * @param $orders
+     * @param array $orders
      *
      * @return array
      */
@@ -167,7 +163,7 @@ class WooCommerce
         $normalizedOrders = [];
 
         foreach ($orders as $order) {
-            if (!array_key_exists($order['orderID'], $normalizedOrders)) {
+            if (!\array_key_exists($order['orderID'], $normalizedOrders)) {
                 $order[$this->mapArrayKey($order['postMetaKey'], $this->orderMapping)] = $order['postMetaValue'];
                 $order[$this->mapArrayKey($order['orderMetaKey'], $this->orderMapping)] = $order['orderMetaValue'];
                 $normalizedOrders[$order['orderID']] = $order;
@@ -181,7 +177,7 @@ class WooCommerce
     }
 
     /**
-     * @param $orderDetails
+     * @param array $orderDetails
      *
      * @return array
      */
@@ -189,7 +185,7 @@ class WooCommerce
     {
         $normalizedOrderDetails = [];
         foreach ($orderDetails as $order) {
-            if (!array_key_exists($order['orderID'], $normalizedOrderDetails)) {
+            if (!\array_key_exists($order['orderID'], $normalizedOrderDetails)) {
                 $order[$this->mapArrayKey($order['metaKey'], $this->orderDetailMapping)] = $order['metaValue'];
                 $normalizedOrderDetails[$order['orderID']] = $order;
             } else {
@@ -201,7 +197,7 @@ class WooCommerce
     }
 
     /**
-     * @param $customers
+     * @param array $customers
      *
      * @return array
      */
@@ -210,7 +206,7 @@ class WooCommerce
         $normalizedCustomers = [];
 
         foreach ($customers as $customer) {
-            if (!array_key_exists($customer['customerID'], $normalizedCustomers)) {
+            if (!\array_key_exists($customer['customerID'], $normalizedCustomers)) {
                 $normalizedCustomers[$customer['customerID']] = $customer;
             } else {
                 $normalizedCustomers[$customer['customerID']][$this->mapArrayKey($customer['metaKey'], $this->customerMapping)] = $customer['metaValue'];
@@ -233,7 +229,7 @@ class WooCommerce
     }
 
     /**
-     * @param $ratings
+     * @param array $ratings
      *
      * @return array
      */
@@ -242,7 +238,7 @@ class WooCommerce
         $normalizedRatings = [];
 
         foreach ($ratings as $rating) {
-            if (!array_key_exists($rating['productID'], $normalizedRatings)) {
+            if (!\array_key_exists($rating['productID'], $normalizedRatings)) {
                 $rating[$this->mapArrayKey($rating['metaKey'], $this->ratingMapping)] = $rating['metaValue'];
                 $normalizedRatings[$rating['productID']] = $rating;
             } else {
@@ -254,7 +250,7 @@ class WooCommerce
     }
 
     /**
-     * @param $variants
+     * @param array $variants
      *
      * @return array
      */
@@ -263,7 +259,7 @@ class WooCommerce
         $normalizedVariants = [];
 
         foreach ($variants as $variant) {
-            if (!array_key_exists($variant['productID'], $normalizedVariants)) {
+            if (!\array_key_exists($variant['productID'], $normalizedVariants)) {
                 $variant[$this->mapArrayKey($variant['metaKey'], $this->ratingMapping)] = $variant['metaValue'];
                 $normalizedVariants[$variant['productID']] = $variant;
             } else {

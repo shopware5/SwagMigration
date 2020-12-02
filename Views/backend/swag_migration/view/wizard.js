@@ -14,7 +14,6 @@
 Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
     extend: 'Ext.panel.Panel',
     alias: 'widget.migration-wizard',
-//    title: '{s name=admin}Administration{/s}',
     layout: 'card',
     bodyBorder: 0,
     border: false,
@@ -74,7 +73,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
         var me = this;
 
         me.buttonPrev = Ext.create(Ext.button.Button, {
-            text: '{s name=prevBtn}Back{/s}',
+            text: '{s name="prevBtn"}Back{/s}',
             cls: 'secondary',
             handler: function(btn) {
                 me.fireEvent('navigate', btn.up('panel'), 'prev');
@@ -83,7 +82,7 @@ Ext.define('Shopware.apps.SwagMigration.view.Wizard', {
         });
 
         me.buttonNext = Ext.create(Ext.button.Button, {
-            text: '{s name=nextBtn}Next{/s}',
+            text: '{s name="nextBtn"}Next{/s}',
             cls: 'primary',
             handler: function(btn) {
                 me.fireEvent('navigate', btn.up('panel'), 'next');

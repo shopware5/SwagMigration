@@ -15,13 +15,13 @@ use Shopware\SwagMigration\Components\DbServices\Import\Import;
 
 class Resources implements SubscriberInterface
 {
-    /** @var Container $container */
+    /**
+     * @var Container
+     */
     private $container;
 
     /**
      * Resources constructor.
-     *
-     * @param Container $container
      */
     public function __construct(Container $container)
     {

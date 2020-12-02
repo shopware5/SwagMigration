@@ -45,22 +45,22 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
 
     snippets: {
         group: {
-            group: '{s name=group/group}Group{/s}',
-            language: '{s name=group/language}Language{/s}',
-            shop: '{s name=group/shop}Shops{/s}',
-            customer_group: '{s name=group/customerGroup}Customer group{/s}',
-            price_group: '{s name=group/priceGroup}Price group{/s}',
-            payment_mean: '{s name=group/paymentMean}Payment mean{/s}',
-            order_status: '{s name=group/orderStatus}Order status{/s}',
-            tax_rate: '{s name=group/taxRate}Tax rate{/s}',
-            attribute: '{s name=group/attribute}Attribute{/s}',
-            property_options: '{s name=group/propertyOptions}Property options{/s}',
-            configurator_mapping: '{s name=group/configuratorMapping}Configurator Mapping{/s}',
-            other: '{s name=group/other}Other{/s}'
+            group: '{s name="group/group"}Group{/s}',
+            language: '{s name="group/language"}Language{/s}',
+            shop: '{s name="group/shop"}Shops{/s}',
+            customer_group: '{s name="group/customerGroup"}Customer group{/s}',
+            price_group: '{s name="group/priceGroup"}Price group{/s}',
+            payment_mean: '{s name="group/paymentMean"}Payment mean{/s}',
+            order_status: '{s name="group/orderStatus"}Order status{/s}',
+            tax_rate: '{s name="group/taxRate"}Tax rate{/s}',
+            attribute: '{s name="group/attribute"}Attribute{/s}',
+            property_options: '{s name="group/propertyOptions"}Property options{/s}',
+            configurator_mapping: '{s name="group/configuratorMapping"}Configurator Mapping{/s}',
+            other: '{s name="group/other"}Other{/s}'
         }
     },
 
-    selectionNeeded: '{s name=pleaseSelect}Please select{/s}',
+    selectionNeeded: '{s name="pleaseSelect"}Please select{/s}',
 
     /**
      * The initComponent template method is an important initialization step for a Component.
@@ -185,15 +185,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                     if (r.data.mapping_name && r.data.mapping_name != me.selectionNeeded) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name=mappedProperty}This property has been mapped{/s}');
+                            '{s name="mappedProperty"}This property has been mapped{/s}');
                     } else if (r.data.required) {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-minus-circle-frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name=requiredProperty}Mapping of this property is required{/s}');
+                            '{s name="requiredProperty"}Mapping of this property is required{/s}');
                     } else {
                         return Ext.String.format('<span data-qtip="[0]" class="sprite-exclamation--frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name=missingProperty}Properties not being mapped will be skipped during the migration{/s}');
+                            '{s name="missingProperty"}Properties not being mapped will be skipped during the migration{/s}');
                     }
                 }
             }, {

@@ -30,7 +30,7 @@ class Variant extends AbstractResource
      */
     public function getCurrentProgressMessage(Progress $progress)
     {
-        return sprintf(
+        return \sprintf(
             $this->getNameSpace()->get('variantsArticleProgress', 'Generating variants for product %s out of %s'),
             $this->getProgress()->getOffset(),
             $this->getProgress()->getCount()
@@ -51,7 +51,7 @@ class Variant extends AbstractResource
     public function run()
     {
         $offsetProduct = $this->getProgress()->getOffset();
-        $call = array_merge($this->Request()->getPost(), $this->Request()->getQuery());
+        $call = \array_merge($this->Request()->getPost(), $this->Request()->getQuery());
 
         // Get products with attributes
         $products_result = $this->Source()->queryAttributedProducts($offsetProduct);
@@ -79,14 +79,14 @@ class Variant extends AbstractResource
             }
         }
 
-        echo $this->getProgress()->done();
+        return $this->getProgress()->done();
     }
 
     /**
      * Helper function which gets the configurator groups for
      * a given product
      *
-     * @param $productId
+     * @param int $productId
      *
      * @return array
      */
@@ -95,14 +95,14 @@ class Variant extends AbstractResource
         // get configurator groups for the given product
         $builder = Shopware()->Models()->createQueryBuilder();
         $builder->select(['PARTIAL article.{id}', 'configuratorSet', 'groups'])
-                ->from(Article::class, 'article')
-                ->innerJoin('article.configuratorSet', 'configuratorSet')
-                ->leftJoin('configuratorSet.groups', 'groups')
-                ->where('article.id = ?1')
-                ->setParameter(1, $productId);
+            ->from(Article::class, 'article')
+            ->innerJoin('article.configuratorSet', 'configuratorSet')
+            ->leftJoin('configuratorSet.groups', 'groups')
+            ->where('article.id = ?1')
+            ->setParameter(1, $productId);
 
         $result = $builder->getQuery()->getArrayResult();
-        $result = array_pop($result);
+        $result = \array_pop($result);
 
         $configuratorArray = $result['configuratorSet'];
         $groups = $configuratorArray['groups'];
@@ -136,8 +136,8 @@ class Variant extends AbstractResource
         $totalCount = 1;
         foreach ($groups as &$group) {
             $group['options'] = $optionsByGroups[$group['id']];
-            if (count($group['options']) > 0) {
-                $totalCount = $totalCount * count($group['options']);
+            if (\count($group['options']) > 0) {
+                $totalCount = $totalCount * \count($group['options']);
             }
         }
 
@@ -155,7 +155,7 @@ class Variant extends AbstractResource
 
         // continue if product was not imported before
         $productId = $this->getBaseArticleInfo($id);
-        if (false === $productId) {
+        if ($productId === false) {
             return;
         }
 

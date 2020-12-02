@@ -14,7 +14,9 @@ use Shopware_Components_Config as Config;
 
 class CustomerImporter
 {
-    /** @var array $customerFields */
+    /**
+     * @var array
+     */
     private $customerFields = [
         'email',
         'active',
@@ -37,7 +39,9 @@ class CustomerImporter
         'encoder',
     ];
 
-    /** @var array $billingFields */
+    /**
+     * @var array
+     */
     private $billingFields = [
         'userID' => 'userID',
         'company' => 'billing_company',
@@ -52,7 +56,9 @@ class CustomerImporter
         'ustid' => 'ustid',
     ];
 
-    /** @var array $billingFields */
+    /**
+     * @var array
+     */
     private $addressFields = [
         'user_id' => 'user_id',
         'company' => 'company',
@@ -68,7 +74,9 @@ class CustomerImporter
         'ustid' => 'ustid',
     ];
 
-    /** @var array $shippingAttributeFields */
+    /**
+     * @var array
+     */
     private $addressAttributeFields = [
         'address_id' => 'address_id',
         'text1' => 'text1',
@@ -79,7 +87,9 @@ class CustomerImporter
         'text6' => 'text6',
     ];
 
-    /** @var array $billingAttributeFields */
+    /**
+     * @var array
+     */
     private $billingAttributeFields = [
         'billingID' => 'billingaddressID',
         'text1' => 'billing_text1',
@@ -90,7 +100,9 @@ class CustomerImporter
         'text6' => 'billing_text6',
     ];
 
-    /** @var array $shippingFields */
+    /**
+     * @var array
+     */
     private $shippingFields = [
         'userID' => 'userID',
         'company' => 'shipping_company',
@@ -104,7 +116,9 @@ class CustomerImporter
         'countryID' => 'shipping_countryID',
     ];
 
-    /** @var array $shippingAttributeFields */
+    /**
+     * @var array
+     */
     private $shippingAttributeFields = [
         'shippingID' => 'shippingaddressID',
         'text1' => 'shipping_text1',
@@ -132,10 +146,6 @@ class CustomerImporter
 
     /**
      * CustomerImporter constructor.
-     *
-     * @param PDOConnection $db
-     * @param ModelManager  $em
-     * @param Config        $config
      */
     public function __construct(PDOConnection $db, ModelManager $em, Config $config)
     {
@@ -145,8 +155,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array $customer
-     *
      * @return bool|array
      */
     public function import(array $customer)
@@ -220,8 +228,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array $customer
-     *
      * @return array
      */
     private function prepareCustomerData(array $customer)
@@ -236,10 +242,10 @@ class CustomerImporter
             $customer['salutation'] = $this->db->quote((string) $customer['salutation']);
         }
         if (isset($customer['password'])) {
-            $customer['password'] = trim($customer['password'], '\r\n');
+            $customer['password'] = \trim($customer['password'], '\r\n');
         }
         if (empty($customer['md5_password']) && !empty($customer['password'])) {
-            $customer['md5_password'] = md5($customer['password']);
+            $customer['md5_password'] = \md5($customer['password']);
         }
         if (isset($customer['md5_password'])) {
             $customer['md5_password'] = $this->db->quote($customer['md5_password']);
@@ -294,8 +300,8 @@ class CustomerImporter
         $customer['customergroup'] = empty($customer['customergroup']) ? $this->db->quote('EK') : $this->db->quote(
             (string) $customer['customergroup']
         );
-        $customer['firstlogin'] = empty($customer['firstlogin']) ? $this->db->quote((string) date('Y-m-d')) : $this->toDate($customer['firstlogin']);
-        $customer['lastlogin'] = empty($customer['lastlogin']) ? $this->db->quote((string) date('Y-m-d H:i:s')) : $this->toTimeStamp($customer['lastlogin']);
+        $customer['firstlogin'] = empty($customer['firstlogin']) ? $this->db->quote((string) \date('Y-m-d')) : $this->toDate($customer['firstlogin']);
+        $customer['lastlogin'] = empty($customer['lastlogin']) ? $this->db->quote((string) \date('Y-m-d H:i:s')) : $this->toTimeStamp($customer['lastlogin']);
 
         return $customer;
     }
@@ -327,8 +333,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array $customer
-     *
      * @return bool|array
      */
     private function createOrUpdateCustomer(array $customer)
@@ -347,8 +351,8 @@ class CustomerImporter
             $insertFields[] = 'password';
             $insertValues[] = $customer['md5_password'];
 
-            $sql = 'INSERT INTO s_user (' . implode(', ', $insertFields) . ')
-                    VALUES (' . implode(', ', $insertValues) . ')';
+            $sql = 'INSERT INTO s_user (' . \implode(', ', $insertFields) . ')
+                    VALUES (' . \implode(', ', $insertValues) . ')';
 
             $result = $this->db->query($sql);
             if ($result === false) {
@@ -369,7 +373,7 @@ class CustomerImporter
             }
 
             if (!empty($updateData)) {
-                $updateData = implode(', ', $updateData);
+                $updateData = \implode(', ', $updateData);
                 $sql = "UPDATE s_user
                         SET $updateData
                         WHERE id = {$customer['userID']}";
@@ -387,7 +391,7 @@ class CustomerImporter
      */
     private function quoteCustomerEmail(array $customer)
     {
-        return isset($customer['email']) ? $this->db->quote(trim($customer['email'])) : '';
+        return isset($customer['email']) ? $this->db->quote(\trim($customer['email'])) : '';
     }
 
     /**
@@ -401,20 +405,18 @@ class CustomerImporter
         if (empty($password) && empty($md5Password)) {
             $newPassword = '';
             for ($i = 0; $i < 10; ++$i) {
-                $randomNumber = mt_rand(0, 35);
-                $newPassword .= ($randomNumber < 10) ? $randomNumber : chr($randomNumber + 87);
+                $randomNumber = \mt_rand(0, 35);
+                $newPassword .= ($randomNumber < 10) ? $randomNumber : \chr($randomNumber + 87);
             }
 
             $password = $newPassword;
-            $md5Password = $this->db->quote(md5($newPassword));
+            $md5Password = $this->db->quote(\md5($newPassword));
         }
 
         return [$password, $md5Password];
     }
 
     /**
-     * @param array $customer
-     *
      * @return array
      */
     private function prepareBillingData(array $customer)
@@ -485,7 +487,7 @@ class CustomerImporter
             return false;
         }
 
-        $countryIso = $this->db->quote(trim((string) $countryIso));
+        $countryIso = $this->db->quote(\trim((string) $countryIso));
 
         $sql = "SELECT id
                 FROM s_core_countries
@@ -495,16 +497,14 @@ class CustomerImporter
     }
 
     /**
-     * @param array  $customer
      * @param string $table
      * @param string $key
-     * @param array  $dbFields
      *
      * @return bool|array
      */
     private function createOrUpdate(array $customer, $table, $key, array $dbFields)
     {
-        $id = is_numeric($key) ? $key : $customer[$key];
+        $id = \is_numeric($key) ? $key : $customer[$key];
         if (empty($id)) {
             $insertFields = [];
             $insertValues = [];
@@ -515,8 +515,8 @@ class CustomerImporter
                 }
             }
 
-            $sql = "INSERT INTO $table (" . implode(', ', $insertFields) . ')
-                    VALUES (' . implode(', ', $insertValues) . ')';
+            $sql = "INSERT INTO $table (" . \implode(', ', $insertFields) . ')
+                    VALUES (' . \implode(', ', $insertValues) . ')';
 
             $result = $this->db->query($sql);
             if ($result === false) {
@@ -532,8 +532,8 @@ class CustomerImporter
                 }
             }
 
-            if (count($updateData) > 1) {
-                $updateData = implode(', ', $updateData);
+            if (\count($updateData) > 1) {
+                $updateData = \implode(', ', $updateData);
                 $sql = "
                     UPDATE $table SET $updateData
                     WHERE id = $id
@@ -547,8 +547,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array $customer
-     *
      * @return array
      */
     private function prepareShippingData(array $customer)
@@ -595,8 +593,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array $address
-     *
      * @return array
      */
     private function prepareAddressData(array $address)
@@ -668,7 +664,6 @@ class CustomerImporter
     }
 
     /**
-     * @param array  $customer
      * @param string $quotedCustomerEmail
      *
      * @return array
@@ -754,8 +749,6 @@ class CustomerImporter
     /**
      * Helper function to build an array of all addresses, so they can be stored in the database.
      *
-     * @param array $customer
-     *
      * @return array
      */
     private function getCustomerAddresses(array $customer)
@@ -783,8 +776,8 @@ class CustomerImporter
             || !empty($customer['shipping_street'])
             || !empty($customer['shipping_lastname'])
         ) {
-            if ($customer['shipping_firstname'] === $customer['billing_firstname'] &&
-                $customer['shipping_lastname'] === $customer['billing_lastname']) {
+            if ($customer['shipping_firstname'] === $customer['billing_firstname']
+                && $customer['shipping_lastname'] === $customer['billing_lastname']) {
                 $addresses[] = [
                     'userID' => $customer['userID'],
                     'company' => $customer['shipping_company'],

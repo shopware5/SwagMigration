@@ -31,7 +31,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 
     autoHeight: true,
 
-    title: '{s name=initShop}Initialize Shop{/s}',
+    title: '{s name="initShop"}Initialize Shop{/s}',
 
     initComponent: function () {
         var me = this;
@@ -106,19 +106,19 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 
         me.leftCheckBoxes = [
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearArticles}Delete articles{/s}',
+                boxLabel: '{s name="clearArticles"}Delete articles{/s}',
                 name: 'clear_articles'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearCategories}Delete categories{/s}',
+                boxLabel: '{s name="clearCategories"}Delete categories{/s}',
                 name: 'clear_categories'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearImages}Delete images{/s}',
+                boxLabel: '{s name="clearImages"}Delete images{/s}',
                 name: 'clear_images'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearProperties}Delete product properties{/s}',
+                boxLabel: '{s name="clearProperties"}Delete product properties{/s}',
                 name: 'clear_properties'
             })
         ];
@@ -135,19 +135,19 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 
         me.middleCheckBoxes = [
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearCustomers}Delete customer{/s}',
+                boxLabel: '{s name="clearCustomers"}Delete customer{/s}',
                 name: 'clear_customers'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearCustomersAndOrders}Delete customers and orders{/s}',
+                boxLabel: '{s name="clearCustomersAndOrders"}Delete customers and orders{/s}',
                 name: 'clear_orders'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearArticleDownloads}Delete article downloads{/s}',
+                boxLabel: '{s name="clearArticleDownloads"}Delete article downloads{/s}',
                 name: 'clear_article_downloads'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearEsdArticleDownloads}Delete ESD article downloads{/s}',
+                boxLabel: '{s name="clearEsdArticleDownloads"}Delete ESD article downloads{/s}',
                 name: 'clear_esd_article_downloads'
             })
         ];
@@ -164,17 +164,13 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
 
         me.rightCheckBoxes = [
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearVotes}Delete votes{/s}',
+                boxLabel: '{s name="clearVotes"}Delete votes{/s}',
                 name: 'clear_votes'
             }),
             Ext.create('Ext.form.field.Checkbox', {
-                boxLabel: '{s name=clearSupplier}Delete supplier{/s}',
+                boxLabel: '{s name="clearSupplier"}Delete supplier{/s}',
                 name: 'clear_supplier'
             })
-//            Ext.create('Ext.form.field.Checkbox', {
-//                boxLabel: '{s name=clearMappings}Clear temporary mappings{/s}',
-//                name: 'clear_mappings'
-//            })
         ];
 
         return me.rightCheckBoxes;
@@ -188,15 +184,15 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
         var me = this;
 
         var deleteButton = Ext.create('Ext.button.Button', {
-            tooltip: '{s name=clearShop}Delete selected {/s}',
+            tooltip: '{s name="clearShop"}Delete selected {/s}',
             name: 'deleteArticlesAndCategories',
-            text: '{s name=deleteCategoriesAndArticles}Delete selected data{/s}',
+            text: '{s name="deleteCategoriesAndArticles"}Delete selected data{/s}',
             cls: 'primary',
             scope: this,
             handler: function () {
                 Ext.Msg.show({
-                    title: '{s name=initShop}Reset this Shop{/s}',
-                    msg: '{s name=initShop/AreYouSure}Are you sure? All selected elements will be deleted permanently.{/s}',
+                    title: '{s name="initShop"}Reset this Shop{/s}',
+                    msg: '{s name="initShop/AreYouSure"}Are you sure? All selected elements will be deleted permanently.{/s}',
                     buttons: Ext.Msg.YESNO,
                     scope: this,
                     fn: function (btn) {
@@ -208,7 +204,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
                                 params: form.getForm().getValues(),
                                 success: function () {
                                     form.setLoading(false);
-                                    Shopware.Notification.createGrowlMessage('{s name=deleted/successTitle}Success{/s}', '{s name=deleted/successMessage}Successfully delete all categories and articles{/s}', 'SwagMigration');
+                                    Shopware.Notification.createGrowlMessage('{s name="deleted/successTitle"}Success{/s}', '{s name="deleted/successMessage"}Successfully delete all categories and articles{/s}', 'SwagMigration');
                                 },
                                 scope: this
                             });
@@ -222,7 +218,7 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ClearShop', {
         var inverseButton = Ext.create('Ext.button.Button', {
             tooltip: '',
             name: 'inverseSelection',
-            text: '{s name=inverseSelection}Inverse selection{/s}',
+            text: '{s name="inverseSelection"}Inverse selection{/s}',
             cls: 'small',
             style: 'position: absolute;right:0;top:10px;',
             scope: this,

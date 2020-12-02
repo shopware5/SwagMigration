@@ -146,7 +146,7 @@ class XtCommerce extends Profile
     /**
      * Returns the sql statement to select articles with
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -204,7 +204,7 @@ class XtCommerce extends Profile
     /**
      * Select attributes for a given article
      *
-     * @param $id
+     * @param int $id
      *
      * @return string
      */
@@ -319,7 +319,7 @@ class XtCommerce extends Profile
             }
         }
 
-        return '(' . implode(') UNION ALL (', $sql) . ')';
+        return '(' . \implode(') UNION ALL (', $sql) . ')';
     }
 
     /**
@@ -387,12 +387,12 @@ class XtCommerce extends Profile
     {
         if ($offset === 0) {
             try {
-                $sql = 'ALTER TABLE `orders` DROP INDEX `customers_id`;';
+                $sql = 'DROP INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
             } catch (Exception $e) {
             }
             try {
-                $sql = 'ALTER TABLE `orders` ADD INDEX ( `customers_id` );';
+                $sql = 'ADD INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
             } catch (Exception $e) {
             }
