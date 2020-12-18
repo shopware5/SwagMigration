@@ -761,7 +761,7 @@ class CustomerImporter
         $addresses[] = [
             'userID' => $customer['userID'],
             'company' => $customer['billing_company'],
-            'department' => $customer['billing_company'],
+            'department' => $customer['billing_department'],
             'salutation' => $customer['billing_salutation'],
             'firstname' => $customer['billing_firstname'],
             'lastname' => $customer['billing_lastname'],
@@ -781,7 +781,7 @@ class CustomerImporter
                 $addresses[] = [
                     'userID' => $customer['userID'],
                     'company' => $customer['shipping_company'],
-                    'department' => $customer['shipping_company'],
+                    'department' => $customer['shipping_department'],
                     'salutation' => $customer['shipping_salutation'],
                     'firstname' => !empty($customer['shipping_firstname']) ? $customer['shipping_firstname'] : $customer['firstname'],
                     'lastname' => !empty($customer['shipping_lastname']) ? $customer['shipping_lastname'] : $customer['lastname'],
