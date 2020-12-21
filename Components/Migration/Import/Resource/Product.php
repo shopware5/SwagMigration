@@ -220,8 +220,12 @@ class Product extends AbstractResource
         if (!empty($attributes)) {
             foreach ($attributes as $source => $target) {
                 if (!empty($target) && isset($product[$source])) {
+                    if ($source == 'ean') {
                     $product[$target] = $product[$source];
+                    } else {
+                    $product['attr'][$target] = $product[$source];
                     unset($product[$source]);
+                    }
                 }
             }
         }
