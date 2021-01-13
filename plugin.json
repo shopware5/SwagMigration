@@ -7,10 +7,10 @@
     "license": "MIT",
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
-    "currentVersion": "2.9.0",
+    "currentVersion": "2.9.1",
     "changelog": {
         "de": {
-            "REPLACE_GLOBAL_WITH_NEXT_VERSION": "PT-10112 - Verbessert den Attribut-Import und beseitigt Join-Limit Fehler; PT-10513 - Verbessert den Bild-Upload; PT-12023 - Verbessert den Adressimport; PT-12161 - Verbessert die Magento Order-Abfrage; ",
+            "2.9.1": "PT-10112 - Verbessert den Attribut-Import und beseitigt Join-Limit Fehler; PT-10513 - Verbessert den Bild-Upload; PT-12023 - Verbessert den Adressimport; PT-12123 - Shopware 5.7 und PHP8 Kompatibilität; PT-12161 - Verbessert die Magento Order-Abfrage; ",
             "2.9.0": "PT-10416 - Shopware 5.6 Kompatibilität;",
             "2.8.1": "PT-9296 - Log-Dateipfad korrigiert; PT-9454 - Performance Optimierung beim Datenbank-Cleanup; PT-9457 - Cleanup der Download-Dateien verbessert;",
             "2.8.0": "PT-9168 - Shopware 5.5 Kompatibilität;",
@@ -30,7 +30,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
-            "REPLACE_GLOBAL_WITH_NEXT_VERSION": "PT-10112 - Improve attribute import and resolve max join limit; PT-10513 - Improve image upload; PT-12023 - Improve address import; PT-12161 - Improve Magento Order-Query;",
+            "2.9.1": "PT-10112 - Improve attribute import and resolve max join limit; PT-10513 - Improve image upload; PT-12023 - Improve address import; PT-12123 - Shopware 5.7 and PHP8 compatibility; PT-12161 - Improve Magento Order-Query;",
             "2.9.0": "PT-10416 - Shopware 5.6 compatibility;",
             "2.8.1": "PT-9296 - Fix log file path; PT-9454 - Improve performance during database cleanup; PT-9457 - Imrpoved cleanup of download files;",
             "2.8.0": "PT-9168 - Shopware 5.5 Compatibility;",
