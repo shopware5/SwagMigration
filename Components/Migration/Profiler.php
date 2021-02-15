@@ -54,7 +54,7 @@ class Profiler extends \Zend_Db_Profiler
         }
 
         $dateTime = new \DateTime();
-        $formattedDateTime = $dateTime->format('Y-m-d H:i');
+        $formattedDateTime = $dateTime->format('Y-m-d_H_i');
         $formattedTime = $dateTime->format('H:i:s');
 
         $initialSeparator = self::TIME_SEPARATOR . $formattedTime . self::TIME_SEPARATOR;
