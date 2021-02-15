@@ -1025,7 +1025,7 @@ class ArticleImporter
 
             $sql = "INSERT INTO s_articles_attributes
                     (articledetailsID $columns) VALUES
-                    ({$article['articleID']}, {$article['articledetailsID']} $values)";
+                    ({$article['articledetailsID']} $values)";
 
             $this->db->query($sql);
             $article['articleattributesID'] = $this->db->lastInsertId();
