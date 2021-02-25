@@ -1027,7 +1027,20 @@ class ArticleImporter
                     (articledetailsID $columns) VALUES
                     ({$article['articledetailsID']} $values)";
 
-            $this->db->query($sql);
+            try {
+                $this->db->query($sql);
+            } catch (\Exception $ex) {
+                Shopware()->Container()->get('pluginlogger')
+                    ->error(
+                        'Error bei Query: ' . str_replace("\n", ' ', str_replace("\r\n", ' ', $sql)),
+                        [
+                            'articleID' => $article['articleID'],
+                            'articledetailsID' => $article['articledetailsID'],
+                            'values' => $values
+                        ]
+                    );
+                throw $ex;
+            }
             $article['articleattributesID'] = $this->db->lastInsertId();
         }
 
