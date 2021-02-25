@@ -9,6 +9,7 @@
 namespace Shopware\SwagMigration\Components;
 
 use Enlight_Controller_Request_RequestHttp as Request;
+use Psr\Log\LoggerInterface;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Import\Resource\AbstractResource;
 use Shopware\SwagMigration\Components\Migration\Profile;
@@ -68,10 +69,11 @@ class Migration extends \Enlight_Class
      * @param Profile  $source
      * @param Profile  $target
      * @param Request  $request
+     * @param LoggerInterface $logger
      *
      * @return AbstractResource
      */
-    public static function resourceFactory($name, $progress, $source, $target, $request)
+    public static function resourceFactory($name, $progress, $source, $target, $request, $logger)
     {
         $className = self::$resourceNamespace . '\\' . $name;
 
@@ -82,6 +84,8 @@ class Migration extends \Enlight_Class
                 $source,
                 $target,
                 $request,
+                $logger,
+                Shopware()->Container()->get('config')
             ]
         );
 
