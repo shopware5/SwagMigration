@@ -414,7 +414,7 @@ class Order extends AbstractResource
             ]
         );
 
-        //TaxRate
+        // TaxRate
         if (!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
             if (isset($this->Request()->tax_rate[$order['taxID']])) {
                 $order['taxID'] = $this->Request()->tax_rate[$order['taxID']];
@@ -477,8 +477,8 @@ class Order extends AbstractResource
                         'class' => __CLASS__,
                         'method' => __METHOD__,
                         'exception' => $ex->getMessage(),
-                        'exceptionType' => get_class($ex),
-                        'exceptionCode' => $ex->getCode()
+                        'exceptionType' => \get_class($ex),
+                        'exceptionCode' => $ex->getCode(),
                     ]
                 );
         }

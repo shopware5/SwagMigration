@@ -164,7 +164,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             (210, 'blogordernumber', 'Blog - ID');";
         $this->db->query($sql);
 
-        //Fix snippet
+        // Fix snippet
         $oldSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
             * höchstens 40 Zeichen lang sein<br>
             * keine anderen Zeichen als : 'a-zA-Z0-9-_. ' und SPACE beinhalten<br>
@@ -183,8 +183,8 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         ";
         $sql = 'UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?';
         $this->db->query($sql, [$newSnippet, 'numberNotValid', $oldSnippet]);
-        $oldSnippet = "Magento 1.8.1.0 bis 1.9.3.4";
-        $newSnippet = "Magento 1.8.1.0 bis 1.9.4.5";
+        $oldSnippet = 'Magento 1.8.1.0 bis 1.9.3.4';
+        $newSnippet = 'Magento 1.8.1.0 bis 1.9.4.5';
         $sql = 'UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?';
         $this->db->query($sql, [$newSnippet, 'profile-magento', $oldSnippet]);
 
@@ -314,11 +314,9 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
     /**
      * Callback function to register our password encoders
      *
-     * @param Enlight_Event_EventArgs $args
-     *
      * @return array
      */
-    public function onAddPasswordEncoder(\Enlight_Event_EventArgs $args)
+    public function onAddPasswordEncoder(Enlight_Event_EventArgs $args)
     {
         $hashes = $args->getReturn();
 

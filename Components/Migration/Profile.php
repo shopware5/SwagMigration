@@ -706,7 +706,6 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     *
      * @param array $order
      *
      * @return \Zend_Db_Statement_Interface|void

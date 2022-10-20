@@ -48,10 +48,6 @@ Ext.define('Shopware.apps.SwagMigration.store.Database', {
             root: 'data',
             totalProperty: 'total'
         }
-
-//        actionMethods: {
-//            read   : 'POST'
-//        }
     }
 });
 // {/block}

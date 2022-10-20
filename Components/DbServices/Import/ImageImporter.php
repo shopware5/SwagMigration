@@ -40,9 +40,6 @@ class ImageImporter
      */
     private $logger;
 
-    /**
-     * ImageImporter constructor.
-     */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
         $this->em = $em;

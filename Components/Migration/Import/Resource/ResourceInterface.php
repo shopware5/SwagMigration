@@ -66,7 +66,7 @@ interface ResourceInterface
     /**
      * The method for the exception to bring back to the backend's Controller, if any.
      *
-     * @return \Throwable|null The Exception / Error object itself or null if everything was ok.
+     * @return \Throwable|null the Exception / Error object itself or null if everything was ok
      */
     public function getException();
 }

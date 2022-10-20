@@ -224,7 +224,7 @@ class Category extends AbstractResource
                 $category['languageID'] = $languageId;
             }
 
-            //check if the category split into the different translations
+            // check if the category split into the different translations
             if (!empty($category['languageID'])
                 && \strpos($category['categoryID'], Migration::CATEGORY_LANGUAGE_SEPARATOR) === false
             ) {
@@ -292,7 +292,7 @@ class Category extends AbstractResource
                     ->error("Category '{$category['description']}' was not imported.");
 
                 $this->increaseProgress();
-                exit();
+                exit;
             }
 
             $sql = '
@@ -446,7 +446,7 @@ class Category extends AbstractResource
                     );
 
                 $this->increaseProgress();
-                exit();
+                exit;
             }
         }
 

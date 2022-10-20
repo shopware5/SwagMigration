@@ -105,9 +105,6 @@ class ArticleImporter
      */
     private $logger;
 
-    /**
-     * ArticleImporter constructor.
-     */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
         $this->em = $em;
@@ -1035,7 +1032,7 @@ class ArticleImporter
                     [
                         'articleID' => $article['articleID'],
                         'articledetailsID' => $article['articledetailsID'],
-                        'values' => $values
+                        'values' => $values,
                     ]
                 );
                 throw $ex;
@@ -1344,7 +1341,7 @@ class ArticleImporter
     {
         $description = \html_entity_decode($description);
         $description = \preg_replace('!<[^>]*?>!', ' ', $description);
-        $description = \str_replace(\chr(0xa0), ' ', $description);
+        $description = \str_replace(\chr(0xA0), ' ', $description);
         $description = \preg_replace('/\s\s+/', ' ', $description);
         $description = \htmlspecialchars($description);
         $description = \trim($description);

@@ -216,21 +216,21 @@ class Product extends AbstractResource
             }
         }
 
-        //Attribute
+        // Attribute
         if (!empty($attributes)) {
             foreach ($attributes as $source => $target) {
                 if (!empty($target) && isset($product[$source])) {
                     if ($source == 'ean') {
-                    $product[$target] = $product[$source];
+                        $product[$target] = $product[$source];
                     } else {
-                    $product['attr'][$target] = $product[$source];
-                    unset($product[$source]);
+                        $product['attr'][$target] = $product[$source];
+                        unset($product[$source]);
                     }
                 }
             }
         }
 
-        //TaxRate
+        // TaxRate
         if (!empty($taxRate) && isset($product['taxID'])) {
             if (isset($taxRate[$product['taxID']])) {
                 $product['taxID'] = $taxRate[$product['taxID']];
@@ -239,12 +239,12 @@ class Product extends AbstractResource
             }
         }
 
-        //Supplier
+        // Supplier
         if (empty($product['supplierID']) && empty($product['supplier']) || !\array_key_exists('supplier', $product)) {
             $product['supplier'] = $supplier;
         }
 
-        //Parent
+        // Parent
         if (!empty($product['parentID'])) {
             $sql = 'SELECT `targetID` FROM `s_plugin_migrations` WHERE `typeID`=? AND `sourceID`=?';
             $product['maindetailsID'] = $db->fetchOne(
@@ -256,7 +256,7 @@ class Product extends AbstractResource
             );
         }
 
-        //Long Description
+        // Long Description
         if (isset($product['description_long'])) {
             $product_description = $product['description_long'];
             unset($product['description_long']);
@@ -264,12 +264,12 @@ class Product extends AbstractResource
             $product_description = null;
         }
 
-        //Description
+        // Description
         if (isset($product['description'])) {
             $product['description'] = \strip_tags($product['description']);
         }
 
-        //Article
+        // Article
         $product_result = $import->article($product);
 
         if (!empty($product_result)) {
@@ -327,7 +327,7 @@ class Product extends AbstractResource
                 );
             }
 
-            //Price
+            // Price
             if (isset($product['net_price'])) {
                 if (empty($product['tax'])) {
                     $product['price'] = $product['net_price'];
@@ -341,7 +341,7 @@ class Product extends AbstractResource
                 $product['articlepricesID'] = $import->setArticlePriceData($product);
             }
 
-            //Link
+            // Link
             if (isset($product['link'])) {
                 $import->deleteArticleLinks($product);
                 if (!empty($product['link'])) {
@@ -355,7 +355,7 @@ class Product extends AbstractResource
                 }
             }
 
-            //If we create valid order number don't insert it again.
+            // If we create valid order number don't insert it again.
             if ($existingOrderNumber) {
                 $sql = '
                         INSERT INTO `s_plugin_migrations` (`typeID`, `sourceID`, `targetID`)

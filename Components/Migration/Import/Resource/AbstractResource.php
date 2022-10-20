@@ -17,12 +17,7 @@ use Shopware\SwagMigration\Components\Migration\Profile;
 
 abstract class AbstractResource extends Enlight_Class implements ResourceInterface
 {
-    const INVALID_SOURCE_ID_REPLACEMENT_PLACEHOLDER = 'n / a';
-
-    protected $hadException = false;
-
-    /** @var \Throwable|null */
-    protected $exception;
+    public const INVALID_SOURCE_ID_REPLACEMENT_PLACEHOLDER = 'n / a';
 
     /**
      * Internal name of the import step used by the controller
@@ -30,6 +25,11 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * @var string
      */
     public $internal_name;
+
+    protected $hadException = false;
+
+    /** @var \Throwable|null */
+    protected $exception;
 
     /**
      * References the progress object
@@ -81,13 +81,11 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     protected $config;
 
     /**
-     * Constructor
-     *
-     * @param Progress $progress
-     * @param Profile  $source
-     * @param Profile  $target
-     * @param Request  $request
-     * @param LoggerInterface $logger
+     * @param Progress                    $progress
+     * @param Profile                     $source
+     * @param Profile                     $target
+     * @param Request                     $request
+     * @param LoggerInterface             $logger
      * @param \Shopware_Components_Config $config
      */
     public function __construct($progress, $source, $target, $request, $logger, $config)
@@ -273,7 +271,7 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * by returning its md5 hash
      *
      * @param int $number The invalid ordernumber to fix
-     * @param int $id Id of the article
+     * @param int $id     Id of the article
      *
      * @return string
      */
@@ -329,23 +327,29 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
             );
         } catch (\Exception $ex) {
             $this->logger->error(
-                'Exception of type ' . get_class($ex)
+                'Exception of type ' . \get_class($ex)
                     . ' thrown during insert query of trying to make an source ordernumber valid to Shopware\'s pattern: '
                     . str_replace("\n", ' ', str_replace("\r\n", ' ', $ex->getMessage()))
                     . ' with {$number} => ' . str_replace(
-                        "\n", ' ', str_replace("\r\n", ' ', var_export($number, true))
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($number, true))
                     )
                     . ' and with {$id} => ' . str_replace(
-                        "\n", ' ', str_replace("\r\n", ' ', var_export($id, true))
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($id, true))
                     )
                     . ' and with {$sourceID} => ' . str_replace(
-                        "\n", ' ', str_replace("\r\n", ' ', var_export($sourceID, true))
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($sourceID, true))
                     ),
                 [
                     'pluginName' => 'SwagMigration',
                     'method' => __METHOD__,
                     'class' => __CLASS__,
-                    'arguments' => func_get_args(),
+                    'arguments' => \func_get_args(),
                     'code' => $ex->getCode(),
                 ]
             );

@@ -183,17 +183,23 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                 flex: 1,
                 renderer: function (val, p, r) {
                     if (r.data.mapping_name && r.data.mapping_name != me.selectionNeeded) {
-                        return Ext.String.format('<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
+                        return Ext.String.format(
+                            '<span data-qtip="[0]" class="sprite-tick-circle-frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name="mappedProperty"}This property has been mapped{/s}');
+                            '{s name="mappedProperty"}This property has been mapped{/s}'
+                        );
                     } else if (r.data.required) {
-                        return Ext.String.format('<span data-qtip="[0]" class="sprite-minus-circle-frame" ' +
+                        return Ext.String.format(
+                            '<span data-qtip="[0]" class="sprite-minus-circle-frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name="requiredProperty"}Mapping of this property is required{/s}');
+                            '{s name="requiredProperty"}Mapping of this property is required{/s}'
+                        );
                     } else {
-                        return Ext.String.format('<span data-qtip="[0]" class="sprite-exclamation--frame" ' +
+                        return Ext.String.format(
+                            '<span data-qtip="[0]" class="sprite-exclamation--frame" ' +
                             'style="width: 25px; height: 25px; display: inline-block;">&nbsp;</span>',
-                            '{s name="missingProperty"}Properties not being mapped will be skipped during the migration{/s}');
+                            '{s name="missingProperty"}Properties not being mapped will be skipped during the migration{/s}'
+                        );
                     }
                 }
             }, {
@@ -292,8 +298,6 @@ Ext.define('Shopware.apps.SwagMigration.view.form.Mapping', {
                         combo.ownerCt.editingPlugin.context.record.set('mapping_name', record.data.name);
                         combo.ownerCt.editingPlugin.completeEdit();
                         me.fireEvent('validate');
-//                  var disableButton = !this.areAllRequiredItemsMapped();
-//                  this.buttons[1].setDisabled(disableButton);
                     },
                     scope: this
                 },
