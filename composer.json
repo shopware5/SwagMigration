@@ -1,5 +1,5 @@
 {
-    "name": "shopwareLabs/swag-migration",
+    "name": "shopware-labs/swag-migration",
     "type": "shopware-backend-plugin",
     "description": "With the Shopware migration plugin, data from existing shop systems can be automatically transferred to Shopware 5.",
     "license": "MIT",
