@@ -72,7 +72,7 @@ class Translation extends AbstractResource
         $import = Shopware()->Container()->get('swagmigration.import');
 
         while ($translation = $result->fetch()) {
-            //Attribute
+            // Attribute
             if (!empty($this->Request()->attribute)) {
                 foreach ($this->Request()->attribute as $source => $target) {
                     if (!empty($target) && isset($translation[$source])) {
@@ -82,17 +82,17 @@ class Translation extends AbstractResource
                 }
             }
 
-            //set the language id of the translation
+            // set the language id of the translation
             if (isset($this->Request()->language[$translation['languageID']])) {
                 $translation['languageID'] = $this->Request()->language[$translation['languageID']];
             }
 
-            //prevent productId from being double
+            // prevent productId from being double
             if (\stristr($translation['productID'], 'e')) {
                 $translation['productID'] = "'" . $translation['productID'] . "'";
             }
 
-            //get the product data
+            // get the product data
             $sql = '
                 SELECT ad.articleID, ad.id AS articledetailsID, kind
                 FROM s_plugin_migrations pm

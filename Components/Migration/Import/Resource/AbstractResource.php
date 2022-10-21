@@ -10,18 +10,26 @@ namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Enlight_Class;
 use Enlight_Controller_Request_RequestHttp as Request;
+use Psr\Log\LoggerInterface;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
 abstract class AbstractResource extends Enlight_Class implements ResourceInterface
 {
+    public const INVALID_SOURCE_ID_REPLACEMENT_PLACEHOLDER = 'n / a';
+
     /**
      * Internal name of the import step used by the controller
      *
      * @var string
      */
     public $internal_name;
+
+    protected $hadException = false;
+
+    /** @var \Throwable|null */
+    protected $exception;
 
     /**
      * References the progress object
@@ -66,20 +74,29 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
     protected $target;
 
     /**
-     * Constructor
-     *
-     * @param Progress $progress
-     * @param Profile  $source
-     * @param Profile  $target
-     * @param Request  $request
+     * @var LoggerInterface
      */
-    public function __construct($progress, $source, $target, $request)
+    protected $logger;
+
+    protected $config;
+
+    /**
+     * @param Progress                    $progress
+     * @param Profile                     $source
+     * @param Profile                     $target
+     * @param Request                     $request
+     * @param LoggerInterface             $logger
+     * @param \Shopware_Components_Config $config
+     */
+    public function __construct($progress, $source, $target, $request, $logger, $config)
     {
         $this->progress = $progress;
         $this->target = $target;
         $this->source = $source;
         $this->requestTime = !empty($_SERVER['REQUEST_TIME']) ? $_SERVER['REQUEST_TIME'] : \time();
         $this->request = $request;
+        $this->logger = $logger;
+        $this->config = $config;
         parent::__construct();
     }
 
@@ -254,20 +271,29 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
      * by returning its md5 hash
      *
      * @param int $number The invalid ordernumber to fix
-     * @param int $id Id of the article
+     * @param int $id     Id of the article
      *
      * @return string
      */
     public function makeInvalidNumberValid($number, $id)
     {
-        // Look up the id in the database - perhaps we've already created a valid number:
-        $number = Shopware()->Db()->fetchOne(
-            'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
-            [Migration::MAPPING_VALID_NUMBER, $id]
-        );
+        $invalidSourceId = false;
+
+        if ($id === null || $id === '' || !is_numeric($id)) {
+            // catch NULL numbers and other invalid stuff before processing anything further
+            $number = null;
+            $invalidSourceId = true;
+        } else {
+            // Look up the id in the database - perhaps we've already created a valid number:
+            $number = Shopware()->Db()->fetchOne(
+                'SELECT targetID FROM s_plugin_migrations WHERE typeID = ? AND sourceID = ?',
+                [Migration::MAPPING_VALID_NUMBER, $id]
+            );
+            $invalidSourceId = false;
+        }
 
         if ($number) {
-            return Shopware()->Config()->backendAutoOrderNumberPrefix . $number;
+            return $this->config->backendAutoOrderNumberPrefix . $number;
         }
 
         // Get number
@@ -279,17 +305,60 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
         $sql = 'UPDATE s_order_number SET number = ? WHERE name = ?';
         Shopware()->Db()->query($sql, [++$number, 'articleordernumber']);
 
-        // Save mapping
-        Shopware()->Db()->insert(
-            's_plugin_migrations',
-            [
-                'typeID' => Migration::MAPPING_VALID_NUMBER,
-                'sourceID' => $id,
-                'targetID' => $number,
-            ]
-        );
+        if ($invalidSourceId) {
+            if ($this->config->defaultIdPlaceholder) {
+                $sourceID = $this->config->defaultIdPlaceholder;
+            } else {
+                $sourceID = self::INVALID_SOURCE_ID_REPLACEMENT_PLACEHOLDER;
+            }
+        } else {
+            $sourceID = $id;
+        }
 
-        return Shopware()->Config()->backendAutoOrderNumberPrefix . $number;
+        try {
+            // Save mapping
+            Shopware()->Db()->insert(
+                's_plugin_migrations',
+                [
+                    'typeID' => Migration::MAPPING_VALID_NUMBER,
+                    'sourceID' => $sourceID,
+                    'targetID' => $number,
+                ]
+            );
+        } catch (\Exception $ex) {
+            $this->logger->error(
+                'Exception of type ' . \get_class($ex)
+                    . ' thrown during insert query of trying to make an source ordernumber valid to Shopware\'s pattern: '
+                    . str_replace("\n", ' ', str_replace("\r\n", ' ', $ex->getMessage()))
+                    . ' with {$number} => ' . str_replace(
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($number, true))
+                    )
+                    . ' and with {$id} => ' . str_replace(
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($id, true))
+                    )
+                    . ' and with {$sourceID} => ' . str_replace(
+                        "\n",
+                        ' ',
+                        str_replace("\r\n", ' ', var_export($sourceID, true))
+                    ),
+                [
+                    'pluginName' => 'SwagMigration',
+                    'method' => __METHOD__,
+                    'class' => __CLASS__,
+                    'arguments' => \func_get_args(),
+                    'code' => $ex->getCode(),
+                ]
+            );
+
+            $this->hadException = true;
+            $this->exception = $ex;
+        }
+
+        return $this->config->backendAutoOrderNumberPrefix . $number;
     }
 
     /**
@@ -319,5 +388,21 @@ abstract class AbstractResource extends Enlight_Class implements ResourceInterfa
                 Migration::MAPPING_VALID_NUMBER,
             ]
         );
+    }
+
+    /**
+     * @return bool
+     */
+    public function hadException()
+    {
+        return $this->hadException;
+    }
+
+    /**
+     * @return \Throwable
+     */
+    public function getException()
+    {
+        return $this->exception;
     }
 }

@@ -396,7 +396,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
     startVariantGenerator: function(model, generatorConfig, currentProduct, totalProducts, importConfig) {
         var me = this;
 
-       // If import was canceled, return and set the cancel flag bag to false
+        // If import was canceled, return and set the cancel flag bag to false
         if (me.cancel) {
             me.cancel = false;
             return;
@@ -414,11 +414,11 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                 var doneVariants = Ext.Array.min([generatorConfig.offset + generatorConfig.limit, model.get('totalCount')]);
                 var progress = doneVariants / model.get('totalCount');
                 me.progressWindow.progressBar.updateProgress(
-                        progress,
-                        Ext.String.format(
-                            me.snippets.variantProgress,
-                            doneVariants, model.get('totalCount'), currentProduct, totalProducts
-                        )
+                    progress,
+                    Ext.String.format(
+                        me.snippets.variantProgress,
+                        doneVariants, model.get('totalCount'), currentProduct, totalProducts
+                    )
                 );
 
                 // if the last variant was created, continue migration

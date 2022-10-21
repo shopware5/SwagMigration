@@ -17,9 +17,6 @@ class DeleteService
      */
     private $db;
 
-    /**
-     * DeleteService constructor.
-     */
     public function __construct(PDOConnection $db)
     {
         $this->db = $db;
@@ -34,7 +31,7 @@ class DeleteService
                 FROM s_core_shops';
         $shopCategoriesIds = $this->db->fetchCol($sql);
 
-        //don't delete shop's categories
+        // don't delete shop's categories
         if (empty($shopCategoriesIds)) {
             $sql = 'TRUNCATE s_categories';
         } else {

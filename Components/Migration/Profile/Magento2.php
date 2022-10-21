@@ -586,7 +586,7 @@ class Magento2 extends Profile
             'default_shipping',
         ];
         $addressAttributes = [
-            //'firstname', 'middlename', 'lastname', 'company', 'region',
+            // 'firstname', 'middlename', 'lastname', 'company', 'region',
             'city',
             'country_id',
             'postcode',

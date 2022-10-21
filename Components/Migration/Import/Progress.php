@@ -13,8 +13,8 @@ use Zend_Json;
 
 class Progress extends Enlight_Class
 {
-    const STATUS_ERROR = 1;
-    const STATUS_DONE = 3;
+    public const STATUS_ERROR = 1;
+    public const STATUS_DONE = 3;
 
     /**
      * Progress message
@@ -224,8 +224,6 @@ class Progress extends Enlight_Class
     }
 
     /**
-     * Get progress
-     *
      * @return float|null
      */
     public function getProgress()
@@ -264,8 +262,6 @@ class Progress extends Enlight_Class
     }
 
     /**
-     * Set success
-     *
      * @param int $success
      */
     public function setSuccess($success)
@@ -307,7 +303,6 @@ class Progress extends Enlight_Class
      * Add a single request param
      *
      * @param string $key
-     * @param mixed  $value
      *
      * @return $this
      */

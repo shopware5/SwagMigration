@@ -36,9 +36,6 @@ class CategoryImporter
      */
     private $logger;
 
-    /**
-     * CategoryImporter constructor.
-     */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
         $this->db = $db;

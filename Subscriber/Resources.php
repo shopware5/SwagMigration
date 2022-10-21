@@ -20,9 +20,6 @@ class Resources implements SubscriberInterface
      */
     private $container;
 
-    /**
-     * Resources constructor.
-     */
     public function __construct(Container $container)
     {
         $this->container = $container;

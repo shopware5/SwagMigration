@@ -164,7 +164,7 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
             (210, 'blogordernumber', 'Blog - ID');";
         $this->db->query($sql);
 
-        //Fix snippet
+        // Fix snippet
         $oldSnippet = "Die Produkt-Nummer '%s' ist ungültig. Eine gültige Nummer darf:<br>
             * höchstens 40 Zeichen lang sein<br>
             * keine anderen Zeichen als : 'a-zA-Z0-9-_. ' und SPACE beinhalten<br>
@@ -183,6 +183,10 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         ";
         $sql = 'UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?';
         $this->db->query($sql, [$newSnippet, 'numberNotValid', $oldSnippet]);
+        $oldSnippet = 'Magento 1.8.1.0 bis 1.9.3.4';
+        $newSnippet = 'Magento 1.8.1.0 bis 1.9.4.5';
+        $sql = 'UPDATE s_core_snippets SET `value` = ? WHERE `name` = ? AND `value` = ?';
+        $this->db->query($sql, [$newSnippet, 'profile-magento', $oldSnippet]);
 
         return true;
     }
@@ -263,16 +267,56 @@ class Shopware_Plugins_Backend_SwagMigration_Bootstrap extends Shopware_Componen
         ];
 
         $this->addFormTranslations($translation);
+
+        $form->setElement(
+            'boolean',
+            'stopOnException',
+            [
+                'description' => 'Das Migration Tool versucht nicht korrekte Nummern automatisch zu korrigieren, wenn man es so anwählt im Tool. Mit der Option können Sie entscheiden, ob bei einem Fehler die Migration abgebrochen werden soll. Das alte Verhalten war bei solch einem Fehler abzubrechen.',
+                'label' => 'Bei Fehler abbrechen',
+                'value' => false,
+            ]
+        );
+
+        $translation = [
+            'en_GB' => [
+                'stopOnException' => [
+                    'label' => 'abort on error',
+                    'description' => 'The migration tool automatically tries to correct incorrect numbers, like i. e. ordernumbers, if you choose it in the tool itself. With this option, you can decide whether it should stop on errors or not. The legacy behaviour was to stop the migration on such errors.',
+                ],
+            ],
+        ];
+
+        $this->addFormTranslations($translation);
+
+        $form->setElement(
+            'text',
+            'defaultIdPlaceholder',
+            [
+                'description' => 'Der Standard-Platzhalter, der im Fehlerfall eingesetzt werden soll beim Nummer korrigieren.',
+                'label' => 'Standard Platzhalter Nummernkorrektur',
+                'value' => 'n / a',
+            ]
+        );
+
+        $translation = [
+            'en_GB' => [
+                'defaultIdPlaceholder' => [
+                    'label' => 'default placeholder for number fix',
+                    'description' => 'The default placeholder, that should be placed in at number fixing plugin feature.',
+                ],
+            ],
+        ];
+
+        $this->addFormTranslations($translation);
     }
 
     /**
      * Callback function to register our password encoders
      *
-     * @param Enlight_Event_EventArgs $args
-     *
      * @return array
      */
-    public function onAddPasswordEncoder(\Enlight_Event_EventArgs $args)
+    public function onAddPasswordEncoder(Enlight_Event_EventArgs $args)
     {
         $hashes = $args->getReturn();
 

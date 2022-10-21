@@ -76,10 +76,11 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.ProfileSelection', {
             }
         });
 
-        return [{
-            xtype: 'label',
-            text: '{s name="profileSelectDescription"}Select the shop you want to migrate to Shopware{/s}'
-        },
+        return [
+            {
+                xtype: 'label',
+                text: '{s name="profileSelectDescription"}Select the shop you want to migrate to Shopware{/s}'
+            },
             me.profileSelection
         ];
     }

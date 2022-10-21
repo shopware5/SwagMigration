@@ -1,0 +1,6 @@
+.githooks
+.eslintignore
+.gitignore
+.gitlab-ci.yml
+.php-cs-fixer.php
+Makefile

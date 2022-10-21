@@ -105,9 +105,6 @@ class ArticleImporter
      */
     private $logger;
 
-    /**
-     * ArticleImporter constructor.
-     */
     public function __construct(PDOConnection $db, ModelManager $em, Logger $logger)
     {
         $this->em = $em;
@@ -1025,9 +1022,21 @@ class ArticleImporter
 
             $sql = "INSERT INTO s_articles_attributes
                     (articledetailsID $columns) VALUES
-                    ({$article['articleID']}, {$article['articledetailsID']} $values)";
+                    ({$article['articledetailsID']} $values)";
 
-            $this->db->query($sql);
+            try {
+                $this->db->query($sql);
+            } catch (\Exception $ex) {
+                Shopware()->Container()->get('pluginlogger')->error(
+                    $ex->getMessage() . ' Error at query: ' . str_replace("\n", ' ', str_replace("\r\n", ' ', $sql)),
+                    [
+                        'articleID' => $article['articleID'],
+                        'articledetailsID' => $article['articledetailsID'],
+                        'values' => $values,
+                    ]
+                );
+                throw $ex;
+            }
             $article['articleattributesID'] = $this->db->lastInsertId();
         }
 
@@ -1332,7 +1341,7 @@ class ArticleImporter
     {
         $description = \html_entity_decode($description);
         $description = \preg_replace('!<[^>]*?>!', ' ', $description);
-        $description = \str_replace(\chr(0xa0), ' ', $description);
+        $description = \str_replace(\chr(0xA0), ' ', $description);
         $description = \preg_replace('/\s\s+/', ' ', $description);
         $description = \htmlspecialchars($description);
         $description = \trim($description);

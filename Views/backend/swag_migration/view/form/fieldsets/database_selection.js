@@ -64,29 +64,31 @@ Ext.define('Shopware.apps.SwagMigration.view.form.fieldsets.DatabaseSelection', 
             disabled: true,
             emptyText: '{s name="selctProfileFirst"}You need to select a profile first{/s}',
             listeners: {
-                'beforequery': { fn: function(e) {
-                    var form = this.up().getForm(),
-                        values = form.getValues();
+                'beforequery': {
+                    fn: function(e) {
+                        var form = this.up().getForm(),
+                            values = form.getValues();
 
-                    if (values.profile === Ext.undefined) {
-                        return false;
-                    }
-
-                    // Add database settings to the request
-                    e.combo.store.getProxy().extraParams = values;
-
-                    // Load the store with the database settings from above
-                    e.combo.store.load(function(data, operation, success) {
-                        if (!success) {
-                            var rawData = operation.request.proxy.reader.jsonData,
-                                message = rawData.message;
-                            Shopware.Notification.createGrowlMessage('{s name="getDatabases/errorTitle"}Error{/s}', '{s name="getDatabases/errorMessage"}Could not get databases{/s}' + '<br />' + message, 'SwagMigration');
-                            e.combo.emptyText = '{s name="selectDatabaseWhenSettingsMatch"}Select source database if above settings do match{/s}';
-                            e.combo.select(null);
+                        if (values.profile === Ext.undefined) {
+                            return false;
                         }
-                    });
-                },
-                    scope: this }
+
+                        // Add database settings to the request
+                        e.combo.store.getProxy().extraParams = values;
+
+                        // Load the store with the database settings from above
+                        e.combo.store.load(function(data, operation, success) {
+                            if (!success) {
+                                var rawData = operation.request.proxy.reader.jsonData,
+                                    message = rawData.message;
+                                Shopware.Notification.createGrowlMessage('{s name="getDatabases/errorTitle"}Error{/s}', '{s name="getDatabases/errorMessage"}Could not get databases{/s}' + '<br />' + message, 'SwagMigration');
+                                e.combo.emptyText = '{s name="selectDatabaseWhenSettingsMatch"}Select source database if above settings do match{/s}';
+                                e.combo.select(null);
+                            }
+                        });
+                    },
+                    scope: this
+                }
             }
         });
 
