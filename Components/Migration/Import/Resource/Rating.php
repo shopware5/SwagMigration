@@ -11,7 +11,6 @@ namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
-use Zend_Db_Expr;
 
 class Rating extends AbstractResource
 {
@@ -129,7 +128,7 @@ class Rating extends AbstractResource
             'headline' => !empty($rating['title']) ? $rating['title'] : '',
             'comment' => !empty($rating['comment']) ? $rating['comment'] : '',
             'points' => isset($rating['rating']) ? (float) $rating['rating'] : 5,
-            'datum' => isset($rating['date']) ? $rating['date'] : new Zend_Db_Expr('NOW()'),
+            'datum' => isset($rating['date']) ? $rating['date'] : new \Zend_Db_Expr('NOW()'),
             'active' => isset($rating['active']) ? $rating['active'] : 1,
             'email' => !empty($rating['email']) ? $rating['email'] : '',
         ];

@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseConnection;
-use Exception;
 use Shopware\SwagMigration\Components\DbServices\Import\Import;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
@@ -32,7 +31,7 @@ class Category extends AbstractResource
     private $unmapped = [];
 
     /**
-     * @throws Exception
+     * @throws \Exception
      *
      * @return DatabaseConnection
      */
@@ -286,7 +285,7 @@ class Category extends AbstractResource
                         ['id=?' => $category['targetID']]
                     );
                 }
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 \print_r($e->getMessage());
                 Shopware()->Container()->get('pluginlogger')
                     ->error("Category '{$category['description']}' was not imported.");
@@ -435,7 +434,7 @@ class Category extends AbstractResource
                     );
                 }
                 unset($this->unmapped[$key]);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
                 Shopware()->Container()->get('pluginlogger')
                     ->error(
                         sprintf(

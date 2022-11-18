@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
 use Shopware\SwagMigration\Components\Migration\Profile;
-use Zend_Db_Expr;
 
 class Magento2 extends Profile
 {
@@ -436,7 +435,7 @@ class Magento2 extends Profile
 			INNER JOIN store
 			ON store.store_id!=0
 
-			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
+			{$this->createTableSelect('catalog_product', $attributes, new \Zend_Db_Expr('store.store_id'))}
 		";
 
         return $sql;

@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
-use ZEND_Db;
 
 class DownloadESDOrder extends AbstractResource
 {
@@ -70,7 +69,7 @@ class DownloadESDOrder extends AbstractResource
                 [
                     $orderNumber,
                 ],
-                ZEND_Db::FETCH_NUM
+                \ZEND_Db::FETCH_NUM
             );
 
             // no userId was found -> skip this ESD order

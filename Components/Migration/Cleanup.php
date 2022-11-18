@@ -8,10 +8,8 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
-use Exception;
 use Shopware\SwagMigration\Components\DbServices\DeleteService;
 use Shopware\SwagMigration\Components\Migration;
-use Shopware_Components_Config;
 
 /**
  * Helper to clean up the target shop
@@ -24,7 +22,7 @@ class Cleanup
     private $shopBasePath;
 
     /**
-     * @var Shopware_Components_Config
+     * @var \Shopware_Components_Config
      */
     private $shopConfig;
 
@@ -70,7 +68,7 @@ class Cleanup
                     $this->removeMigrationMappingsByType(Migration::MAPPING_ARTICLE);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_seo;');
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         // if table does not exist - resume, it might be just an old SW version
                     }
                     break;
@@ -80,7 +78,7 @@ class Cleanup
                     $this->removeMigrationMappingsByType(Migration::MAPPING_CATEGORY_TARGET);
                     try {
                         Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
-                    } catch (Exception $e) {
+                    } catch (\Exception $e) {
                         // if table does not exist - resume, it might be just an old SW version
                     }
                     break;
@@ -200,7 +198,7 @@ class Cleanup
             Shopware()->Db()->query('TRUNCATE s_article_configurator_price_variations;');
 
             Shopware()->Db()->query('TRUNCATE s_articles_categories_ro;');
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             // if table does not exist - resume, it might be just an old SW version
         }
     }

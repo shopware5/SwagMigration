@@ -8,8 +8,6 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
-use Enlight_Components_Snippet_Namespace;
-
 class Mapping
 {
     /**
@@ -27,7 +25,7 @@ class Mapping
     protected $target;
 
     /**
-     * @var Enlight_Components_Snippet_Namespace
+     * @var \Enlight_Components_Snippet_Namespace
      */
     private $namespace;
 
@@ -37,7 +35,7 @@ class Mapping
      * @param Profile $source
      * @param Profile $target
      */
-    public function __construct($source, $target, Enlight_Components_Snippet_Namespace $namespace)
+    public function __construct($source, $target, \Enlight_Components_Snippet_Namespace $namespace)
     {
         $this->source = $source;
         $this->target = $target;

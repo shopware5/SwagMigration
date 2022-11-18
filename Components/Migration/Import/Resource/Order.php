@@ -12,8 +12,6 @@ use Shopware;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
-use Zend_Db_Expr;
-use Zend_Json;
 
 class Order extends AbstractResource
 {
@@ -215,7 +213,7 @@ class Order extends AbstractResource
             'userID' => $order['userID'],
             'invoice_shipping' => !empty($order['invoice_shipping']) ? $order['invoice_shipping'] : 0,
             'invoice_shipping_net' => !empty($order['invoice_shipping_net']) ? $order['invoice_shipping_net'] : 0,
-            'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
+            'ordertime' => isset($order['date']) ? $order['date'] : new \Zend_Db_Expr('NOW()'),
             'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
             'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
             'paymentID' => (int) $order['paymentID'],
@@ -376,7 +374,7 @@ class Order extends AbstractResource
         ) {
             switch ($numberValidationMode) {
                 case 'complain':
-                    echo Zend_Json::encode(
+                    echo \Zend_Json::encode(
                         [
                             'message' => \sprintf($numberSnippet, $number),
                             'success' => false,

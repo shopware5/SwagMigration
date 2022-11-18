@@ -8,7 +8,6 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
-use Exception;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
 class XtCommerce extends Profile
@@ -389,12 +388,12 @@ class XtCommerce extends Profile
             try {
                 $sql = 'DROP INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
             }
             try {
                 $sql = 'ADD INDEX customers_id ON orders;';
                 $this->Db()->exec($sql);
-            } catch (Exception $e) {
+            } catch (\Exception $e) {
             }
         }
 

@@ -8,14 +8,13 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Enlight_Class;
 use Enlight_Controller_Request_RequestHttp as Request;
 use Psr\Log\LoggerInterface;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
-abstract class AbstractResource extends Enlight_Class implements ResourceInterface
+abstract class AbstractResource extends \Enlight_Class implements ResourceInterface
 {
     public const INVALID_SOURCE_ID_REPLACEMENT_PLACEHOLDER = 'n / a';
 

@@ -8,10 +8,7 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import;
 
-use Enlight_Class;
-use Zend_Json;
-
-class Progress extends Enlight_Class
+class Progress extends \Enlight_Class
 {
     public const STATUS_ERROR = 1;
     public const STATUS_DONE = 3;
@@ -93,7 +90,7 @@ class Progress extends Enlight_Class
             $output[$key] = $value;
         }
 
-        echo Zend_Json::encode($output);
+        echo \Zend_Json::encode($output);
     }
 
     /**
