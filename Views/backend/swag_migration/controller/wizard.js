@@ -127,7 +127,7 @@ Ext.define('Shopware.apps.SwagMigration.controller.Wizard', {
                         } else {
                             activeCard.setSaltInputNeeded(false);
                         }
-                        if (profile === 'Oxid') {
+                        if (profile === 'Oxid' || profile === 'Oxid6') {
                             activeCard.setImportAllowed(true);
                         } else {
                             activeCard.setImportAllowed(false);
