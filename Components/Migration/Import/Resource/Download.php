@@ -117,7 +117,7 @@ class Download extends AbstractResource
                     WHERE ordernumber = ?';
             $getShopwareArticleId = Shopware()->Db()->fetchOne($sql, [$orderNumber]);
             if (empty($getShopwareArticleId)) {
-                //No article
+                // No article
                 continue;
             }
 

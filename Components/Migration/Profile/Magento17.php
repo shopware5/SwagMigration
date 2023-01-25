@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
 use Shopware\SwagMigration\Components\Migration\Profile;
-use Zend_Db_Expr;
 
 class Magento17 extends Profile
 {
@@ -431,7 +430,7 @@ class Magento17 extends Profile
 			INNER JOIN {$this->quoteTable('core_store')} store
 			ON store.store_id!=0
 
-			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
+			{$this->createTableSelect('catalog_product', $attributes, new \Zend_Db_Expr('store.store_id'))}
 		";
 
         return $sql;
@@ -575,7 +574,7 @@ class Magento17 extends Profile
             'default_shipping',
         ];
         $addressAttributes = [
-            //'firstname', 'middlename', 'lastname', 'company', 'region',
+            // 'firstname', 'middlename', 'lastname', 'company', 'region',
             'city',
             'country_id',
             'postcode',

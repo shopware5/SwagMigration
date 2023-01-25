@@ -12,8 +12,6 @@ use Shopware;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
-use Zend_Db_Expr;
-use Zend_Json;
 
 class Order extends AbstractResource
 {
@@ -215,7 +213,7 @@ class Order extends AbstractResource
             'userID' => $order['userID'],
             'invoice_shipping' => !empty($order['invoice_shipping']) ? $order['invoice_shipping'] : 0,
             'invoice_shipping_net' => !empty($order['invoice_shipping_net']) ? $order['invoice_shipping_net'] : 0,
-            'ordertime' => isset($order['date']) ? $order['date'] : new Zend_Db_Expr('NOW()'),
+            'ordertime' => isset($order['date']) ? $order['date'] : new \Zend_Db_Expr('NOW()'),
             'status' => !empty($order['statusID']) ? (int) $order['statusID'] : 0,
             'cleared' => !empty($order['clearedID']) ? (int) $order['clearedID'] : 17,
             'paymentID' => (int) $order['paymentID'],
@@ -376,7 +374,7 @@ class Order extends AbstractResource
         ) {
             switch ($numberValidationMode) {
                 case 'complain':
-                    echo Zend_Json::encode(
+                    echo \Zend_Json::encode(
                         [
                             'message' => \sprintf($numberSnippet, $number),
                             'success' => false,
@@ -414,7 +412,7 @@ class Order extends AbstractResource
             ]
         );
 
-        //TaxRate
+        // TaxRate
         if (!empty($this->Request()->tax_rate) && isset($order['taxID'])) {
             if (isset($this->Request()->tax_rate[$order['taxID']])) {
                 $order['taxID'] = $this->Request()->tax_rate[$order['taxID']];
@@ -450,22 +448,55 @@ class Order extends AbstractResource
             }
         }
 
-        Shopware()->Db()->insert('s_order_details', $data);
+        try {
+            Shopware()->Db()->insert('s_order_details', $data);
 
-        $data_attributes = [
-            'detailID' => Shopware()->Db()->lastInsertId(),
-            'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
-            'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
-            'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
-            'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
-            'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
-            'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null,
-        ];
-        Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
+            $data_attributes = [
+                'detailID' => Shopware()->Db()->lastInsertId(),
+                'attribute1' => !empty($order['attr1']) ? $order['attr1'] : null,
+                'attribute2' => !empty($order['attr2']) ? $order['attr2'] : null,
+                'attribute3' => !empty($order['attr3']) ? $order['attr3'] : null,
+                'attribute4' => !empty($order['attr4']) ? $order['attr4'] : null,
+                'attribute5' => !empty($order['attr5']) ? $order['attr5'] : null,
+                'attribute6' => !empty($order['attr6']) ? $order['attr6'] : null,
+            ];
+            Shopware()->Db()->insert('s_order_details_attributes', $data_attributes);
+        } catch (\Exception $ex) {
+            Shopware()->Container()->get('pluginlogger')
+                ->error(
+                    'Error while importing order with details: '
+                        . self::toOneLine(print_r($order, true))
+                        . ' with $data array: ' . self::toOneLine(print_r($data, true))
+                        . ' with $data_attributes array: ' . self::toOneLine(
+                            print_r(isset($data_attributes) ? $data_attributes : [], true)
+                        ),
+                    [
+                        'plugin' => 'SwagMigration',
+                        'class' => __CLASS__,
+                        'method' => __METHOD__,
+                        'exception' => $ex->getMessage(),
+                        'exceptionType' => \get_class($ex),
+                        'exceptionCode' => $ex->getCode(),
+                    ]
+                );
+        }
 
         $this->increaseProgress();
         if ($this->newRequestNeeded()) {
             return $this->getProgress();
         }
+    }
+
+    private static function toOneLine($str)
+    {
+        return str_replace(
+            "\n",
+            '',
+            str_replace(
+                "\r\n",
+                '',
+                $str
+            )
+        );
     }
 }

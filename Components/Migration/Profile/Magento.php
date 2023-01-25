@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
 use Shopware\SwagMigration\Components\Migration\Profile;
-use Zend_Db_Expr;
 
 class Magento extends Profile
 {
@@ -334,7 +333,7 @@ class Magento extends Profile
             'special_price',
         ];
 
-        $productAttributes = array();
+        $productAttributes = [];
 
         foreach ($this->getAttributes() as $attributeID => $attribute) {
             $productAttributes[] = $attributeID;
@@ -431,7 +430,7 @@ class Magento extends Profile
 			INNER JOIN {$this->quoteTable('core_store')} store
 			ON store.store_id!=0
 
-			{$this->createTableSelect('catalog_product', $attributes, new Zend_Db_Expr('store.store_id'))}
+			{$this->createTableSelect('catalog_product', $attributes, new \Zend_Db_Expr('store.store_id'))}
 		";
 
         return $sql;
@@ -567,7 +566,6 @@ class Magento extends Profile
             'firstname',
             'middlename',
             'lastname',
-            'company',
             'dob',
             'password_hash',
             'taxvat',
@@ -575,12 +573,13 @@ class Magento extends Profile
             'default_shipping',
         ];
         $addressAttributes = [
-            //'firstname', 'middlename', 'lastname', 'company', 'region',
+            // 'firstname', 'middlename', 'lastname', 'company', 'region',
             'city',
             'country_id',
             'postcode',
             'street',
             'telephone',
+            'company',
         ];
 
         return "
@@ -815,7 +814,6 @@ class Magento extends Profile
 			";
     }
 
-
     /**
      * Returns the sql statement to select the shop system article attribute fields
      *
@@ -859,7 +857,7 @@ class Magento extends Profile
 					NULL as `$attribute`
 				";
             } else {
-                $join_fields .="
+                $join_fields .= "
                 ,(
                     SELECT value FROM {$this->quoteTable($type . '_entity_' . $attribute_fields[$attribute]['type'])}
                     WHERE entity_id = {$type}.entity_id

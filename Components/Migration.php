@@ -9,6 +9,7 @@
 namespace Shopware\SwagMigration\Components;
 
 use Enlight_Controller_Request_RequestHttp as Request;
+use Psr\Log\LoggerInterface;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Migration\Import\Resource\AbstractResource;
 use Shopware\SwagMigration\Components\Migration\Profile;
@@ -18,14 +19,14 @@ class Migration extends \Enlight_Class
     /*
      * Default constants for the mappings from the foreign IDs to Shopware IDs
      */
-    const MAPPING_ARTICLE = 1;
-    const MAPPING_CATEGORY = 2;
-    const MAPPING_CUSTOMER = 3;
-    const MAPPING_ORDER = 4;
-    const MAPPING_VALID_NUMBER = 23;
-    const MAPPING_CATEGORY_TARGET = 99;
+    public const MAPPING_ARTICLE = 1;
+    public const MAPPING_CATEGORY = 2;
+    public const MAPPING_CUSTOMER = 3;
+    public const MAPPING_ORDER = 4;
+    public const MAPPING_VALID_NUMBER = 23;
+    public const MAPPING_CATEGORY_TARGET = 99;
 
-    const CATEGORY_LANGUAGE_SEPARATOR = '_LANG_';
+    public const CATEGORY_LANGUAGE_SEPARATOR = '_LANG_';
 
     /**
      * Namespace for the profiles
@@ -63,15 +64,16 @@ class Migration extends \Enlight_Class
     /**
      * Generates an instances of an import resource
      *
-     * @param string   $name
-     * @param Progress $progress
-     * @param Profile  $source
-     * @param Profile  $target
-     * @param Request  $request
+     * @param string          $name
+     * @param Progress        $progress
+     * @param Profile         $source
+     * @param Profile         $target
+     * @param Request         $request
+     * @param LoggerInterface $logger
      *
      * @return AbstractResource
      */
-    public static function resourceFactory($name, $progress, $source, $target, $request)
+    public static function resourceFactory($name, $progress, $source, $target, $request, $logger)
     {
         $className = self::$resourceNamespace . '\\' . $name;
 
@@ -82,6 +84,8 @@ class Migration extends \Enlight_Class
                 $source,
                 $target,
                 $request,
+                $logger,
+                Shopware()->Container()->get('config'),
             ]
         );
 

@@ -17,9 +17,6 @@ class TranslationImporter
      */
     private $db;
 
-    /**
-     * TranslationImporter constructor.
-     */
     public function __construct(PDOConnection $db)
     {
         $this->db = $db;
@@ -194,7 +191,7 @@ class TranslationImporter
     {
         $value = \html_entity_decode($value);
         $value = \preg_replace('!<[^>]*?>!', ' ', $value);
-        $value = \str_replace(\chr(0xa0), ' ', $value);
+        $value = \str_replace(\chr(0xA0), ' ', $value);
         $value = \preg_replace('/\s\s+/', ' ', $value);
         $value = \htmlspecialchars($value);
         $value = \trim($value);

@@ -144,9 +144,6 @@ class CustomerImporter
      */
     private $config;
 
-    /**
-     * CustomerImporter constructor.
-     */
     public function __construct(PDOConnection $db, ModelManager $em, Config $config)
     {
         $this->db = $db;

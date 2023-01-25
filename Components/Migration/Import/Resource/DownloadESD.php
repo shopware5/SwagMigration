@@ -9,7 +9,6 @@
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
-use ZEND_Db;
 
 class DownloadESD extends AbstractResource
 {
@@ -96,7 +95,7 @@ class DownloadESD extends AbstractResource
             list($articleDetailsId, $articleId) = Shopware()->Db()->fetchRow(
                 'SELECT id, articleID FROM s_articles_details WHERE ordernumber = ?',
                 [$orderNumber],
-                ZEND_Db::FETCH_NUM
+                \ZEND_Db::FETCH_NUM
             );
 
             // if no articleId was found, skip this article

@@ -16,10 +16,6 @@ use Shopware\SwagMigration\Components\Migration\Import\Progress;
  * Shopware SwagMigration Components - Image
  *
  * Image import adapter
- *
- * @category  Shopware
- *
- * @copyright Copyright (c) 2012, shopware AG (http://www.shopware.de)
  */
 class Image extends AbstractResource
 {
@@ -153,7 +149,7 @@ class Image extends AbstractResource
     /**
      * Helper function which tells, if a given image was already assigned to a given product
      *
-     * @param int $articleId
+     * @param int    $articleId
      * @param string $image
      *
      * @return bool

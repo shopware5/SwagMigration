@@ -14,10 +14,7 @@ class PreCommitChecks
      */
     private $error = false;
 
-    /**
-     * @return int
-     */
-    public function run()
+    public function run(): int
     {
         $this->writeln();
         $this->writeln('Checking commit requirements', 0);
@@ -29,8 +26,8 @@ class PreCommitChecks
             return 0;
         }
 
-        $this->runPhpLint($this->getCommittedFileList('php'));
-        $this->runPhpCsFixer($this->getCommittedFileList('php'));
+        $this->runPhpLint($this->getCommittedFileList());
+        $this->runPhpCsFixer($this->getCommittedFileList());
         $this->runEsLint($this->getCommittedFileList('js'));
 
         if ($this->error) {
@@ -40,31 +37,20 @@ class PreCommitChecks
         exit((int) $this->error);
     }
 
-    /**
-     * @param string $output
-     * @param int    $level
-     */
-    private function writeln($output = '', $level = 1)
+    private function writeln(string $output = '', int $level = 1): void
     {
         $this->write($output, $level);
         echo PHP_EOL;
     }
 
-    /**
-     * @param string $output
-     * @param int    $level
-     */
-    private function write($output = '', $level = 1)
+    private function write(string $output = '', int $level = 1): void
     {
         $spaces = $level * 3;
 
         echo str_pad($output, strlen($output) + $spaces, ' ', STR_PAD_LEFT);
     }
 
-    /**
-     * @return bool
-     */
-    private function isRebase()
+    private function isRebase(): bool
     {
         $output = [];
         exec('git symbolic-ref --short -q HEAD', $output);
@@ -76,17 +62,14 @@ class PreCommitChecks
      * @param string $extension
      * @return string[]
      */
-    private function getCommittedFileList($extension = 'php')
+    private function getCommittedFileList(string $extension = 'php'): array
     {
         exec("git diff --name-only --diff-filter=ACMRTUXB \"HEAD\" | grep -e '\." . $extension . "$'", $fileList);
 
         return $fileList;
     }
 
-    /**
-     * @param array $fileList
-     */
-    private function runPhpLint(array $fileList)
+    private function runPhpLint(array $fileList): void
     {
         $this->writeln('# Checking php syntax');
         $this->writeln('> php -l');
@@ -102,10 +85,7 @@ class PreCommitChecks
         $this->writeln();
     }
 
-    /**
-     * @param array $fileList
-     */
-    private function runPhpCsFixer(array $fileList)
+    private function runPhpCsFixer(array $fileList): void
     {
         $this->writeln('# Checking php code style');
         $this->writeln('> php-cs-fixer fix -v --no-ansi --dry-run');
@@ -139,10 +119,7 @@ class PreCommitChecks
         $this->writeln();
     }
 
-    /**
-     * @param array $fileList
-     */
-    private function runEsLint(array $fileList)
+    private function runEsLint(array $fileList): void
     {
         $this->writeln('# Checking javascript code style');
         $this->writeln('> eslint.js --ignore-path .eslintignore');
@@ -159,34 +136,17 @@ class PreCommitChecks
         $this->writeln();
     }
 
-    /**
-     * @return bool
-     */
-    private function isPHPCSFixerAvailable()
+    public function isPHPCSFixerAvailable(): bool
     {
-        $output = [];
-        $return = 0;
-        exec('command -v ./../../../../../../vendor/bin/php-cs-fixer >/dev/null 2>&1', $output, $return);
-
-        return !(bool) $return;
+        return is_executable('./../../../../../../vendor/bin/php-cs-fixer');
     }
 
-    /**
-     * @return bool
-     */
-    private function isESLintAvailable()
+    public function isESLintAvailable(): bool
     {
-        $output = [];
-        $return = 0;
-        exec('command -v ./../../../../../../themes/node_modules/eslint/bin/eslint.js >/dev/null 2>&1', $output, $return);
-
-        return !(bool) $return;
+        return is_executable('./../../../../../../themes/node_modules/eslint/bin/eslint.js');
     }
 
-    /**
-     * @param array $fileList
-     */
-    private function checkESLint(array $fileList = [])
+    private function checkESLint(array $fileList = []): void
     {
         $output = [];
         $return = 0;

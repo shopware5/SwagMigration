@@ -10,19 +10,19 @@ namespace Shopware\SwagMigration\Components\Migration;
 
 class Profiler extends \Zend_Db_Profiler
 {
-    const TIME_SEPARATOR = \PHP_EOL . '<<<=======================>>>' . \PHP_EOL;
+    public const TIME_SEPARATOR = \PHP_EOL . '<<<=======================>>>' . \PHP_EOL;
 
-    const LOG_SEPARATOR = \PHP_EOL . '::::::::::' . \PHP_EOL;
+    public const LOG_SEPARATOR = \PHP_EOL . '::::::::::' . \PHP_EOL;
 
-    const SQL_SEPARATOR = \PHP_EOL . 'SQL' . \PHP_EOL;
+    public const SQL_SEPARATOR = \PHP_EOL . 'SQL' . \PHP_EOL;
 
-    const PARAMETER_SEPARATOR = \PHP_EOL . 'PARAMETER' . \PHP_EOL;
+    public const PARAMETER_SEPARATOR = \PHP_EOL . 'PARAMETER' . \PHP_EOL;
 
-    const TYPES_SEPARATOR = \PHP_EOL . 'TYPES' . \PHP_EOL;
+    public const TYPES_SEPARATOR = \PHP_EOL . 'TYPES' . \PHP_EOL;
 
-    const DURATION_SEPARATOR = \PHP_EOL . 'DURATION' . \PHP_EOL;
+    public const DURATION_SEPARATOR = \PHP_EOL . 'DURATION' . \PHP_EOL;
 
-    const END_SEPARATOR = \PHP_EOL . '<<<============ END OF QUERY ============>>>' . \PHP_EOL;
+    public const END_SEPARATOR = \PHP_EOL . '<<<============ END OF QUERY ============>>>' . \PHP_EOL;
 
     /**
      * @var string
@@ -54,7 +54,7 @@ class Profiler extends \Zend_Db_Profiler
         }
 
         $dateTime = new \DateTime();
-        $formattedDateTime = $dateTime->format('Y-m-d H:i');
+        $formattedDateTime = $dateTime->format('Y-m-d_H_i');
         $formattedTime = $dateTime->format('H:i:s');
 
         $initialSeparator = self::TIME_SEPARATOR . $formattedTime . self::TIME_SEPARATOR;

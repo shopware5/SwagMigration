@@ -55,4 +55,18 @@ interface ResourceInterface
      * @return Progress
      */
     public function run();
+
+    /**
+     * This is the getter method of the flag, if an exception occurred during run.
+     *
+     * @return bool the flag
+     */
+    public function hadException();
+
+    /**
+     * The method for the exception to bring back to the backend's Controller, if any.
+     *
+     * @return \Throwable|null the Exception / Error object itself or null if everything was ok
+     */
+    public function getException();
 }

@@ -8,15 +8,13 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
-use ArrayObject;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
-use Enlight_Class;
 use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseConnection;
 use Shopware\Components\DependencyInjection\Bridge\Db;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
 
-abstract class Profile extends Enlight_Class
+abstract class Profile extends \Enlight_Class
 {
     /**
      * Global variable for the database object
@@ -141,7 +139,7 @@ abstract class Profile extends Enlight_Class
     /**
      * This function returns the configuration array
      *
-     * @return array|ArrayObject
+     * @return array|\ArrayObject
      */
     public function Config()
     {
@@ -169,7 +167,7 @@ abstract class Profile extends Enlight_Class
                 }
                 $config[$row['name']] = $row['value'];
             }
-            $this->config = new ArrayObject($config, ArrayObject::ARRAY_AS_PROPS);
+            $this->config = new \ArrayObject($config, \ArrayObject::ARRAY_AS_PROPS);
         }
 
         return $this->config;
@@ -706,7 +704,6 @@ abstract class Profile extends Enlight_Class
     }
 
     /**
-     *
      * @param array $order
      *
      * @return \Zend_Db_Statement_Interface|void

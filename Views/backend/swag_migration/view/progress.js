@@ -95,10 +95,11 @@ Ext.define('Shopware.apps.SwagMigration.view.Progress', {
     createPanel: function() {
         var me = this;
 
-        return [{
-            xtype: 'label',
-            text: 'asdasasd'
-        },
+        return [
+            {
+                xtype: 'label',
+                text: 'asdasasd'
+            },
             me.createProgressBar()
         ];
     },

@@ -8,8 +8,6 @@
 
 namespace Shopware\SwagMigration\Components\Migration;
 
-use Enlight_Components_Snippet_Namespace;
-
 class Mapping
 {
     /**
@@ -27,7 +25,7 @@ class Mapping
     protected $target;
 
     /**
-     * @var Enlight_Components_Snippet_Namespace
+     * @var \Enlight_Components_Snippet_Namespace
      */
     private $namespace;
 
@@ -309,13 +307,13 @@ class Mapping
     public function setAliases($array)
     {
         $aliasList = [
-            //Languages - Shops
+            // Languages - Shops
             ['deutsch', 'german', 'main store', 'main', 'mainstore', 'hauptshop deutsch'],
             ['englisch', 'english', 'default english'],
             ['französisch', 'french'],
-            //Payments
+            // Payments
             ['vorkasse', 'vorauskasse', 'prepayment', 'in advance'],
-            //order states
+            // order states
             [
                 'in bearbeitung(wartet)',
                 'in bearbeitung',
@@ -339,7 +337,7 @@ class Mapping
                 'more information needed',
             ],
             ['abgebrochen', 'canceled', 'aborted'],
-            //taxes
+            // taxes
             ['Standardsatz', 'standard tax rate', '19%', '19 %'],
             ['ermäßigter Steuersatz', 'reduced tax rate', '7%', '7 %'],
         ];

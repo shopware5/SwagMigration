@@ -416,7 +416,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $progress,
             $this->Source(),
             $this->Target(),
-            $this->request
+            $this->request,
+            $this->container->get('pluginlogger'),
+            $this->container->get('config')
         );
         $import->setInternalName($importType);
         $import->setMaxExecution($this->max_execution);
@@ -431,6 +433,8 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
      */
     public function runImport($importType)
     {
+        $config = $this->container->get('config');
+
         $name = $this->imports[$importType];
 
         if ($this->printCurrentImportMessage($name)) {
@@ -444,6 +448,9 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             $retProgress = $import->run();
             if ($retProgress) {
                 $progress = $retProgress;
+            }
+            if ($import->hadException() && $config->stopOnException) {
+                throw $import->getExceptionObj();
             }
         } catch (Exception $e) {
             $this->printError($e, $import->getDefaultErrorMessage());
