@@ -268,6 +268,7 @@ class Shopware_Controllers_Backend_SwagMigration extends Shopware_Controllers_Ba
             ['id' => 'Magento', 'name' => $this->getNamespace()->get('profile-magento')],
             ['id' => 'Magento17', 'name' => $this->getNamespace()->get('profile-magento-old')],
             ['id' => 'Oxid', 'name' => $this->getNamespace()->get('profile-oxid')],
+			['id' => 'Oxid', 'name' => $this->getNamespace()->get('profile-oxid6')],
             ['id' => 'Veyton', 'name' => $this->getNamespace()->get('profile-xt4')],
             ['id' => 'Gambio', 'name' => $this->getNamespace()->get('profile-gambio')],
             ['id' => 'Xt Commerce', 'name' => $this->getNamespace()->get('profile-xt')],
