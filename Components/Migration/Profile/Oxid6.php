@@ -11,7 +11,7 @@ namespace Shopware\SwagMigration\Components\Migration\Profile;
 use Exception;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
-class Oxid extends Profile
+class Oxid6 extends Profile
 {
     /**
      * Database prefix
@@ -511,7 +511,7 @@ class Oxid extends Profile
 
             return $this->Db()->fetchOne($sql);
         } catch (Exception $e) {
-			$sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = '1'";
+            $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = '1'"; //baseshop wurde umbenannt in id
 
             return $this->Db()->fetchOne($sql);
         }
