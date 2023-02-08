@@ -8,7 +8,6 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Profile;
 
-use Exception;
 use Shopware\SwagMigration\Components\Migration\Profile;
 
 class Oxid6 extends Profile
@@ -510,8 +509,8 @@ class Oxid6 extends Profile
             $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXISSUPERSHOP=1 ORDER BY OXID ASC LIMIT 1";
 
             return $this->Db()->fetchOne($sql);
-        } catch (Exception $e) {
-            $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = '1'"; //baseshop wurde umbenannt in id
+        } catch (\Exception $e) {
+            $sql = "SELECT OXID FROM {$this->quoteTable('shops', 's')} WHERE OXID = '1'"; // baseshop wurde umbenannt in id
 
             return $this->Db()->fetchOne($sql);
         }

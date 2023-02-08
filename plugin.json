@@ -7,9 +7,10 @@
     "license": "MIT",
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
-    "currentVersion": "2.9.2",
+    "currentVersion": "2.10.0",
     "changelog": {
         "de": {
+            "2.10.0": "Community Release, kein Support; PT-13036 - Oxid 6 Profil hinzugefügt;",
             "2.9.2": "Community Release, kein Support; PT-12272 - Neue Konfiguration hinzugefügt, um zu entscheiden, was bei Nummernumwandlungsfehlern passieren soll; PT-12177, PT-12218, PT-12272 - Magento 1.9.4.5 Support hinzugefügt;",
             "2.9.1": "PT-10112 - Verbessert den Attribut-Import und beseitigt Join-Limit Fehler; PT-10513 - Verbessert den Bild-Upload; PT-12023 - Verbessert den Adressimport; PT-12123 - Shopware 5.7 und PHP8 Kompatibilität; PT-12161 - Verbessert die Magento Order-Abfrage; ",
             "2.9.0": "PT-10416 - Shopware 5.6 Kompatibilität;",
@@ -31,6 +32,7 @@
             "2.1.8": "Fixes Property not found failure during product-attribute import"
         },
         "en": {
+            "2.10.0": "Community release, no support; PT-13036 - Added Oxid 6 profile;",
             "2.9.2": "Community release, no support; PT-12272 - Added new configuration to decide what should happen on number converting errors; PT-12177, PT-12218, PT-12272 - Added Magento 1.9.4.5 support;",
             "2.9.1": "PT-10112 - Improve attribute import and resolve max join limit; PT-10513 - Improve image upload; PT-12023 - Improve address import; PT-12123 - Shopware 5.7 and PHP8 compatibility; PT-12161 - Improve Magento Order-Query;",
             "2.9.0": "PT-10416 - Shopware 5.6 compatibility;",
