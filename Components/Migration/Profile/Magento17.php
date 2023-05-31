@@ -123,7 +123,7 @@ class Magento17 extends Profile
     /**
      * Returns an array of the order states mapping, with keys and descriptions
      *
-     * @return array {Array} | order states: key - description
+     * @return array<string, string> order states: key - description
      */
     public function getOrderStatus()
     {

@@ -43,7 +43,7 @@ class Woocommerce extends Profile
     /**
      * Returns the shop system languages
      *
-     * @return array {Array} | languages
+     * @return array languages
      */
     public function getLanguages()
     {
@@ -500,7 +500,7 @@ class Woocommerce extends Profile
     /**
      * Returns an array of the order states mapping, with keys and descriptions
      *
-     * @return array {Array} | order states: key - description
+     * @return array<string, string> order states: key - description
      */
     public function getOrderStatus()
     {
