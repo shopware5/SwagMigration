@@ -8,7 +8,6 @@
 
 namespace Shopware\SwagMigration\Components\Migration\Import\Resource;
 
-use Shopware;
 use Shopware\SwagMigration\Components\Migration;
 use Shopware\SwagMigration\Components\Migration\Import\Progress;
 use Shopware\SwagMigration\Components\Normalizer\WooCommerce;
