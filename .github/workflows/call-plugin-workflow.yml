@@ -1,0 +1,26 @@
+name: Run plugin workflow
+
+on:
+    pull_request:
+    workflow_dispatch:
+    push:
+        branches:
+            - main
+
+jobs:
+
+    call-analyse-workflow:
+        name: Analyse PHP Code for SwagUserPrice
+        uses: shopware5/docker-images-testing/.github/workflows/php-code-analysis.yml@main
+        with:
+            plugin-name: SwagMigration
+            legacy-plugin: true
+            legacy-plugin-target: Backend
+
+    call-javascript-workflow:
+        name: Analyse Javascript Code for SwagUserPrice
+        uses: shopware5/docker-images-testing/.github/workflows/javascript-analysis.yml@main
+        with:
+            plugin-name: SwagMigration
+            legacy-plugin: true
+            legacy-plugin-target: Backend
