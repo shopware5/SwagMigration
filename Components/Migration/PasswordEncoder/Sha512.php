@@ -111,7 +111,8 @@ class Sha512 implements PasswordEncoderInterface
             $bl = \strlen($buffer);
             for ($i = 0; $i < $raw_length; ++$i) {
                 if ($i < $bl) {
-                    $buffer[$i] = $buffer[$i] ^ \chr(\mt_rand(0, 255));
+                    $newBuffer = $buffer[$i] ^ \chr(\mt_rand(0, 255));
+                    $buffer[$i] = $newBuffer;
                 } else {
                     $buffer .= \chr(\mt_rand(0, 255));
                 }

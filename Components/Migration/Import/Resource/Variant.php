@@ -137,7 +137,7 @@ class Variant extends AbstractResource
         foreach ($groups as &$group) {
             $group['options'] = $optionsByGroups[$group['id']];
             if (\count($group['options']) > 0) {
-                $totalCount = $totalCount * \count($group['options']);
+                $totalCount *= \count($group['options']);
             }
         }
 

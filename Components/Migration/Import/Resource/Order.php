@@ -109,12 +109,12 @@ class Order extends AbstractResource
                 $order['invoice_amount'] = $orderAmounts[0]['invoice_amount'];
 
                 if (\array_key_exists('orderTaxRate', $order)) {
-                    $order['invoice_amount'] = $order['invoice_amount'] + $order['orderTaxRate'];
+                    $order['invoice_amount'] += $order['orderTaxRate'];
                 }
 
                 if (\array_key_exists('invoice_shipping_net', $order)) {
                     $order['invoice_shipping'] = $order['invoice_shipping_net'] + $order['shippingTax'];
-                    $order['invoice_amount'] = $order['invoice_amount'] + $order['invoice_shipping'];
+                    $order['invoice_amount'] += $order['invoice_shipping'];
                 }
 
                 $this->migrateOrder($order);
